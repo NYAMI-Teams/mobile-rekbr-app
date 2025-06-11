@@ -10,10 +10,13 @@
   },
   "dependencies": {
     "@expo/vector-icons": "^14.1.0",
+    "@pakenfit/react-native-pin-input": "^1.2.1",
     "expo": "~53.0.11",
+    "expo-clipboard": "^7.1.4",
     "expo-status-bar": "~2.2.3",
     "react": "19.0.0",
-    "react-native": "0.79.3"
+    "react-native": "0.79.3",
+    "react-native-gesture-handler": "^2.25.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"

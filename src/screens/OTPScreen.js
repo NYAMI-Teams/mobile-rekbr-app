@@ -10,10 +10,13 @@ import {
   Platform,
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
+import { PinInput } from "@pakenfit/react-native-pin-input";
 
 export default function OTPScreen() {
-  const [otpValues, setOtpValues] = useState(Array(6).fill(""));
   const [timeLeft, setTimeLeft] = useState(299);
+  const [isError, setIsError] = useState(false);
+  const [isValid, setIsValid] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const inputRefs = useRef([]);
 
   useEffect(() => {
@@ -31,39 +34,31 @@ export default function OTPScreen() {
       .padStart(2, "0")}`;
   };
 
-  const handleOtpChange = (index, value) => {
-    if (!/^[0-9]*$/.test(value)) return;
-    const newOtpValues = [...otpValues];
-    newOtpValues[index] = value;
-    setOtpValues(newOtpValues);
-    if (value && index < 5) {
-      inputRefs.current[index + 1]?.focus();
-    }
-  };
-
-  const handleKeyPress = (index, key) => {
-    if (key === "Backspace" && !otpValues[index] && index > 0) {
-      inputRefs.current[index - 1]?.focus();
-    }
-  };
-
-  const handlePaste = async () => {
-    const clipboardContent = await Clipboard.getString();
-    const numbers = clipboardContent.replace(/\D/g, "").slice(0, 6);
-    const newOtpValues = Array(6).fill("");
-    for (let i = 0; i < numbers.length; i++) {
-      newOtpValues[i] = numbers[i];
-    }
-    setOtpValues(newOtpValues);
-    const nextEmptyIndex = newOtpValues.findIndex((val) => val === "");
-    const focusIndex = nextEmptyIndex === -1 ? 5 : nextEmptyIndex;
-    inputRefs.current[focusIndex]?.focus();
-  };
-
   const handleResendCode = () => {
     setTimeLeft(299);
-    setOtpValues(Array(6).fill(""));
-    inputRefs.current[0]?.focus();
+    inputRefs[0]?.focus();
+  };
+
+  const submitOtp = (otpValue) => {
+    try {
+      console.log("Submitting OTP:", otpValue);
+      // Simulasi validasi OTP
+      setTimeout(() => {
+        if (otpValue === "123456") {
+          setIsError(false);
+          setIsValid(true);
+          setTimeLeft(0);
+          setErrorMessage("");
+          console.log("OTP valid!");
+          // Navigasi atau aksi selanjutnya
+        } else {
+          setIsError(true);
+          setErrorMessage("Kode OTP yang Anda masukkan salah.");
+        }
+      }, 1000);
+    } catch (error) {
+      console.error("Error submitting OTP:", error);
+    }
   };
 
   return (
@@ -85,30 +80,33 @@ export default function OTPScreen() {
         </Text>
 
         <View style={styles.otpContainer}>
-          {otpValues.map((value, index) => (
-            <TextInput
-              key={index}
-              ref={(ref) => (inputRefs.current[index] = ref)}
-              style={styles.otpInput}
-              keyboardType="numeric"
-              maxLength={1}
-              value={value}
-              onChangeText={(text) => handleOtpChange(index, text)}
-              onKeyPress={({ nativeEvent }) =>
-                handleKeyPress(index, nativeEvent.key)
-              }
-              autoComplete="one-time-code"
-            />
-          ))}
+          <PinInput
+            length={6}
+            onFillEnded={(otp) => submitOtp(otp)}
+            inputStyle={{
+              width: 40,
+              height: 40,
+              borderWidth: 1,
+              borderColor: isValid ? "#009688" : isError ? "#FF3B30" : "#ccc",
+              borderRadius: 8,
+              textAlign: "center",
+              justifyContent: "center",
+              alignItems: "center",
+              fontSize: 16,
+            }}
+          />
         </View>
 
         <Text
-          style={[
-            styles.timer,
-            { color: timeLeft > 0 ? "#007AFF" : "#FF3B30" },
-          ]}>
+          style={[styles.timer, { color: timeLeft > 0 ? "#000" : "#FF3B30" }]}>
           {formatTime(timeLeft)}
         </Text>
+
+        {isError && (
+          <Text style={{ color: "#FF3B30", fontSize: 12, marginTop: 4 }}>
+            {errorMessage}
+          </Text>
+        )}
 
         <View style={styles.resendContainer}>
           <Text style={styles.resendText}>Tidak menerima kode?</Text>
@@ -178,9 +176,11 @@ const styles = StyleSheet.create({
   },
   otpContainer: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    width: 300,
+    justifyContent: "center",
+    width: 280,
     marginTop: 16,
+    borderColor: "#ccc",
+    borderWidth: 1,
   },
   otpInput: {
     width: 40,
@@ -189,16 +189,18 @@ const styles = StyleSheet.create({
     borderColor: "#ccc",
     borderRadius: 8,
     textAlign: "center",
-    fontSize: 18,
+    fontSize: 16,
   },
   timer: {
     fontSize: 12,
     marginTop: 16,
+    marginBottom: 16,
+    fontWeight: "500",
   },
   resendContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginTop: 8,
+    marginTop: 16,
   },
   resendText: {
     fontSize: 10,
