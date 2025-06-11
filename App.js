@@ -6,17 +6,15 @@ import QuickActions from "./src/components/QuickActions";
 import PrimaryButton from "./src/components/PrimaryButton";
 import AuthLink from "./src/components/AuthLinks";
 import InputField from "./src/components/InputField";
-
-
+// import Login from "./src/screens/login";
+import "./global.css";
+import Register from "./src/screens/register";
 
 
 export default function App() {
   return (
     <View style={styles.container}>
-      <StatusBar style="light" />
-      <NavigationBar onMenuPress={() => console.log("Menu pressed")} />
-      <AccountBalance balance={10000000} />
-      <QuickActions />
+      <Register />
     </View>
   );
 }

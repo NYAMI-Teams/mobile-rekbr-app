@@ -1,95 +1,132 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Alert, TouchableOpacity } from 'react-native';
-import InputField from '../components/InputField';
-import PrimaryButton from '../components/PrimaryButton';
-import AuthLink from '../components/AuthLink';
+import {
+    View,
+    Text,
+    Image,
+    Alert,
+    ScrollView,
+    TouchableOpacity,
+} from 'react-native';
+import InputField from '../../components/InputField';
+import PrimaryButton from '../../components/PrimaryButton';
+import { MaterialIcons } from '@expo/vector-icons'; // Tambahkan ini
 
-export default function Login() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+export default function Login({ navigation }) {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+    const [error, setError] = useState('');
 
-  const handleLogin = () => {
-    setError('');
+    const togglePasswordVisibility = () => {
+        setIsPasswordVisible(!isPasswordVisible);
+    };
 
-    if (!email.trim() || !password.trim()) {
-      setError('Please enter both email and password.');
-      return;
-    }
+    const handleLogin = () => {
+        setError('');
+        if (!email.trim() || !password.trim()) {
+            setError('Please enter both email and password.');
+            return;
+        }
 
-    if (email === 'user@example.com' && password === 'password123') {
-      Alert.alert('Login Successful', 'Welcome!');
-    } else {
-      Alert.alert('Login Failed', 'Invalid email or password.');
-    }
-  };
+        if (email === 'user@example.com' && password === 'password123') {
+            Alert.alert('Login Successful', 'Welcome!');
+            navigation.replace('Home');
+        } else {
+            Alert.alert('Login Failed', 'Invalid email or password.');
+        }
+    };
 
-  return (
-    <View style={styles.wrapper}>
-      <View style={styles.container}>
-        <Text style={styles.title}>Login</Text>
+    return (
+        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+            {/* Header */}
+            <View className="bg-white items-center mb-2">
+                <Image
+                    source={require('../../../assets/header.png')}
+                    className="w-full h-[300px] rounded-b-2xl"
+                    resizeMode="cover"
+                />
+            </View>
 
-        <InputField
-          placeholder="Email"
-          value={email}
-          onChangeText={setEmail}
-          keyboardType="email-address"
-        />
+            {/* Form */}
+            <View className="px-6 py-5">
+                {/* Email */}
+                <View className="mb-4">
+                    <Text className="mb-2 text-base text-black">Email Kamu, Yuk!</Text>
+                    <InputField
+                        placeholder="email@kamu.com"
+                        value={email}
+                        onChangeText={setEmail}
+                        keyboardType="email-address"
+                    />
+                </View>
 
-        <InputField
-          placeholder="Password"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-        />
+                {/* Password */}
+                <View className="mb-4">
+                    <Text className="mb-2 text-base text-black">Kata Sandi Rekbr</Text>
+                    <View className="relative">
+                        <InputField
+                            placeholder="Masukkan kata sandi kamu"
+                            value={password}
+                            onChangeText={setPassword}
+                            secureTextEntry={!isPasswordVisible}
+                            isPassword={true}
+                        />
+                        <TouchableOpacity
+                            className="absolute right-3 top-3"
+                            onPress={togglePasswordVisibility}
+                        >
+                            <MaterialIcons
+                                name={isPasswordVisible ? 'visibility' : 'visibility-off'}
+                                size={22}
+                                color="#666"
+                            />
+                        </TouchableOpacity>
+                    </View>
 
-        {error ? <Text style={styles.errorText}>{error}</Text> : null}
+                    <TouchableOpacity className="self-end mt-2 mb-2">
+                        <Text className="text-blue-600 text-sm">Lupa Kata Sandi?</Text>
+                    </TouchableOpacity>
 
-        <PrimaryButton title="Sign In" onPress={handleLogin} />
+                    {error ? (
+                        <Text className="text-red-500 text-sm text-center">{error}</Text>
+                    ) : null}
+                </View>
 
-        <TouchableOpacity style={styles.forgotPasswordButton}>
-          <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
-        </TouchableOpacity>
+                {/* Button & Links */}
+                <View className="items-center mt-40 space-y-4">
+                    <View className="absolute bottom-0 left-0 right-0 h-52 rounded-b-3xl overflow-hidden z-[-1]">
+                        <Image
+                            source={require('../../../assets/gradasi.png')}
+                            className="w-full h-full absolute"
+                            resizeMode="cover"
+                        />
+                    </View>
+                    <PrimaryButton title="Masuk" onPress={handleLogin} />
 
-        <AuthLink text="Don't have an account?" linkText=" Sign Up" onPress={() => {}} />
-      </View>
-    </View>
-  );
+                    {/* Registrasi / Hubungi Kami */}
+                    <View className="items-center space-y1 mt-3">
+                        <Text className="text-sm mb-4">
+                            Belum punya akun?{' '}
+                            <Text className="text-blue-600 font-medium">Silakan Registrasi</Text>
+                        </Text>
+                        <Text className="text-sm mb-2">
+                            Terdapat kendala?{' '}
+                            <Text className="text-blue-600 font-medium">Silakan Hubungi Kami</Text>
+                        </Text>
+                    </View>
+
+                    {/* Powered by */}
+                    <View className="flex-row items-center space-x-1 mt-4">
+                        <Text className="text-xs text-gray-600">Powered by</Text>
+                        <Image
+                            source={require('../../../assets/326.png')}
+                            className="w-4 h-4"
+                            resizeMode="contain"
+                        />
+                        <Text className="text-xs font-semibold text-orange-500">ADHIKSHA TRIBIXA</Text>
+                    </View>
+                </View>
+            </View>
+        </ScrollView>
+    );
 }
-
-const styles = StyleSheet.create({
-  wrapper: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#f0f2f5',
-  },
-  container: {
-    width: '90%',
-    maxWidth: 400,
-    padding: 24,
-    borderRadius: 16,
-    backgroundColor: '#ffffff',
-    elevation: 8,
-    alignItems: 'center',
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: '700',
-    color: '#333',
-    marginBottom: 28,
-  },
-  errorText: {
-    color: '#dc3545',
-    fontSize: 14,
-    marginBottom: 10,
-    textAlign: 'center',
-  },
-  forgotPasswordButton: {
-    marginTop: 15,
-  },
-  forgotPasswordText: {
-    color: '#007bff',
-    fontSize: 15,
-  },
-});
