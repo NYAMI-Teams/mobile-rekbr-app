@@ -9,9 +9,12 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@expo-google-fonts/poppins": "^0.4.0",
     "@expo/vector-icons": "^14.1.0",
+    "@react-native-community/checkbox": "^0.5.20",
     "@pakenfit/react-native-pin-input": "^1.2.1",
     "expo": "~53.0.11",
+    "expo-font": "~13.3.1",
     "expo-clipboard": "^7.1.4",
     "expo-status-bar": "~2.2.3",
     "react": "19.0.0",
