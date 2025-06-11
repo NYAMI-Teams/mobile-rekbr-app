@@ -3,6 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import NavigationBar from './src/components/NavigationBar';
 import AccountBalance from './src/components/AccountBalance';
 import QuickActions from './src/components/QuickActions';
+import StepProgressBar from './src/components/ProgressBar';
 
 export default function App() {
   return (
@@ -11,6 +12,7 @@ export default function App() {
       <NavigationBar onMenuPress={() => console.log('Menu pressed')} />
       <AccountBalance balance={10000000} />
       <QuickActions />
+      <StepProgressBar currentStep={3} />
     </View>
   );
 }
