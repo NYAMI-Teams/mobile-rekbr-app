@@ -42,7 +42,7 @@ export default function Welcoming() {
         <View style={styles.checkboxContainer}>
           <TouchableOpacity
             onPress={() => setIsChecked(!isChecked)}
-            style={styles.checkbox}
+            style={[styles.checkbox, isChecked && styles.checkboxChecked]}
           >
             {isChecked && <Text style={styles.checkmark}>✓</Text>}
           </TouchableOpacity>
@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
   },
   image: {
     width: '100%',
-    height: 200,
+    height: 280,
     borderRadius: 16,
     marginBottom: 24,
     marginTop: 16,
@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
   bottomSection: {
     paddingHorizontal: 16,
     paddingBottom: 16,
-    backgroundColor: '#fff', // borderTopWidth dihapus supaya tidak ada garis
+    backgroundColor: '#fff',
   },
   checkboxContainer: {
     flexDirection: 'row',
@@ -128,21 +128,26 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   checkbox: {
-    width: 20,
-    height: 20,
+    width: 24,
+    height: 24,
     borderWidth: 2,
     borderColor: '#000',
-    borderRadius: 4,
+    borderRadius: 8, // rounded sesuai gambar
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
+    backgroundColor: '#fff', // default background putih
+  },
+  checkboxChecked: {
+    backgroundColor: '#3ED6C5', // hijau toska saat dicentang
+    borderColor: '#3ED6C5', // border hilang / sama dengan background
   },
   checkmark: {
-    color: '#000',
+    color: '#fff', // centang putih
     fontSize: 16,
     fontWeight: 'bold',
     textAlign: 'center',
-    lineHeight: 20, // supaya centang benar-benar tengah
+    lineHeight: 20,
   },
   checkboxText: {
     flex: 1,
@@ -168,8 +173,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
   },
   footerLogo: {
-    width: 28,
-    height: 28,
+    width: 36, // diperbesar sesuai request
+    height: 36,
     marginRight: 8,
   },
   footerText: {
