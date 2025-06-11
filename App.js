@@ -17,8 +17,6 @@ export default function App() {
       <NavigationBar onMenuPress={() => console.log("Menu pressed")} />
       <AccountBalance balance={10000000} />
       <QuickActions />
-      <Login />
-      <Register />
     </View>
   );
 }
