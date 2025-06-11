@@ -3,7 +3,11 @@ import { StyleSheet, View } from "react-native";
 import NavigationBar from "./src/components/NavigationBar";
 import AccountBalance from "./src/components/AccountBalance";
 import QuickActions from "./src/components/QuickActions";
-import Login from "./src/components/Login";
+import PrimaryButton from "./src/components/PrimaryButton";
+import AuthLink from "./src/components/AuthLinks";
+import InputField from "./src/components/InputField";
+
+
 
 
 export default function App() {
@@ -14,6 +18,7 @@ export default function App() {
       <AccountBalance balance={10000000} />
       <QuickActions />
       <Login />
+      <Register />
     </View>
   );
 }
