@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
-import Icon from "react-native-vector-icons/Feather";
+import { MaterialIcons } from "@expo/vector-icons"; // ganti di sini
 
 const steps = ["Data Diri", "Lainnya", "Lampiran", "Pratinjau"];
 
@@ -24,7 +24,7 @@ const StepProgressBar = ({ currentStep }) => {
                 ]}
               >
                 {isCompleted || isFinalStep ? (
-                  <Icon
+                  <MaterialIcons
                     name="check"
                     size={16}
                     color={isFinalStep ? "#4CD964" : "#4CD7D0"}
@@ -54,7 +54,6 @@ const StepProgressBar = ({ currentStep }) => {
                 style={[
                   styles.line,
                   index < currentStep && styles.completedLine,
-                  index < currentStep && currentStep === steps.length - 1,
                 ]}
               />
             )}

@@ -1,25 +1,20 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, View } from 'react-native';
-import NavigationBar from './src/components/NavigationBar';
-import AccountBalance from './src/components/AccountBalance';
-import QuickActions from './src/components/QuickActions';
-import StepProgressBar from './src/components/ProgressBar';
+import { StatusBar } from "expo-status-bar";
+import { StyleSheet, View } from "react-native";
+import OTPScreen from "./src/screens/OTPScreen";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 export default function App() {
   return (
-    <View style={styles.container}>
+    <GestureHandlerRootView style={styles.container}>
       <StatusBar style="light" />
-      <NavigationBar onMenuPress={() => console.log('Menu pressed')} />
-      <AccountBalance balance={10000000} />
-      <QuickActions />
-      <StepProgressBar currentStep={3} />
-    </View>
+      <OTPScreen />
+    </GestureHandlerRootView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: "#F5F5F5",
   },
 });
