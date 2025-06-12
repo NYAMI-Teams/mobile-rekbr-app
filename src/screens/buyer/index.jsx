@@ -46,7 +46,7 @@ export default function BuyerEmptyContent() {
     }
 
     return (
-        <SafeAreaView className="flex-1 bg-white pt-4 px-6 justify-start">
+        <SafeAreaView className="flex-1 bg-white pt-4 justify-start">
             <StatusBar style="dark" />
 
             {/* Content Empty */}
