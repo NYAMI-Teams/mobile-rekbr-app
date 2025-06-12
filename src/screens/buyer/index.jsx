@@ -1,0 +1,65 @@
+import { StatusBar } from 'expo-status-bar';
+import { View, Text, Image, TouchableOpacity, SafeAreaView, ActivityIndicator } from 'react-native';
+import { useState, useEffect } from 'react';
+
+export default function BuyerEmptyContent() {
+    const [isLoading, setIsLoading] = useState(true);
+    const [isKycCompleted, setIsKycCompleted] = useState(false);
+
+    useEffect(() => {
+        const fetchUserProfile = async () => {
+            try {
+                const token = 'YOUR_ACCESS_TOKEN_HERE';
+
+                const response = await fetch('https://api.rekbr.com/user/profile', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log('User profile:', data);
+                setIsKycCompleted(data.kycStatus === 'COMPLETED');
+            } catch (error) {
+                console.error('Error fetching user profile:', error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchUserProfile();
+    }, []);
+
+    if (isLoading) {
+        return (
+            <SafeAreaView className="flex-1 justify-center items-center">
+                <ActivityIndicator size="large" color="#000" />
+            </SafeAreaView>
+        );
+    }
+
+    return (
+        <SafeAreaView className="flex-1 bg-white pt-4 justify-center">
+            <StatusBar style="dark" />
+
+            {/* Content Empty */}
+            <View className="items-center mb-8">
+                <Image
+                    source={require('../../../assets/illustration-empty.png')}
+                    className="w-72 h-72 mb-4"
+                    resizeMode="contain"
+                />
+                <Text className="text-base text-gray-600 font-normal text-center">
+                    Belum ada Rekber yang masuk.{'\n'}
+                    Tunggu seller kirimkan Rekber untuk kamu
+                </Text>
+            </View>
+        </SafeAreaView>
+    );
+}
