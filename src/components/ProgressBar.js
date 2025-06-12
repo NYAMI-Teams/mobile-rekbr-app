@@ -2,9 +2,7 @@ import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons"; // ganti di sini
 
-const steps = ["Data Diri", "Lainnya", "Lampiran", "Pratinjau"];
-
-const StepProgressBar = ({ currentStep }) => {
+const StepProgressBar = ({ currentStep, steps}) => {
   return (
     <View style={styles.container}>
       {steps.map((label, index) => {
@@ -70,6 +68,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 10,
     marginVertical: 20,
+    marginBottom: 16,
+    marginHorizontal: 16,
   },
   stepContainer: {
     alignItems: "center",
