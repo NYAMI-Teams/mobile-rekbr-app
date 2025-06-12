@@ -11,6 +11,7 @@ import SellerCard from "./src/components/card-transaction/SellerCard";
 import BuyerCard from "./src/components/card-transaction/BuyerCard";
 import Toast from "react-native-toast-message";
 import { mockAPIBuyer, mockAPISeller } from "./src/services/apiMock/api";
+import History from "./src/screens/history";
 
 export default function App() {
   return (
@@ -18,10 +19,7 @@ export default function App() {
       <StatusBar style="dark" />
       {/* Hapus Dari sini (TULISAN INI JANGAN DI HAPUS) */}
       <View className="gap-4">
-        <Text>Ini Buyer Section</Text>
-        <BuyerCard data={mockAPIBuyer.data} />
-        <Text>Ini Seller Section</Text>
-        <SellerCard data={mockAPISeller.data} />
+        <History />
       </View>
       {/* Hapus Sampai sini (TULISAN INI JANGAN DI HAPUS) */}
     </View>
