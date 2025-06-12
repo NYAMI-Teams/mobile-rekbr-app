@@ -7,17 +7,24 @@ import Lampiran from "./src/screens/e-KYC/KYC_Lampiran";
 import NavigationBar from "./src/components/NavigationBar";
 import AccountBalance from "./src/components/AccountBalance";
 import QuickActions from "./src/components/QuickActions";
-// import Welcoming from './src/screens/e-KYC/Welcoming';
-import AttachmentFilled from './src/components/AttachmentFilled';
-import Register from './src/screens/register';
-import "./global.css"
+import Welcoming from './src/screens/e-KYC/Welcoming';
+import AttachmentFilled from "./src/components/AttachmentFilled";
+import Register from "./src/screens/register";
+import DataDiri from "./src/screens/e-KYC/KYC_DataDiri";
+import LainnyaPage from "./src/screens/e-KYC/KYC_Lainnya";
 
+import "./global.css";
+import Pratinjau from "./src/screens/e-KYC/KYC_Pratinjau";
 
 export default function App() {
   return (
     <GestureHandlerRootView style={styles.container}>
       <StatusBar style="light" />
-      <Lampiran />
+      {/* <Welcoming /> */}
+      {/* <DataDiri /> */}
+      {/* <LainnyaPage /> */}
+      {/* <Lampiran /> */}
+      <Pratinjau />
     </GestureHandlerRootView>
   );
 }
