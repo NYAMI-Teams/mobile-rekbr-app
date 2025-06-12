@@ -25,7 +25,7 @@ export default function App() {
       {/* <LainnyaPage /> */}
       {/* <Lampiran /> */}
       <Pratinjau />
-    </GestureHandlerRootView>
+    </View>
   );
 }
 
