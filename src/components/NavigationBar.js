@@ -1,6 +1,9 @@
 // src/components/NavigationBar.js
 
+// src/components/NavigationBar.js
+
 import React from 'react';
+import { View, Text, Image, TouchableOpacity, StyleSheet, Platform, StatusBar, SafeAreaView } from 'react-native';
 import { View, Text, Image, TouchableOpacity, StyleSheet, Platform, StatusBar, SafeAreaView } from 'react-native';
 
 export default function NavigationBar({ name, onNotificationPress, onProfilePress }) {
