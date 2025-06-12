@@ -9,10 +9,12 @@ import {
   SafeAreaView,
 } from "react-native";
 import { useState } from "react";
-import { MaterialIcons } from "@expo/vector-icons";
+import { MaterialIcons, Ionicons } from "@expo/vector-icons";
 import ProgressBar from "../../components/ProgressBar";
+import PrimaryButton from "../../components/PrimaryButton";
+import DropDownField from "../../components/DropDownField";
 
-export default function Welcoming() {
+export default function Pratinjau() {
   const [isChecked, setIsChecked] = useState(false);
 
   return (
@@ -22,7 +24,7 @@ export default function Welcoming() {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => console.log("Back pressed")}>
-          <Text style={styles.backArrow}>←</Text>
+          <Ionicons name="chevron-back-outline" size={24} color="#000" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Know Your Customer</Text>
         <View style={{ width: 24 }} />
@@ -30,7 +32,7 @@ export default function Welcoming() {
 
       {/* Content scrollable */}
       <ProgressBar
-        currentStep={2}
+        currentStep={3}
         steps={["Data diri", "Lainnya", "Lampiran", "Pratinjau"]}
       />
 
@@ -44,6 +46,44 @@ export default function Welcoming() {
           melanjutkan, ya!
         </Text>
       </View>
+
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={{ paddingBottom: 16 }}
+      >
+        <View style={styles.content}>
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>Data Diri</Text>
+            <Ionicons
+              name={"chevron-down-circle"}
+              size={24}
+              color={"#49DBC8"}
+            />
+          </View>
+        </View>
+
+        <View style={styles.content}>
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>Lainnya</Text>
+            <Ionicons
+              name={"chevron-down-circle"}
+              size={24}
+              color={"#49DBC8"}
+            />
+          </View>
+        </View>
+
+        <View style={styles.content}>
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>Lampiran</Text>
+            <Ionicons
+              name={"chevron-down-circle"}
+              size={24}
+              color={"#49DBC8"}
+            />
+          </View>
+        </View>
+      </ScrollView>
 
       {/* Bottom Section */}
       <View style={styles.bottomSection}>
@@ -62,16 +102,11 @@ export default function Welcoming() {
           </Text>
         </View>
 
-        <TouchableOpacity
-          style={[
-            styles.button,
-            { backgroundColor: isChecked ? "#000" : "#aaa" },
-          ]}
+        <PrimaryButton
+          title="Lanjut"
           onPress={() => console.log("Lanjut pressed")}
           disabled={!isChecked}
-        >
-          <Text style={styles.buttonText}>Lanjut</Text>
-        </TouchableOpacity>
+        />
 
         <View style={styles.footer}>
           <Image
@@ -112,7 +147,6 @@ const styles = StyleSheet.create({
     color: "#000",
   },
   information: {
-    flex: 1,
     flexDirection: "row",
     paddingHorizontal: 16,
     marginTop: 24,
@@ -184,5 +218,29 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: "#444",
     lineHeight: 16,
+  },
+  content: {
+    marginTop: 16,
+    marginHorizontal: 20,
+  },
+  card: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FFF",
+    borderRadius: 10,
+    paddingHorizontal: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 1, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  cardTitle: {
+    flex: 1,
+    height: 50,
+    fontSize: 16,
+    color: "#333",
+    marginLeft: 8,
+    paddingVertical: 14,
   },
 });

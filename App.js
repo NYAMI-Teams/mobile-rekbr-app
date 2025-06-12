@@ -9,11 +9,18 @@ import Seller from './src/screens/seller/homeScreen';
 import BuyerEmptyContent from './src/screens/buyer';
 import "./global.css"
 
+import "./global.css";
+import Pratinjau from "./src/screens/e-KYC/KYC_Pratinjau";
 
 export default function App() {
   return (
     <View style={styles.container}>
       <StatusBar style="light" />
+      {/* <Welcoming /> */}
+      {/* <DataDiri /> */}
+      {/* <LainnyaPage /> */}
+      {/* <Lampiran /> */}
+      {/* <Pratinjau /> */}
       {/* <NavigationBar onMenuPress={() => console.log('Menu pressed')} />
       <AccountBalance balance={10000000} />
       <QuickActions /> */}
@@ -25,7 +32,6 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: "#F5F5F5",
   },
 });
-
