@@ -24,7 +24,9 @@ const App = () => {
       useNativeDriver: true,
     }).start(() => {
       setModalVisible(false);
-      setIsPaymentDone(false);
+      setIsPaym
+      
+      entDone(false);
     });
   };
 
