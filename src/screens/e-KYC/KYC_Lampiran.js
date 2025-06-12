@@ -11,9 +11,15 @@ import {
 import { useState } from "react";
 import { MaterialIcons } from "@expo/vector-icons";
 import ProgressBar from "../../components/ProgressBar";
+import AttachmentFilled from "../../components/AttachmentFilled";
 
 export default function Welcoming() {
   const [isChecked, setIsChecked] = useState(false);
+  const [isUploaded, setIsUploaded] = useState(false);
+
+  const handleUpload = () => {
+    setIsUploaded(true);
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -29,46 +35,84 @@ export default function Welcoming() {
       </View>
 
       {/* Content scrollable */}
-      <ProgressBar
-        currentStep={2}
-        steps={["Data diri", "Lainnya", "Lampiran", "Pratinjau"]}
-      />
+      <ProgressBar currentStep={2} steps={["Data diri", "Lainnya", "Lampiran", "Pratinjau"]} />
 
-      <View style={styles.information}>
-        <Image
-          source={require("../../../assets/admin 1.png")}
-          style={styles.logo_admin}
-        />
-        <Text style={styles.informationText}>
-          Harap tinjau kembali dan pastikan seluruh data kamu sebelum
-          melanjutkan, ya!
-        </Text>
-      </View>
+      {/* Content */}
+      <ScrollView>
+        {/* Foto KTP */}
+        <View style={styles.content}>
+          <AttachmentFilled
+            title="Foto Diri dengan KTP"
+            caption={
+              isUploaded
+                ? "Swafoto KTP telah diambil"
+                : "Ambil foto diri dengan KTP"
+            }
+            captionColor={isUploaded ? "#08B20F" : "#9E9E9E"}
+            iconName={"camera"}
+            boxColor={isUploaded ? "#F9F9F9" : "#49DBC8"}
+            iconsColor={isUploaded ? "#C2C2C2" : "#FFFFFF"}
+            cardColor={"#FFF"}
+            alertText="Pratinjau hasil pengambilan swafoto KTP anda"
+            alertColor={isUploaded ? "#08B20F" : "#C2C2C2"}
+            alertIconName={isUploaded ? "checkmark-circle" : "alert-circle"}
+            alertIconColor={isUploaded ? "#08B20F" : "#C2C2C2"}
+            onPress={handleUpload}
+          />
+        </View>
+        {/* Video Pernyataan */}
+        <View style={styles.content}>
+          <AttachmentFilled
+            title="Video Pernyataan"
+            caption={
+              isUploaded
+                ? "Swafoto KTP telah diambil"
+                : "Rekam video pernyataan diri"
+            }
+            captionColor={isUploaded ? "#08B20F" : "#9E9E9E"}
+            iconName={"camera"}
+            boxColor={isUploaded ? "#F9F9F9" : "#49DBC8"}
+            iconsColor={isUploaded ? "#C2C2C2" : "#FFFFFF"}
+            cardColor={"#FFF"}
+            alertText="Pastikan wajah terlihat jelas untuk rekaman ini"
+            alertColor={isUploaded ? "#08B20F" : "#C2C2C2"}
+            alertIconName={isUploaded ? "checkmark-circle" : "alert-circle"}
+            alertIconColor={isUploaded ? "#08B20F" : "#C2C2C2"}
+            onPress={handleUpload}
+          />
+        </View>
+        {/* Tanda Tangan */}
+        <View style={styles.content}>
+          <AttachmentFilled
+            title="Tanda Tangan"
+            caption={
+              isUploaded
+                ? "Swafoto KTP telah diambil"
+                : "Masukkan tanda tangan anda"
+            }
+            captionColor={isUploaded ? "#08B20F" : "#9E9E9E"}
+            iconName={"pencil"}
+            boxColor={isUploaded ? "#F9F9F9" : "#49DBC8"}
+            iconsColor={isUploaded ? "#C2C2C2" : "#FFFFFF"}
+            cardColor={"#FFF"}
+            alertText="Gunakan layar sentuh pada perangkat anda"
+            alertColor={isUploaded ? "#08B20F" : "#C2C2C2"}
+            alertIconName={isUploaded ? "checkmark-circle" : "alert-circle"}
+            alertIconColor={isUploaded ? "#08B20F" : "#C2C2C2"}
+            onPress={handleUpload}
+          />
+        </View>
+      </ScrollView>
 
       {/* Bottom Section */}
       <View style={styles.bottomSection}>
-        <View style={styles.checkboxContainer}>
-          <TouchableOpacity
-            onPress={() => setIsChecked(!isChecked)}
-            style={[styles.checkbox, isChecked && styles.checkedCheckbox]}
-          >
-            {isChecked && (
-              <MaterialIcons name="check" size={18} color="white" />
-            )}
-          </TouchableOpacity>
-          <Text style={styles.checkboxText}>
-            Saya menyatakan bahwa seluruh data pribadi dan pekerjaan yang saya
-            isi adalah benar dan sesuai dengan peraturan yang berlaku.
-          </Text>
-        </View>
-
         <TouchableOpacity
           style={[
             styles.button,
-            { backgroundColor: isChecked ? "#000" : "#aaa" },
+            { backgroundColor: isUploaded ? "#000" : "#aaa" },
           ]}
           onPress={() => console.log("Lanjut pressed")}
-          disabled={!isChecked}
+          disabled={!isUploaded}
         >
           <Text style={styles.buttonText}>Lanjut</Text>
         </TouchableOpacity>
@@ -110,6 +154,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
     color: "#000",
+  },
+  content: {
+    flex: 1,
+    marginTop: 16,
   },
   information: {
     flex: 1,
