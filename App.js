@@ -1,20 +1,26 @@
-import { StatusBar } from "expo-status-bar";
-import { StyleSheet, View } from "react-native";
-import OTPScreen from "./src/screens/OTPScreen";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { StatusBar } from 'expo-status-bar';
+import { StyleSheet, View } from 'react-native';
+import NavigationBar from './src/components/NavigationBar';
+import AccountBalance from './src/components/AccountBalance';
+import QuickActions from './src/components/QuickActions';
+// import Welcoming from './src/screens/e-KYC/Welcoming';
+import AttachmentFilled from './src/components/AttachmentFilled';
+
 
 export default function App() {
   return (
-    <GestureHandlerRootView style={styles.container}>
+    <View style={styles.container}>
       <StatusBar style="light" />
-      <OTPScreen />
-    </GestureHandlerRootView>
+      <NavigationBar onMenuPress={() => console.log('Menu pressed')} />
+      <AccountBalance balance={10000000} />
+      <QuickActions />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F5F5F5",
+    backgroundColor: '#F5F5F5',
   },
 });
