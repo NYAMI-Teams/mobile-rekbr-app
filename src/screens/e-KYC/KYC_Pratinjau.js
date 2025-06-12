@@ -33,7 +33,7 @@ export default function Welcoming() {
 
       <View style={styles.information}>
         <Image
-          source={require("../../../assets/admin 1.png")}
+          source={require("../../../assets/admin1.png")}
           style={styles.logo_admin}
         />
         <Text style={styles.informationText}>
@@ -47,8 +47,7 @@ export default function Welcoming() {
         <View style={styles.checkboxContainer}>
           <TouchableOpacity
             onPress={() => setIsChecked(!isChecked)}
-            style={[styles.checkbox, isChecked && styles.checkedCheckbox]}
-          >
+            style={[styles.checkbox, isChecked && styles.checkedCheckbox]}>
             {isChecked && (
               <MaterialIcons name="check" size={18} color="white" />
             )}
@@ -65,8 +64,7 @@ export default function Welcoming() {
             { backgroundColor: isChecked ? "#000" : "#aaa" },
           ]}
           onPress={() => console.log("Lanjut pressed")}
-          disabled={!isChecked}
-        >
+          disabled={!isChecked}>
           <Text style={styles.buttonText}>Lanjut</Text>
         </TouchableOpacity>
 
