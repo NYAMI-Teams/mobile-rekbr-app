@@ -1,6 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
-import { View, Text, Image, TouchableOpacity, SafeAreaView, ActivityIndicator } from 'react-native';
+import { View, Text, SafeAreaView, ActivityIndicator } from 'react-native';
 import { useState, useEffect } from 'react';
+import EmptyIllustration from '../../components/Ilustration';
 
 export default function BuyerEmptyContent() {
     const [isLoading, setIsLoading] = useState(true);
@@ -45,20 +46,12 @@ export default function BuyerEmptyContent() {
     }
 
     return (
-        <SafeAreaView className="flex-1 bg-white pt-4 justify-center">
+        <SafeAreaView className="flex-1 bg-white pt-4 justify-start">
             <StatusBar style="dark" />
 
             {/* Content Empty */}
-            <View className="items-center mb-8">
-                <Image
-                    source={require('../../../assets/illustration-empty.png')}
-                    className="w-72 h-72 mb-4"
-                    resizeMode="contain"
-                />
-                <Text className="text-base text-gray-600 font-normal text-center">
-                    Belum ada Rekber yang masuk.{'\n'}
-                    Tunggu seller kirimkan Rekber untuk kamu
-                </Text>
+            <View className="items-center mt-8">
+                <EmptyIllustration text="Belum ada Rekber yang masuk.{'\n'}Tunggu seller kirimkan Rekber untuk kamu" />
             </View>
         </SafeAreaView>
     );
