@@ -9,7 +9,7 @@ export default function App() {
   return (
     <GestureHandlerRootView style={styles.container}>
       <StatusBar style="light" />
-      <Lampiran/>
+      <Lampiran />
     </GestureHandlerRootView>
   );
 }
