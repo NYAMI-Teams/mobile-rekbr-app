@@ -1,22 +1,42 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
-import { MaterialIcons, Ionicons, AntDesign } from "@expo/vector-icons";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { Ionicons, AntDesign } from "@expo/vector-icons";
+import { icons } from "lucide-react-native";
 
-const AttachmentFilled = ({ title, caption, iconName, alertText }) => {
+const AttachmentFilled = ({
+  title = "",
+  caption = "",
+  cardColor = "#FFF",
+  captionColor = "#9E9E9E",
+  iconName = "camera",
+  boxColor = "#49DBC8",
+  alertText = "",
+  alertColor = "#C2C2C2",
+  alertIconName = "alert-circle",
+  alertIconColor = "#C2C2C2",
+  onPress,
+  iconsColor,
+}) => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{title}</Text>
 
-      <View style={styles.card}>
-        <Text style={styles.caption}>{caption}</Text>
-        <View style={styles.iconWrapper}>
-          <AntDesign name={iconName} size={24} color="#FFF" />
+      <TouchableOpacity
+        style={[styles.card, { backgroundColor: cardColor }]}
+        onPress={onPress}
+        activeOpacity={0.8}
+      >
+        <Text style={[styles.caption, { color: captionColor }]}>{caption}</Text>
+        <View style={[styles.iconWrapper, { backgroundColor: boxColor }]}>
+          <Ionicons name={iconName} size={24} color={iconsColor} />
         </View>
-      </View>
+      </TouchableOpacity>
 
       <View style={styles.alertContainer}>
-        <Ionicons name="alert-circle" size={20} color="#C2C2C2" />
-        <Text style={styles.alertText}>{alertText}</Text>
+        <Ionicons name={alertIconName} size={20} color={alertIconColor} />
+        <Text style={[styles.alertText, { color: alertColor }]}>
+          {alertText}
+        </Text>
       </View>
     </View>
   );
@@ -47,7 +67,6 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   caption: {
-    color: "#9E9E9E",
     fontSize: 16,
     fontWeight: "bold",
     flex: 1,
@@ -64,7 +83,6 @@ const styles = StyleSheet.create({
   },
   alertText: {
     marginLeft: 5,
-    color: "#616161",
     fontSize: 16,
     flex: 1,
   },

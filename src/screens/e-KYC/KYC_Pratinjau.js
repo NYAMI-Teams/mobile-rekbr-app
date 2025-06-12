@@ -29,7 +29,10 @@ export default function Welcoming() {
       </View>
 
       {/* Content scrollable */}
-      <ProgressBar currentStep={3} />
+      <ProgressBar
+        currentStep={2}
+        steps={["Data diri", "Lainnya", "Lampiran", "Pratinjau"]}
+      />
 
       <View style={styles.information}>
         <Image
