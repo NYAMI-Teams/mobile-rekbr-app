@@ -77,13 +77,7 @@ export default function SellerEmptyContent() {
 
       {/* Empty Illustration + Text */}
       <View className="items-center mb-8">
-        <EmptyIllustration />
-        <Text className="text-base text-gray-500 font-normal mb-1">
-          Kosong banget di sini...
-        </Text>
-        <Text className="text-sm text-gray-500 font-normal">
-          Bikin Rekber pertama kamu, kuy!
-        </Text>
+        <EmptyIllustration text={"loremipsum"} />
       </View>
 
       {/* CTA Button */}
