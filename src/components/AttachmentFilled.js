@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import { Ionicons, AntDesign } from "@expo/vector-icons";
+import { Ionicons} from "@expo/vector-icons";
 import { icons } from "lucide-react-native";
 
 const AttachmentFilled = ({
@@ -68,7 +68,6 @@ const styles = StyleSheet.create({
   },
   caption: {
     fontSize: 16,
-    fontWeight: "bold",
     flex: 1,
   },
   iconWrapper: {

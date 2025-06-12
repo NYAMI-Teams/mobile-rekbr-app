@@ -1,13 +1,16 @@
-import React from 'react';
-import { View, TextInput, StyleSheet, Text } from 'react-native';
+import React from "react";
+import { View, TextInput, StyleSheet, Text } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 
-const InputField = ({
+const DropDownField = ({
   title,
   placeholder,
   value,
   onChangeText,
+  iconName = "chevron-down",
+  iconColor = "#999",
   secureTextEntry = false,
-  keyboardType = 'default',
+  keyboardType = "default",
 }) => {
   return (
     <View style={styles.container}>
@@ -24,6 +27,7 @@ const InputField = ({
           keyboardType={keyboardType}
           autoCapitalize="none"
         />
+        <Ionicons name={iconName} size={24} color={iconColor} />
       </View>
     </View>
   );
@@ -41,12 +45,12 @@ const styles = StyleSheet.create({
     color: "#000",
   },
   card: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFF',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FFF",
     borderRadius: 10,
     paddingHorizontal: 16,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 1, height: 2 },
     shadowOpacity: 0.08,
     shadowRadius: 2,
@@ -56,9 +60,9 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 50,
     fontSize: 16,
-    color: '#333',
-
+    color: "#333",
+    marginLeft: 8,
   },
 });
 
-export default InputField;
+export default DropDownField;
