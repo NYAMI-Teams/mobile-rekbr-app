@@ -10,14 +10,16 @@ import BuyerEmptyContent from './src/screens/buyer';
 import "./global.css"
 
 
+
 export default function App() {
   return (
     <View style={styles.container}>
       <StatusBar style="light" />
+      <NavigationBar />
       {/* <NavigationBar onMenuPress={() => console.log('Menu pressed')} />
       <AccountBalance balance={10000000} />
       <QuickActions /> */}
-      <BuyerEmptyContent />
+      <Seller />
     </View>
   );
 }
