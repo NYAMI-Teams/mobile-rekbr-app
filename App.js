@@ -1,14 +1,16 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, View } from 'react-native';
-import NavigationBar from './src/components/NavigationBar';
-import AccountBalance from './src/components/AccountBalance';
-import QuickActions from './src/components/QuickActions';
-import Onboarding from './src/screens/e-KYC/Onboarding';
-import Success from './src/screens/e-KYC/Success';
-import Seller from './src/screens/seller/homeScreen';
-import BuyerEmptyContent from './src/screens/buyer';
-import "./global.css"
-
+import { StatusBar } from "expo-status-bar";
+import { StyleSheet, View, Text } from "react-native";
+import NavigationBar from "./src/components/NavigationBar";
+import AccountBalance from "./src/components/AccountBalance";
+import QuickActions from "./src/components/QuickActions";
+// import Welcoming from './src/screens/e-KYC/Welcoming';
+import AttachmentFilled from "./src/components/AttachmentFilled";
+import Register from "./src/screens/register";
+import "./global.css";
+import SellerCard from "./src/components/card-transaction/SellerCard";
+import BuyerCard from "./src/components/card-transaction/BuyerCard";
+import Toast from "react-native-toast-message";
+import { mockAPIBuyer, mockAPISeller } from "./src/services/apiMock/api";
 
 
 export default function App() {
@@ -27,7 +29,8 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#F5F5F5",
   },
 });
-
