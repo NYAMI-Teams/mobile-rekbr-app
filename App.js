@@ -4,7 +4,10 @@ import NavigationBar from "./src/components/NavigationBar";
 import AccountBalance from "./src/components/AccountBalance";
 import QuickActions from "./src/components/QuickActions";
 // import Welcoming from './src/screens/e-KYC/Welcoming';
-import AttachmentFilled from "./src/components/AttachmentFilled";
+import AttachmentFilled from './src/components/AttachmentFilled';
+import Register from './src/screens/register';
+import "./global.css"
+
 
 export default function App() {
   return (
