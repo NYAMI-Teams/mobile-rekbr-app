@@ -51,8 +51,7 @@ export default function BuyerEmptyContent() {
 
             {/* Content Empty */}
             <View className="items-center mt-8">
-                <EmptyIllustration text={"loremipsum"} />
-
+                <EmptyIllustration text="Belum ada Rekber yang masuk.{'\n'}Tunggu seller kirimkan Rekber untuk kamu" />
             </View>
         </SafeAreaView>
     );

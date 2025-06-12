@@ -77,7 +77,7 @@ export default function SellerEmptyContent() {
 
       {/* Empty Illustration + Text */}
       <View className="items-center mb-8">
-        <EmptyIllustration text={"loremipsum"} />
+        <EmptyIllustration text="Kosong banget di sini...{'\n'}Bikin Rekber pertama kamu, kuy!" />
       </View>
 
       {/* CTA Button */}

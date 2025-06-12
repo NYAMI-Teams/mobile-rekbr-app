@@ -8,7 +8,7 @@ export default function EmptyIllustration({text}) {
             className="w-72 h-72 mb-4"
             resizeMode="contain"
         />
-        <Text>{text}</Text>
+        <Text className="text-base text-gray-600 font-normal text-center">{text}</Text>
         </>
     );
 }
