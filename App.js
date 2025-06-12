@@ -18,7 +18,7 @@ import Pratinjau from "./src/screens/e-KYC/KYC_Pratinjau";
 
 export default function App() {
   return (
-    <GestureHandlerRootView style={styles.container}>
+    <View style={styles.container}>
       <StatusBar style="light" />
       {/* <Welcoming /> */}
       {/* <DataDiri /> */}
@@ -32,6 +32,6 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F5F5F5",
+    backgroundColor: '#F5F5F5',
   },
 });
