@@ -10,10 +10,7 @@ import AttachmentFilled from './src/components/AttachmentFilled';
 export default function App() {
   return (
     <View style={styles.container}>
-      <StatusBar style="light" />
-      <NavigationBar onMenuPress={() => console.log('Menu pressed')} />
-      <AccountBalance balance={10000000} />
-      <QuickActions />
+      <Register />
     </View>
   );
 }
@@ -21,6 +18,6 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: "#F5F5F5",
   },
 });
