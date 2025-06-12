@@ -38,7 +38,7 @@ export default function Pratinjau() {
 
       <View style={styles.information}>
         <Image
-          source={require("../../../assets/admin 1.png")}
+          source={require("../../../assets/admin1.png")}
           style={styles.logo_admin}
         />
         <Text style={styles.informationText}>
@@ -90,8 +90,7 @@ export default function Pratinjau() {
         <View style={styles.checkboxContainer}>
           <TouchableOpacity
             onPress={() => setIsChecked(!isChecked)}
-            style={[styles.checkbox, isChecked && styles.checkedCheckbox]}
-          >
+            style={[styles.checkbox, isChecked && styles.checkedCheckbox]}>
             {isChecked && (
               <MaterialIcons name="check" size={18} color="white" />
             )}
