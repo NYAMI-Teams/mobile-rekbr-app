@@ -3,10 +3,11 @@ import { useState } from "react";
 import BuyerCard from "../../components/card-transaction/BuyerCard";
 import SellerCard from "../../components/card-transaction/SellerCard";
 import { mockAPIBuyer, mockAPISeller } from "../../services/apiMock/api";
+import EmptyIllustration from "../../components/Ilustration";
 
 export default function History() {
   const [selectedTab, setSelectedTab] = useState("pembelian");
-  const mockDataLength = 0;
+  //   const mockDataLength = 0;
 
   const handleTabPress = (tab) => {
     setSelectedTab(tab);
@@ -14,20 +15,36 @@ export default function History() {
 
   const renderContent = () => {
     if (selectedTab === "pembelian") {
-      if (mockDataLength === 0) {
-        return <Text>Tidak ada data</Text>;
+      if (mockAPIBuyer.data.length === 0) {
+        return (
+          <View className="justify-center items-center">
+            <EmptyIllustration
+              text={
+                "Belum ada riwayat pembelian, semua masih kosong\nTunggu sampai kamu mulai rekber pertama!"
+              }
+            />
+          </View>
+        );
       }
       return <BuyerCard data={mockAPIBuyer.data} />;
     }
 
-    if (mockDataLength === 0) {
-      return <Text>Tidak ada data</Text>;
+    if (mockAPISeller.data.length === 0) {
+      return (
+        <View className="justify-center items-center">
+          <EmptyIllustration
+            text={
+              "Belum ada riwayat penjualan, semua masih kosong\nTunggu sampai kamu mulai rekber pertama!"
+            }
+          />
+        </View>
+      );
     }
     return <SellerCard data={mockAPISeller.data} />;
   };
 
   return (
-    <View className="flex-1 bg-white items-center pt-20 w-full">
+    <View className="bg-white items-center w-full h-[80%]">
       <View className="flex-row w-full mt-4 px-6">
         <TouchableOpacity
           onPress={() => handleTabPress("pembelian")}
@@ -58,7 +75,7 @@ export default function History() {
           </Text>
         </TouchableOpacity>
       </View>
-      <View className="w-full pt-8">{renderContent()}</View>
+      <View className="w-full pt-8 px-6">{renderContent()}</View>
     </View>
   );
 }
