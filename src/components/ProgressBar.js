@@ -68,6 +68,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 10,
     marginVertical: 20,
+    marginBottom: 16,
+    marginHorizontal: 16,
   },
   stepContainer: {
     alignItems: "center",

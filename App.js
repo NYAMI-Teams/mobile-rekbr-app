@@ -3,7 +3,8 @@ import { StyleSheet, View } from "react-native";
 import NavigationBar from "./src/components/NavigationBar";
 import AccountBalance from "./src/components/AccountBalance";
 import QuickActions from "./src/components/QuickActions";
-import StepProgressBar from "./src/components/ProgressBar";
+// import Welcoming from './src/screens/e-KYC/Welcoming';
+import AttachmentFilled from "./src/components/AttachmentFilled";
 
 export default function App() {
   return (
@@ -13,6 +14,7 @@ export default function App() {
       <AccountBalance balance={10000000} />
       <QuickActions />
       <StepProgressBar currentStep={2} steps={steps} />
+      <Register />
     </View>
   );
 }
