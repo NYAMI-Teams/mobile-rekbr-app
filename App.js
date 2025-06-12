@@ -1,14 +1,10 @@
-import { StatusBar } from "expo-status-bar";
-import { StyleSheet, View } from "react-native";
-import NavigationBar from "./src/components/NavigationBar";
-import AccountBalance from "./src/components/AccountBalance";
-import QuickActions from "./src/components/QuickActions";
-import PrimaryButton from "./src/components/PrimaryButton";
-import AuthLink from "./src/components/AuthLinks";
-import InputField from "./src/components/InputField";
-// import Login from "./src/screens/login";
-import "./global.css";
-import Register from "./src/screens/register";
+import { StatusBar } from 'expo-status-bar';
+import { StyleSheet, View } from 'react-native';
+import NavigationBar from './src/components/NavigationBar';
+import AccountBalance from './src/components/AccountBalance';
+import QuickActions from './src/components/QuickActions';
+// import Welcoming from './src/screens/e-KYC/Welcoming';
+import AttachmentFilled from './src/components/AttachmentFilled';
 
 
 export default function App() {
