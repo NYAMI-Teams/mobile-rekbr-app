@@ -9,13 +9,18 @@ import {
   SafeAreaView,
 } from "react-native";
 import { useState } from "react";
-import { MaterialIcons, Ionicons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import ProgressBar from "../../components/ProgressBar";
+import AttachmentFilled from "../../components/AttachmentFilled";
 import PrimaryButton from "../../components/PrimaryButton";
-import DropDownField from "../../components/DropDownField";
 
-export default function Pratinjau() {
+export default function Lampiran() {
   const [isChecked, setIsChecked] = useState(false);
+  const [isUploaded, setIsUploaded] = useState(false);
+
+  const handleUpload = () => {
+    setIsUploaded(true);
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -32,79 +37,83 @@ export default function Pratinjau() {
 
       {/* Content scrollable */}
       <ProgressBar
-        currentStep={3}
+        currentStep={2}
         steps={["Data diri", "Lainnya", "Lampiran", "Pratinjau"]}
       />
 
-      <View style={styles.information}>
-        <Image
-          source={require("../../../assets/admin1.png")}
-          style={styles.logo_admin}
-        />
-        <Text style={styles.informationText}>
-          Harap tinjau kembali dan pastikan seluruh data kamu sebelum
-          melanjutkan, ya!
-        </Text>
-      </View>
-
-      <ScrollView
-        style={{ flex: 1 }}
-        contentContainerStyle={{ paddingBottom: 16 }}
-      >
+      {/* Content */}
+      <ScrollView>
+        {/* Foto KTP */}
         <View style={styles.content}>
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>Data Diri</Text>
-            <Ionicons
-              name={"chevron-down-circle"}
-              size={24}
-              color={"#49DBC8"}
-            />
-          </View>
+          <AttachmentFilled
+            title="Foto Diri dengan KTP"
+            caption={
+              isUploaded
+                ? "Swafoto KTP telah diambil"
+                : "Ambil foto diri dengan KTP"
+            }
+            captionColor={isUploaded ? "#08B20F" : "#9E9E9E"}
+            iconName={"camera"}
+            boxColor={isUploaded ? "#F9F9F9" : "#49DBC8"}
+            iconsColor={isUploaded ? "#C2C2C2" : "#FFFFFF"}
+            cardColor={"#FFF"}
+            alertText="Pratinjau hasil pengambilan swafoto KTP anda"
+            alertColor={isUploaded ? "#08B20F" : "#C2C2C2"}
+            alertIconName={isUploaded ? "checkmark-circle" : "alert-circle"}
+            alertIconColor={isUploaded ? "#08B20F" : "#C2C2C2"}
+            onPress={handleUpload}
+          />
         </View>
-
+        {/* Video Pernyataan */}
         <View style={styles.content}>
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>Lainnya</Text>
-            <Ionicons
-              name={"chevron-down-circle"}
-              size={24}
-              color={"#49DBC8"}
-            />
-          </View>
+          <AttachmentFilled
+            title="Video Pernyataan"
+            caption={
+              isUploaded
+                ? "Rekam video pernyataan diri"
+                : "Rekam video pernyataan diri"
+            }
+            captionColor={isUploaded ? "#08B20F" : "#9E9E9E"}
+            iconName={"camera"}
+            boxColor={isUploaded ? "#F9F9F9" : "#49DBC8"}
+            iconsColor={isUploaded ? "#C2C2C2" : "#FFFFFF"}
+            cardColor={"#FFF"}
+            alertText="Pastikan wajah terlihat jelas untuk rekaman ini"
+            alertColor={isUploaded ? "#08B20F" : "#C2C2C2"}
+            alertIconName={isUploaded ? "checkmark-circle" : "alert-circle"}
+            alertIconColor={isUploaded ? "#08B20F" : "#C2C2C2"}
+            onPress={handleUpload}
+          />
         </View>
-
+        {/* Tanda Tangan */}
         <View style={styles.content}>
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>Lampiran</Text>
-            <Ionicons
-              name={"chevron-down-circle"}
-              size={24}
-              color={"#49DBC8"}
-            />
-          </View>
+          <AttachmentFilled
+            title="Tanda Tangan"
+            caption={
+              isUploaded
+                ? "Foto tanda tangan telah diambil"
+                : "Masukkan tanda tangan anda"
+            }
+            captionColor={isUploaded ? "#08B20F" : "#9E9E9E"}
+            iconName={"pencil"}
+            boxColor={isUploaded ? "#F9F9F9" : "#49DBC8"}
+            iconsColor={isUploaded ? "#C2C2C2" : "#FFFFFF"}
+            cardColor={"#FFF"}
+            alertText="Gunakan layar sentuh pada perangkat anda"
+            alertColor={isUploaded ? "#08B20F" : "#C2C2C2"}
+            alertIconName={isUploaded ? "checkmark-circle" : "alert-circle"}
+            alertIconColor={isUploaded ? "#08B20F" : "#C2C2C2"}
+            onPress={handleUpload}
+          />
         </View>
       </ScrollView>
 
       {/* Bottom Section */}
       <View style={styles.bottomSection}>
-        <View style={styles.checkboxContainer}>
-          <TouchableOpacity
-            onPress={() => setIsChecked(!isChecked)}
-            style={[styles.checkbox, isChecked && styles.checkedCheckbox]}>
-            {isChecked && (
-              <MaterialIcons name="check" size={18} color="white" />
-            )}
-          </TouchableOpacity>
-          <Text style={styles.checkboxText}>
-            Saya menyatakan bahwa seluruh data pribadi dan pekerjaan yang saya
-            isi adalah benar dan sesuai dengan peraturan yang berlaku.
-          </Text>
-        </View>
-
         <PrimaryButton
           title="Lanjut"
           onPress={() => console.log("Lanjut pressed")}
-          disabled={!isChecked}
+          disabled={!isUploaded}
         />
 
         <View style={styles.footer}>
@@ -145,7 +154,12 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: "#000",
   },
+  content: {
+    flex: 1,
+    marginTop: 16,
+  },
   information: {
+    flex: 1,
     flexDirection: "row",
     paddingHorizontal: 16,
     marginTop: 24,
@@ -217,29 +231,5 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: "#444",
     lineHeight: 16,
-  },
-  content: {
-    marginTop: 16,
-    marginHorizontal: 20,
-  },
-  card: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#FFF",
-    borderRadius: 10,
-    paddingHorizontal: 16,
-    shadowColor: "#000",
-    shadowOffset: { width: 1, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  cardTitle: {
-    flex: 1,
-    height: 50,
-    fontSize: 16,
-    color: "#333",
-    marginLeft: 8,
-    paddingVertical: 14,
   },
 });
