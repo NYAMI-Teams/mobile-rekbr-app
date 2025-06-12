@@ -12,7 +12,7 @@ export default function App() {
       <NavigationBar onMenuPress={() => console.log("Menu pressed")} />
       <AccountBalance balance={10000000} />
       <QuickActions />
-      <StepProgressBar currentStep={2} />
+      <StepProgressBar currentStep={2} steps={steps} />
     </View>
   );
 }
