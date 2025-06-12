@@ -9,11 +9,12 @@ import {
   SafeAreaView,
 } from "react-native";
 import { useState } from "react";
-import { MaterialIcons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import ProgressBar from "../../components/ProgressBar";
 import AttachmentFilled from "../../components/AttachmentFilled";
+import PrimaryButton from "../../components/PrimaryButton";
 
-export default function Welcoming() {
+export default function Lampiran() {
   const [isChecked, setIsChecked] = useState(false);
   const [isUploaded, setIsUploaded] = useState(false);
 
@@ -28,14 +29,17 @@ export default function Welcoming() {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => console.log("Back pressed")}>
-          <Text style={styles.backArrow}>←</Text>
+          <Ionicons name="chevron-back-outline" size={24} color="#000" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Know Your Customer</Text>
         <View style={{ width: 24 }} />
       </View>
 
       {/* Content scrollable */}
-      <ProgressBar currentStep={2} steps={["Data diri", "Lainnya", "Lampiran", "Pratinjau"]} />
+      <ProgressBar
+        currentStep={2}
+        steps={["Data diri", "Lainnya", "Lampiran", "Pratinjau"]}
+      />
 
       {/* Content */}
       <ScrollView>
@@ -66,7 +70,7 @@ export default function Welcoming() {
             title="Video Pernyataan"
             caption={
               isUploaded
-                ? "Swafoto KTP telah diambil"
+                ? "Rekam video pernyataan diri"
                 : "Rekam video pernyataan diri"
             }
             captionColor={isUploaded ? "#08B20F" : "#9E9E9E"}
@@ -87,7 +91,7 @@ export default function Welcoming() {
             title="Tanda Tangan"
             caption={
               isUploaded
-                ? "Swafoto KTP telah diambil"
+                ? "Foto tanda tangan telah diambil"
                 : "Masukkan tanda tangan anda"
             }
             captionColor={isUploaded ? "#08B20F" : "#9E9E9E"}
@@ -106,16 +110,11 @@ export default function Welcoming() {
 
       {/* Bottom Section */}
       <View style={styles.bottomSection}>
-        <TouchableOpacity
-          style={[
-            styles.button,
-            { backgroundColor: isUploaded ? "#000" : "#aaa" },
-          ]}
+        <PrimaryButton
+          title="Lanjut"
           onPress={() => console.log("Lanjut pressed")}
           disabled={!isUploaded}
-        >
-          <Text style={styles.buttonText}>Lanjut</Text>
-        </TouchableOpacity>
+        />
 
         <View style={styles.footer}>
           <Image
