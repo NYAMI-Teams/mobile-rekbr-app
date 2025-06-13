@@ -174,10 +174,12 @@ const BankScreen = () => {
                                     </View>
 
                                     <View className="flex-row flex-wrap justify-center mt-8 px-4">
+                                    <View className="flex-row flex-wrap justify-center mt-8 px-4">
                                         {keys.map((key, index) => (
                                             <TouchableOpacity
                                                 key={index}
                                                 onPress={() => handleKeyPress(key)}
+                                                className="w-[90px] h-[90px] rounded-full bg-white border border-gray-300 justify-center items-center m-2 shadow-sm"
                                                 className="w-[90px] h-[90px] rounded-full bg-white border border-gray-300 justify-center items-center m-2 shadow-sm"
                                             >
                                                 <Text className="text-2xl font-semibold text-gray-800">{key}</Text>
@@ -185,13 +187,10 @@ const BankScreen = () => {
                                         ))}
                                     </View>
 
-                                    <TouchableOpacity
-                                        className="bg-black rounded-lg py-4 mt-2"
-                                        onPress={handleCheckAccount}
-                                    >
-                                        <Text className="text-white text-center font-semibold text-base">
-                                            Cek Rekening
-                                        </Text>
+
+
+                                    <TouchableOpacity className="bg-black rounded-lg py-4 mt-2">
+                                        <Text className="text-white text-center font-semibold text-base">Cek Rekening</Text>
                                     </TouchableOpacity>
                                 </>
                             )}
