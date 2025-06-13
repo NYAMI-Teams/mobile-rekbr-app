@@ -99,7 +99,7 @@ export default function CreateRekber({ bankData }) {
                   <TouchableOpacity
                     onPress={() => setIsChecked(!isChecked)}
                     className={clsx(
-                      "w-6 h-6 border border-black bg-white rounded flex items-center justify-center",
+                      "w-6 h-6 border border-gray-400 bg-white rounded flex items-center justify-center",
                       isChecked && "bg-[#3ED6C5] border-[#3ED6C5]"
                     )}>
                     {isChecked && (

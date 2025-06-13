@@ -10,14 +10,16 @@ import {
 } from "react-native";
 import { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
-import ProgressBar from "../../components/ProgressBar";
-import AttachmentFilled from "../../components/AttachmentFilled";
-import InputField from "../../components/InputField";
-import DateField from "../../components/DateField";
-import DropDownField from "../../components/DropDownField";
-import PrimaryButton from "../../components/PrimaryButton";
+import ProgressBar from "../../src/components/ProgressBar";
+import AttachmentFilled from "../../src/components/AttachmentFilled";
+import InputField from "../../src/components/InputField";
+import DateField from "../../src/components/DateField";
+import DropDownField from "../../src/components/DropDownField";
+import PrimaryButton from "../../src/components/PrimaryButton";
+import { useRouter } from "expo-router";
 
 export default function DataDiri() {
+  const router = useRouter();
   const [isUploaded, setIsUploaded] = useState(false);
   const [notification, setNotification] = useState("");
 
@@ -71,7 +73,7 @@ export default function DataDiri() {
 
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => console.log("Back pressed")}>
+        <TouchableOpacity onPress={() => router.back()}>
           <Ionicons name="chevron-back-outline" size={24} color="#000" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Know Your Customer</Text>
@@ -209,13 +211,13 @@ export default function DataDiri() {
       <View style={styles.bottomSection}>
         <PrimaryButton
           title="Lanjut"
-          onPress={() => console.log("Lanjut pressed")}
+          onPress={() => router.push("/E-kyc/KYC_Lainnya")}
           disabled={!isFormValid}
         />
 
         <View style={styles.footer}>
           <Image
-            source={require("../../../assets/bni-logo.png")}
+            source={require("../../assets/bni-logo.png")}
             style={styles.footerLogo}
             resizeMode="contain"
           />

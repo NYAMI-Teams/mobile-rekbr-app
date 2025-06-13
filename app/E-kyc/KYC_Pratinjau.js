@@ -10,11 +10,13 @@ import {
 } from "react-native";
 import { useState } from "react";
 import { MaterialIcons, Ionicons } from "@expo/vector-icons";
-import ProgressBar from "../../components/ProgressBar";
-import PrimaryButton from "../../components/PrimaryButton";
-import DropDownField from "../../components/DropDownField";
+import ProgressBar from "../../src/components/ProgressBar";
+import PrimaryButton from "../../src/components/PrimaryButton";
+import DropDownField from "../../src/components/DropDownField";
+import { useRouter } from "expo-router";
 
 export default function Pratinjau() {
+  const router = useRouter();
   const [isChecked, setIsChecked] = useState(false);
 
   return (
@@ -23,7 +25,7 @@ export default function Pratinjau() {
 
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => console.log("Back pressed")}>
+        <TouchableOpacity onPress={() => router.back()}>
           <Ionicons name="chevron-back-outline" size={24} color="#000" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Know Your Customer</Text>
@@ -38,7 +40,7 @@ export default function Pratinjau() {
 
       <View style={styles.information}>
         <Image
-          source={require("../../../assets/admin1.png")}
+          source={require("../../assets/admin1.png")}
           style={styles.logo_admin}
         />
         <Text style={styles.informationText}>
@@ -49,8 +51,7 @@ export default function Pratinjau() {
 
       <ScrollView
         style={{ flex: 1 }}
-        contentContainerStyle={{ paddingBottom: 16 }}
-      >
+        contentContainerStyle={{ paddingBottom: 16 }}>
         <View style={styles.content}>
           <View style={styles.card}>
             <Text style={styles.cardTitle}>Data Diri</Text>
@@ -103,13 +104,13 @@ export default function Pratinjau() {
 
         <PrimaryButton
           title="Lanjut"
-          onPress={() => console.log("Lanjut pressed")}
+          onPress={() => router.push("/E-kyc/KYC_Success")}
           disabled={!isChecked}
         />
 
         <View style={styles.footer}>
           <Image
-            source={require("../../../assets/bni-logo.png")}
+            source={require("../../assets/bni-logo.png")}
             style={styles.footerLogo}
             resizeMode="contain"
           />

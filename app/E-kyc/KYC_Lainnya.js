@@ -10,12 +10,14 @@ import {
 } from "react-native";
 import { useState, useEffect } from "react";
 import { Ionicons } from "@expo/vector-icons";
-import ProgressBar from "../../components/ProgressBar";
-import InputField from "../../components/InputField";
-import DropDownField from "../../components/DropDownField";
-import PrimaryButton from "../../components/PrimaryButton";
+import ProgressBar from "../../src/components/ProgressBar";
+import InputField from "../../src/components/InputField";
+import DropDownField from "../../src/components/DropDownField";
+import PrimaryButton from "../../src/components/PrimaryButton";
+import { useRouter } from "expo-router";
 
 export default function LainnyaPage() {
+  const router = useRouter();
   const [namaIbu, setNamaIbu] = useState("");
   const [pendidikan, setPendidikan] = useState("");
   const [kodePos, setKodePos] = useState("");
@@ -47,6 +49,7 @@ export default function LainnyaPage() {
       namaUsaha,
       bidangUsaha,
     });
+    router.push("/E-kyc/KYC_Lampiran");
   };
 
   return (
@@ -55,7 +58,7 @@ export default function LainnyaPage() {
 
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => console.log("Back pressed")}>
+        <TouchableOpacity onPress={() => router.back()}>
           <Ionicons name="chevron-back-outline" size={24} color="#000" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Know Your Customer</Text>
@@ -126,7 +129,7 @@ export default function LainnyaPage() {
 
         <View style={styles.footer}>
           <Image
-            source={require("../../../assets/bni-logo.png")}
+            source={require("../../assets/bni-logo.png")}
             style={styles.footerLogo}
             resizeMode="contain"
           />
