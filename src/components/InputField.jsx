@@ -1,18 +1,20 @@
 import React from 'react';
-import { View, TextInput, StyleSheet, Text } from 'react-native';
+import { View, TextInput, Text } from 'react-native';
+import clsx from 'clsx';
+import { StyleSheet } from 'react-native';
 
-const InputField = ({
+export default function InputField({
   title,
   placeholder,
   value,
   onChangeText,
   secureTextEntry = false,
   keyboardType = 'default',
-}) => {
+  className = '',
+}) {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>{title}</Text>
-
+    <View className={clsx("flex-col mx-5", className)}>
+      <Text className="text-[14px] text-black font-normal mb-2">{title}</Text>
       <View style={styles.card}>
         <TextInput
           style={styles.input}
@@ -27,19 +29,11 @@ const InputField = ({
       </View>
     </View>
   );
-};
+}
+
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    marginHorizontal: 20,
-  },
-  title: {
-    marginBottom: 8,
-    fontSize: 14,
-    fontWeight: "500",
-    color: "#000",
-  },
+
   card: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -55,10 +49,8 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     height: 50,
-    fontSize: 16,
+    fontSize: 12,
     color: '#333',
 
   },
 });
-
-export default InputField;

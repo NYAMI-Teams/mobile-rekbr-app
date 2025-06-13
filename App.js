@@ -13,15 +13,27 @@ import BuyerCard from "./src/components/card-transaction/BuyerCard";
 import Toast from "react-native-toast-message";
 import { mockAPIBuyer, mockAPISeller } from "./src/services/apiMock/api";
 import History from "./src/screens/history";
+import RekeningKamu from "./src/components/RekeningKamu";
+import CreateRekber from "./src/screens/CreateRekbr";
+import DataDiri from "./src/screens/e-KYC/KYC_DataDiri";
 
 export default function App() {
+  const bankData = {
+    accountHolder: "Sdr Bayu Saptaji Rahman",
+    bankName: "Bank Negara Indonesia",
+    accountNumber: "0900604501",
+    // Gunakan require untuk gambar lokal di React Native
+    logoSrc: require("./assets/bni-logo2.png"), // Sesuaikan path sesuai lokasi gambar Anda
+  };
+
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
       {/* Hapus Dari sini (TULISAN INI JANGAN DI HAPUS) */}
-      <View className="gap-4">
-        <History />
-      </View>
+      {/* <View className="gap-4"> */}
+      <CreateRekber bankData={bankData} />
+      {/* <DataDiri /> */}
+      {/* </View> */}
       {/* Hapus Sampai sini (TULISAN INI JANGAN DI HAPUS) */}
     </View>
   );
