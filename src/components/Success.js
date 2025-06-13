@@ -57,14 +57,14 @@ export default function RegisterSuccess({ title, subTitle, fromRegister }) {
 
             <TouchableOpacity
               style={styles.buttonDark}
-              onPress={() => router.push("/E-kyc/kyc_intro")}>
+              onPress={() => router.push("/E-kyc/KYC_Intro")}>
               <Text style={styles.buttonDarkText}>Mulai KYC Sekarang</Text>
             </TouchableOpacity>
           </>
         ) : (
           <TouchableOpacity
             style={styles.buttonDark}
-            onPress={() => router.push("/")}>
+            onPress={() => router.replace("/")}>
             <Text style={styles.buttonDarkText}>Beranda</Text>
           </TouchableOpacity>
         )}
