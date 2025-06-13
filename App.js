@@ -9,6 +9,7 @@ import Seller from "./src/screens/seller/homeScreen";
 import BuyerEmptyContent from "./src/screens/buyer";
 import "./global.css";
 import BankScreen from "./src/screens/bank";
+import TransactionSummaryScreen from "./src/screens/summary";
 
 export default function App() {
   const bankData = {
@@ -27,7 +28,8 @@ export default function App() {
       <AccountBalance balance={10000000} />
       <QuickActions /> */}
       {/* <BuyerEmptyContent /> */}
-      <BankScreen/>
+      {/* <BankScreen/> */}
+      <TransactionSummaryScreen />
     </View>
   );
 }
