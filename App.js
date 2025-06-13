@@ -11,6 +11,14 @@ import "./global.css";
 import BankScreen from "./src/screens/bank";
 
 export default function App() {
+  const bankData = {
+    accountHolder: "Sdr Bayu Saptaji Rahman",
+    bankName: "Bank Negara Indonesia",
+    accountNumber: "0900604501",
+    // Gunakan require untuk gambar lokal di React Native
+    logoSrc: require("./assets/bni-logo2.png"), // Sesuaikan path sesuai lokasi gambar Anda
+  };
+
   return (
     <View style={styles.container}>
       <StatusBar style="light" />
@@ -27,6 +35,6 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
+    backgroundColor: '#F5F5F5',
   },
 });

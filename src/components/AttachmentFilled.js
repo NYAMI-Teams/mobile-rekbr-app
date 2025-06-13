@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import { Ionicons} from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import { icons } from "lucide-react-native";
 
 const AttachmentFilled = ({
@@ -24,11 +24,10 @@ const AttachmentFilled = ({
       <TouchableOpacity
         style={[styles.card, { backgroundColor: cardColor }]}
         onPress={onPress}
-        activeOpacity={0.8}
-      >
+        activeOpacity={0.8}>
         <Text style={[styles.caption, { color: captionColor }]}>{caption}</Text>
         <View style={[styles.iconWrapper, { backgroundColor: boxColor }]}>
-          <Ionicons name={iconName} size={24} color={iconsColor} />
+          <Ionicons name={iconName} size={20} color={iconsColor} />
         </View>
       </TouchableOpacity>
 
@@ -67,7 +66,7 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   caption: {
-    fontSize: 16,
+    fontSize: 14,
     flex: 1,
   },
   iconWrapper: {
@@ -82,7 +81,7 @@ const styles = StyleSheet.create({
   },
   alertText: {
     marginLeft: 5,
-    fontSize: 16,
+    fontSize: 12,
     flex: 1,
   },
 });
