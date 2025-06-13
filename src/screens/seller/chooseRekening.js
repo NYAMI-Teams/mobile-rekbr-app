@@ -88,6 +88,7 @@ export default function PilihRekeningScreen() {
   };
 
   const isEmpty = favorites.length === 0 && saved.length === 0;
+  const isSavedEmpty = saved.length === 0;
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -145,7 +146,7 @@ export default function PilihRekeningScreen() {
                 favorites.map((item, index) => renderAccountItem(item, true, index))
               )}
 
-              {saved.length > 0 && (
+              {!isSavedEmpty && (
                 <>
                   <Text style={[styles.sectionTitle, { marginTop: 24 }]}>
                     Tujuan Tersimpan
