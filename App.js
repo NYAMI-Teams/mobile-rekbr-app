@@ -1,10 +1,16 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, View } from 'react-native';
-import NavigationBar from './src/components/NavigationBar';
-import AccountBalance from './src/components/AccountBalance';
-import QuickActions from './src/components/QuickActions';
-import Onboarding from './src/screens/e-KYC/Onboarding';
-import ChooseRekening from './src/screens/seller/chooseRekening';
+import { StatusBar } from "expo-status-bar";
+import { StyleSheet, View } from "react-native";
+import NavigationBar from "./src/components/NavigationBar";
+import AccountBalance from "./src/components/AccountBalance";
+import QuickActions from "./src/components/QuickActions";
+import Onboarding from "./src/screens/e-KYC/Onboarding";
+import Success from "./src/screens/e-KYC/Success";
+import Seller from "./src/screens/seller/homeScreen";
+import BuyerEmptyContent from "./src/screens/buyer";
+import "./global.css";
+// import BankScreen from "./src/screens/bank";
+import SomeScreen from "./src/screens/SomeScreen";
+import BankScreen from "./src/screens/bank";
 
 export default function App() {
   return (
@@ -13,7 +19,10 @@ export default function App() {
       {/* <NavigationBar onMenuPress={() => console.log('Menu pressed')} />
       <AccountBalance balance={10000000} />
       <QuickActions /> */}
-      <ChooseRekening />
+      {/* <BuyerEmptyContent /> */}
+      <BankScreen />
+      {/* <TransactionSummaryScreen /> */}
+      {/* <SomeScreen /> */}
     </View>
   );
 }
@@ -21,6 +30,6 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: "#F5F5F5",
   },
 });

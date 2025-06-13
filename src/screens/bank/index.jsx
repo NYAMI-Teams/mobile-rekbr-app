@@ -158,6 +158,9 @@ const BankScreen = () => {
                                         ))}
                                     </View>
 
+
+
+
                                     <TouchableOpacity className="bg-black rounded-lg py-4 mt-2">
                                         <Text className="text-white text-center font-semibold text-base">Cek Rekening</Text>
                                     </TouchableOpacity>
