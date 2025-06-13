@@ -8,13 +8,20 @@ import ChooseRekening from './src/screens/seller/chooseRekening';
 import "./global.css"
 
 export default function App() {
+  const bankData = {
+    accountHolder: "Sdr Bayu Saptaji Rahman",
+    bankName: "Bank Negara Indonesia",
+    accountNumber: "0900604501",
+    // Gunakan require untuk gambar lokal di React Native
+    logoSrc: require("./assets/bni-logo2.png"), // Sesuaikan path sesuai lokasi gambar Anda
+  };
+
   return (
     <View style={styles.container}>
-      <StatusBar style="light" />
-      {/* <NavigationBar onMenuPress={() => console.log('Menu pressed')} />
-      <AccountBalance balance={10000000} />
-      <QuickActions /> */}
-      <ChooseRekening />
+      <StatusBar style="dark" />
+      {/* Hapus Dari sini (TULISAN INI JANGAN DI HAPUS) */}
+      <CreateRekber bankData={bankData} />
+      {/* Hapus Sampai sini (TULISAN INI JANGAN DI HAPUS) */}
     </View>
   );
 }
