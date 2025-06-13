@@ -1,7 +1,4 @@
 // src/components/NavigationBar.js
-
-// src/components/NavigationBar.js
-
 import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, Platform, StatusBar, SafeAreaView } from 'react-native';
 
