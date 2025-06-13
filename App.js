@@ -8,16 +8,18 @@ import Success from "./src/screens/e-KYC/Success";
 import Seller from "./src/screens/seller/homeScreen";
 import BuyerEmptyContent from "./src/screens/buyer";
 import "./global.css";
+import BankScreen from "./src/screens/bank";
 
 export default function App() {
   return (
     <View style={styles.container}>
       <StatusBar style="light" />
-      <NavigationBar />
+      {/* <NavigationBar /> */}
       {/* <NavigationBar onMenuPress={() => console.log('Menu pressed')} />
       <AccountBalance balance={10000000} />
       <QuickActions /> */}
-      <BuyerEmptyContent />
+      {/* <BuyerEmptyContent /> */}
+      <BankScreen/>
     </View>
   );
 }
