@@ -1,3 +1,5 @@
+// index.jsx
+
 import React, { useState, useRef, useEffect } from 'react';
 import {
     View,
@@ -13,8 +15,7 @@ import {
 } from 'react-native';
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import { ChevronLeftCircle } from 'lucide-react-native';
-import BankSelector from '../../components/BankScreens';
-
+import BankSelector from '../../components/BankScreens'; // pakai file BankScreens.jsx kamu
 
 const banks = [
     {
@@ -49,6 +50,8 @@ const keys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '', '0', 'x'];
 const BankScreen = () => {
     const [modalVisible, setModalVisible] = useState(false);
     const [isPaymentDone, setIsPaymentDone] = useState(false);
+    const [isAccountVerified, setIsAccountVerified] = useState(false);
+    const [accountHolderName, setAccountHolderName] = useState('');
     const [selectedBank, setSelectedBank] = useState(null);
     const [accountNumber, setAccountNumber] = useState('');
     const slideAnim = useRef(new Animated.Value(300)).current;
@@ -61,6 +64,8 @@ const BankScreen = () => {
         }).start(() => {
             setModalVisible(false);
             setIsPaymentDone(false);
+            setIsAccountVerified(false);
+            setAccountHolderName('');
             setAccountNumber('');
         });
     };
@@ -86,7 +91,15 @@ const BankScreen = () => {
 
     const handleBackToBankSelection = () => {
         setIsPaymentDone(false);
+        setIsAccountVerified(false);
+        setAccountHolderName('');
         setAccountNumber('');
+    };
+
+    const handleCheckAccount = () => {
+        // Simulasi verifikasi akun
+        setAccountHolderName('Sdr Bayu Saptaji Rahman');
+        setIsAccountVerified(true);
     };
 
     return (
@@ -103,19 +116,31 @@ const BankScreen = () => {
                 >
                     <View className="flex-1 justify-end bg-black/30">
                         <Animated.View
-                            style={{ transform: [{ translateY: slideAnim }] }}
-                            className="bg-white px-5 pt-5 pb-8 rounded-t-3xl"
+                            style={{
+                                transform: [{ translateY: slideAnim }],
+                                height: '80%', // modal lebih tinggi
+                                borderTopLeftRadius: 24,
+                                borderTopRightRadius: 24,
+                            }}
+                            className="bg-white px-5 pt-5 pb-8"
                         >
+                            {/* Handle di atas */}
+                            <View className="w-14 h-1.5 bg-gray-300 rounded-full self-center mb-5" />
+
                             <Pressable onPress={isPaymentDone ? handleBackToBankSelection : closeModal}>
                                 <View className="flex-row items-center mb-6">
                                     <ChevronLeftCircle size={24} color="#00C2C2" />
                                     <Text className="text-lg font-semibold text-gray-800 ml-2">
-                                        {isPaymentDone ? 'Masukan No Rekening Kamu' : 'Pilih Bank Kamu'}
+                                        {isAccountVerified
+                                            ? 'Rekening Kamu Ditemukan'
+                                            : isPaymentDone
+                                            ? 'Masukkan No Rekening Kamu'
+                                            : 'Pilih Bank Kamu'}
                                     </Text>
                                 </View>
                             </Pressable>
 
-                            {!isPaymentDone ? (
+                            {!isPaymentDone && (
                                 <BankSelector
                                     banks={banks}
                                     onSelectBank={(bank) => {
@@ -123,7 +148,9 @@ const BankScreen = () => {
                                         setIsPaymentDone(true);
                                     }}
                                 />
-                            ) : (
+                            )}
+
+                            {isPaymentDone && !isAccountVerified && (
                                 <>
                                     {selectedBank && (
                                         <View className="flex-row items-center space-x-3 mt-2 mb-6">
@@ -147,10 +174,12 @@ const BankScreen = () => {
                                     </View>
 
                                     <View className="flex-row flex-wrap justify-center mt-8 px-4">
+                                    <View className="flex-row flex-wrap justify-center mt-8 px-4">
                                         {keys.map((key, index) => (
                                             <TouchableOpacity
                                                 key={index}
                                                 onPress={() => handleKeyPress(key)}
+                                                className="w-[90px] h-[90px] rounded-full bg-white border border-gray-300 justify-center items-center m-2 shadow-sm"
                                                 className="w-[90px] h-[90px] rounded-full bg-white border border-gray-300 justify-center items-center m-2 shadow-sm"
                                             >
                                                 <Text className="text-2xl font-semibold text-gray-800">{key}</Text>
@@ -165,6 +194,21 @@ const BankScreen = () => {
                                     </TouchableOpacity>
                                 </>
                             )}
+
+                            {isAccountVerified && (
+                                <View className="bg-[#F0FCFC] p-4 rounded-xl">
+                                    <Text className="text-lg font-semibold mb-4">{accountHolderName}</Text>
+                                    <View className="flex-row items-center">
+                                        <Image
+                                            source={{ uri: selectedBank.logo }}
+                                            className="w-8 h-8"
+                                            resizeMode="contain"
+                                            style={{ marginRight: 12 }} // Jarak logo & teks diperbaiki
+                                        />
+                                        <Text className="text-base font-medium">{selectedBank.name}</Text>
+                                    </View>
+                                </View>
+                            )}
                         </Animated.View>
                     </View>
                 </Modal>
@@ -174,8 +218,7 @@ const BankScreen = () => {
                     onPress={() => setModalVisible(true)}
                 >
                     <Text className="text-white font-semibold">
-                        {/* {selectedBank ? selectedBank.name : 'Pilih Bank'} */}
-                        Pilih Bank
+                        {selectedBank ? selectedBank.name : 'Pilih Bank'}
                     </Text>
                 </Pressable>
             </SafeAreaView>
