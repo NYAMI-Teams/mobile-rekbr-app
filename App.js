@@ -29,9 +29,9 @@ export default function App() {
       <AccountBalance balance={10000000} />
       <QuickActions /> */}
       {/* <BuyerEmptyContent /> */}
-      <BankScreen />
+      {/* <BankScreen /> */}
       {/* <TransactionSummaryScreen /> */}
-      {/* <SomeScreen /> */}
+      <SomeScreen />
     </View>
   );
 }
