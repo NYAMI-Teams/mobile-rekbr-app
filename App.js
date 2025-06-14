@@ -12,7 +12,11 @@ export default function App() {
       {/* <NavigationBar onMenuPress={() => console.log('Menu pressed')} />
       <AccountBalance balance={10000000} />
       <QuickActions /> */}
-      <ChooseRekening />
+
+      {/* <BuyerEmptyContent /> */}
+      {/* <BankScreen /> */}
+      {/* <TransactionSummaryScreen /> */}
+      <SomeScreen />
     </View>
   );
 }
