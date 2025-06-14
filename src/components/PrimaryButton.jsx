@@ -6,7 +6,7 @@ const PrimaryButton = ({ title, onPress, disabled = false, height = 50, width = 
     <TouchableOpacity
       style={[
         styles.button,
-        { backgroundColor: disabled ? '#aaa' : btnColor },
+        { backgroundColor: disabled ? '#F9F9F9' : btnColor },
         { height: height },
         { width: width },
       ]}
@@ -26,8 +26,8 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   buttonText: {
-    fontSize: 18,
-    fontWeight: '600',
+    fontSize: 15,
+    fontWeight: '500',
   },
 });
 

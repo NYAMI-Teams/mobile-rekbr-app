@@ -10,14 +10,14 @@ import {
 } from "react-native";
 import { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
-import ProgressBar from "../../components/ProgressBar";
+import ProgressBar from "../ProgressBar";
 import Timestamp from "./Timestamp";
 import * as Clipboard from "expo-clipboard";
 import Toast from "react-native-toast-message";
 import PrimaryButton from "../PrimaryButton";
 import Tagihan from "./Tagihan";
 
-export default function TransactionPage({ data }) {
+export default function DetailTransaksiBuyer({ data }) {
   const handleCopy = async (text) => {
     // belum bisa jalan toastnya
     if (!text) return;

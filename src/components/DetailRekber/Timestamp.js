@@ -26,7 +26,7 @@ const TimestampDetail = ({ status, date }) => {
         </Text>
         <Text
           style={{
-            fontSize: 14,
+            fontSize: 13,
             marginVertical: 5,
             fontWeight: "500",
             color: "#616161",
@@ -98,7 +98,9 @@ const Timestamp = ({ data, caption, date, details = [] }) => {
           justifyContent: "center",
           marginBottom: 12,
         }}>
-        <Text style={{ fontSize: 15, flex: 1 }}>{caption}</Text>
+        <Text style={{ fontSize: 14, flex: 1, paddingRight: 10 }}>
+          {caption}
+        </Text>
         {/* Countdown */}
         {(data.status == "shipped" &&
           data.fundReleaseRequest.status != "approved") ||
