@@ -1,22 +1,16 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, View } from 'react-native';
-import NavigationBar from './src/components/NavigationBar';
-import AccountBalance from './src/components/AccountBalance';
-import QuickActions from './src/components/QuickActions';
-import ChooseRekening from './src/screens/seller/chooseRekening';
-
+import { StatusBar } from "expo-status-bar";
+import { StyleSheet, View, Text } from "react-native";
+import "./global.css";
+import TransaksiBuyer from "./src/components/DetailRekber/DetailTransaksiBuyer";
+import TransaksiSeller from "./src/components/DetailRekber/DetailTransaksiSeller";
+import { mockAPIBuyer, mockAPISeller } from "./src/services/apiMock/api";
 export default function App() {
   return (
     <View style={styles.container}>
-      <StatusBar style="light" />
-      {/* <NavigationBar onMenuPress={() => console.log('Menu pressed')} />
-      <AccountBalance balance={10000000} />
-      <QuickActions /> */}
-
-      {/* <BuyerEmptyContent /> */}
-      {/* <BankScreen /> */}
-      {/* <TransactionSummaryScreen /> */}
-      <SomeScreen />
+      <StatusBar style="dark" />
+      {/* Hapus Dari sini (TULISAN INI JANGAN DI HAPUS) */}
+      <TransaksiSeller data={mockAPISeller.data} />
+      {/* Hapus Sampai sini (TULISAN INI JANGAN DI HAPUS) */}
     </View>
   );
 }

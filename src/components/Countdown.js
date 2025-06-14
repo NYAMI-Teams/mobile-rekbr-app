@@ -40,7 +40,7 @@ const CountdownTimer = ({ deadline, fromTime }) => {
   };
 
   return (
-    <Text className="font-poppins-semibold text-xs text-gray-800">
+    <Text className="font-poppins-semibold text-[14px] text-gray-800">
       {formatTime(timeLeftInSeconds)}
     </Text>
   );
