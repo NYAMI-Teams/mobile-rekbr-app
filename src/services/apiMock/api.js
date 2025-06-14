@@ -3,8 +3,8 @@ export const mockAPIBuyer = {
   message: "Berhasil mengambil detail transaksi",
   data: {
     id: "abc123",
-    transactionCode: "123456789",
-    status: "completed",
+    transactionCode: "RKB -8080123456789",
+    status: "pending_payment", // pending_payment, waiting_shipment, shipped, completed, refunded, cancelled, dispute
     itemName: "iPhone 13 Pro Max",
     itemPrice: 8000000,
     insuranceFee: 160000,
@@ -15,7 +15,7 @@ export const mockAPIBuyer = {
     createdAt: "2025-06-09T14:00:00Z",
     paymentDeadline: "2025-06-09T17:00:00Z",
     paidAt: "2025-06-09T16:40:00Z",
-    shipmentDeadline: "2025-06-11T17:00:00Z",
+    shipmentDeadline: "2025-06-11T16:40:00Z",
     shipmentDate: "2025-06-10T08:00:00Z",
 
     shipment: {
@@ -25,7 +25,7 @@ export const mockAPIBuyer = {
 
     fundReleaseRequest: {
       requested: true,
-      status: "waiting", // "rejected" atau "approved" atau "waiting"
+      status: null, // "rejected" atau "approved" atau "waiting"
       requestedAt: "2025-06-16T08:00:00Z",
       resolvedAt: "2025-06-16T10:00:00Z",
     },
