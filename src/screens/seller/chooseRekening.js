@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -10,14 +10,88 @@ import {
   Dimensions,
   Platform,
   StatusBar,
+  FlatList,
+  Animated,
+  UIManager,
+  LayoutAnimation,
 } from 'react-native';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
+
+const initialFavorites = [];
+
+const initialSaved = [
+  {
+    id: '1',
+    name: 'Bayu',
+    bank: 'Bank Negara Indonesia',
+    accountNumber: '0900604501',
+    bankLogo: require('../../../assets/logo-bni.png'),
+    isFavorite: false,
+  },
+  {
+    id: '2',
+    name: 'Zhirazzi',
+    bank: 'Bank Negara Indonesia',
+    accountNumber: '0900604502',
+    bankLogo: require('../../../assets/logo-bni.png'),
+    isFavorite: false,
+  },
+  {
+    id: '3',
+    name: 'Diffa',
+    bank: 'Bank Negara Indonesia',
+    accountNumber: '0900604503',
+    bankLogo: require('../../../assets/logo-bni.png'),
+    isFavorite: false,
+  },
+  {
+    id: '4',
+    name: 'Reynhard',
+    bank: 'Bank Negara Indonesia',
+    accountNumber: '0900604504',
+    bankLogo: require('../../../assets/logo-bni.png'),
+    isFavorite: false,
+  },
+];
+
 export default function PilihRekeningScreen() {
+  const [favorites, setFavorites] = useState(initialFavorites);
+  const [saved, setSaved] = useState(initialSaved);
+
+  const toggleFavorite = (item, fromFavorites) => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+
+    if (fromFavorites) {
+      setFavorites(prev => prev.filter(x => x.id !== item.id));
+      setSaved(prev => [{ ...item, isFavorite: false }, ...prev]);
+    } else {
+      setSaved(prev => prev.filter(x => x.id !== item.id));
+      setFavorites(prev => [{ ...item, isFavorite: true }, ...prev]);
+    }
+  };
+
+  const renderAccountItem = (item, fromFavorites, index = 0) => {
+    return (
+      <AnimatedAccountItem
+        key={item.id}
+        item={item}
+        fromFavorites={fromFavorites}
+        toggleFavorite={toggleFavorite}
+        index={index}
+      />
+    );
+  };
+
+  const isEmpty = favorites.length === 0 && saved.length === 0;
+  const isSavedEmpty = saved.length === 0;
+
   return (
     <SafeAreaView style={styles.safeArea}>
-      {/* AppBar */}
       <View style={styles.appBar}>
         <TouchableOpacity style={styles.backButton}>
           <Image
@@ -28,7 +102,6 @@ export default function PilihRekeningScreen() {
         <Text style={styles.appBarTitle}>Pilih Rekening Kamu</Text>
       </View>
 
-      {/* Top Background + Ilustrasi */}
       <View style={styles.topBackground}>
         <Image
           source={require('../../../assets/illustration-transfer.png')}
@@ -37,7 +110,6 @@ export default function PilihRekeningScreen() {
         />
       </View>
 
-      {/* Search Bar → tetap separuh di hijau */}
       <View style={styles.searchContainer}>
         <TextInput
           placeholder="Cari nama, bank, atau nomor rekening"
@@ -50,19 +122,48 @@ export default function PilihRekeningScreen() {
         />
       </View>
 
-      {/* Empty State */}
-      <View style={styles.emptyState}>
-        <Image
-          source={require('../../../assets/illustration-empty.png')}
-          style={styles.emptyImage}
-          resizeMode="contain"
-        />
-        <Text style={styles.emptyText}>
-          Kamu belum pernah transaksi sebelumnya, jadi belum ada tujuan rekening yang bisa dituju.
-        </Text>
-      </View>
+      {isEmpty ? (
+        <View style={styles.emptyState}>
+          <Image
+            source={require('../../../assets/illustration-empty.png')}
+            style={styles.emptyImage}
+            resizeMode="contain"
+          />
+          <Text style={styles.emptyText}>
+            Kamu belum pernah transaksi sebelumnya, jadi belum ada tujuan rekening yang bisa dituju.
+          </Text>
+        </View>
+      ) : (
+        <FlatList
+          ListHeaderComponent={
+            <View style={{ paddingHorizontal: 16, paddingTop: 16 }}>
+              <Text style={styles.sectionTitle}>Tujuan Favorit kamu!</Text>
+              {favorites.length === 0 ? (
+                <Text style={styles.noFavoritesText}>
+                  Tambah tujuan favorit kamu biar lebih gampang nyarinya nanti, biar nggak ribet!
+                </Text>
+              ) : (
+                favorites.map((item, index) => renderAccountItem(item, true, index))
+              )}
 
-      {/* Button + Rekening */}
+              {!isSavedEmpty && (
+                <>
+                  <Text style={[styles.sectionTitle, { marginTop: 24 }]}>
+                    Tujuan Tersimpan
+                  </Text>
+                  {saved.map((item, index) => renderAccountItem(item, false, index))}
+                </>
+              )}
+            </View>
+          }
+          data={[]}
+          renderItem={null}
+          keyExtractor={() => ''}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 100 }}
+        />
+      )}
+
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.addButton}>
           <Text style={styles.addButtonText}>＋ Rekening</Text>
@@ -71,6 +172,60 @@ export default function PilihRekeningScreen() {
     </SafeAreaView>
   );
 }
+
+const AnimatedAccountItem = ({ item, fromFavorites, toggleFavorite, index = 0 }) => {
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const scaleAnim = useRef(new Animated.Value(0.8)).current;
+
+  useEffect(() => {
+    Animated.sequence([
+      Animated.delay(index * 100), // Staggered animation
+      Animated.parallel([
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+        Animated.spring(scaleAnim, {
+          toValue: 1,
+          friction: 5,
+          useNativeDriver: true,
+        }),
+      ]),
+    ]).start();
+  }, []);
+
+  return (
+    <Animated.View
+      style={[
+        styles.accountItem,
+        {
+          opacity: fadeAnim,
+          transform: [{ scale: scaleAnim }],
+        },
+      ]}
+    >
+      <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+        <Image source={item.bankLogo} style={styles.bankLogo} />
+        <View style={{ marginLeft: 12 }}>
+          <Text style={styles.accountName}>{item.name}</Text>
+          <Text style={styles.bankName}>{item.bank}</Text>
+          <Text style={styles.accountNumber}>{item.accountNumber}</Text>
+        </View>
+      </View>
+      <TouchableOpacity onPress={() => toggleFavorite(item, fromFavorites)}>
+        <Image
+          source={
+            item.isFavorite
+              ? require('../../../assets/icon-star-filled.png')
+              : require('../../../assets/icon-star-outline.png')
+          }
+          style={styles.favoriteIcon}
+        />
+      </TouchableOpacity>
+    </Animated.View>
+  );
+};
 
 const styles = StyleSheet.create({
   safeArea: {
@@ -102,10 +257,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#EAFBF8',
     borderBottomLeftRadius: 24,
     borderBottomRightRadius: 24,
-    minHeight: screenHeight * 0.22, // responsive height → sekitar 22% dari tinggi layar
+    minHeight: screenHeight * 0.22,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingBottom: 16, // supaya gambar tidak nempel bawah
+    paddingBottom: 16,
   },
   topImage: {
     width: screenWidth * 0.6,
@@ -119,9 +274,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#E0E0E0',
     paddingHorizontal: 16,
-    paddingVertical: 14,
+    paddingVertical: 10,
     marginHorizontal: 16,
-    marginTop: -screenHeight * 0.035, // responsive → sekitar -3.5% tinggi layar
+    marginTop: -screenHeight * 0.035,
     zIndex: 1,
   },
   searchInput: {
@@ -150,15 +305,60 @@ const styles = StyleSheet.create({
     color: '#666',
     textAlign: 'center',
   },
-  buttonContainer: {
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 12,
+  },
+  noFavoritesText: {
+    fontSize: 14,
+    color: '#666',
+    textAlign: 'center',
+    marginBottom: 12,
+  },
+  accountItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#EAFBF8',
+    borderRadius: 12,
     padding: 16,
-    alignItems: 'flex-end',
+    marginBottom: 12,
+  },
+  bankLogo: {
+    width: 32,
+    height: 32,
+    resizeMode: 'contain',
+  },
+  accountName: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#000',
+  },
+  bankName: {
+    fontSize: 12,
+    color: '#444',
+    marginTop: 4,
+  },
+  accountNumber: {
+    fontSize: 12,
+    color: '#444',
+    marginTop: 2,
+  },
+  favoriteIcon: {
+    width: 24,
+    height: 24,
+    marginLeft: 12,
+  },
+  buttonContainer: {
+    position: 'absolute',
+    bottom: 16,
+    right: 16,
   },
   addButton: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#000',
-    borderRadius: 12,
+    borderRadius: 16,
     paddingHorizontal: 20,
     paddingVertical: 12,
   },
