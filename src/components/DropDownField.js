@@ -27,7 +27,7 @@ const DropDownField = ({
           keyboardType={keyboardType}
           autoCapitalize="none"
         />
-        <Ionicons name={iconName} size={24} color={iconColor} />
+        <Ionicons name={iconName} size={20} color={iconColor} />
       </View>
     </View>
   );
@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     height: 50,
-    fontSize: 16,
+    fontSize: 14,
     color: "#333",
     marginLeft: 8,
   },

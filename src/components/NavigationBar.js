@@ -1,5 +1,4 @@
 // src/components/NavigationBar.js
-
 import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, Platform, StatusBar, SafeAreaView } from 'react-native';
 
@@ -99,6 +98,6 @@ const styles = StyleSheet.create({
   actionText: {
     fontSize: 14,
     color: '#000',
-    fontFamily: 'Poppins_500Medium', // ← supaya tidak terlalu tebal
-  },
+    fontFamily: 'Poppins_500Medium', // ← supaya tidak terlalu tebal
+    },
 });
