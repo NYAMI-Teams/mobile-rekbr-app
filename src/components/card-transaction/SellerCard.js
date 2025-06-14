@@ -160,7 +160,7 @@ const SellerCard = ({ data }) => {
 
   // Format waktu jadi: 11 Juni 2025, 17:00 WIB
   const formatDateWIB = (datetime) => {
-    return moment(datetime).utcOffset(7).format("DD MMMM YYYY, HH:mm [WIB]");
+    return moment(datetime).utcOffset(-7).format("DD MMMM YYYY, HH:mm [WIB]");
   };
 
   return (
