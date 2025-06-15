@@ -51,7 +51,7 @@ export default function RegisterSuccess({ title, subTitle, fromRegister }) {
           <>
             <TouchableOpacity
               style={styles.buttonLight}
-              onPress={() => console.log("Silakan Masuk pressed")}>
+              onPress={() => router.replace("/")}>
               <Text style={styles.buttonLightText}>Silakan Masuk</Text>
             </TouchableOpacity>
 

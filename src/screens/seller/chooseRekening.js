@@ -113,6 +113,11 @@ export default function PilihRekeningScreen() {
     setIsAlreadyCheckedRekening(false);
   };
 
+  const handleToCreateRekbr = () => {
+    setIsAlreadyCheckedRekening(true);
+    router.push("/CreateTransaksi/CreateRekening/ChooseRekening");
+  };
+
   const toggleFavorite = (item, fromFavorites) => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
 
@@ -227,8 +232,6 @@ export default function PilihRekeningScreen() {
             contentContainerStyle={{
               paddingBottom: 100,
               width: "100%",
-              borderColor: "black",
-              borderWidth: 1,
             }}
           />
         )}
@@ -407,7 +410,7 @@ export default function PilihRekeningScreen() {
                       </View>
                     </View>
                     <PrimaryButton
-                      onPress={() => setIsAlreadyCheckedRekening(true)}
+                      onPress={() => handleToCreateRekbr}
                       title="Simpan dan Gunakan Rekening"
                     />
                   </Animated.View>
@@ -485,8 +488,6 @@ const styles = StyleSheet.create({
   accountItemContainer: {
     marginBottom: 16,
     width: "100%",
-    borderColor: "black",
-    borderWidth: 1,
   },
   safeArea: {
     flex: 1,
@@ -523,6 +524,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     paddingBottom: 16,
+    width: "100%",
   },
   topImage: {
     width: screenWidth * 0.6,
@@ -571,16 +573,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
     marginBottom: 12,
-    borderColor: "black",
-    borderWidth: 1,
   },
   noFavoritesText: {
     fontSize: 14,
     color: "#666",
     textAlign: "center",
     marginBottom: 12,
-    borderColor: "black",
-    borderWidth: 1,
   },
   accountItem: {
     flexDirection: "row",

@@ -3,7 +3,7 @@ import "../global.css";
 import { useEffect, useState } from "react";
 
 export default function RootLayout() {
- const [isLoggedIn, setIsLoggedIn] = useState(true); // Ini harusnya false, gua bikin true biar langsung masuk home
+  const [isLoggedIn, setIsLoggedIn] = useState(true); // Ini harusnya false, gua bikin true biar langsung masuk home
 
   useEffect(() => {
     // Cek status login / cek token valid atau engga

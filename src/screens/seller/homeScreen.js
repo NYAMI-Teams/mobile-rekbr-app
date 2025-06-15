@@ -9,10 +9,11 @@ import {
 } from "react-native";
 import { useState, useEffect } from "react";
 import EmptyIllustration from "../../components/Ilustration";
+import { useRouter } from "expo-router";
 
-export default function SellerEmptyContent() {
+export default function SellerEmptyContent({ isKYCCompleted }) {
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
-  const [isKycCompleted, setIsKycCompleted] = useState(false);
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -34,7 +35,7 @@ export default function SellerEmptyContent() {
         const data = await response.json();
         console.log("User profile:", data);
 
-        setIsKycCompleted(data.kycStatus === "COMPLETED");
+        // setIsKycCompleted(data.kycStatus === "COMPLETED");
       } catch (error) {
         console.error("Error fetching user profile:", error);
       } finally {
@@ -55,11 +56,9 @@ export default function SellerEmptyContent() {
 
   return (
     <SafeAreaView className="flex-1 bg-white pt-4 justify-start">
-      <StatusBar style="dark" />
-
       {/* Warning Banner (jika belum KYC) */}
-      {!isKycCompleted && (
-        <View className="px-8 mb-6">
+      {!isKYCCompleted && (
+        <View className="mb-6">
           <View className="bg-[#FFF4D9] rounded-xl py-3 px-4">
             <View className="flex-row items-start">
               <Image
@@ -77,23 +76,25 @@ export default function SellerEmptyContent() {
 
       {/* Empty Illustration + Text */}
       <View className="items-center mb-8">
-        <EmptyIllustration text="Kosong banget di sini...{'\n'}Bikin Rekber pertama kamu, kuy!" />
+        <EmptyIllustration
+          text={`Kosong banget di sini...\nBikin Rekber pertama kamu, kuy!`}
+        />
       </View>
 
       {/* CTA Button */}
-      <View className="px-8">
+      <View className="">
         <TouchableOpacity
           className="w-full py-4 rounded-xl bg-black items-center justify-center"
           onPress={() => {
-            if (!isKycCompleted) {
+            if (!isKYCCompleted) {
               console.log("Navigasi ke halaman KYC");
+              router.push("E-kyc/KYC_Intro");
             } else {
               console.log("Navigasi ke buat Rekber baru");
             }
-          }}
-        >
+          }}>
           <Text className="text-white text-base font-semibold">
-            {isKycCompleted
+            {isKYCCompleted
               ? "Bikin Rekber Baru"
               : "Lengkapi KYC & Bikin Rekber"}
           </Text>
