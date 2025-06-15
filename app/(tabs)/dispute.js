@@ -14,7 +14,7 @@ export default function Home() {
   return (
     <View style={{ flex: 1, backgroundColor: "#000000" }}>
       <NavigationBar />
-      <AccountBalance bankData={bankData} />
+      <AccountBalance balance={3} />
       <QuickActions />
     </View>
   );

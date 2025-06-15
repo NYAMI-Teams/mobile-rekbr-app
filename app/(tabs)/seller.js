@@ -1,13 +1,10 @@
 import { StatusBar } from "expo-status-bar";
 import { View, ScrollView, Text } from "react-native";
-import NavigationBar from "../src/components/NavigationBar";
-import BuyerCard from "../src/components/card-transaction/BuyerCard";
-import { mockAPIBuyer } from "../src/services/apiMock/api";
+import NavigationBar from "../../src/components/NavigationBar";
+import BuyerCard from "../../src/components/card-transaction/BuyerCard";
+import { mockAPIBuyer } from "../../src/services/apiMock/api";
 import { useRouter } from "expo-router";
-import PrimaryButton from "../src/components/PrimaryButton";
-
-
-// ini harusnya ga kepakai lagi karna langsung ke (tabs)
+import PrimaryButton from "../../src/components/PrimaryButton";
 
 export default function Home() {
   const router = useRouter();
@@ -40,7 +37,7 @@ export default function Home() {
           height={50}
           style={{
             position: "absolute",
-            bottom: 120,
+            bottom: 30,
             right: 16,
             borderRadius: 16,
             alignItems: "center",
@@ -52,11 +49,6 @@ export default function Home() {
             elevation: 8,
             zIndex: 10,
           }}
-        />
-        <NavigationBar
-          name="irgi168@gmail.commmmmmmmmm"
-          onNotificationPress={() => console.log("Notification pressed")}
-          onProfilePress={() => router.push("/profile")}
         />
       </View>
     </View>

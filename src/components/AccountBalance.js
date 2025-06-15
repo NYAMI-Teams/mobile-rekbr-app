@@ -6,7 +6,9 @@ const AccountBalance = ({ balance }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.label}>Total Balance</Text>
-      <Text style={styles.amount}>Rp {balance.toLocaleString()}</Text>
+      <Text style={styles.amount}>
+        Rp {(Number(balance) || 0).toLocaleString('id-ID')}
+      </Text>
     </View>
   );
 };
