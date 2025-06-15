@@ -18,7 +18,7 @@ export default function Seller() {
       <StatusBar style="dark" />
       <View style={{ flex: 1, padding: 16 }}>
         <NavigationBar
-          name="irgi168@gmail.commmmmmmmmm"
+          name="irgi168@gmail.com"
           onNotificationPress={() => console.log("Notification pressed")}
           onProfilePress={() => console.log("Notification pressed")}
         />

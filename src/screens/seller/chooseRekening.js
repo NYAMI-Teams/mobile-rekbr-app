@@ -23,6 +23,7 @@ import BankSelector from "../../../src/components/BankScreens";
 import { mockBank } from "../../../src/services/apiMock/api";
 import { ChevronLeftCircle } from "lucide-react-native";
 import PrimaryButton from "../../components/PrimaryButton";
+import CreateRekber from "../../../app/CreateTransaksi/CreateRekbr/index";
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
 
@@ -115,7 +116,8 @@ export default function PilihRekeningScreen() {
 
   const handleToCreateRekbr = () => {
     setIsAlreadyCheckedRekening(true);
-    router.push("/CreateTransaksi/CreateRekening/ChooseRekening");
+    setModalVisible(false);
+    router.push("/CreateTransaksi/CreateRekbr");
   };
 
   const toggleFavorite = (item, fromFavorites) => {
@@ -282,7 +284,7 @@ export default function PilihRekeningScreen() {
                     banks={mockBank.data}
                     onSelectBank={(bank) => {
                       setSelectedBank({
-                        logo: bank.logoUrl,
+                        logoSrc: bank.logoUrl,
                         name: bank.bankName,
                         bankId: bank.bankId,
                       });
@@ -410,7 +412,7 @@ export default function PilihRekeningScreen() {
                       </View>
                     </View>
                     <PrimaryButton
-                      onPress={() => handleToCreateRekbr}
+                      onPress={() => handleToCreateRekbr()}
                       title="Simpan dan Gunakan Rekening"
                     />
                   </Animated.View>

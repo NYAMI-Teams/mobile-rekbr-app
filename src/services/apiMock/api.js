@@ -43,7 +43,7 @@ export const mockAPISeller = {
   data: {
     id: "12345678",
     transactionCode: "TXN-8080123456789",
-    status: "completed", // enum: pending_payment, waiting_shipment, shipped, completed, refunded, cancelled, dispute
+    status: "pending_payment", // enum: pending_payment, waiting_shipment, shipped, completed, refunded, cancelled, dispute
     itemName: "iPhone 13 Pro Max",
     itemPrice: 8000000,
     insuranceFee: 16000,

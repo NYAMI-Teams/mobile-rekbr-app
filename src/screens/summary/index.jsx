@@ -5,30 +5,24 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { ChevronLeft, Info } from 'lucide-react-native';
 import PrimaryButton from '../../components/PrimaryButton';
 import RekeningKamu from '../../components/RekeningKamu';
+import { useRouter } from 'expo-router';
 
-export default function TransactionSummaryScreen() {
-    const bankData = {
-        accountHolder: 'Sdr Bayu Saptaji Rahman',
-        bankName: 'Bank Negara Indonesia',
-        accountNumber: '0900604501',
-        logoSrc: {
-            uri: 'https://upload.wikimedia.org/wikipedia/id/thumb/5/55/BNI_logo.svg/2560px-BNI_logo.svg.png',
-        },
-    };
+export default function TransactionSummaryScreen({ bankData }) {
+    const router = useRouter();
 
     return (
         <SafeAreaView className="flex-1 bg-white relative">
+            {/* Header */}
+            <View className="flex-row items-center justify-center mb-6 relative">
+                <TouchableOpacity className="absolute left-0" onPress={() => router.back()}>
+                    <ChevronLeft size={24} color="#000" />
+                </TouchableOpacity>
+                <Text className="text-lg font-semibold text-center">Ringkasan Transaksi Rekber</Text>
+            </View>
             <ScrollView
                 contentContainerStyle={{ paddingBottom: 160 }}
                 className="px-4 pt-6"
             >
-                {/* Header */}
-                <View className="flex-row items-center justify-center mb-6 relative">
-                    <TouchableOpacity className="absolute left-0">
-                        <ChevronLeft size={24} color="#000" />
-                    </TouchableOpacity>
-                    <Text className="text-lg font-semibold text-center">Ringkasan Transaksi Rekber</Text>
-                </View>
 
                 {/* Rekening Kamu */}
                 <RekeningKamu bankData={bankData} />
@@ -66,8 +60,8 @@ export default function TransactionSummaryScreen() {
             </ScrollView>
 
             {/* Footer */}
-            <View className="absolute bottom-0 left-0 right-0 bg-gray-100 rounded-t-2xl px-4 py-5 mb-4">
-                <View className="flex-row justify-between items-center mb-4">
+            <View className="p-3 border-t-2 rounded-t-3xl border-x-2 border-gray-200 drop-shadow-xl items-center justify-between">
+                <View className="flex-row justify-between items-center mb-4 w-full px-2">
                     <Text className="text-base text-gray-700 font-medium">Total Tagihan Buyer</Text>
                     <Text className="text-xl font-bold text-gray-900">Rp. 8.080.000,00</Text>
                 </View>
@@ -75,6 +69,7 @@ export default function TransactionSummaryScreen() {
                     title="Generate VA dan Kirim"
                     onPress={() => {
                         // Aksi tombol
+                        router.replace("/");
                     }}
                 />
             </View>

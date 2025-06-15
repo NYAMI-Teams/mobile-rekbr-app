@@ -1,9 +1,14 @@
 import { View } from "react-native";
 import NavigationBar from "../../src/components/NavigationBar";
-import AccountBalance from "../../src/components/AccountBalance";
-import QuickActions from "../../src/components/QuickActions";
+import { useState } from "react";
+import BuyerEmptyContent from "../../src/screens/buyer/index";
+import { mockAPIBuyer } from "../../src/services/apiMock/api";
+import { StatusBar } from "expo-status-bar";
+import BuyerCard from "../../src/components/card-transaction/BuyerCard";
+import { ScrollView } from "react-native";
 
 export default function Home() {
+  const [isEmptyTransaction, setIsEmptyTransaction] = useState(false);
   const bankData = {
     accountHolder: "Sdr Bayu Saptaji Rahman",
     bankName: "Bank Negara Indonesia",
@@ -12,10 +17,24 @@ export default function Home() {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#000000" }}>
-      <NavigationBar />
-      <AccountBalance balance={2}/>
-      <QuickActions />
+    <View style={{ flex: 1, backgroundColor: "#fff" }}>
+      <StatusBar style="dark" />
+      <View style={{ flex: 1, padding: 16 }}>
+        <NavigationBar
+          name="irgi168@gmail.com"
+          onNotificationPress={() => console.log("Notification pressed")}
+          onProfilePress={() => console.log("Notification pressed")}
+        />
+        <ScrollView
+          className="flex flex-col gap-12"
+          showsVerticalScrollIndicator={false}>
+          {isEmptyTransaction ? (
+            <BuyerEmptyContent />
+          ) : (
+            <BuyerCard data={mockAPIBuyer.data} />
+          )}
+        </ScrollView>
+      </View>
     </View>
   );
 }

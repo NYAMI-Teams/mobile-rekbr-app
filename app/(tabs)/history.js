@@ -1,7 +1,7 @@
 import { View } from "react-native";
 import NavigationBar from "../../src/components/NavigationBar";
-import AccountBalance from "../../src/components/AccountBalance";
-import QuickActions from "../../src/components/QuickActions";
+import History from "../../src/screens/history";
+import { StatusBar } from "expo-status-bar";
 
 export default function Home() {
   const bankData = {
@@ -12,10 +12,25 @@ export default function Home() {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#000000" }}>
-      <NavigationBar />
-      <AccountBalance balance={4} />
-      <QuickActions />
+    <View style={{ flex: 1, backgroundColor: "#fff" }}>
+      <StatusBar style="dark" />
+      <View style={{ flex: 1, padding: 16 }}>
+        <NavigationBar
+          name="irgi168@gmail.com"
+          onNotificationPress={() => console.log("Notification pressed")}
+          onProfilePress={() => console.log("Notification pressed")}
+        />
+        {/* <ScrollView
+          className="flex flex-col gap-12"
+          showsVerticalScrollIndicator={false}>
+          {isEmptyTransaction ? (
+            <BuyerEmptyContent />
+          ) : (
+            <BuyerCard data={mockAPIBuyer.data} />
+          )}
+        </ScrollView> */}
+        <History />
+      </View>
     </View>
   );
 }

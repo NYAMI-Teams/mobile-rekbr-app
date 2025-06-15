@@ -7,7 +7,7 @@ import EmptyIllustration from "../../components/Ilustration";
 
 export default function History() {
   const [selectedTab, setSelectedTab] = useState("pembelian");
-  //   const mockDataLength = 0;
+  const mockDataLength = 0;
 
   const handleTabPress = (tab) => {
     setSelectedTab(tab);
@@ -15,7 +15,7 @@ export default function History() {
 
   const renderContent = () => {
     if (selectedTab === "pembelian") {
-      if (mockAPIBuyer.data.length === 0) {
+      if (mockAPIBuyer.data.length === 0 || mockDataLength === 0) {
         return (
           <View className="justify-center items-center">
             <EmptyIllustration
@@ -29,7 +29,7 @@ export default function History() {
       return <BuyerCard data={mockAPIBuyer.data} />;
     }
 
-    if (mockAPISeller.data.length === 0) {
+    if (mockAPISeller.data.length === 0 || mockDataLength === 0) {
       return (
         <View className="justify-center items-center">
           <EmptyIllustration
@@ -45,7 +45,7 @@ export default function History() {
 
   return (
     <View className="bg-white items-center w-full h-[80%]">
-      <View className="flex-row w-full mt-4 px-6">
+      <View className="flex-row w-full mt-4">
         <TouchableOpacity
           onPress={() => handleTabPress("pembelian")}
           className={`flex-1 items-center justify-center h-8 ${
