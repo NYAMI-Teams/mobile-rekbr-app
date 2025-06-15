@@ -27,7 +27,7 @@ const PasswordChecklist = ({ password }) => {
     ];
 
     return (
-        <View className="mt-3 space-y-2">
+        <View className="mt-3 space-y-2 mx-5 justify-between gap-1">
             {criteria.map((item, index) => (
                 <View key={index} className="flex-row items-center space-x-2">
                     <Feather

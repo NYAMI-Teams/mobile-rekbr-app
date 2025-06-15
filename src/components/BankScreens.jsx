@@ -15,7 +15,7 @@ const BankSelector = ({ banks, onSelectBank }) => {
     const [searchQuery, setSearchQuery] = useState('');
 
     const filteredBanks = banks.filter((bank) =>
-        bank.name.toLowerCase().includes(searchQuery.toLowerCase())
+        bank.bankName.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
     return (
@@ -37,18 +37,18 @@ const BankSelector = ({ banks, onSelectBank }) => {
 
             <FlatList
                 data={filteredBanks}
-                keyExtractor={(item) => item.id}
+                keyExtractor={(item) => item.bankId}
                 renderItem={({ item }) => (
                     <TouchableOpacity
                         onPress={() => onSelectBank(item)}
                         className="flex-row items-center space-x-3 mb-5"
                     >
                         <Image
-                            source={{ uri: item.logo }}
+                            source={{ uri: item.logoUrl }}
                             className="w-20 h-20 rounded-md"
                             resizeMode="contain"
                         />
-                        <Text className="text-xl text-gray-800 ml-3">{item.name}</Text>
+                        <Text className="text-xl text-gray-800 ml-3">{item.bankName}</Text>
                     </TouchableOpacity>
                 )}
             />

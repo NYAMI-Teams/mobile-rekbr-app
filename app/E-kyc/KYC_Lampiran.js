@@ -10,11 +10,13 @@ import {
 } from "react-native";
 import { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
-import ProgressBar from "../../components/ProgressBar";
-import AttachmentFilled from "../../components/AttachmentFilled";
-import PrimaryButton from "../../components/PrimaryButton";
+import ProgressBar from "../../src/components/ProgressBar";
+import AttachmentFilled from "../../src/components/AttachmentFilled";
+import PrimaryButton from "../../src/components/PrimaryButton";
+import { useRouter } from "expo-router";
 
 export default function Lampiran() {
+  const router = useRouter();
   const [isChecked, setIsChecked] = useState(false);
   const [isUploaded, setIsUploaded] = useState(false);
 
@@ -28,7 +30,7 @@ export default function Lampiran() {
 
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => console.log("Back pressed")}>
+        <TouchableOpacity onPress={() => router.back()}>
           <Ionicons name="chevron-back-outline" size={24} color="#000" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Know Your Customer</Text>
@@ -112,13 +114,13 @@ export default function Lampiran() {
       <View style={styles.bottomSection}>
         <PrimaryButton
           title="Lanjut"
-          onPress={() => console.log("Lanjut pressed")}
+          onPress={() => router.push("/E-kyc/KYC_Pratinjau")}
           disabled={!isUploaded}
         />
 
         <View style={styles.footer}>
           <Image
-            source={require("../../../assets/bni-logo.png")}
+            source={require("../../assets/bni-logo.png")}
             style={styles.footerLogo}
             resizeMode="contain"
           />

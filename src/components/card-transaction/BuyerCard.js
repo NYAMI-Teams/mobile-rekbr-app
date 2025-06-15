@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from "react";
+import { useNavigation } from "@react-navigation/native";
 import { View, Text, Image, Pressable, TouchableOpacity } from "react-native";
 import * as Clipboard from "expo-clipboard";
 import Toast from "react-native-toast-message";
 import moment from "moment";
 import clsx from "clsx";
 import CountdownTimer from "../Countdown";
+import { useRouter } from "expo-router";
 
 const BuyerCard = ({ data }) => {
+  const router = useRouter();
   const status = data.status;
 
   const handleCopy = async (text) => {
@@ -161,7 +164,7 @@ const BuyerCard = ({ data }) => {
   };
 
   return (
-    <>
+    <TouchableOpacity onPress={() => router.push("/DetailTransaksi/Buyer")}>
       <View className="border border-gray-200 rounded-lg overflow-hidden my-2 w-full bg-white">
         {/* Detail Section */}
         <View className="p-3">
@@ -233,7 +236,7 @@ const BuyerCard = ({ data }) => {
           </View>
         </View>
       </View>
-    </>
+    </TouchableOpacity>
   );
 };
 

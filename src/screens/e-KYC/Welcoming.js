@@ -13,17 +13,21 @@ import {
 import { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import PrimaryButton from "../../components/PrimaryButton";
+import { useRouter } from "expo-router";
 
 export default function Welcoming() {
+  const router = useRouter();
+
   const [isChecked, setIsChecked] = useState(false);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <>
+      {/* <SafeAreaView className="flex-1 bg-white"> */}
       <StatusBar style="dark" />
 
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => console.log("Back pressed")}>
+        <TouchableOpacity onPress={() => router.back()}>
           <Ionicons name="chevron-back-outline" size={24} color="#000" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Know Your Customer</Text>
@@ -55,8 +59,7 @@ export default function Welcoming() {
         <View style={styles.checkboxContainer}>
           <TouchableOpacity
             onPress={() => setIsChecked(!isChecked)}
-            style={[styles.checkbox, isChecked && styles.checkboxChecked]}
-          >
+            style={[styles.checkbox, isChecked && styles.checkboxChecked]}>
             {isChecked && <Text style={styles.checkmark}>✓</Text>}
           </TouchableOpacity>
           <Text style={styles.checkboxText}>
@@ -67,7 +70,7 @@ export default function Welcoming() {
 
         <PrimaryButton
           title="Lanjut"
-          onPress={() => console.log("Lanjut pressed")}
+          onPress={() => router.push("/E-kyc/KYC_DataDiri")}
           disabled={!isChecked}
         />
 
@@ -83,7 +86,8 @@ export default function Welcoming() {
           </Text>
         </View>
       </View>
-    </SafeAreaView>
+      {/* </SafeAreaView> */}
+    </>
   );
 }
 

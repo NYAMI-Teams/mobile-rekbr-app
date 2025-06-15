@@ -1,16 +1,14 @@
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, View, Text } from "react-native";
+import { StyleSheet, View } from "react-native";
+import { useLocalSearchParams } from "expo-router";
 import "./global.css";
-import TransaksiBuyer from "./src/components/DetailRekber/DetailTransaksiBuyer";
-import TransaksiSeller from "./src/components/DetailRekber/DetailTransaksiSeller";
-import { mockAPIBuyer, mockAPISeller } from "./src/services/apiMock/api";
+
 export default function App() {
+  const params = useLocalSearchParams();
+
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
-      {/* Hapus Dari sini (TULISAN INI JANGAN DI HAPUS) */}
-      <TransaksiSeller data={mockAPISeller.data} />
-      {/* Hapus Sampai sini (TULISAN INI JANGAN DI HAPUS) */}
     </View>
   );
 }
@@ -18,6 +16,6 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: "#F5F5F5",
   },
 });

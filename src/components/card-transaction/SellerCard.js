@@ -5,9 +5,11 @@ import Toast from "react-native-toast-message";
 import moment from "moment";
 import clsx from "clsx";
 import CountdownTimer from "../Countdown";
+import { useRouter } from "expo-router";
 
 const SellerCard = ({ data }) => {
   const status = data.status;
+  const router = useRouter();
 
   const handleCopy = async (text) => {
     // belum bisa jalan toastnya
@@ -53,13 +55,13 @@ const SellerCard = ({ data }) => {
       case "waiting_shipment":
         return [
           { label: "Nama Produk", value: data.itemName },
-          { label: "Pembeli", value: data.sellerEmail },
+          { label: "Pembeli", value: data.buyerEmail },
           { label: "VA Number", value: data.virtualAccount, copyable: true },
         ];
       case "shipped":
         return [
           { label: "Nama Produk", value: data.itemName },
-          { label: "Pembeli", value: data.sellerEmail },
+          { label: "Pembeli", value: data.buyerEmail },
           {
             label: "Nomor Resi",
             value: data.shipment.trackingNumber,
@@ -70,7 +72,7 @@ const SellerCard = ({ data }) => {
       case "completed":
         return [
           { label: "Nama Produk", value: data.itemName },
-          { label: "Pembeli", value: data.sellerEmail },
+          { label: "Pembeli", value: data.buyerEmail },
           {
             label: "Nomor Resi",
             value: data.shipment.trackingNumber,
@@ -164,7 +166,7 @@ const SellerCard = ({ data }) => {
   };
 
   return (
-    <>
+    <TouchableOpacity onPress={() => router.push(`/DetailTransaksi/Buyer`)}>
       <View className="border border-gray-200 rounded-lg overflow-hidden my-2 w-full bg-white">
         {/* Detail Section */}
         <View className="p-3">
@@ -242,7 +244,7 @@ const SellerCard = ({ data }) => {
           </View>
         </View>
       </View>
-    </>
+    </TouchableOpacity>
   );
 };
 
