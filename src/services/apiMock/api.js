@@ -86,3 +86,40 @@ export const mockAPISeller = {
     },
   },
 };
+
+export const mockBank = {
+  success: true,
+  message: "Daftar bank berhasil diambil",
+  data: [
+    {
+      bankId: "123321",
+      bankName: "Bank Negara Indonesia",
+      logoUrl:
+        "https://upload.wikimedia.org/wikipedia/id/thumb/5/55/BNI_logo.svg/2560px-BNI_logo.svg.png",
+    },
+    {
+      bankId: "bca",
+      bankName: "Bank Central Asia",
+      logoUrl:
+        "https://www.bca.co.id/-/media/Feature/Card/List-Card/Tentang-BCA/Brand-Assets/Logo-BCA/Logo-BCA_Biru.png",
+    },
+    {
+      bankId: "bri",
+      bankName: "Bank Rakyat Indonesia",
+      logoUrl:
+        "https://buatlogoonline.com/wp-content/uploads/2022/10/Logo-Bank-BRI.png",
+    },
+    {
+      bankId: "bsi",
+      bankName: "Bank Syariah Indonesia",
+      logoUrl:
+        "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Bank_Syariah_Indonesia.svg/1200px-Bank_Syariah_Indonesia.svg.png",
+    },
+    {
+      bankId: "mandiri",
+      bankName: "Bank Mandiri",
+      logoUrl:
+        "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Bank_Mandiri_logo_2016.svg/1280px-Bank_Mandiri_logo_2016.svg.png",
+    },
+  ],
+};

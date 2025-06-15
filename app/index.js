@@ -30,7 +30,9 @@ export default function Home() {
         </ScrollView>
         <PrimaryButton
           title={"+ Rekbr Baru"}
-          onPress={() => console.log("+ Rekbr pressed")}
+          onPress={() =>
+            router.push("/CreateTransaksi/CreateRekening/ChooseRekening")
+          }
           btnColor="black"
           textColor="#fff"
           width="50%"
