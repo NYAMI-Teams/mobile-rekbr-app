@@ -1,4 +1,3 @@
-import { StatusBar } from "expo-status-bar";
 import {
   StyleSheet,
   View,
@@ -16,8 +15,10 @@ import * as Clipboard from "expo-clipboard";
 import Toast from "react-native-toast-message";
 import PrimaryButton from "../PrimaryButton";
 import Tagihan from "./Tagihan";
+import { useRouter } from "expo-router";
 
 export default function DetailTransaksiBuyer({ data }) {
+  const router = useRouter();
   const handleCopy = async (text) => {
     // belum bisa jalan toastnya
     if (!text) return;
@@ -307,7 +308,7 @@ export default function DetailTransaksiBuyer({ data }) {
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => console.log("Back pressed")}>
+        <TouchableOpacity onPress={() => router.back()}>
           <Ionicons name="chevron-back-outline" size={24} color="#000" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Detail Transaksi</Text>

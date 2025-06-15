@@ -1,15 +1,28 @@
 // src/components/NavigationBar.js
-import React from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet, Platform, StatusBar, SafeAreaView } from 'react-native';
+import React from "react";
+import {
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  StyleSheet,
+  Platform,
+  StatusBar,
+  SafeAreaView,
+} from "react-native";
 
-export default function NavigationBar({ name, onNotificationPress, onProfilePress }) {
+export default function NavigationBar({
+  name,
+  onNotificationPress,
+  onProfilePress,
+}) {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
         {/* Left → Logo + Hi + Name */}
         <View style={styles.leftSection}>
           <Image
-            source={require('../../assets/logo-rekbr.png')}
+            source={require("../../assets/logo-rekbr.png")}
             style={styles.logoRekbr}
             resizeMode="contain"
           />
@@ -17,24 +30,33 @@ export default function NavigationBar({ name, onNotificationPress, onProfilePres
           {/* Hi + name → turunkan sedikit pakai marginTop */}
           <View style={styles.greetingRow}>
             <Text style={styles.greetingText}>Hi, </Text>
-            <Text style={styles.emailText}>{name}</Text>
+            <Text
+              style={styles.emailText}
+              numberOfLines={1}
+              ellipsizeMode="tail">
+              {name}
+            </Text>
           </View>
         </View>
 
         {/* Right → Notification & Profile */}
         <View style={styles.rightSection}>
-          <TouchableOpacity style={styles.actionButton} onPress={onNotificationPress}>
+          <TouchableOpacity
+            style={styles.actionButton}
+            onPress={onNotificationPress}>
             <Image
-              source={require('../../assets/icon-notification.png')}
+              source={require("../../assets/icon-notification.png")}
               style={styles.actionIcon}
               resizeMode="contain"
             />
             <Text style={styles.actionText}>Notifikasi</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.actionButton} onPress={onProfilePress}>
+          <TouchableOpacity
+            style={styles.actionButton}
+            onPress={onProfilePress}>
             <Image
-              source={require('../../assets/icon-profile.png')}
+              source={require("../../assets/icon-profile.png")}
               style={styles.actionIcon}
               resizeMode="contain"
             />
@@ -48,56 +70,63 @@ export default function NavigationBar({ name, onNotificationPress, onProfilePres
 
 const styles = StyleSheet.create({
   safeArea: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
+    marginVertical: 12,
   },
   container: {
-    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight + 8 : 12,
-    paddingHorizontal: 16,
-    paddingBottom: 12,
-    flexDirection: 'row',
-    alignItems: 'flex-start', // supaya "Hi, nama" bisa agak turun
-    justifyContent: 'space-between',
-    backgroundColor: '#fff',
+    flexDirection: "row",
+    alignItems: "flex-start", // supaya "Hi, nama" bisa agak turun
+    justifyContent: "space-between",
+    backgroundColor: "#fff",
+    width: "100%",
   },
   leftSection: {
-    flexDirection: 'column',
+    flexDirection: "column",
+    width: "50%",
+    justifyContent: "center",
   },
   logoRekbr: {
-    width: 72,
-    height: 24,
+    width: 80,
+    height: 30,
     marginBottom: 4,
   },
   greetingRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 6, // ← ini yang bikin "Hi, nama" agak turun
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    // marginTop: 6, // ← ini yang bikin "Hi, nama" agak turun
   },
   greetingText: {
-    fontSize: 16,
-    color: '#888',
-    fontFamily: 'Poppins_400Regular',
+    fontSize: 12,
+    color: "#888",
+    fontFamily: "Poppins_400Regular",
   },
   emailText: {
-    fontSize: 16,
-    color: '#000',
-    fontFamily: 'Poppins_600SemiBold',
+    fontSize: 12,
+    color: "#000",
+    fontFamily: "Poppins_600SemiBold",
+    flex: 1,
+    width: "100%",
   },
   rightSection: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    width: "38%",
+    justifyContent: "space-between",
   },
   actionButton: {
-    alignItems: 'center',
-    marginLeft: 16,
+    alignItems: "center",
+    justifyContent: "center",
   },
   actionIcon: {
-    width: 40,
-    height: 40,
+    width: 26,
+    height: 26,
     marginBottom: 4,
   },
   actionText: {
-    fontSize: 14,
-    color: '#000',
-    fontFamily: 'Poppins_500Medium', // ← supaya tidak terlalu tebal
-    },
+    fontSize: 12,
+    color: "#000",
+    fontFamily: "Poppins_500Medium", // ← supaya tidak terlalu tebal
+    fontWeight: 500,
+  },
 });

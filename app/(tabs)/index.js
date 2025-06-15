@@ -12,7 +12,7 @@ export default function Home() {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#F5F5F5" }}>
+    <View style={{ flex: 1, backgroundColor: "#000000" }}>
       <NavigationBar />
       <AccountBalance bankData={bankData} />
       <QuickActions />
