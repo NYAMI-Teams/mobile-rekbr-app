@@ -10,8 +10,10 @@ import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { ChevronLeftCircle } from "lucide-react-native";
 import * as ImagePicker from "expo-image-picker"; // Import ImagePicker
+import BuyerKonfirmasi from "../components/BuyerKonfirmasi";
+import { postResi } from "../utils/api/seller";
 
-export default function InputResi() {
+export default function InputResi({ id }) {
   const router = useRouter();
   const [isUploaded, setIsUploaded] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
@@ -20,6 +22,7 @@ export default function InputResi() {
 
   const [resiNumber, setResiNumber] = useState("");
   const [courier, setCourier] = useState("");
+  const [showPopup, setShowPopup] = useState(false);
 
   // Permintaan izin kamera saat komponen di-mount
   useEffect(() => {
@@ -78,6 +81,21 @@ export default function InputResi() {
   const handleSelectCourier = (selectedCourier) => {
     setCourier(selectedCourier);
     setModalVisible(false);
+  };
+
+  const handleBtnPress = () => {
+    setShowPopup(true);
+  };
+
+  const handleUploadResi = () => {
+    // setShowPopup(true);
+    try {
+      postResi(id, courier, resiNumber, image);
+      setShowPopup(false);
+    } catch (error) {
+      console.log(error);
+    }
+    router.replace("/");
   };
 
   return (
@@ -151,8 +169,19 @@ export default function InputResi() {
       <View className="w-full px-4 py-4">
         {" "}
         {/* Tambahkan padding horizontal dan vertikal */}
-        <PrimaryButton title="Simpan" onPress={() => console.log(image)} />
+        <PrimaryButton title="Simpan" onPress={handleBtnPress} />
       </View>
+
+      {showPopup && (
+        <BuyerKonfirmasi
+          onClose={() => setShowPopup(false)}
+          onBtn2={handleUploadResi}
+          onBtn1={() => setShowPopup(false)}
+          title="Kirim form bukti pengiriman? Pastikan semua data udah benar !"
+          btn1="Kembali"
+          btn2="Konfirmasi"
+        />
+      )}
 
       {/* Bottom Sheet Modal */}
       <Modal

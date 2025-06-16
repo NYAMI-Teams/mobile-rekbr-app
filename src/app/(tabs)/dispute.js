@@ -1,6 +1,6 @@
 import { View, StatusBar } from "react-native";
 import NavigationBar from "../../components/NavigationBar";
-import InputResi from "../../components/InputResi";
+import FundReleaseRequestScreen from "../FundReleaseRequest";
 
 export default function Home() {
   return (
@@ -12,7 +12,7 @@ export default function Home() {
           onNotificationPress={() => console.log("Notification pressed")}
           onProfilePress={() => console.log("Notification pressed")}
         /> */}
-        <InputResi />
+        <FundReleaseRequestScreen />
       </View>
     </View>
   );
