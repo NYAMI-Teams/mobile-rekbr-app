@@ -22,7 +22,7 @@ export default function NavigationBar({
         {/* Left → Logo + Hi + Name */}
         <View style={styles.leftSection}>
           <Image
-            source={require("../../assets/logo-rekbr.png")}
+            source={require("../assets/logo-rekbr.png")}
             style={styles.logoRekbr}
             resizeMode="contain"
           />
@@ -45,7 +45,7 @@ export default function NavigationBar({
             style={styles.actionButton}
             onPress={onNotificationPress}>
             <Image
-              source={require("../../assets/icon-notification.png")}
+              source={require("../assets/icon-notification.png")}
               style={styles.actionIcon}
               resizeMode="contain"
             />
@@ -56,7 +56,7 @@ export default function NavigationBar({
             style={styles.actionButton}
             onPress={onProfilePress}>
             <Image
-              source={require("../../assets/icon-profile.png")}
+              source={require("../assets/icon-profile.png")}
               style={styles.actionIcon}
               resizeMode="contain"
             />

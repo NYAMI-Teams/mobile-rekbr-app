@@ -192,7 +192,7 @@ const BuyerCard = ({ data }) => {
                     onPress={() => handleCopy(row.value)}
                     className="p-1 rounded-full">
                     <Image
-                      source={require("../../../assets/copy.png")}
+                      source={require("../../assets/copy.png")}
                       className="w-4 h-4 opacity-70"
                     />
                   </Pressable>
@@ -209,7 +209,7 @@ const BuyerCard = ({ data }) => {
             data.fundReleaseRequest.status === "approved" && (
               <View className="flex-row gap-1 mb-3">
                 <Image
-                  source={require("../../../assets/admin1.png")}
+                  source={require("../../assets/admin1.png")}
                   className="w-4 h-4 mt-1"
                 />
                 <Text className="font-poppins text-xs text-gray-800 flex-1">

@@ -228,7 +228,7 @@ export default function DetailTransaksiBuyer({ data }) {
           <PrimaryButton
             title="Cek Status Transaksi"
             onPress={() => console.log("Cek Status Transaksi pressed")}
-            // disabled={!isFormValid}
+          // disabled={!isFormValid}
           />
           <View className="flex-row w-9/12 items-center justify-between px-3">
             <Text className="text-sm items-start justify-start text-[#616161]">
@@ -337,10 +337,10 @@ export default function DetailTransaksiBuyer({ data }) {
       })()}
       <ScrollView>
         {data.status == "pending_payment" ||
-        (data.status == "waiting_shipment" &&
-          data.shipment.trackingNumber != null) ||
-        data.status == "shipped" ||
-        data.status == "completed" ? (
+          (data.status == "waiting_shipment" &&
+            data.shipment.trackingNumber != null) ||
+          data.status == "shipped" ||
+          data.status == "completed" ? (
           <>
             {/* Copas Field */}
             <View
@@ -357,13 +357,12 @@ export default function DetailTransaksiBuyer({ data }) {
                   : "No Resi"}
               </Text>
               <View
-                className={`flex-row items-center ${
-                  data.status == "waiting_shipment" ||
+                className={`flex-row items-center ${data.status == "waiting_shipment" ||
                   data.status == "shipped" ||
                   data.status == "completed"
-                    ? "mb-3"
-                    : ""
-                }`}>
+                  ? "mb-3"
+                  : ""
+                  }`}>
                 <Text style={{ fontSize: 17, fontWeight: "500" }}>
                   {data.status == "pending_payment"
                     ? data.virtualAccount
@@ -378,14 +377,14 @@ export default function DetailTransaksiBuyer({ data }) {
                     )
                   }>
                   <Image
-                    source={require("../../../assets/copy.png")}
+                    source={require("../../assets/copy.png")}
                     style={{ marginLeft: 4, width: 17, height: 16 }}
                   />
                 </TouchableOpacity>
               </View>
               {data.status == "waiting_shipment" ||
-              data.status == "shipped" ||
-              data.status == "completed" ? (
+                data.status == "shipped" ||
+                data.status == "completed" ? (
                 <Text
                   style={{
                     fontSize: 12,
@@ -402,11 +401,11 @@ export default function DetailTransaksiBuyer({ data }) {
 
         {/* Admin Message */}
         {data.fundReleaseRequest.status == "approved" ||
-        data.status == "completed" ? (
+          data.status == "completed" ? (
           <>
             <View className="flex-row mx-3 p-3 justify-between items-center gap-3">
               <Image
-                source={require("../../../assets/admin1.png")}
+                source={require("../../assets/admin1.png")}
                 style={{
                   width: 20,
                   height: 20,
@@ -486,7 +485,7 @@ export default function DetailTransaksiBuyer({ data }) {
             </Text>
             <TouchableOpacity onPress={() => handleCopy(data.transactionCode)}>
               <Image
-                source={require("../../../assets/copy.png")}
+                source={require("../../assets/copy.png")}
                 style={{ marginLeft: 4, width: 17, height: 16 }}
               />
             </TouchableOpacity>
@@ -502,7 +501,7 @@ export default function DetailTransaksiBuyer({ data }) {
             </Text>
             <TouchableOpacity onPress={() => handleCopy(data.virtualAccount)}>
               <Image
-                source={require("../../../assets/copy.png")}
+                source={require("../../assets/copy.png")}
                 style={{ marginLeft: 4, width: 17, height: 16 }}
               />
             </TouchableOpacity>
