@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -7,8 +7,8 @@ import {
   ScrollView,
   TouchableOpacity,
 } from "react-native";
-import InputField from "../../src/components/InputField";
-import PrimaryButton from "../../src/components/PrimaryButton";
+import InputField from "../../components/InputField";
+import PrimaryButton from "../../components/PrimaryButton";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
