@@ -367,10 +367,10 @@ export default function DetailTransaksiSeller({ data }) {
       })()}
       <ScrollView>
         {data.status == "pending_payment" ||
-        (data.status == "waiting_shipment" &&
-          data.shipment.trackingNumber != null) ||
-        data.status == "shipped" ||
-        data.status == "completed" ? (
+          (data.status == "waiting_shipment" &&
+            data.shipment.trackingNumber != null) ||
+          data.status == "shipped" ||
+          data.status == "completed" ? (
           <>
             {/* Copas Field */}
             <View
@@ -387,13 +387,12 @@ export default function DetailTransaksiSeller({ data }) {
                   : "No Resi"}
               </Text>
               <View
-                className={`flex-row items-center ${
-                  data.status == "waiting_shipment" ||
-                  data.status == "shipped" ||
-                  data.status == "completed"
+                className={`flex-row items-center ${data.status == "waiting_shipment" ||
+                    data.status == "shipped" ||
+                    data.status == "completed"
                     ? "mb-3"
                     : ""
-                }`}>
+                  }`}>
                 <Text style={{ fontSize: 17, fontWeight: "500" }}>
                   {data.status == "pending_payment"
                     ? data.virtualAccount
@@ -408,14 +407,14 @@ export default function DetailTransaksiSeller({ data }) {
                     )
                   }>
                   <Image
-                    source={require("../../../assets/copy.png")}
+                    source={require("../../assets/copy.png")}
                     style={{ marginLeft: 4, width: 17, height: 16 }}
                   />
                 </TouchableOpacity>
               </View>
               {data.status == "waiting_shipment" ||
-              data.status == "shipped" ||
-              data.status == "completed" ? (
+                data.status == "shipped" ||
+                data.status == "completed" ? (
                 <Text
                   style={{
                     fontSize: 12,
@@ -432,11 +431,11 @@ export default function DetailTransaksiSeller({ data }) {
 
         {/* Admin Message (done)*/}
         {data.fundReleaseRequest.status != null ||
-        data.status == "completed" ? (
+          data.status == "completed" ? (
           <>
             <View className="flex-row mx-3 p-3 justify-between items-center gap-3">
               <Image
-                source={require("../../../assets/admin1.png")}
+                source={require("../../assets/admin1.png")}
                 style={{
                   width: 20,
                   height: 20,
@@ -446,10 +445,10 @@ export default function DetailTransaksiSeller({ data }) {
                 {data.status == "completed"
                   ? "Komplain dianggap tidak ada dan bakal selesai otomatis kalau pembeli nggak respon."
                   : data.fundReleaseRequest.status == "waiting"
-                  ? "Tunggu approval kami, ya! Kalau bukti kamu oke, permintaan konfirmasi bakal langsung dikirim ke buyer!"
-                  : data.fundReleaseRequest.status == "approved"
-                  ? "Konfirmasi udah dikirim ke buyer! Sekarang tinggal tunggu respon mereka dalam 1 x 24 jam"
-                  : "Permintaan konfirmasi ke buyer ditolak. Pastikan data atau bukti yang kamu kirim sudah lengkap dan sesuai"}
+                    ? "Tunggu approval kami, ya! Kalau bukti kamu oke, permintaan konfirmasi bakal langsung dikirim ke buyer!"
+                    : data.fundReleaseRequest.status == "approved"
+                      ? "Konfirmasi udah dikirim ke buyer! Sekarang tinggal tunggu respon mereka dalam 1 x 24 jam"
+                      : "Permintaan konfirmasi ke buyer ditolak. Pastikan data atau bukti yang kamu kirim sudah lengkap dan sesuai"}
               </Text>
             </View>
           </>
@@ -457,7 +456,7 @@ export default function DetailTransaksiSeller({ data }) {
 
         {/* Status Rekbr (done)*/}
         {data.fundReleaseRequest.status == "waiting" ||
-        data.fundReleaseRequest.status == "rejected" ? (
+          data.fundReleaseRequest.status == "rejected" ? (
           <View className="flex-col  gap-2 mx-3 p-3">
             <View className="flex-row justify-between">
               <Text className="text-[15px]">Status Rekbr:</Text>
@@ -537,7 +536,7 @@ export default function DetailTransaksiSeller({ data }) {
             </Text>
             <TouchableOpacity onPress={() => handleCopy(data.virtualAccount)}>
               <Image
-                source={require("../../../assets/copy.png")}
+                source={require("../../assets/copy.png")}
                 style={{ marginLeft: 4, width: 17, height: 16 }}
               />
             </TouchableOpacity>
@@ -593,7 +592,7 @@ export default function DetailTransaksiSeller({ data }) {
               <TouchableOpacity
                 onPress={() => handleCopy(data.withdrawalBankAccountId)}>
                 <Image
-                  source={require("../../../assets/copy.png")}
+                  source={require("../../assets/copy.png")}
                   style={{ marginLeft: 4, width: 17, height: 16 }}
                 />
               </TouchableOpacity>
@@ -610,7 +609,7 @@ export default function DetailTransaksiSeller({ data }) {
             </Text>
             <TouchableOpacity onPress={() => handleCopy(data.transactionCode)}>
               <Image
-                source={require("../../../assets/copy.png")}
+                source={require("../../assets/copy.png")}
                 style={{ marginLeft: 4, width: 17, height: 16 }}
               />
             </TouchableOpacity>

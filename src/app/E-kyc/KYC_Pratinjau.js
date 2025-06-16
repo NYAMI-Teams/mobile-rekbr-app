@@ -1,5 +1,3 @@
-// Welcoming.js
-
 import { StatusBar } from "expo-status-bar";
 import {
   StyleSheet,
@@ -11,18 +9,18 @@ import {
   SafeAreaView,
 } from "react-native";
 import { useState } from "react";
-import { Ionicons } from "@expo/vector-icons";
+import { MaterialIcons, Ionicons } from "@expo/vector-icons";
+import ProgressBar from "../../components/ProgressBar";
 import PrimaryButton from "../../components/PrimaryButton";
+import DropDownField from "../../components/DropDownField";
 import { useRouter } from "expo-router";
 
-export default function Welcoming() {
+export default function Pratinjau() {
   const router = useRouter();
-
   const [isChecked, setIsChecked] = useState(false);
 
   return (
-    <>
-      {/* <SafeAreaView className="flex-1 bg-white"> */}
+    <SafeAreaView style={styles.container}>
       <StatusBar style="dark" />
 
       {/* Header */}
@@ -35,22 +33,56 @@ export default function Welcoming() {
       </View>
 
       {/* Content scrollable */}
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        <Image
-          source={require("../../assets/kyc-image.png")}
-          style={styles.image}
-          resizeMode="cover"
-        />
+      <ProgressBar
+        currentStep={3}
+        steps={["Data diri", "Lainnya", "Lampiran", "Pratinjau"]}
+      />
 
-        <View style={styles.textContainer}>
-          <Text style={styles.title}>
-            Kenapa Seller Wajib KYC Dulu Sebelumnya?
-          </Text>
-          <Text style={styles.paragraph}>
-            Dengan KYC, kita pastiin penjual asli, bukan akun palsu atau penipu.
-            Jadi, kamu bisa jualan tanpa takut ribet, dan pembeli juga yakin
-            barangnya beneran nyata.
-          </Text>
+      <View style={styles.information}>
+        <Image
+          source={require("../../assets/admin1.png")}
+          style={styles.logo_admin}
+        />
+        <Text style={styles.informationText}>
+          Harap tinjau kembali dan pastikan seluruh data kamu sebelum
+          melanjutkan, ya!
+        </Text>
+      </View>
+
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={{ paddingBottom: 16 }}>
+        <View style={styles.content}>
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>Data Diri</Text>
+            <Ionicons
+              name={"chevron-down-circle"}
+              size={24}
+              color={"#49DBC8"}
+            />
+          </View>
+        </View>
+
+        <View style={styles.content}>
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>Lainnya</Text>
+            <Ionicons
+              name={"chevron-down-circle"}
+              size={24}
+              color={"#49DBC8"}
+            />
+          </View>
+        </View>
+
+        <View style={styles.content}>
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>Lampiran</Text>
+            <Ionicons
+              name={"chevron-down-circle"}
+              size={24}
+              color={"#49DBC8"}
+            />
+          </View>
         </View>
       </ScrollView>
 
@@ -59,18 +91,20 @@ export default function Welcoming() {
         <View style={styles.checkboxContainer}>
           <TouchableOpacity
             onPress={() => setIsChecked(!isChecked)}
-            style={[styles.checkbox, isChecked && styles.checkboxChecked]}>
-            {isChecked && <Text style={styles.checkmark}>✓</Text>}
+            style={[styles.checkbox, isChecked && styles.checkedCheckbox]}>
+            {isChecked && (
+              <MaterialIcons name="check" size={18} color="white" />
+            )}
           </TouchableOpacity>
           <Text style={styles.checkboxText}>
-            Saya setuju data saya digunakan untuk verifikasi identitas demi
-            keamanan transaksi.
+            Saya menyatakan bahwa seluruh data pribadi dan pekerjaan yang saya
+            isi adalah benar dan sesuai dengan peraturan yang berlaku.
           </Text>
         </View>
 
         <PrimaryButton
           title="Lanjut"
-          onPress={() => router.push("/E-kyc/KYC_DataDiri")}
+          onPress={() => router.push("/E-kyc/KYC_Success")}
           disabled={!isChecked}
         />
 
@@ -86,8 +120,7 @@ export default function Welcoming() {
           </Text>
         </View>
       </View>
-      {/* </SafeAreaView> */}
-    </>
+    </SafeAreaView>
   );
 }
 
@@ -113,27 +146,18 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: "#000",
   },
-  content: {
-    flex: 1,
+  information: {
+    flexDirection: "row",
     paddingHorizontal: 16,
+    marginTop: 24,
   },
-  image: {
-    width: "100%",
-    height: 280,
-    borderRadius: 16,
-    marginBottom: 24,
-    marginTop: 16,
+  logo_admin: {
+    width: 20,
+    height: 20,
+    marginRight: 16,
   },
-  textContainer: {
-    marginBottom: 24,
-  },
-  title: {
-    fontSize: 16,
-    fontWeight: "700",
-    marginBottom: 8,
-    color: "#000",
-  },
-  paragraph: {
+  informationText: {
+    flex: 1,
     fontSize: 14,
     color: "#444",
     lineHeight: 20,
@@ -145,35 +169,27 @@ const styles = StyleSheet.create({
   },
   checkboxContainer: {
     flexDirection: "row",
-    alignItems: "center",
     marginBottom: 16,
   },
   checkbox: {
     width: 24,
     height: 24,
     borderWidth: 2,
-    borderColor: "#000",
-    borderRadius: 8, // rounded sesuai gambar
-    alignItems: "center",
+    borderColor: "#4CD7D0",
+    borderRadius: 6,
     justifyContent: "center",
-    marginRight: 12,
-    backgroundColor: "#fff", // default background putih
+    alignItems: "center",
+    backgroundColor: "white",
   },
-  checkboxChecked: {
-    backgroundColor: "#3ED6C5", // hijau toska saat dicentang
-    borderColor: "#3ED6C5", // border hilang / sama dengan background
-  },
-  checkmark: {
-    color: "#fff", // centang putih
-    fontSize: 16,
-    fontWeight: "bold",
-    textAlign: "center",
-    lineHeight: 20,
+  checkedCheckbox: {
+    backgroundColor: "#4CD7D0",
+    borderColor: "#4CD7D0",
   },
   checkboxText: {
     flex: 1,
     fontSize: 14,
     color: "#444",
+    marginLeft: 12,
   },
   button: {
     width: "100%",
@@ -194,8 +210,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
   },
   footerLogo: {
-    width: 36, // diperbesar sesuai request
-    height: 36,
+    width: 40,
     marginRight: 8,
   },
   footerText: {
@@ -203,5 +218,29 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: "#444",
     lineHeight: 16,
+  },
+  content: {
+    marginTop: 16,
+    marginHorizontal: 20,
+  },
+  card: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FFF",
+    borderRadius: 10,
+    paddingHorizontal: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 1, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  cardTitle: {
+    flex: 1,
+    height: 50,
+    fontSize: 16,
+    color: "#333",
+    marginLeft: 8,
+    paddingVertical: 14,
   },
 });

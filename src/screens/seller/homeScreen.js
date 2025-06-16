@@ -62,7 +62,7 @@ export default function SellerEmptyContent({ isKYCCompleted }) {
           <View className="bg-[#FFF4D9] rounded-xl py-3 px-4">
             <View className="flex-row items-start">
               <Image
-                source={require("../../../assets/icon-warning.png")}
+                source={require("../../assets/icon-warning.png")}
                 className="w-5 h-5 mt-[2px] mr-2"
                 resizeMode="contain"
               />

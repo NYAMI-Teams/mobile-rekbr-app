@@ -4,7 +4,7 @@ export default function EmptyIllustration({text}) {
     return (
         <>
         <Image
-            source={require('../../assets/illustration-empty.png')}
+            source={require('../assets/illustration-empty.png')}
             className="w-72 h-72 mb-4"
             resizeMode="contain"
         />

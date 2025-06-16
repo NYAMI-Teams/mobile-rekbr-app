@@ -51,7 +51,7 @@ export default function Register() {
     <ScrollView className="flex-1 bg-white relative">
       <View className="bg-white items-center mb-2">
         <Image
-          source={require("../../../assets/header.png")}
+          source={require("../../assets/header.png")}
           className="w-full h-[300px] rounded-b-2xl"
           resizeMode="cover"
         />
@@ -129,11 +129,10 @@ export default function Register() {
                 color={confirmPassword === password ? "#4ade80" : "#f87171"}
               />
               <Text
-                className={`ml-2 text-sm ${
-                  confirmPassword === password
+                className={`ml-2 text-sm ${confirmPassword === password
                     ? "text-green-600"
                     : "text-red-400"
-                }`}
+                  }`}
               >
                 {confirmPassword === password
                   ? "Kata sandi sesuai"
@@ -145,9 +144,8 @@ export default function Register() {
         <View className="flex-row items-center justify-center mt-4">
           <TouchableOpacity
             onPress={() => setIsChecked(!isChecked)}
-            className={`w-5 h-5 rounded border ${
-              isChecked ? "bg-blue-600 border-blue-600" : "border-gray-400"
-            } items-center justify-center`}
+            className={`w-5 h-5 rounded border ${isChecked ? "bg-blue-600 border-blue-600" : "border-gray-400"
+              } items-center justify-center`}
           >
             {isChecked && <Text className="text-white text-xs">✓</Text>}
           </TouchableOpacity>
@@ -167,7 +165,7 @@ export default function Register() {
       <View className="items-center space-y-4">
         <View className="absolute bottom-0 left-0 right-0 h-52 rounded-b-3xl overflow-hidden z-[-1]">
           <Image
-            source={require("../../../assets/gradasi.png")}
+            source={require("../../assets/gradasi.png")}
             className="w-full h-full absolute"
             resizeMode="cover"
           />
@@ -191,7 +189,7 @@ export default function Register() {
         <View className="flex-row items-center space-x-1 mt-4">
           <Text className="text-xs text-gray-600">Powered by</Text>
           <Image
-            source={require("../../../assets/326.png")}
+            source={require("../../assets/326.png")}
             className="w-4 h-4"
             resizeMode="contain"
           />

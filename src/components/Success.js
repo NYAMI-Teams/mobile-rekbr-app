@@ -22,7 +22,7 @@ export default function RegisterSuccess({ title, subTitle, fromRegister }) {
       {/* Logo Rekbr + by BNI */}
       <View style={styles.logoContainer}>
         <Image
-          source={require("../../assets/logo-rekbr.png")}
+          source={require("../assets/logo-rekbr.png")}
           style={styles.logoRekbr}
           resizeMode="contain"
         />
@@ -33,7 +33,7 @@ export default function RegisterSuccess({ title, subTitle, fromRegister }) {
         {/* Image + Title Group */}
         <View style={styles.imageAndTitleWrapper}>
           <Image
-            source={require("../../assets/illustration-berhasil.png")}
+            source={require("../assets/illustration-berhasil.png")}
             style={styles.illustration}
             resizeMode="contain"
           />
