@@ -427,8 +427,26 @@ export default function DetailTransaksiBuyer({ data }) {
           </>
         ) : null}
 
-        {/* Admin Message */}
+        {/* Warning Message */}
         {data.status == "shipped" ? (
+          <>
+            <View className="flex-row items-center bg-yellow-200 px-4 py-3 rounded-lg w-full">
+              <Image
+                source={require("../../../assets/warning.png")}
+                className="w-5 h-5"
+                resizeMode="contain"
+              />
+              <Text className="text-xs text-black font-semibold flex-1">
+                {data.status === "completed"
+                  ? "Komplain dianggap tidak ada dan bakal selesai otomatis kalau pembeli nggak respon."
+                  : "Biar aman, pastikan kamu videoin proses buka paket ya! Ini penting banget sebagai bukti kalau mau komplain nanti."}
+              </Text>
+            </View>
+          </>
+        ) : null}
+
+        {data.fundReleaseRequest.status == "approved" ||
+        data.status == "waiting_shipment" ? (
           <>
             <View className="flex-row mx-3 p-3 justify-between items-center gap-3">
               <Image
@@ -441,7 +459,7 @@ export default function DetailTransaksiBuyer({ data }) {
               <Text className="text-sm flex-1">
                 {data.status == "completed"
                   ? "Komplain dianggap tidak ada dan bakal selesai otomatis kalau pembeli nggak respon."
-                  : "Halo! Barang udah sampai. Cek dan konfirmasi, biar dana langsung ke penjual via BNI!"}
+                  : "Pastikan alamat buyer sudah benar. Kalau ada kesalahan, langsung hubungi CS ekspedisi ya!"}
               </Text>
             </View>
           </>
