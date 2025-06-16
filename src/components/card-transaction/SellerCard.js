@@ -194,7 +194,7 @@ const SellerCard = ({ data }) => {
                     onPress={() => handleCopy(row.value)}
                     className="p-1 rounded-full">
                     <Image
-                      source={require("../../../assets/copy.png")}
+                      source={require("../../assets/copy.png")}
                       className="w-4 h-4 opacity-70"
                     />
                   </Pressable>
@@ -210,19 +210,19 @@ const SellerCard = ({ data }) => {
           {status === "shipped" && (
             <View className="flex-row gap-1 mb-3">
               <Image
-                source={require("../../../assets/admin1.png")}
+                source={require("../../assets/admin1.png")}
                 className="w-4 h-4 mt-1"
               />
               <Text className="font-poppins text-xs text-gray-800 flex-1">
                 {data.fundReleaseRequest.status === null
                   ? "Cek no resi berkala, kalau pembeli nggak konfirmasi, minta konfirmasi pembeli lewat admin."
                   : data.fundReleaseRequest.status === "waiting"
-                  ? "Tunggu approval kami, ya! Kalau bukti kamu oke, permintaan konfirmasi bakal langsung dikirim ke pembeli!"
-                  : data.fundReleaseRequest.status === "rejected"
-                  ? "Permintaan konfirmasi ke pembeli ditolak. Pastikan data atau bukti yang kamu kirim sudah lengkap dan sesuai."
-                  : data.fundReleaseRequest.status === "approved"
-                  ? "Konfirmasi udah dikirim ke pembeli! Sekarang tinggal tunggu respon mereka dalam 1 x 24 jam."
-                  : "-"}
+                    ? "Tunggu approval kami, ya! Kalau bukti kamu oke, permintaan konfirmasi bakal langsung dikirim ke pembeli!"
+                    : data.fundReleaseRequest.status === "rejected"
+                      ? "Permintaan konfirmasi ke pembeli ditolak. Pastikan data atau bukti yang kamu kirim sudah lengkap dan sesuai."
+                      : data.fundReleaseRequest.status === "approved"
+                        ? "Konfirmasi udah dikirim ke pembeli! Sekarang tinggal tunggu respon mereka dalam 1 x 24 jam."
+                        : "-"}
               </Text>
             </View>
           )}

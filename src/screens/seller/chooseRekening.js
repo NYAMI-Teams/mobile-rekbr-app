@@ -19,11 +19,11 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
-import BankSelector from "../../../src/components/BankScreens";
-import { mockBank } from "../../../src/services/apiMock/api";
+import BankSelector from "../../components/BankScreens";
+import { mockBank } from "../../services/apiMock/api";
 import { ChevronLeftCircle } from "lucide-react-native";
 import PrimaryButton from "../../components/PrimaryButton";
-import CreateRekber from "../../../app/CreateTransaksi/CreateRekbr/index";
+import CreateRekber from "../../app/CreateTransaksi/CreateRekbr/index";
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
 
@@ -42,7 +42,7 @@ const initialSaved = [
     name: "Bayu",
     bank: "Bank Negara Indonesia",
     accountNumber: "0900604501",
-    bankLogo: require("../../../assets/logo-bni.png"),
+    bankLogo: require("../../assets/logo-bni.png"),
     isFavorite: false,
   },
   {
@@ -50,7 +50,7 @@ const initialSaved = [
     name: "Zhirazzi",
     bank: "Bank Negara Indonesia",
     accountNumber: "0900604502",
-    bankLogo: require("../../../assets/logo-bni.png"),
+    bankLogo: require("../../assets/logo-bni.png"),
     isFavorite: false,
   },
   {
@@ -58,7 +58,7 @@ const initialSaved = [
     name: "Diffa",
     bank: "Bank Negara Indonesia",
     accountNumber: "0900604503",
-    bankLogo: require("../../../assets/logo-bni.png"),
+    bankLogo: require("../../assets/logo-bni.png"),
     isFavorite: false,
   },
   {
@@ -66,7 +66,7 @@ const initialSaved = [
     name: "Reynhard",
     bank: "Bank Negara Indonesia",
     accountNumber: "0900604504",
-    bankLogo: require("../../../assets/logo-bni.png"),
+    bankLogo: require("../../assets/logo-bni.png"),
     isFavorite: false,
   },
 ];
@@ -157,7 +157,7 @@ export default function PilihRekeningScreen() {
             onPress={() => router.back()}
           >
             <Image
-              source={require("../../../assets/icon-back.png")}
+              source={require("../../assets/icon-back.png")}
               style={styles.backIcon}
             />
           </TouchableOpacity>
@@ -166,7 +166,7 @@ export default function PilihRekeningScreen() {
 
         <View style={styles.topBackground}>
           <Image
-            source={require("../../../assets/illustration-transfer.png")}
+            source={require("../../assets/illustration-transfer.png")}
             style={styles.topImage}
             resizeMode="contain"
           />
@@ -179,7 +179,7 @@ export default function PilihRekeningScreen() {
             placeholderTextColor="#999"
           />
           <Image
-            source={require("../../../assets/icon-search.png")}
+            source={require("../../assets/icon-search.png")}
             style={styles.searchIcon}
           />
         </View>
@@ -187,7 +187,7 @@ export default function PilihRekeningScreen() {
         {isEmpty ? (
           <View style={styles.emptyState}>
             <Image
-              source={require("../../../assets/illustration-empty.png")}
+              source={require("../../assets/illustration-empty.png")}
               style={styles.emptyImage}
               resizeMode="contain"
             />
@@ -279,8 +279,8 @@ export default function PilihRekeningScreen() {
                       {!isSelectBankDone
                         ? "Pilih Bank Kamu"
                         : !isAlreadyCheckedRekening
-                        ? "Masukan No Rekening Kamu"
-                        : "Rekening Kamu Ditemukan"}
+                          ? "Masukan No Rekening Kamu"
+                          : "Rekening Kamu Ditemukan"}
                     </Text>
                   </View>
                 </Pressable>
@@ -497,8 +497,8 @@ const AnimatedAccountItem = ({
         <Image
           source={
             item.isFavorite
-              ? require("../../../assets/icon-star-filled.png")
-              : require("../../../assets/icon-star-outline.png")
+              ? require("../../assets/icon-star-filled.png")
+              : require("../../assets/icon-star-outline.png")
           }
           style={styles.favoriteIcon}
         />
