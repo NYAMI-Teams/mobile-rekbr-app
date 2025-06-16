@@ -7,8 +7,34 @@ import clsx from "clsx";
 import CountdownTimer from "../Countdown";
 import { useRouter } from "expo-router";
 
+// const data = {
+//   id: "",
+//   transactionCode: "",
+//   itemName: "",
+//   totalAmount: 0,
+//   createdAt: "",
+//   buyerEmail: "",
+//   virtualAccount: "",
+//   status: "",
+//   paymentDeadline: "",
+//   shipmentDeadline: "",
+//   currentTimestamp: "",
+//   trackingNumber: "",
+//   fundReleaseRequest: {
+//     requested: false,
+//     status: "",
+//     requestedAt: "",
+//     resolvedAt: "",
+//     adminEmail: "",
+//   },
+//   shipment: {
+//     trackingNumber: "",
+//     courier: "",
+//   },
+// };
+
 const SellerCard = ({ data }) => {
-  const status = data.status;
+  const status = data?.status || "";
   const router = useRouter();
 
   const handleCopy = async (text) => {
@@ -54,31 +80,35 @@ const SellerCard = ({ data }) => {
       case "pending_payment":
       case "waiting_shipment":
         return [
-          { label: "Nama Produk", value: data.itemName },
-          { label: "Pembeli", value: data.buyerEmail },
-          { label: "VA Number", value: data.virtualAccount, copyable: true },
+          { label: "Nama Produk", value: data?.itemName || "-" },
+          { label: "Pembeli", value: data?.buyerEmail || "-" },
+          {
+            label: "VA Number",
+            value: data?.virtualAccount || "-",
+            copyable: true,
+          },
         ];
       case "shipped":
         return [
-          { label: "Nama Produk", value: data.itemName },
-          { label: "Pembeli", value: data.buyerEmail },
+          { label: "Nama Produk", value: data?.itemName || "-" },
+          { label: "Pembeli", value: data?.buyerEmail || "-" },
           {
             label: "Nomor Resi",
-            value: data.shipment.trackingNumber,
+            value: data?.shipment.trackingNumber || "-",
             copyable: true,
           },
-          { label: "Ekspedisi", value: data.shipment.courier },
+          { label: "Ekspedisi", value: data?.shipment.courier || "-" },
         ];
       case "completed":
         return [
-          { label: "Nama Produk", value: data.itemName },
-          { label: "Pembeli", value: data.buyerEmail },
+          { label: "Nama Produk", value: data?.itemName || "-" },
+          { label: "Pembeli", value: data?.buyerEmail || "-" },
           {
             label: "Nomor Resi",
-            value: data.shipment.trackingNumber,
+            value: data?.shipment.trackingNumber || "-",
             copyable: true,
           },
-          { label: "Ekspedisi", value: data.shipment.courier },
+          { label: "Ekspedisi", value: data?.shipment.courier || "-" },
         ];
       default:
         return [];
@@ -91,8 +121,8 @@ const SellerCard = ({ data }) => {
         <View className="bg-yellow-100 px-3 py-1 rounded-full">
           <Text className="font-poppins-semibold text-xs text-gray-800">
             <CountdownTimer
-              deadline={data.paymentDeadline}
-              fromTime={data.createdAt}
+              deadline={data?.paymentDeadline || "-"}
+              fromTime={data?.createdAt || "-"}
             />
           </Text>
         </View>
@@ -102,7 +132,7 @@ const SellerCard = ({ data }) => {
     if (status === "waiting_shipment") {
       return (
         <TouchableOpacity
-          onPress={data.onConfirmReceived}
+          onPress={() => console.log("Bukti Pengiriman Pressed")}
           className="bg-black px-3 py-1 rounded-full">
           <Text className="font-poppins-semibold text-xs text-white">
             Bukti Pengiriman
@@ -112,7 +142,7 @@ const SellerCard = ({ data }) => {
     }
 
     if (status === "shipped") {
-      if (data.fundReleaseRequest.status === "waiting") {
+      if (data?.fundReleaseRequest?.status === "waiting") {
         return (
           <View className="bg-yellow-100 px-3 py-1 rounded-full">
             <Text className="font-poppins-semibold text-xs text-gray-800">
@@ -120,24 +150,24 @@ const SellerCard = ({ data }) => {
             </Text>
           </View>
         );
-      } else if (data.fundReleaseRequest.status === "approved") {
+      } else if (data?.fundReleaseRequest?.status === "approved") {
         return (
           <View className="bg-yellow-100 px-3 py-1 rounded-full">
             <Text className="font-poppins-semibold text-xs text-gray-800">
               <CountdownTimer
-                deadline={data.buyerConfirmDeadline}
-                fromTime={data.fundReleaseRequest.resolvedAt}
+                deadline={data?.buyerConfirmDeadline || "-"}
+                fromTime={data?.fundReleaseRequest.resolvedAt || "-"}
               />
             </Text>
           </View>
         );
       } else if (
-        data.fundReleaseRequest.status === "rejected" ||
-        data.fundReleaseRequest.status === null
+        data?.fundReleaseRequest?.status === "rejected" ||
+        data?.fundReleaseRequest?.status === null
       ) {
         return (
           <TouchableOpacity
-            onPress={data.onConfirmReceived}
+            onPress={() => console.log("Minta Konfirmasi Pressed")}
             className="bg-black px-3 py-1 rounded-full">
             <Text className="font-poppins-semibold text-xs text-white">
               Minta Konfirmasi
@@ -151,7 +181,7 @@ const SellerCard = ({ data }) => {
       return (
         <View className="px-3 py-1 rounded-full">
           <Text className="font-poppins-semibold text-xs text-gray-800">
-            {formatDateWIB(data.buyerConfirmedAt)}
+            {formatDateWIB(data?.buyerConfirmedAt || "-")}
           </Text>
         </View>
       );
@@ -214,15 +244,15 @@ const SellerCard = ({ data }) => {
                 className="w-4 h-4 mt-1"
               />
               <Text className="font-poppins text-xs text-gray-800 flex-1">
-                {data.fundReleaseRequest.status === null
+                {data?.fundReleaseRequest?.status === null
                   ? "Cek no resi berkala, kalau pembeli nggak konfirmasi, minta konfirmasi pembeli lewat admin."
-                  : data.fundReleaseRequest.status === "waiting"
-                    ? "Tunggu approval kami, ya! Kalau bukti kamu oke, permintaan konfirmasi bakal langsung dikirim ke pembeli!"
-                    : data.fundReleaseRequest.status === "rejected"
-                      ? "Permintaan konfirmasi ke pembeli ditolak. Pastikan data atau bukti yang kamu kirim sudah lengkap dan sesuai."
-                      : data.fundReleaseRequest.status === "approved"
-                        ? "Konfirmasi udah dikirim ke pembeli! Sekarang tinggal tunggu respon mereka dalam 1 x 24 jam."
-                        : "-"}
+                  : data?.fundReleaseRequest?.status === "waiting"
+                  ? "Tunggu approval kami, ya! Kalau bukti kamu oke, permintaan konfirmasi bakal langsung dikirim ke pembeli!"
+                  : data?.fundReleaseRequest?.status === "rejected"
+                  ? "Permintaan konfirmasi ke pembeli ditolak. Pastikan data atau bukti yang kamu kirim sudah lengkap dan sesuai."
+                  : data?.fundReleaseRequest?.status === "approved"
+                  ? "Konfirmasi udah dikirim ke pembeli! Sekarang tinggal tunggu respon mereka dalam 1 x 24 jam."
+                  : "-"}
               </Text>
             </View>
           )}

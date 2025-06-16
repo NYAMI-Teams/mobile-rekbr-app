@@ -8,9 +8,35 @@ import clsx from "clsx";
 import CountdownTimer from "../Countdown";
 import { useRouter } from "expo-router";
 
+// const data = {
+//   id: "",
+//   transactionCode: "",
+//   itemName: "",
+//   totalAmount: 0,
+//   createdAt: "",
+//   buyerEmail: "",
+//   virtualAccount: "",
+//   status: "",
+//   paymentDeadline: "",
+//   shipmentDeadline: "",
+//   currentTimestamp: "",
+//   trackingNumber: "",
+//   fundReleaseRequest: {
+//     requested: false,
+//     status: "",
+//     requestedAt: "",
+//     resolvedAt: "",
+//     adminEmail: "",
+//   },
+//   shipment: {
+//     trackingNumber: "",
+//     courier: "",
+//   },
+// };
+
 const BuyerCard = ({ data }) => {
   const router = useRouter();
-  const status = data.status;
+  const status = data?.status;
 
   const handleCopy = async (text) => {
     // belum bisa jalan toastnya
@@ -39,37 +65,41 @@ const BuyerCard = ({ data }) => {
     switch (status) {
       case "pending_payment":
         return [
-          { label: "Nama Produk", value: data.itemName },
-          { label: "Penjual", value: data.sellerEmail },
-          { label: "VA Number", value: data.virtualAccount, copyable: true },
+          { label: "Nama Produk", value: data?.itemName || "-" },
+          { label: "Penjual", value: data?.sellerEmail || "-" },
+          {
+            label: "VA Number",
+            value: data?.virtualAccount || "-",
+            copyable: true,
+          },
         ];
       case "waiting_shipment":
         return [
-          { label: "Nama Produk", value: data.itemName },
-          { label: "Penjual", value: data.sellerEmail },
+          { label: "Nama Produk", value: data?.itemName || "-" },
+          { label: "Penjual", value: data?.sellerEmail || "-" },
           { label: "Nomor Resi", value: "waiting_seller" },
         ];
       case "shipped":
         return [
-          { label: "Nama Produk", value: data.itemName },
-          { label: "Penjual", value: data.sellerEmail },
+          { label: "Nama Produk", value: data?.itemName || "-" },
+          { label: "Penjual", value: data?.sellerEmail || "-" },
           {
             label: "Nomor Resi",
-            value: data.shipment.trackingNumber,
+            value: data?.shipment?.trackingNumber || "-",
             copyable: true,
           },
-          { label: "Ekspedisi", value: data.shipment.courier },
+          { label: "Ekspedisi", value: data?.shipment?.courier || "-" },
         ];
       case "completed":
         return [
-          { label: "Nama Produk", value: data.itemName },
-          { label: "Penjual", value: data.sellerEmail },
+          { label: "Nama Produk", value: data?.itemName || "-" },
+          { label: "Penjual", value: data?.sellerEmail || "-" },
           {
             label: "Nomor Resi",
-            value: data.shipment.trackingNumber,
+            value: data?.shipment?.trackingNumber || "-",
             copyable: true,
           },
-          { label: "Ekspedisi", value: data.shipment.courier },
+          { label: "Ekspedisi", value: data?.shipment?.courier || "-" },
         ];
       default:
         return [];
@@ -98,8 +128,8 @@ const BuyerCard = ({ data }) => {
           <Text className="font-poppins-semibold text-xs text-gray-800">
             {/* Replace this with dynamic countdown logic */}
             <CountdownTimer
-              deadline={data.paymentDeadline}
-              fromTime={data.createdAt}
+              deadline={data?.paymentDeadline || "-"}
+              fromTime={data?.createdAt || "-"}
             />
           </Text>
         </View>
@@ -110,7 +140,7 @@ const BuyerCard = ({ data }) => {
       return (
         <View className="bg-yellow-100 px-3 py-1 rounded-full">
           <Text className="font-poppins-semibold text-xs text-gray-800">
-            {formatDateWIB(data.resiDeadline)}
+            {formatDateWIB(data?.shipmentDeadline || "-")}
           </Text>
         </View>
       );
@@ -118,16 +148,16 @@ const BuyerCard = ({ data }) => {
 
     if (status === "shipped") {
       if (
-        data.fundReleaseRequest.requested &&
-        data.fundReleaseRequest.status === "approved"
+        data?.fundReleaseRequest?.requested &&
+        data?.fundReleaseRequest?.status === "approved"
       ) {
         return (
           <View className="bg-yellow-100 px-3 py-1 rounded-full">
             <Text className="font-poppins-semibold text-xs text-gray-800">
               {/* Replace this with actual countdown (e.g., 24 jam mundur dari requestAt) */}
               <CountdownTimer
-                deadline={data.buyerConfirmDeadline}
-                fromTime={data.fundReleaseRequest.resolvedAt}
+                deadline={data?.buyerConfirmDeadline || "-"}
+                fromTime={data?.fundReleaseRequest?.resolvedAt || "-"}
               />
             </Text>
           </View>
@@ -135,7 +165,7 @@ const BuyerCard = ({ data }) => {
       } else {
         return (
           <TouchableOpacity
-            onPress={data.onConfirmReceived}
+            onPress={() => console.log("Barang Diterima Pressed")}
             className="bg-black px-3 py-1 rounded-full">
             <Text className="font-poppins-semibold text-xs text-white">
               Barang Diterima
@@ -149,7 +179,7 @@ const BuyerCard = ({ data }) => {
       return (
         <View className="px-3 py-1 rounded-full">
           <Text className="font-poppins-semibold text-xs text-gray-800">
-            {formatDateWIB(data.buyerConfirmedAt)}
+            {formatDateWIB(data?.buyerConfirmedAt || "-")}
           </Text>
         </View>
       );
@@ -206,7 +236,7 @@ const BuyerCard = ({ data }) => {
         <View className="bg-gray-100 border-t border-gray-200 p-3">
           {/* Admin Message */}
           {status === "shipped" &&
-            data.fundReleaseRequest.status === "approved" && (
+            data?.fundReleaseRequest?.status === "approved" && (
               <View className="flex-row gap-1 mb-3">
                 <Image
                   source={require("../../assets/admin1.png")}

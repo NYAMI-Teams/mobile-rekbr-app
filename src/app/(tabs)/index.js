@@ -2,16 +2,36 @@ import { View, ScrollView } from "react-native";
 import { useRouter } from "expo-router";
 import PrimaryButton from "../../components/PrimaryButton";
 import SellerEmptyContent from "../../screens/seller/homeScreen";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import NavigationBar from "../../components/NavigationBar";
 import { StatusBar } from "expo-status-bar";
 import SellerCard from "../../components/card-transaction/SellerCard";
 import { mockAPISeller } from "../../services/apiMock/api";
+import { getSellerTransactions } from "../../utils/api/seller";
 
 export default function Seller() {
   const router = useRouter();
   const [isKYCCompleted, setIsKYCCompleted] = useState(true);
   const [isEmptyTransaction, setIsEmptyTransaction] = useState(false);
+  const [transactions, setTransactions] = useState([]);
+
+  const getTransactions = async () => {
+    try {
+      const res = await getSellerTransactions();
+      if (res) {
+        res.data.length > 0
+          ? setIsEmptyTransaction(false)
+          : setIsEmptyTransaction(true);
+        setTransactions(res.data);
+      }
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  useEffect(() => {
+    getTransactions();
+  }, []);
 
   return (
     <View style={{ flex: 1, backgroundColor: "#fff" }}>
@@ -28,7 +48,9 @@ export default function Seller() {
           {isEmptyTransaction ? (
             <SellerEmptyContent isKYCCompleted={isKYCCompleted} />
           ) : (
-            <SellerCard data={mockAPISeller.data} />
+            transactions.map((transaction) => (
+              <SellerCard key={transaction.id} data={transaction} />
+            ))
           )}
         </ScrollView>
         {isKYCCompleted && !isEmptyTransaction && (
