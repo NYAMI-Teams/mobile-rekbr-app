@@ -7,11 +7,35 @@ import NavigationBar from "../../components/NavigationBar";
 import { StatusBar } from "expo-status-bar";
 import SellerCard from "../../components/card-transaction/SellerCard";
 import { mockAPISeller } from "../../services/apiMock/api";
+import { getProfile } from "../../utils/api/auth";
+import { removeAccessToken } from "../../store";
 
 export default function Seller() {
   const router = useRouter();
-  const [isKYCCompleted, setIsKYCCompleted] = useState(true);
-  const [isEmptyTransaction, setIsEmptyTransaction] = useState(false);
+  const [isKYCCompleted, setIsKYCCompleted] = useState(false);
+  const [isEmptyTransaction, setIsEmptyTransaction] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const check = () => {
+    setIsLoading(true);
+    getProfile()
+      .then((res) => {
+        console.log("Profile data:", res);
+      })
+      .catch((err) => {
+        console.error(err);
+      }).finally(() => {
+        setIsLoading(false);
+      });
+  };
+
+  const handleLogout = () => {
+    removeAccessToken().then(() => {
+      router.replace("/auth/login");
+    }).catch((err) => {
+      console.error("Logout failed:", err);
+    });
+  }
 
   return (
     <View style={{ flex: 1, backgroundColor: "#fff" }}>
@@ -19,8 +43,11 @@ export default function Seller() {
       <View style={{ flex: 1, padding: 16 }}>
         <NavigationBar
           name="irgi168@gmail.com"
-          onNotificationPress={() => console.log("Notification pressed")}
-          onProfilePress={() => console.log("Notification pressed")}
+          // onNotificationPress={() => console.log("Notification pressed")}
+          onNotificationPress={() => handleLogout()}
+          // onProfilePress={() => console.log("Profile pressed")}
+          // onProfilePress={() => router.replace("/auth/login")}
+          onProfilePress={() => check()}
         />
         <ScrollView
           className="flex flex-col gap-12"

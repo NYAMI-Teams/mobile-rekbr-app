@@ -1,5 +1,5 @@
 import axios from "axios";
-
+import { getAccessToken } from "../store";
 
 const Api = axios.create({
   baseURL: "https://kvnpp4pb-3000.asse.devtunnels.ms/api",
@@ -10,9 +10,9 @@ const Api = axios.create({
   },
 });
 
-const onRequestSuccess = (config) => {
-  // const token = getAccessToken();
-  // if (token) config.headers.Authorization = `Bearer ${token}`;
+const onRequestSuccess = async (config) => {
+  const token = await getAccessToken();
+  if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 };
 

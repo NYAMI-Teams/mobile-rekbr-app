@@ -13,6 +13,8 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { login } from "../../utils/api/auth";
+import { showToast } from "../../utils";
+import { setAccessToken } from "../../store";
 
 export default function Login() {
   const router = useRouter();
@@ -25,7 +27,7 @@ export default function Login() {
 
   useEffect(() => {
     // development purposes, remove this in production
-    setEmail("buyer@gmail.com");
+    setEmail("danilardi13@gmail.com");
     setPassword("pass123");
   }, [])
 
@@ -40,15 +42,18 @@ export default function Login() {
       setErrorMsg("Please enter both email and password.");
       return;
     }
+
     setIsLoading(true);
-    
     // Call the login API
     login(email, password).then((res) => {
-      Alert.alert("Login Successful", "Welcome back!");
+      showToast("Login Successful", "Welcome back!");
+      setAccessToken(res?.data?.accessToken);
+      router.replace("/");
     }).catch((err) => {
-      console.error("Login error:", err);
+      console.log(err);
       setError(true);
       setErrorMsg("Login failed. Please try again.");
+      showToast("Login Failed", err?.message, "error");
     }).finally(() => {
       setIsLoading(false);
     });
@@ -126,7 +131,7 @@ export default function Login() {
                 />
               </View>
               <View className="px-5 py-5 w-full">
-                <PrimaryButton title="Masuk" onPress={handleLogin} />
+                <PrimaryButton title="Masuk" onPress={handleLogin} disabled={isLoading} />
               </View>
 
               {/* Registrasi / Hubungi Kami */}
