@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -7,8 +7,8 @@ import {
   ScrollView,
   TouchableOpacity,
 } from "react-native";
-import InputField from "../../components/InputField";
-import PrimaryButton from "../../components/PrimaryButton";
+import InputField from "../../src/components/InputField";
+import PrimaryButton from "../../src/components/PrimaryButton";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -23,12 +23,35 @@ export default function Login() {
   const [errorMsg, setErrorMsg] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
+  useEffect(() => {
+    // development purposes, remove this in production
+    setEmail("buyer@gmail.com");
+    setPassword("pass123");
+  }, [])
 
   const togglePasswordVisibility = () => {
     setIsPasswordVisible(!isPasswordVisible);
   };
 
   const handleLogin = () => {
+
+    setError(false);
+    if (!email.trim() || !password.trim()) {
+      setErrorMsg("Please enter both email and password.");
+      return;
+    }
+    setIsLoading(true);
+    
+    // Call the login API
+    login(email, password).then((res) => {
+      Alert.alert("Login Successful", "Welcome back!");
+    }).catch((err) => {
+      console.error("Login error:", err);
+      setError(true);
+      setErrorMsg("Login failed. Please try again.");
+    }).finally(() => {
+      setIsLoading(false);
+    });
   };
 
   return (
