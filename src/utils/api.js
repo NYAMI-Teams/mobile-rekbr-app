@@ -1,7 +1,8 @@
-import axios from "axios";;
+import axios from "axios";
+
 
 const Api = axios.create({
-  baseURL: "http://152.42.249.176:3000/api",
+  baseURL: "https://kvnpp4pb-3000.asse.devtunnels.ms/api",
   timeout: 30 * 1000,
   headers: {
     "Content-Type": "application/json",
@@ -9,26 +10,26 @@ const Api = axios.create({
   },
 });
 
-// const onRequestSuccess = (config) => {
-//   const token = getAccessToken();
-//   if (token) config.headers.Authorization = `Bearer ${token}`;
-//   return config;
-// };
+const onRequestSuccess = (config) => {
+  // const token = getAccessToken();
+  // if (token) config.headers.Authorization = `Bearer ${token}`;
+  return config;
+};
 
-// const onRequestError = (error) => Promise.reject(error)
-// const onResponseSuccess = (response) => response.data
-// const onResponseError = (error) => {
+const onRequestError = (error) => Promise.reject(error)
+const onResponseSuccess = (response) => response.data
+const onResponseError = (error) => {
 
-//   if (error.response?.data.statusCode === 401 && getAccessToken()) {
-//     refreshToken({ refreshToken: getRefreshToken() })
-//   } else if (error.response?.data.statusCode === 401 && !getAccessToken()) {
-//     // // removeAuth()
-//     // window.location.reload()
-//   }
-//   return Promise.reject(error?.response?.data ? error?.response?.data : error)
-// }
+  // if (error.response?.data.statusCode === 401 && getAccessToken()) {
+  //   refreshToken({ refreshToken: getRefreshToken() })
+  // } else if (error.response?.data.statusCode === 401 && !getAccessToken()) {
+  //   // // removeAuth()
+  //   // window.location.reload()
+  // }
+  return Promise.reject(error?.response?.data ? error?.response?.data : error)
+}
 
-// Api.interceptors.request.use(onRequestSuccess, onRequestError)
-// Api.interceptors.response.use(onResponseSuccess, onResponseError)
+Api.interceptors.request.use(onRequestSuccess, onRequestError)
+Api.interceptors.response.use(onResponseSuccess, onResponseError)
 
 export default Api
