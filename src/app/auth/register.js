@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, Image, ScrollView, TouchableOpacity } from "react-native";
 import InputField from "../../components/InputField";
 import PrimaryButton from "../../components/PrimaryButton";
@@ -8,6 +8,8 @@ import { Feather } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { Alert } from "react-native";
+import { register } from "../../utils/api/auth";
+import { showToast } from "../../utils";
 
 export default function Register() {
   const router = useRouter();
@@ -18,6 +20,14 @@ export default function Register() {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    // development purposes, remove this in production
+    setEmail("danilardi13@gmail.com")
+    setPassword("pass123");
+    setConfirmPassword("pass123");
+  }, []);
 
   const togglePasswordVisibility = () => {
     setIsPasswordVisible(!isPasswordVisible);
@@ -49,8 +59,23 @@ export default function Register() {
   };
 
   const handleRegister = () => {
-    // console.log("Registering with:", { name, email, password });
-    router.push("/auth/otp");
+    setIsLoading(true);
+    register(email, password).then((res) => {
+      showToast("Success", res?.message, "success");
+      router.push({
+        pathname: "/auth/otp",
+        params: { email: email }
+      });
+    }).catch((err) => {
+      showToast("Registrasi Gagal", err?.message, "error");
+    }).finally(() => {
+      // setEmail("");
+      // setPassword("");
+      // setConfirmPassword("");
+      // setIsChecked(false);
+      setIsLoading(false);
+    });
+
   };
 
   return (
@@ -162,7 +187,7 @@ export default function Register() {
 
           <View className="px-5 py-5">
             <PrimaryButton
-              title="Masuk"
+              title="Daftar"
               onPress={handleRegister}
               disabled={!isFormValid()}
             />

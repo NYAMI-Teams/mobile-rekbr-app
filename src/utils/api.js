@@ -1,4 +1,5 @@
 import axios from "axios";
+import { getAccessToken } from "../store";
 
 const Api = axios.create({
   baseURL: "http://152.42.249.176:3000/api",
@@ -9,10 +10,8 @@ const Api = axios.create({
   },
 });
 
-const onRequestSuccess = (config) => {
-  // const token = getAccessToken();
-  const token =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjQ2ZGNhOTRmLTRjNzktNGQ0NS05OWVkLTEwZTJmOTAwNDQxYSIsInRva2VuSWQiOiIxNzUwMDU5NzkwODM2IiwiaXNBZG1pbiI6ZmFsc2UsImlhdCI6MTc1MDA1OTc5MCwiZXhwIjoxNzUwMDYzMzkwfQ.BaHisb8CZt6xKeG277oYVSeIBs2RKkrbCql2ijmXFlw";
+const onRequestSuccess = async (config) => {
+  const token = await getAccessToken();
   if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 };

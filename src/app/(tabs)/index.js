@@ -7,12 +7,38 @@ import NavigationBar from "../../components/NavigationBar";
 import { StatusBar } from "expo-status-bar";
 import SellerCard from "../../components/card-transaction/SellerCard";
 import { getSellerTransactions } from "../../utils/api/seller";
+import { getProfile } from "../../utils/api/auth";
+import { removeAccessToken } from "../../store";
 
 export default function Seller() {
   const router = useRouter();
   const [isKYCCompleted, setIsKYCCompleted] = useState(false);
   const [isEmptyTransaction, setIsEmptyTransaction] = useState(true);
-  const [transactions, setTransactions] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const check = () => {
+    setIsLoading(true);
+    getProfile()
+      .then((res) => {
+        console.log("Profile data:", res);
+      })
+      .catch((err) => {
+        console.error(err);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
+
+  const handleLogout = () => {
+    removeAccessToken()
+      .then(() => {
+        router.replace("/auth/login");
+      })
+      .catch((err) => {
+        console.error("Logout failed:", err);
+      });
+  };
 
   useEffect(() => {
     const fetchTransactions = async () => {
@@ -42,8 +68,11 @@ export default function Seller() {
       <View style={{ flex: 1, padding: 16 }}>
         <NavigationBar
           name="irgi168@gmail.com"
-          onNotificationPress={() => console.log("Notification pressed")}
-          onProfilePress={() => console.log("Notification pressed")}
+          // onNotificationPress={() => console.log("Notification pressed")}
+          onNotificationPress={() => handleLogout()}
+          // onProfilePress={() => console.log("Profile pressed")}
+          // onProfilePress={() => router.replace("/auth/login")}
+          onProfilePress={() => check()}
         />
         <ScrollView
           className="flex flex-col gap-12"
