@@ -6,31 +6,34 @@ import { useState, useEffect } from "react";
 import NavigationBar from "../../components/NavigationBar";
 import { StatusBar } from "expo-status-bar";
 import SellerCard from "../../components/card-transaction/SellerCard";
-import { mockAPISeller } from "../../services/apiMock/api";
 import { getSellerTransactions } from "../../utils/api/seller";
 
 export default function Seller() {
   const router = useRouter();
-  const [isKYCCompleted, setIsKYCCompleted] = useState(true);
-  const [isEmptyTransaction, setIsEmptyTransaction] = useState(false);
+  const [isKYCCompleted, setIsKYCCompleted] = useState(false);
+  const [isEmptyTransaction, setIsEmptyTransaction] = useState(true);
   const [transactions, setTransactions] = useState([]);
 
-  const getTransactions = async () => {
-    try {
-      const res = await getSellerTransactions();
-      if (res) {
-        res.data.length > 0
-          ? setIsEmptyTransaction(false)
-          : setIsEmptyTransaction(true);
-        setTransactions(res.data);
-      }
-    } catch (error) {
-      throw error;
-    }
-  };
-
   useEffect(() => {
-    getTransactions();
+    const fetchTransactions = async () => {
+      try {
+        const res = await getSellerTransactions();
+        if (res.data.length > 0) {
+          setIsEmptyTransaction(false);
+        } else {
+          setIsEmptyTransaction(true);
+        }
+        setTransactions(res.data);
+        console.log("Berhasil get all transaction seller");
+        console.log(res.data);
+      } catch (err) {
+        console.error("Error fetching transactions:", err);
+      } finally {
+        console.log("finally");
+      }
+    };
+
+    fetchTransactions();
   }, []);
 
   return (

@@ -27,31 +27,33 @@ export default function Login() {
     // development purposes, remove this in production
     setEmail("buyer@gmail.com");
     setPassword("pass123");
-  }, [])
+  }, []);
 
   const togglePasswordVisibility = () => {
     setIsPasswordVisible(!isPasswordVisible);
   };
 
   const handleLogin = () => {
-
     setError(false);
     if (!email.trim() || !password.trim()) {
       setErrorMsg("Please enter both email and password.");
       return;
     }
     setIsLoading(true);
-    
+
     // Call the login API
-    login(email, password).then((res) => {
-      Alert.alert("Login Successful", "Welcome back!");
-    }).catch((err) => {
-      console.error("Login error:", err);
-      setError(true);
-      setErrorMsg("Login failed. Please try again.");
-    }).finally(() => {
-      setIsLoading(false);
-    });
+    login(email, password)
+      .then((res) => {
+        Alert.alert("Login Successful", "Welcome back!");
+      })
+      .catch((err) => {
+        console.error("Login error:", err);
+        setError(true);
+        setErrorMsg("Login failed. Please try again.");
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
 
   return (

@@ -11,6 +11,7 @@ const DropDownField = ({
   iconColor = "#999",
   secureTextEntry = false,
   keyboardType = "default",
+  editable = true,
 }) => {
   return (
     <View style={styles.container}>
@@ -26,6 +27,7 @@ const DropDownField = ({
           secureTextEntry={secureTextEntry}
           keyboardType={keyboardType}
           autoCapitalize="none"
+          editable={editable}
         />
         <Ionicons name={iconName} size={20} color={iconColor} />
       </View>
@@ -35,8 +37,8 @@ const DropDownField = ({
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    marginHorizontal: 20,
+    // flex: 1,
+    // marginHorizontal: 20,
   },
   title: {
     marginBottom: 8,

@@ -1,20 +1,37 @@
 import { View } from "react-native";
 import NavigationBar from "../../components/NavigationBar";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import BuyerEmptyContent from "../../screens/buyer/index";
-import { mockAPIBuyer } from "../../services/apiMock/api";
 import { StatusBar } from "expo-status-bar";
 import BuyerCard from "../../components/card-transaction/BuyerCard";
 import { ScrollView } from "react-native";
+import { getBuyerTransactions } from "../../utils/api/buyer";
 
 export default function Home() {
   const [isEmptyTransaction, setIsEmptyTransaction] = useState(false);
-  const bankData = {
-    accountHolder: "Sdr Bayu Saptaji Rahman",
-    bankName: "Bank Negara Indonesia",
-    accountNumber: "0900604501",
-    logoSrc: require("../../assets/bni-logo2.png"),
-  };
+  const [transactions, setTransactions] = useState([]);
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      try {
+        const res = await getBuyerTransactions();
+        if (res.data.length > 0) {
+          setIsEmptyTransaction(false);
+        } else {
+          setIsEmptyTransaction(true);
+        }
+        console.log(res.data);
+        setTransactions(res.data);
+      } catch (err) {
+        console.error("Error fetching buyer transactions:", err);
+      } finally {
+        console.log("finally");
+      }
+    };
+
+    fetchTransactions();
+  }, []);
+
+  // console.log("transactions", transactions[0]);
 
   return (
     <View style={{ flex: 1, backgroundColor: "#fff" }}>
@@ -31,7 +48,9 @@ export default function Home() {
           {isEmptyTransaction ? (
             <BuyerEmptyContent />
           ) : (
-            <BuyerCard data={mockAPIBuyer.data} />
+            transactions.map((transaction) => (
+              <BuyerCard key={transaction.id} data={transaction} />
+            ))
           )}
         </ScrollView>
       </View>

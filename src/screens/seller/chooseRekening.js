@@ -252,7 +252,6 @@ export default function PilihRekeningScreen() {
             transparent={true}
             visible={modalVisible}
             onRequestClose={() => {
-              Alert.alert("Modal has been closed.");
               closeModal();
             }}>
             <View className="bg-black/50 w-full h-full">
@@ -264,8 +263,8 @@ export default function PilihRekeningScreen() {
                     isAlreadyCheckedRekening
                       ? handleBackToInputRekening
                       : isSelectBankDone
-                        ? handleBackToBankSelection
-                        : closeModal
+                      ? handleBackToBankSelection
+                      : closeModal
                   }>
                   <View className="flex-row items-center mb-6">
                     <ChevronLeftCircle size={24} color="#00C2C2" />
@@ -273,8 +272,8 @@ export default function PilihRekeningScreen() {
                       {!isSelectBankDone
                         ? "Pilih Bank Kamu"
                         : !isAlreadyCheckedRekening
-                          ? "Masukan No Rekening Kamu"
-                          : "Rekening Kamu Ditemukan"}
+                        ? "Masukan No Rekening Kamu"
+                        : "Rekening Kamu Ditemukan"}
                     </Text>
                   </View>
                 </Pressable>

@@ -8,33 +8,29 @@ import clsx from "clsx";
 import CountdownTimer from "../Countdown";
 import { useRouter } from "expo-router";
 
-// const data = {
-//   id: "",
-//   transactionCode: "",
-//   itemName: "",
-//   totalAmount: 0,
-//   createdAt: "",
-//   buyerEmail: "",
-//   virtualAccount: "",
-//   status: "",
-//   paymentDeadline: "",
-//   shipmentDeadline: "",
-//   currentTimestamp: "",
-//   trackingNumber: "",
-//   fundReleaseRequest: {
-//     requested: false,
-//     status: "",
-//     requestedAt: "",
-//     resolvedAt: "",
-//     adminEmail: "",
-//   },
-//   shipment: {
-//     trackingNumber: "",
-//     courier: "",
-//   },
-// };
+// Helper function to safely parse dates
+const parseDate = (date) => {
+  if (!date) return null;
+  // Try different formats
+  const formats = [
+    "YYYY-MM-DD HH:mm:ss",
+    "YYYY-MM-DD",
+    "MM/DD/YYYY",
+    "DD/MM/YYYY",
+  ];
+  for (const format of formats) {
+    const parsed = moment(date, format, true);
+    if (parsed.isValid()) return parsed;
+  }
+  return null;
+};
 
 const BuyerCard = ({ data }) => {
+  const formatDateWIB = (dateTime) => {
+    const parsedDate = parseDate(dateTime);
+    if (!parsedDate) return "Invalid date";
+    return parsedDate.utcOffset(-7).format("DD MMMM YYYY, HH:mm [WIB]");
+  };
   const router = useRouter();
   const status = data?.status;
 
@@ -188,13 +184,16 @@ const BuyerCard = ({ data }) => {
     return null;
   };
 
-  // Format waktu jadi: 11 Juni 2025, 17:00 WIB
-  const formatDateWIB = (datetime) => {
-    return moment(datetime).utcOffset(-7).format("DD MMMM YYYY, HH:mm [WIB]");
-  };
-
   return (
-    <TouchableOpacity onPress={() => router.push("/DetailTransaksi/Buyer")}>
+    <TouchableOpacity
+      onPress={() =>
+        router.push({
+          pathname: "/DetailTransaksi/Buyer",
+          params: {
+            id: data?.id,
+          },
+        })
+      }>
       <View className="border border-gray-200 rounded-lg overflow-hidden my-2 w-full bg-white">
         {/* Detail Section */}
         <View className="p-3">

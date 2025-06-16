@@ -1,21 +1,19 @@
-import { View } from "react-native";
+import { View, StatusBar } from "react-native";
 import NavigationBar from "../../components/NavigationBar";
-import AccountBalance from "../../components/AccountBalance";
-import QuickActions from "../../components/QuickActions";
+import InputResi from "../../components/InputResi";
 
 export default function Home() {
-  const bankData = {
-    accountHolder: "Sdr Bayu Saptaji Rahman",
-    bankName: "Bank Negara Indonesia",
-    accountNumber: "0900604501",
-    logoSrc: require("../../assets/bni-logo2.png"),
-  };
-
   return (
-    <View style={{ flex: 1, backgroundColor: "#000000" }}>
-      <NavigationBar />
-      <AccountBalance balance={3} />
-      <QuickActions />
+    <View style={{ flex: 1, backgroundColor: "#fff" }}>
+      <StatusBar style="dark" />
+      <View style={{ flex: 1, padding: 16 }}>
+        {/* <NavigationBar
+          name="irgi168@gmail.com"
+          onNotificationPress={() => console.log("Notification pressed")}
+          onProfilePress={() => console.log("Notification pressed")}
+        /> */}
+        <InputResi />
+      </View>
     </View>
   );
 }

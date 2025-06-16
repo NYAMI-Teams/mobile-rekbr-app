@@ -21,3 +21,14 @@ export const getSellerTransactions = async () => {
     throw error;
   }
 };
+
+export const getDetailSellerTransaction = async (id) => {
+  try {
+    const res = await Api.get(`/seller/transactions/${id}`);
+    if (res) {
+      return res;
+    }
+  } catch (error) {
+    throw error;
+  }
+};
