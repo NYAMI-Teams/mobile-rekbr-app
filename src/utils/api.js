@@ -5,7 +5,7 @@ const Api = axios.create({
   baseURL: "http://152.42.249.176:3000/api",
   timeout: 30 * 1000,
   headers: {
-    "Content-Type": "application/json",
+    // "Content-Type": "application/json",
     accept: "application/json",
   },
 });

@@ -27,7 +27,7 @@ export default function Login() {
 
   useEffect(() => {
     // development purposes, remove this in production
-    setEmail("danilardi13@gmail.com");
+    setEmail("seller@gmail.com");
     setPassword("pass123");
   }, []);
 
@@ -45,18 +45,21 @@ export default function Login() {
     setIsLoading(true);
 
     // Call the login API
-    login(email, password).then((res) => {
-      showToast("Login Successful", "Welcome back!");
-      setAccessToken(res?.data?.accessToken);
-      router.replace("/");
-    }).catch((err) => {
-      console.log(err);
-      setError(true);
-      setErrorMsg("Login failed. Please try again.");
-      showToast("Login Failed", err?.message, "error");
-    }).finally(() => {
-      setIsLoading(false);
-    });
+    login(email, password)
+      .then((res) => {
+        showToast("Login Successful", "Welcome back!");
+        setAccessToken(res?.data?.accessToken);
+        router.replace("/");
+      })
+      .catch((err) => {
+        console.log(err);
+        setError(true);
+        setErrorMsg("Login failed. Please try again.");
+        showToast("Login Failed", err?.message, "error");
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
 
   return (
@@ -131,7 +134,11 @@ export default function Login() {
                 />
               </View>
               <View className="px-5 py-5 w-full">
-                <PrimaryButton title="Masuk" onPress={handleLogin} disabled={isLoading} />
+                <PrimaryButton
+                  title="Masuk"
+                  onPress={handleLogin}
+                  disabled={isLoading}
+                />
               </View>
 
               {/* Registrasi / Hubungi Kami */}

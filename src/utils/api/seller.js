@@ -41,26 +41,36 @@ export const postResi = async (id, courier_id, tracking_number, photo) => {
       photo,
     });
     if (res) {
+      console.log("ini res", res);
       return res;
     }
   } catch (error) {
+    console.log("Error post resi:", error);
     throw error;
   }
 };
 
 export const postFundRelease = async (id, evidence, reason) => {
   try {
+    // Convert image URI to Blob
+    const response = await fetch(evidence);
+    const blob = await response.blob();
+    const file = new File([blob], "evidence.jpg", { type: "image/jpeg" });
+
+    const formData = new FormData();
+    formData.append("evidence", file);
+    formData.append("reason", reason);
+
     const res = await Api.post(
-      `/api/seller/transaction/${id}/request-confirmation-shipment`,
-      {
-        evidence,
-        reason,
-      }
+      `/seller/transaction/${id}/request-confirmation-shipment`,
+      formData
     );
     if (res) {
+      console.log("ini res", res);
       return res;
     }
   } catch (error) {
+    console.log("Error post fund release:", error);
     throw error;
   }
 };

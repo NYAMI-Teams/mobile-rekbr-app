@@ -1,4 +1,4 @@
-import { View, ScrollView } from "react-native";
+import { View, ScrollView, RefreshControl } from "react-native";
 import { useRouter } from "expo-router";
 import PrimaryButton from "../../components/PrimaryButton";
 import SellerEmptyContent from "../../screens/seller/homeScreen";
@@ -12,9 +12,14 @@ import { removeAccessToken } from "../../store";
 
 export default function Seller() {
   const router = useRouter();
-  const [isKYCCompleted, setIsKYCCompleted] = useState(false);
+  const [isKYCCompleted, setIsKYCCompleted] = useState(true);
   const [isEmptyTransaction, setIsEmptyTransaction] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+  const [transactions, setTransactions] = useState([]);
+
+  useEffect(() => {
+    fetchTransactions();
+  }, []);
 
   const check = () => {
     setIsLoading(true);
@@ -40,27 +45,31 @@ export default function Seller() {
       });
   };
 
-  useEffect(() => {
-    const fetchTransactions = async () => {
-      try {
-        const res = await getSellerTransactions();
-        if (res.data.length > 0) {
-          setIsEmptyTransaction(false);
-        } else {
-          setIsEmptyTransaction(true);
-        }
-        setTransactions(res.data);
-        console.log("Berhasil get all transaction seller");
-        console.log(res.data);
-      } catch (err) {
-        console.error("Error fetching transactions:", err);
-      } finally {
-        console.log("finally");
+  const fetchTransactions = async () => {
+    try {
+      const res = await getSellerTransactions();
+      if (res.data.length > 0) {
+        setIsEmptyTransaction(false);
+      } else {
+        setIsEmptyTransaction(true);
       }
-    };
+      setTransactions(res.data);
+      console.log("Berhasil get all transaction seller");
+      // console.log(res.data);
+    } catch (err) {
+      console.error("Error fetching transactions:", err);
+    } finally {
+      console.log("finally");
+    }
+  };
 
-    fetchTransactions();
-  }, []);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchTransactions();
+    setRefreshing(false);
+  };
 
   return (
     <View style={{ flex: 1, backgroundColor: "#fff" }}>
@@ -76,7 +85,10 @@ export default function Seller() {
         />
         <ScrollView
           className="flex flex-col gap-12"
-          showsVerticalScrollIndicator={false}>
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }>
           {isEmptyTransaction ? (
             <SellerEmptyContent isKYCCompleted={isKYCCompleted} />
           ) : (

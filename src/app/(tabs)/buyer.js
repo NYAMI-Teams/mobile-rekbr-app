@@ -10,28 +10,34 @@ import { getBuyerTransactions } from "../../utils/api/buyer";
 export default function Home() {
   const [isEmptyTransaction, setIsEmptyTransaction] = useState(false);
   const [transactions, setTransactions] = useState([]);
-  useEffect(() => {
-    const fetchTransactions = async () => {
-      try {
-        const res = await getBuyerTransactions();
-        if (res.data.length > 0) {
-          setIsEmptyTransaction(false);
-        } else {
-          setIsEmptyTransaction(true);
-        }
-        console.log(res.data);
-        setTransactions(res.data);
-      } catch (err) {
-        console.error("Error fetching buyer transactions:", err);
-      } finally {
-        console.log("finally");
-      }
-    };
+  const [refreshing, setRefreshing] = useState(false);
 
+  useEffect(() => {
     fetchTransactions();
   }, []);
 
-  // console.log("transactions", transactions[0]);
+  const fetchTransactions = async () => {
+    try {
+      const res = await getBuyerTransactions();
+      if (res.data.length > 0) {
+        setIsEmptyTransaction(false);
+      } else {
+        setIsEmptyTransaction(true);
+      }
+      console.log(res.data);
+      setTransactions(res.data);
+    } catch (err) {
+      console.error("Error fetching buyer transactions:", err);
+    } finally {
+      console.log("finally");
+    }
+  };
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchTransactions();
+    setRefreshing(false);
+  };
 
   return (
     <View style={{ flex: 1, backgroundColor: "#fff" }}>
@@ -44,7 +50,10 @@ export default function Home() {
         />
         <ScrollView
           className="flex flex-col gap-12"
-          showsVerticalScrollIndicator={false}>
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }>
           {isEmptyTransaction ? (
             <BuyerEmptyContent />
           ) : (

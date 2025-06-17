@@ -13,6 +13,33 @@ import * as ImagePicker from "expo-image-picker"; // Import ImagePicker
 import BuyerKonfirmasi from "../components/BuyerKonfirmasi";
 import { postResi } from "../utils/api/seller";
 
+const mockCouriers = [
+  {
+    id: "23be3cdf-0591-4eec-83a4-e88d860317c6",
+    name: "J&T Express Indonesia",
+  },
+  {
+    id: "e3273d93-8f13-428d-b2ef-c820af3c34f6",
+    name: "JNE REG",
+  },
+  {
+    id: "b93f73e0-df31-48e1-8a20-e42f0bee3ead",
+    name: "SiCepat Ekspres",
+  },
+  {
+    id: "c2600a13-c68a-49d7-bd90-7e8af3a7993a",
+    name: "AnterAja",
+  },
+  {
+    id: "de7ba283-eb43-4575-a823-319dd0005805",
+    name: "Ninja Xpress",
+  },
+  {
+    id: "df156819-7eaf-49df-b678-2678360317d3",
+    name: "POS Indonesia",
+  },
+];
+
 export default function InputResi({ id }) {
   const router = useRouter();
   const [isUploaded, setIsUploaded] = useState(false);
@@ -80,6 +107,7 @@ export default function InputResi({ id }) {
 
   const handleSelectCourier = (selectedCourier) => {
     setCourier(selectedCourier);
+    console.log(selectedCourier);
     setModalVisible(false);
   };
 
@@ -95,6 +123,10 @@ export default function InputResi({ id }) {
     } catch (error) {
       console.log(error);
     }
+    console.log("ini id", id);
+    console.log("ini courier", courier);
+    console.log("ini resiNumber", resiNumber);
+    console.log("ini image", image);
     router.replace("/");
   };
 
@@ -216,58 +248,15 @@ export default function InputResi({ id }) {
                 {" "}
                 {/* Sembunyikan indikator scroll */}
                 <View className="flex-col gap-4 bg-slate-100/50 p-5 rounded-lg border border-gray-300">
-                  <TouchableOpacity
-                    className="p-5 border-b-2 border-gray-300/50 mb-4"
-                    onPress={() =>
-                      handleSelectCourier("J&T Express Indonesia")
-                    }>
-                    <Text className="text-[15px] font-semibold">
-                      J&T Express Indonesia
-                    </Text>
-                  </TouchableOpacity>
-
-                  <TouchableOpacity
-                    className="p-5 border-b-2 border-gray-300/50 mb-4"
-                    onPress={() => handleSelectCourier("JNE Indonesia")}>
-                    <Text className="text-[15px] font-semibold">
-                      JNE Indonesia
-                    </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    className="p-5 border-b-2 border-gray-300/50 mb-4"
-                    onPress={() => handleSelectCourier("Sicepat Express")}>
-                    <Text className="text-[15px] font-semibold">
-                      Sicepat Express
-                    </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    className="p-5 border-b-2 border-gray-300/50 mb-4"
-                    onPress={() => handleSelectCourier("TIKI Express")}>
-                    <Text className="text-[15px] font-semibold">
-                      TIKI Express
-                    </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    className="p-5 border-b-2 border-gray-300/50 mb-4"
-                    onPress={() => handleSelectCourier("Pos Indonesia")}>
-                    <Text className="text-[15px] font-semibold">
-                      Pos Indonesia
-                    </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    className="p-5 border-b-2 border-gray-300/50 mb-4"
-                    onPress={() => handleSelectCourier("Grab Express")}>
-                    <Text className="text-[15px] font-semibold">
-                      Grab Express
-                    </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    className="p-5 border-b-2 border-gray-300/50 mb-4"
-                    onPress={() => handleSelectCourier("Gojek Express")}>
-                    <Text className="text-[15px] font-semibold">
-                      Gojek Express
-                    </Text>
-                  </TouchableOpacity>
+                  {mockCouriers.map((courier) => (
+                    <TouchableOpacity
+                      className="p-5 border-b-2 border-gray-300/50 mb-4"
+                      onPress={() => handleSelectCourier(courier.id)}>
+                      <Text className="text-[15px] font-semibold">
+                        {courier.name}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
                 </View>
               </ScrollView>
               <TouchableOpacity

@@ -85,6 +85,8 @@ const SellerCard = ({ data }) => {
           },
         ];
       case "shipped":
+        console.log("data", data);
+
         return [
           { label: "Nama Produk", value: data?.itemName || "-" },
           { label: "Pembeli", value: data?.buyerEmail || "-" },
@@ -118,7 +120,7 @@ const SellerCard = ({ data }) => {
           <Text className="font-poppins-semibold text-xs text-gray-800">
             <CountdownTimer
               deadline={data?.paymentDeadline || "-"}
-              fromTime={data?.createdAt || "-"}
+              fromTime={data?.currentTimestamp || "-"}
             />
           </Text>
         </View>
@@ -128,7 +130,12 @@ const SellerCard = ({ data }) => {
     if (status === "waiting_shipment") {
       return (
         <TouchableOpacity
-          onPress={() => console.log("Bukti Pengiriman Pressed")}
+          onPress={() =>
+            router.push({
+              pathname: `/InputResi`,
+              params: { id: data?.id },
+            })
+          }
           className="bg-black px-3 py-1 rounded-full">
           <Text className="font-poppins-semibold text-xs text-white">
             Bukti Pengiriman
@@ -163,7 +170,12 @@ const SellerCard = ({ data }) => {
       ) {
         return (
           <TouchableOpacity
-            onPress={() => console.log("Minta Konfirmasi Pressed")}
+            onPress={() =>
+              router.push({
+                pathname: `/FundReleaseRequest`,
+                params: { id: data?.id },
+              })
+            }
             className="bg-black px-3 py-1 rounded-full">
             <Text className="font-poppins-semibold text-xs text-white">
               Minta Konfirmasi

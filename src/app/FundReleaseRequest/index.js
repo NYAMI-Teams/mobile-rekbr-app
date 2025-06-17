@@ -74,6 +74,9 @@ export default function FundReleaseRequestScreen() {
 
   const handleBtnPress = () => {
     setShowPopup(true);
+    console.log("ini id ", id);
+    console.log("ini image ", image);
+    console.log("ini alasanText ", alasanText);
   };
 
   const handleUploadFundRelease = () => {
@@ -121,7 +124,7 @@ export default function FundReleaseRequestScreen() {
             caption={
               isUploaded
                 ? image.split("/").pop()
-                : "Berikan bukti berupa screenshot cek resi1"
+                : "Berikan bukti berupa screenshot cek resi"
             }
             captionColor={isUploaded ? "#08B20F" : "#9E9E9E"}
             iconName={"camera"} // Pastikan AttachmentFilled Anda bisa menerima string 'camera' untuk ikon
