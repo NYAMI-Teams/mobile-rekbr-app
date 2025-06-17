@@ -49,8 +49,8 @@ export default function Home() {
           onNotificationPress={() => console.log("Notification pressed")}
           onProfilePress={() => console.log("Notification pressed")}
         />
-        {/* <ScrollView
-          className="flex flex-col gap-12"
+        <ScrollView
+          className="flex flex-col gap-6"
           showsVerticalScrollIndicator={false}
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
@@ -62,8 +62,7 @@ export default function Home() {
               <BuyerCard key={transaction.id} data={transaction} />
             ))
           )}
-        </ScrollView> */}
-        <InputResi id={""} />
+        </ScrollView>
       </View>
     </View>
   );

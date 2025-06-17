@@ -14,10 +14,10 @@ export default function RootLayout() {
   useEffect(() => {
     setIsLoading(true);
     getAccessToken()
-      .then(token => {
+      .then((token) => {
         if (!token) return setIsLoggedIn(false);
         getProfile()
-          .then(res => {
+          .then((res) => {
             console.log("Profile data:", res.data);
             setIsLoggedIn(true);
           })
@@ -35,7 +35,7 @@ export default function RootLayout() {
       <View className="flex-1 items-center justify-center">
         <ActivityIndicator size="large" color="#0000ff" />
       </View>
-    )
+    );
   }
 
   return (
@@ -44,7 +44,7 @@ export default function RootLayout() {
         {isLoggedIn ? (
           <Stack.Screen name="(tabs)" />
         ) : (
-          <Stack.Screen name="auth/login" />
+          <Stack.Screen name="Onboarding/index" />
         )}
       </Stack>
       <Toast />

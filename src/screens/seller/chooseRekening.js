@@ -22,7 +22,11 @@ import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import BankSelector from "../../components/BankScreens";
 import { ChevronLeftCircle } from "lucide-react-native";
 import PrimaryButton from "../../components/PrimaryButton";
-import { getListBankAccount, getAllBankList } from "../../utils/api/seller";
+import {
+  getListBankAccount,
+  getAllBankList,
+  checkRekeningExist,
+} from "../../utils/api/seller";
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
 
@@ -84,6 +88,23 @@ export default function PilihRekeningScreen() {
     }
   };
 
+  const checkRekening = async () => {
+    try {
+      const res = await checkRekeningExist(accountNumber, selectedBank.id);
+      if (res.success === true) {
+        console.log("rekening user ditemukan", res);
+        // setSaved(res);
+        setIsAlreadyCheckedRekening(true);
+      }
+      if (res.success === false) {
+        console.log("rekening user tidak ditemukan", res);
+        setIsAlreadyCheckedRekening(false);
+      }
+    } catch (error) {
+      console.log("Error get list bank account:", error);
+    }
+  };
+
   const closeModal = () => {
     setModalVisible(false);
     setIsSelectBankDone(false);
@@ -108,9 +129,10 @@ export default function PilihRekeningScreen() {
   };
 
   const handleToCreateRekbr = () => {
-    setIsAlreadyCheckedRekening(true);
     setModalVisible(false);
     router.push("/CreateTransaksi/CreateRekbr");
+    handleBackToInputRekening();
+    handleBackToBankSelection();
   };
 
   const toggleFavorite = (item, fromFavorites) => {
@@ -147,8 +169,7 @@ export default function PilihRekeningScreen() {
         <View style={styles.appBar}>
           <TouchableOpacity
             style={styles.backButton}
-            onPress={() => router.back()}
-          >
+            onPress={() => router.back()}>
             <Image
               source={require("../../assets/icon-back.png")}
               style={styles.backIcon}
@@ -196,8 +217,7 @@ export default function PilihRekeningScreen() {
                 style={{
                   paddingHorizontal: 16,
                   paddingTop: 16,
-                }}
-              >
+                }}>
                 <Text style={styles.sectionTitle}>Tujuan Favorit kamu!</Text>
                 {favorites.length === 0 ? (
                   <Text style={styles.noFavoritesText}>
@@ -236,8 +256,10 @@ export default function PilihRekeningScreen() {
         <View style={styles.buttonContainer}>
           <TouchableOpacity
             style={styles.addButton}
-            onPress={() => setModalVisible(true)}
-          >
+            onPress={() => {
+              setModalVisible(true);
+              console.log("bank list", bankList);
+            }}>
             <Text style={styles.addButtonText}>+ Rekening</Text>
           </TouchableOpacity>
         </View>
@@ -249,13 +271,11 @@ export default function PilihRekeningScreen() {
             visible={modalVisible}
             onRequestClose={() => {
               closeModal();
-            }}
-          >
+            }}>
             <View className="bg-black/50 w-full h-full">
               <Animated.View
                 style={{ transform: [{ translateY: slideAnim }] }}
-                className="bg-white px-5 pt-5 pb-8 rounded-t-3xl"
-              >
+                className="bg-white px-5 pt-5 pb-8 rounded-t-3xl">
                 <Pressable
                   onPress={
                     isAlreadyCheckedRekening
@@ -277,30 +297,32 @@ export default function PilihRekeningScreen() {
                 </Pressable>
 
                 {!isSelectBankDone ? (
+                  // <View className="bg-red-300">
                   <BankSelector
-                    banks={bankList.data}
+                    banks={bankList}
                     onSelectBank={(bank) => {
                       setSelectedBank({
-                        logoSrc: bank.logoUrl,
-                        name: bank.bankName,
+                        logoUrl: bank.logoUrl,
+                        bankName: bank.bankName,
                         bankId: bank.id,
                       });
                       setIsSelectBankDone(true);
                     }}
                   />
-                ) : !isAlreadyCheckedRekening ? (
+                ) : // </View>
+                !isAlreadyCheckedRekening ? (
                   <>
                     {selectedBank && (
                       <View className="flex-row items-center mt-2 mb-2 gap-4">
                         <View className="w-20 h-10 rounded bg-[#EDFBFA] justify-center items-center py-2">
                           <Image
-                            source={{ uri: selectedBank.logo }}
+                            source={{ uri: selectedBank.logoUrl }}
                             className="w-12 h-12 object-contain"
                             resizeMode="contain"
                           />
                         </View>
                         <Text className="text-base font-normal">
-                          {selectedBank.name}
+                          {selectedBank.bankName}
                         </Text>
                       </View>
                     )}
@@ -325,12 +347,10 @@ export default function PilihRekeningScreen() {
                             return (
                               <View
                                 key={index}
-                                className="w-1/3 items-center justify-center mb-4"
-                              >
+                                className="w-1/3 items-center justify-center mb-4">
                                 <TouchableOpacity
                                   onPress={() => handleKeyPress(key)}
-                                  className="size-[62px] aspect-square rounded-full bg-white border border-gray-300 justify-center items-center shadow-sm"
-                                >
+                                  className="size-[62px] aspect-square rounded-full bg-white border border-gray-300 justify-center items-center shadow-sm">
                                   <Text className="text-2xl font-normal text-gray-800">
                                     {key}
                                   </Text>
@@ -344,16 +364,14 @@ export default function PilihRekeningScreen() {
                             return (
                               <View
                                 key="last-row"
-                                className="flex-row w-full justify-around items-center mt-2"
-                              >
+                                className="flex-row w-full justify-around items-center mt-2">
                                 {/* Spacer kiri biar seimbang */}
                                 <View className="size-[62px] aspect-square opacity-0" />
 
                                 {/* Tombol 0 */}
                                 <TouchableOpacity
                                   onPress={() => handleKeyPress("0")}
-                                  className="size-[62px] aspect-square rounded-full bg-white border border-gray-300 justify-center items-center shadow-sm"
-                                >
+                                  className="size-[62px] aspect-square rounded-full bg-white border border-gray-300 justify-center items-center shadow-sm">
                                   <Text className="text-2xl font-normal text-gray-800">
                                     0
                                   </Text>
@@ -362,8 +380,7 @@ export default function PilihRekeningScreen() {
                                 {/* Tombol x */}
                                 <TouchableOpacity
                                   onPress={() => handleKeyPress("x")}
-                                  className="size-[62px] aspect-square rounded-full bg-white border border-gray-300 justify-center items-center shadow-sm"
-                                >
+                                  className="size-[62px] aspect-square rounded-full bg-white border border-gray-300 justify-center items-center shadow-sm">
                                   <Text className="text-2xl font-normal text-gray-800">
                                     x
                                   </Text>
@@ -378,9 +395,8 @@ export default function PilihRekeningScreen() {
                     </View>
 
                     <TouchableOpacity
-                      onPress={() => setIsAlreadyCheckedRekening(true)}
-                      className="bg-black rounded-lg py-4 mt-3"
-                    >
+                      onPress={checkRekening}
+                      className="bg-black rounded-lg py-4 mt-3">
                       <Text className="text-white text-center font-semibold text-base">
                         Cek Rekening
                       </Text>
@@ -395,8 +411,7 @@ export default function PilihRekeningScreen() {
                           alignItems: "flex-start",
                           flex: 1,
                           justifyContent: "flex-start",
-                        }}
-                      >
+                        }}>
                         <View className="flex-col gap-2 w-full">
                           <Text className="text-base font-medium">
                             Bayu Septyan Nur Hidayat
@@ -412,7 +427,7 @@ export default function PilihRekeningScreen() {
                             />
                             <View className="flex-col justify-center items-start p-2">
                               <Text className="text-sm font-medium">
-                                {selectedBank.name}
+                                {selectedBank.bankName}
                               </Text>
                               <Text className="text-sm font-normal">
                                 {formatAccountNumber(accountNumber)}
@@ -472,8 +487,7 @@ const AnimatedAccountItem = ({
           opacity: fadeAnim,
           transform: [{ scale: scaleAnim }],
         },
-      ]}
-    >
+      ]}>
       <View style={{ flexDirection: "row", alignItems: "center", flex: 1 }}>
         <Image source={{ uri: item.bank.logoUrl }} style={styles.bankLogo} />
         <View style={{ marginLeft: 12 }}>

@@ -74,7 +74,7 @@ const Timestamp = ({ data, caption, date, details = [] }) => {
           {/* Replace this with dynamic countdown logic */}
           <CountdownTimer
             deadline={data.paymentDeadline}
-            fromTime={data.createdAt}
+            fromTime={data.currentTimestamp}
           />
         </Text>
       );

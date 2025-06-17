@@ -10,7 +10,6 @@ import { getSellerTransactions } from "../../utils/api/seller";
 import { getProfile } from "../../utils/api/auth";
 import { removeAccessToken } from "../../store";
 
-
 export default function Seller() {
   const router = useRouter();
   const [isKYCCompleted, setIsKYCCompleted] = useState(true);
@@ -85,7 +84,7 @@ export default function Seller() {
           onProfilePress={() => check()}
         />
         <ScrollView
-          className="flex flex-col gap-12"
+          className="flex flex-col gap-6"
           showsVerticalScrollIndicator={false}
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />

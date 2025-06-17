@@ -114,3 +114,20 @@ export const getAllBankList = async () => {
     throw error;
   }
 };
+
+// Check Rekening Exist
+export const checkRekeningExist = async (account_number, bank_id) => {
+  try {
+    const res = await Api.get(`/bank/account`, {
+      params: {
+        account_number,
+        bank_id,
+      },
+    });
+    if (res) {
+      return res;
+    }
+  } catch (error) {
+    throw error;
+  }
+};

@@ -37,7 +37,8 @@ const BankSelector = ({ banks, onSelectBank }) => {
 
             <FlatList
                 data={filteredBanks}
-                keyExtractor={(item) => item.bankId}
+                keyExtractor={(item) => item.id}
+                className="mb-5 h-[50%]"
                 renderItem={({ item }) => (
                     <TouchableOpacity
                         onPress={() => onSelectBank(item)}
