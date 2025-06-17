@@ -38,7 +38,7 @@ export default function CreateRekber({ bankData }) {
                 <Icon name="arrow-left" size={20} color="black" />
               </TouchableOpacity>
 
-              <Text className="flex-1 text-center text-neutral-950 text-sm font-medium">
+              <Text className="flex-1 text-center text-neutral-950 text-lg font-medium">
                 Buat Transaksi Rekber
               </Text>
 

@@ -154,7 +154,8 @@ export default function PilihRekeningScreen() {
         <View style={styles.appBar}>
           <TouchableOpacity
             style={styles.backButton}
-            onPress={() => router.back()}>
+            onPress={() => router.back()}
+          >
             <Image
               source={require("../../assets/icon-back.png")}
               style={styles.backIcon}
@@ -202,7 +203,8 @@ export default function PilihRekeningScreen() {
                 style={{
                   paddingHorizontal: 16,
                   paddingTop: 16,
-                }}>
+                }}
+              >
                 <Text style={styles.sectionTitle}>Tujuan Favorit kamu!</Text>
                 {favorites.length === 0 ? (
                   <Text style={styles.noFavoritesText}>
@@ -241,8 +243,9 @@ export default function PilihRekeningScreen() {
         <View style={styles.buttonContainer}>
           <TouchableOpacity
             style={styles.addButton}
-            onPress={() => setModalVisible(true)}>
-            <Text style={styles.addButtonText}>＋ Rekening</Text>
+            onPress={() => setModalVisible(true)}
+          >
+            <Text style={styles.addButtonText}>+ Rekening</Text>
           </TouchableOpacity>
         </View>
 
@@ -254,19 +257,22 @@ export default function PilihRekeningScreen() {
             onRequestClose={() => {
               Alert.alert("Modal has been closed.");
               closeModal();
-            }}>
+            }}
+          >
             <View className="bg-black/50 w-full h-full">
               <Animated.View
                 style={{ transform: [{ translateY: slideAnim }] }}
-                className="bg-white px-5 pt-5 pb-8 rounded-t-3xl">
+                className="bg-white px-5 pt-5 pb-8 rounded-t-3xl"
+              >
                 <Pressable
                   onPress={
                     isAlreadyCheckedRekening
                       ? handleBackToInputRekening
                       : isSelectBankDone
-                        ? handleBackToBankSelection
-                        : closeModal
-                  }>
+                      ? handleBackToBankSelection
+                      : closeModal
+                  }
+                >
                   <View className="flex-row items-center mb-6">
                     <ChevronLeftCircle size={24} color="#00C2C2" />
                     <Text className="text-lg font-normal text-gray-800 ml-2">
@@ -320,42 +326,53 @@ export default function PilihRekeningScreen() {
                       />
                     </View>
 
-                    <View className="w-[100%] justify-center items-center">
-                      <View className="flex-row flex-wrap justify-between items-center mt-7 px-6 w-[80%]">
+                    <View className="w-full items-center justify-center">
+                      <View className="flex-row flex-wrap justify-center items-center mt-8 px-6 w-[80%]">
                         {keys.map((key, index) => {
-                          // Skip the first 9 keys (1-9) and handle them normally
+                          // Tombol 1-9
                           if (index < 9) {
                             return (
-                              <TouchableOpacity
+                              <View
                                 key={index}
-                                onPress={() => handleKeyPress(key)}
-                                className="size-[62px] aspect-square rounded-full bg-white border border-gray-300 justify-center items-center mb-4 shadow-sm">
-                                <Text className="text-2xl font-normal text-gray-800">
-                                  {key}
-                                </Text>
-                              </TouchableOpacity>
+                                className="w-1/3 items-center justify-center mb-4"
+                              >
+                                <TouchableOpacity
+                                  onPress={() => handleKeyPress(key)}
+                                  className="size-[62px] aspect-square rounded-full bg-white border border-gray-300 justify-center items-center shadow-sm"
+                                >
+                                  <Text className="text-2xl font-normal text-gray-800">
+                                    {key}
+                                  </Text>
+                                </TouchableOpacity>
+                              </View>
                             );
                           }
-                          // For the last two keys (0 and x), handle them in a single row
-                          else if (index === 9) {
+
+                          // Tombol baris terakhir (0 dan x)
+                          if (index === 9) {
                             return (
-                              <View className="flex-row w-full justify-between">
-                                {/* Empty space on the left */}
-                                <View className="size-[62px] aspect-square" />
-                                {/* 0 in the middle */}
+                              <View
+                                key="last-row"
+                                className="flex-row w-full justify-around items-center mt-2"
+                              >
+                                {/* Spacer kiri biar seimbang */}
+                                <View className="size-[62px] aspect-square opacity-0" />
+
+                                {/* Tombol 0 */}
                                 <TouchableOpacity
-                                  key={9}
                                   onPress={() => handleKeyPress("0")}
-                                  className="size-[62px] aspect-square rounded-full bg-white border border-gray-300 justify-center items-center mb-4 shadow-sm">
+                                  className="size-[62px] aspect-square rounded-full bg-white border border-gray-300 justify-center items-center shadow-sm"
+                                >
                                   <Text className="text-2xl font-normal text-gray-800">
                                     0
                                   </Text>
                                 </TouchableOpacity>
-                                {/* x on the right */}
+
+                                {/* Tombol x */}
                                 <TouchableOpacity
-                                  key={10}
                                   onPress={() => handleKeyPress("x")}
-                                  className="size-[62px] aspect-square rounded-full bg-white border border-gray-300 justify-center items-center mb-4 shadow-sm">
+                                  className="size-[62px] aspect-square rounded-full bg-white border border-gray-300 justify-center items-center shadow-sm"
+                                >
                                   <Text className="text-2xl font-normal text-gray-800">
                                     x
                                   </Text>
@@ -363,6 +380,7 @@ export default function PilihRekeningScreen() {
                               </View>
                             );
                           }
+
                           return null;
                         })}
                       </View>
@@ -370,7 +388,8 @@ export default function PilihRekeningScreen() {
 
                     <TouchableOpacity
                       onPress={() => setIsAlreadyCheckedRekening(true)}
-                      className="bg-black rounded-lg py-4 mt-3">
+                      className="bg-black rounded-lg py-4 mt-3"
+                    >
                       <Text className="text-white text-center font-semibold text-base">
                         Cek Rekening
                       </Text>
@@ -385,7 +404,8 @@ export default function PilihRekeningScreen() {
                           alignItems: "flex-start",
                           flex: 1,
                           justifyContent: "flex-start",
-                        }}>
+                        }}
+                      >
                         <View className="flex-col gap-2 w-full">
                           <Text className="text-base font-medium">
                             Bayu Septyan Nur Hidayat
@@ -461,7 +481,8 @@ const AnimatedAccountItem = ({
           opacity: fadeAnim,
           transform: [{ scale: scaleAnim }],
         },
-      ]}>
+      ]}
+    >
       <View style={{ flexDirection: "row", alignItems: "center", flex: 1 }}>
         <Image source={item.bankLogo} style={styles.bankLogo} />
         <View style={{ marginLeft: 12 }}>
@@ -496,7 +517,7 @@ const styles = StyleSheet.create({
     paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
     backgroundColor: "#fff",
     justifyContent: "center",
-    alignItems: "center",
+    // alignItems: "center",
   },
   appBar: {
     flexDirection: "row",

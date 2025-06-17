@@ -235,7 +235,8 @@ export default function DetailTransaksiBuyer({ data }) {
               Terdapat kendala?
             </Text>
             <TouchableOpacity
-              onPress={() => console.log("Hubungi Kami pressed")}>
+              onPress={() => console.log("Hubungi Kami pressed")}
+            >
               <Text className="text-sm items-end justify-end text-[#3267E3]">
                 Silahkan Hubungi Kami
               </Text>
@@ -349,9 +350,11 @@ export default function DetailTransaksiBuyer({ data }) {
                 marginHorizontal: 12,
                 backgroundColor: "#EDFBFA",
                 borderRadius: 12,
-              }}>
+              }}
+            >
               <Text
-                style={{ fontSize: 15, marginBottom: 12, fontWeight: "500" }}>
+                style={{ fontSize: 15, marginBottom: 12, fontWeight: "500" }}
+              >
                 {data.status == "pending_payment"
                   ? "Virtual Account"
                   : "No Resi"}
@@ -360,9 +363,10 @@ export default function DetailTransaksiBuyer({ data }) {
                 className={`flex-row items-center ${data.status == "waiting_shipment" ||
                   data.status == "shipped" ||
                   data.status == "completed"
-                  ? "mb-3"
-                  : ""
-                  }`}>
+                    ? "mb-3"
+                    : ""
+                }`}
+              >
                 <Text style={{ fontSize: 17, fontWeight: "500" }}>
                   {data.status == "pending_payment"
                     ? data.virtualAccount
@@ -375,7 +379,8 @@ export default function DetailTransaksiBuyer({ data }) {
                         ? data.virtualAccount
                         : data.shipment.trackingNumber
                     )
-                  }>
+                  }
+                >
                   <Image
                     source={require("../../assets/copy.png")}
                     style={{ marginLeft: 4, width: 17, height: 16 }}
@@ -391,7 +396,8 @@ export default function DetailTransaksiBuyer({ data }) {
                     // marginBottom: 12,
                     fontWeight: "400",
                     color: "#616161",
-                  }}>
+                  }}
+                >
                   {data.shipment.courier}
                 </Text>
               ) : null}
@@ -415,6 +421,44 @@ export default function DetailTransaksiBuyer({ data }) {
                 {data.status == "completed"
                   ? "Komplain dianggap tidak ada dan bakal selesai otomatis kalau pembeli nggak respon."
                   : "Halo! Barang udah sampai. Cek dan konfirmasi, biar dana langsung ke penjual via BNI!"}
+              </Text>
+            </View>
+          </>
+        ) : null}
+
+        {/* Warning Message */}
+        {data.status == "shipped" ? (
+          <>
+            <View className="flex-row items-center bg-yellow-200 px-4 py-3 rounded-lg w-full">
+              <Image
+                source={require("../../../assets/icon-warning.png")}
+                className="w-5 h-5"
+                resizeMode="contain"
+              />
+              <Text className="text-xs text-black font-semibold flex-1">
+                {data.status === "completed"
+                  ? "Komplain dianggap tidak ada dan bakal selesai otomatis kalau pembeli nggak respon."
+                  : "Biar aman, pastikan kamu videoin proses buka paket ya! Ini penting banget sebagai bukti kalau mau komplain nanti."}
+              </Text>
+            </View>
+          </>
+        ) : null}
+
+        {data.fundReleaseRequest.status == "approved" ||
+        data.status == "waiting_shipment" ? (
+          <>
+            <View className="flex-row mx-3 p-3 justify-between items-center gap-3">
+              <Image
+                source={require("../../../assets/admin1.png")}
+                style={{
+                  width: 20,
+                  height: 20,
+                }}
+              />
+              <Text className="text-sm flex-1">
+                {data.status == "completed"
+                  ? "Komplain dianggap tidak ada dan bakal selesai otomatis kalau pembeli nggak respon."
+                  : "Pastikan alamat buyer sudah benar. Kalau ada kesalahan, langsung hubungi CS ekspedisi ya!"}
               </Text>
             </View>
           </>

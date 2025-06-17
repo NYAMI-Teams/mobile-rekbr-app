@@ -14,7 +14,7 @@ export default function InputField({
 }) {
   return (
     <View className={clsx("flex-col mx-5", className)}>
-      <Text className="text-[14px] text-black font-normal mb-2">{title}</Text>
+      <Text className="text-[15px] text-black font-normal mb-2">{title}</Text>
       <View style={styles.card}>
         <TextInput
           style={styles.input}

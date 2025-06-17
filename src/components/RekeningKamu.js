@@ -5,14 +5,14 @@ export default function RekeningKamu({ bankData }) {
     <View className="flex flex-col items-center gap-4 py-0 relative self-stretch w-full">
       {/* Bank Account Section */}
       <View className="gap-2 self-stretch w-full flex flex-col items-start relative">
-        <Text className="text-[14px] text-black font-normal mb-2">
+        <Text className="text-[15px] text-black font-normal mb-2">
           Rekening Kamu
         </Text>
 
         <View className="w-full bg-[#EDFBFA] rounded-lg h-[86px]">
           <View className="p-4 flex flex-col gap-2 justify-between w-full h-[86px]">
             <View className="flex flex-col items-start gap-2 w-full">
-              <Text className="text-neutral-950 text-sm font-medium whitespace-nowrap">
+              <Text className="text-neutral-950 text-[15px] font-medium whitespace-nowrap">
                 {bankData.accountHolderName}
               </Text>
             </View>
@@ -26,11 +26,11 @@ export default function RekeningKamu({ bankData }) {
               </View>
 
               <View className="items-start justify-center gap-1">
-                <Text className="text-neutral-950 text-sm font-normal">
+                <Text className="text-neutral-950 text-[14px] font-normal">
                   {bankData.detailBank.bankName}
                 </Text>
 
-                <Text className="self-stretch text-neutral-950 text-sm font-normal">
+                <Text className="self-stretch text-neutral-950 text-[14px] font-normal">
                   {bankData.accountNumber}
                 </Text>
               </View>
