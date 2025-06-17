@@ -2,8 +2,11 @@ import React from "react";
 import { View, Text, TouchableOpacity, Image, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import PrimaryButton from "../../components/PrimaryButton";
+import { ChevronLeft } from "lucide-react-native";
+import { useNavigation } from "expo-router";
 
 export default function Dispute() {
+  const navigation = useNavigation();
   const complaints = [
     {
       label: "Barang belum sampai atau kesasar",
@@ -26,10 +29,20 @@ export default function Dispute() {
   return (
     <SafeAreaView className="flex-1 bg-white">
       <ScrollView className="px-4 pt-4">
-        {/* Header */}
-        <Text className="text-xl font-semibold mb-4 text-center">
-          Permintaan Komplain Buyer
-        </Text>
+        <View className="relative items-center justify-center mb-4">
+          {/* Tombol Back di kiri */}
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            className="absolute left-0"
+          >
+            <ChevronLeft size={24} color="black" />
+          </TouchableOpacity>
+
+          {/* Judul di tengah */}
+          <Text className="text-xl font-semibold text-center">
+            Permintaan Komplain Buyer
+          </Text>
+        </View>
 
         {/* Informasi Admin */}
         <View className="flex-row items-start bg-orange-50 p-4 rounded-xl mb-4 border border-orange-100 space-x-3">
@@ -70,7 +83,7 @@ export default function Dispute() {
           {complaints.map((item, index) => (
             <TouchableOpacity
               key={index}
-              className="w-[48%] h-40 bg-white border border-gray-300 rounded-xl px-4 py-6 items-center justify-center space-y-4"
+              className="w-[48%] h-40 bg-white border border-gray-300 rounded-xl px-4 py-10 items-center justify-between"
             >
               <Image
                 source={item.icon}
