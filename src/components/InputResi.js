@@ -13,6 +13,7 @@ import * as ImagePicker from "expo-image-picker"; // Import ImagePicker
 import BuyerKonfirmasi from "../components/BuyerKonfirmasi";
 import { postResi } from "../utils/api/seller";
 import { getListCourier } from "../utils/api/seller";
+import Toast from "react-native-toast-message";
 
 const mockCouriers = [
   {
@@ -135,7 +136,6 @@ export default function InputResi({ id }) {
   };
 
   const handleUploadResi = () => {
-    // setShowPopup(true);
     try {
       postResi(id, courier, resiNumber, image);
       setShowPopup(false);
@@ -235,7 +235,11 @@ export default function InputResi({ id }) {
       <View className="w-full px-4 py-4">
         {" "}
         {/* Tambahkan padding horizontal dan vertikal */}
-        <PrimaryButton title="Simpan" onPress={handleBtnPress} />
+        <PrimaryButton
+          title="Kirim"
+          onPress={handleBtnPress}
+          // disabled={courier == "" || resiNumber == "" || image == null}
+        />
       </View>
 
       {showPopup && (
@@ -258,14 +262,15 @@ export default function InputResi({ id }) {
           // Alert.alert("Modal has been closed."); // Komentar atau hapus ini untuk UX yang lebih baik
           closeModal();
         }}>
-        <View className="flex-1 bg-black/50 justify-end">
+        <TouchableOpacity
+          className="flex-1 bg-black/50 justify-end"
+          onPress={closeModal}>
           <View className="bg-white rounded-t-lg h-[55%]">
             {/* Close Button */}
-            <View className="flex-row justify-start p-4">
+            <View className="flex-row justify-start p-4 ">
               <TouchableOpacity
                 onPress={closeModal}
                 className="flex-row items-center mb-6">
-                {" "}
                 {/* Tambahkan onPress untuk menutup modal */}
                 <ChevronLeftCircle size={24} color="#00C2C2" />
                 <Text className="text-lg font-normal text-gray-800 ml-2">
@@ -275,13 +280,11 @@ export default function InputResi({ id }) {
             </View>
 
             {/* Modal Content */}
-            <View className="p-4 justify-between flex-1">
-              {" "}
+            <View className="justify-between flex-1">
               {/* Ubah h-[70%] menjadi flex-1 agar menyesuaikan sisa ruang */}
               <ScrollView className="my-2" showsVerticalScrollIndicator={false}>
-                {" "}
                 {/* Sembunyikan indikator scroll */}
-                <View className="flex-col gap-4 bg-slate-100/50 p-5 rounded-lg border border-gray-300">
+                <View className="flex-col gap-4 bg-slate-100/50 m-5 p-5 rounded-lg border border-gray-300">
                   {courierList.map((courier) => (
                     <TouchableOpacity
                       className="p-5 border-b-2 border-gray-300/50 mb-4"
@@ -293,16 +296,9 @@ export default function InputResi({ id }) {
                   ))}
                 </View>
               </ScrollView>
-              <TouchableOpacity
-                className="bg-[#00C2C2] rounded-lg p-4 mt-4 mb-6" // Tambahkan margin-top
-                onPress={() => console.log("Select courier")}>
-                <Text className="text-center text-white text-[15px] font-medium">
-                  Pilih dari Daftar
-                </Text>
-              </TouchableOpacity>
             </View>
           </View>
-        </View>
+        </TouchableOpacity>
       </Modal>
     </SafeAreaView>
   );

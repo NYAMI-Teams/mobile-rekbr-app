@@ -264,7 +264,7 @@ export default function PilihRekeningScreen() {
           </TouchableOpacity>
         </View>
 
-        <View className="flex-1 w-full h-full bg-red-500">
+        <View className="flex-1 w-full h-full">
           <Modal
             animationType="slide"
             transparent={true}

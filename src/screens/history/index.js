@@ -1,21 +1,57 @@
-import { View, Text, TouchableOpacity } from "react-native";
-import { useState } from "react";
+import { View, Text, TouchableOpacity, ScrollView } from "react-native";
+import { useState, useEffect } from "react";
 import BuyerCard from "../../components/card-transaction/BuyerCard";
 import SellerCard from "../../components/card-transaction/SellerCard";
-import { mockAPIBuyer, mockAPISeller } from "../../services/apiMock/api";
 import EmptyIllustration from "../../components/Ilustration";
+import { getHistoryBuyer } from "../../utils/api/seller";
+import { getHistorySeller } from "../../utils/api/seller";
 
 export default function History() {
   const [selectedTab, setSelectedTab] = useState("pembelian");
-  const mockDataLength = 0;
+
+  const [historyBuyer, setHistoryBuyer] = useState([]);
+  const [historySeller, setHistorySeller] = useState([]);
+
+  useEffect(() => {
+    if (selectedTab === "pembelian") {
+      getHistoryBuyerData();
+    }
+    if (selectedTab === "penjualan") {
+      getHistorySellerData();
+    }
+  }, [selectedTab]);
 
   const handleTabPress = (tab) => {
     setSelectedTab(tab);
   };
 
+  const getHistoryBuyerData = async () => {
+    try {
+      const res = await getHistoryBuyer(`completed`);
+      if (res) {
+        console.log("ini history buyer", res);
+        setHistoryBuyer(res.data);
+      }
+    } catch (error) {
+      console.log("Error get history buyer:", error);
+    }
+  };
+
+  const getHistorySellerData = async () => {
+    try {
+      const res = await getHistorySeller(`completed`);
+      if (res) {
+        console.log("ini history seller", res);
+        setHistorySeller(res.data);
+      }
+    } catch (error) {
+      console.log("Error get history seller:", error);
+    }
+  };
+
   const renderContent = () => {
     if (selectedTab === "pembelian") {
-      if (mockAPIBuyer.data.length === 0 || mockDataLength === 0) {
+      if (historyBuyer.length === 0) {
         return (
           <View className="justify-center items-center">
             <EmptyIllustration
@@ -26,21 +62,25 @@ export default function History() {
           </View>
         );
       }
-      return <BuyerCard data={mockAPIBuyer.data} />;
+      return historyBuyer.map((item) => (
+        <BuyerCard key={item.id} data={item} />
+      ));
+    } else {
+      if (historySeller.length === 0) {
+        return (
+          <View className="justify-center items-center">
+            <EmptyIllustration
+              text={
+                "Belum ada riwayat penjualan, semua masih kosong\nTunggu sampai kamu mulai rekber pertama!"
+              }
+            />
+          </View>
+        );
+      }
+      return historySeller.map((item) => (
+        <SellerCard key={item.id} data={item} />
+      ));
     }
-
-    if (mockAPISeller.data.length === 0 || mockDataLength === 0) {
-      return (
-        <View className="justify-center items-center">
-          <EmptyIllustration
-            text={
-              "Belum ada riwayat penjualan, semua masih kosong\nTunggu sampai kamu mulai rekber pertama!"
-            }
-          />
-        </View>
-      );
-    }
-    return <SellerCard data={mockAPISeller.data} />;
   };
 
   return (
@@ -75,7 +115,9 @@ export default function History() {
           </Text>
         </TouchableOpacity>
       </View>
-      <View className="w-full pt-8 px-6">{renderContent()}</View>
+      <ScrollView className="w-full pt-8" showsVerticalScrollIndicator={false}>
+        {renderContent()}
+      </ScrollView>
     </View>
   );
 }

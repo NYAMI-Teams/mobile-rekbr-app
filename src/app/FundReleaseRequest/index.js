@@ -139,9 +139,6 @@ export default function FundReleaseRequestScreen() {
           />
         </TouchableOpacity>
         <View className="mt-4 mb-4">
-          {" "}
-          {/* Tambahkan margin vertikal */}
-          {/* Image Preview */}
           {!image ? null : (
             <Image source={{ uri: image }} className="w-full h-64 rounded-lg" />
           )}

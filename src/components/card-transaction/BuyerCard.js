@@ -7,32 +7,26 @@ import moment from "moment";
 import clsx from "clsx";
 import CountdownTimer from "../Countdown";
 import { useRouter } from "expo-router";
-
-// Helper function to safely parse dates
-const parseDate = (date) => {
-  if (!date) return null;
-  // Try different formats
-  const formats = [
-    "YYYY-MM-DD HH:mm:ss",
-    "YYYY-MM-DD",
-    "MM/DD/YYYY",
-    "DD/MM/YYYY",
-  ];
-  for (const format of formats) {
-    const parsed = moment(date, format, true);
-    if (parsed.isValid()) return parsed;
-  }
-  return null;
-};
+import { buyerConfirmReceivedTransaction } from "../../utils/api/buyer";
+import BuyerKonfirmasi from "../BuyerKonfirmasi";
 
 const BuyerCard = ({ data }) => {
+  const [showPopup, setShowPopup] = useState(false);
   const formatDateWIB = (dateTime) => {
-    const parsedDate = parseDate(dateTime);
-    if (!parsedDate) return "Invalid date";
-    return parsedDate.utcOffset(-7).format("DD MMMM YYYY, HH:mm [WIB]");
+    if (!dateTime) return "Invalid date";
+    return moment(dateTime).utcOffset(0).format("DD MMMM YYYY, HH:mm [WIB]");
   };
   const router = useRouter();
   const status = data?.status;
+
+  const handleConfirmReceived = async () => {
+    try {
+      const res = await buyerConfirmReceivedTransaction(data?.id);
+      setShowPopup(false);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const handleCopy = async (text) => {
     // belum bisa jalan toastnya
@@ -161,7 +155,7 @@ const BuyerCard = ({ data }) => {
       } else {
         return (
           <TouchableOpacity
-            onPress={() => console.log("Barang Diterima Pressed")}
+            onPress={() => setShowPopup(true)}
             className="bg-black px-3 py-1 rounded-full">
             <Text className="font-poppins-semibold text-xs text-white">
               Barang Diterima
@@ -265,6 +259,16 @@ const BuyerCard = ({ data }) => {
           </View>
         </View>
       </View>
+      {showPopup && (
+        <BuyerKonfirmasi
+          onClose={() => setShowPopup(false)}
+          onBtn2={handleConfirmReceived}
+          onBtn1={() => setShowPopup(false)}
+          title="Pastikan semua data di form sudah benar dan lengkap sebelum kamu kirim. Cek lagi, ya!"
+          btn1="Kembali"
+          btn2="Konfirmasi"
+        />
+      )}
     </TouchableOpacity>
   );
 };

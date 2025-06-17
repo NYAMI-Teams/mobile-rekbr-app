@@ -30,7 +30,7 @@ const SellerCard = ({ data }) => {
   const formatDateWIB = (dateTime) => {
     const parsedDate = parseDate(dateTime);
     if (!parsedDate) return "Invalid date";
-    return parsedDate.utcOffset(-7).format("DD MMMM YYYY, HH:mm [WIB]");
+    return parsedDate.utcOffset(0).format("DD MMMM YYYY, HH:mm [WIB]");
   };
 
   const handleCopy = async (text) => {

@@ -17,43 +17,37 @@ import Toast from "react-native-toast-message";
 import PrimaryButton from "../PrimaryButton";
 import Tagihan from "./Tagihan";
 import { useRouter } from "expo-router";
-
-// const data = {
-//   id: "6ee685c4-55d4-4629-a6cd-744dd8d2751e",
-//   transactionCode: "TRX-181126-8978",
-//   status: "pending_payment",
-//   itemName: "Babi Ngepetss",
-//   itemPrice: 75000000,
-//   insuranceFee: 150000,
-//   platformFee: 600000,
-//   totalAmount: 75750000,
-//   virtualAccount: "8888918877866",
-//   sellerEmail: "seller@gmail.com",
-//   createdAt: "2025-06-16T03:23:01.128Z",
-//   paidAt: null,
-//   paymentDeadline: "2025-06-16T05:23:01.100Z",
-//   shipmentDeadline: null,
-//   shipment: {
-//     trackingNumber: null,
-//     courier: null,
-//     shipmentDate: null,
-//     photoUrl: null,
-//   },
-//   fundReleaseRequest: {
-//     requested: false,
-//     status: null,
-//     requestedAt: null,
-//     resolvedAt: null,
-//   },
-//   buyerConfirmDeadline: null,
-//   buyerConfirmedAt: null,
-//   currentTimestamp: "2025-06-16T06:43:39.337Z",
-// };
+import { cancelTransaksiSeller } from "../../utils/api/seller";
 
 export default function DetailTransaksiSeller({ data }) {
   const status = data?.status || "";
   const router = useRouter();
   const [isExpanded, setIsExpanded] = useState(false);
+
+  const handleCancelTransaksiSeller = async () => {
+    try {
+      const res = await cancelTransaksiSeller(data?.id);
+      if (res) {
+        console.log(res);
+        Toast.show({
+          type: "success",
+          text1: "Berhasil",
+          text2: "Transaksi berhasil dibatalkan",
+          position: "top",
+        });
+        router.replace("/");
+      }
+    } catch (error) {
+      console.log(error);
+      Toast.show({
+        type: "error",
+        text1: "Gagal",
+        text2: "Transaksi gagal dibatalkan",
+        position: "top",
+      });
+    }
+  };
+
   const handleCopy = async (text) => {
     // belum bisa jalan toastnya
     if (!text) return;
@@ -63,7 +57,7 @@ export default function DetailTransaksiSeller({ data }) {
         type: "success",
         text1: "Berhasil",
         text2: "Disalin ke clipboard",
-        position: "bottom",
+        position: "top",
       });
       console.log("Copied to clipboard:", text);
     } catch (error) {
@@ -71,7 +65,7 @@ export default function DetailTransaksiSeller({ data }) {
         type: "error",
         text1: "Gagal",
         text2: "Tidak dapat menyalin",
-        position: "bottom",
+        position: "top",
       });
       console.log("Failed to copy to clipboard:", error);
     }
@@ -270,7 +264,7 @@ export default function DetailTransaksiSeller({ data }) {
         <View className="flex-col gap-4 w-full items-center">
           <PrimaryButton
             title="Batalkan Rekbr"
-            onPress={() => console.log("Batalkan Rekbr pressed")}
+            onPress={handleCancelTransaksiSeller}
             // disabled={!isFormValid}
             btnColor="#FEF0E9"
             textColor="#000"
@@ -295,7 +289,7 @@ export default function DetailTransaksiSeller({ data }) {
           <View className="flex flex-row items-center gap-4">
             <PrimaryButton
               title="Batalkan Rekbr"
-              onPress={() => console.log("Batalkan Rekbr pressed")}
+              onPress={handleCancelTransaksiSeller}
               // disabled={!isFormValid}
               height={50}
               width={"45%"}
@@ -627,10 +621,10 @@ export default function DetailTransaksiSeller({ data }) {
         {/* Seller Bank Section (done)*/}
         <View className="flex-col justify-center gap-2 mx-3 p-3">
           <Text className="text-[15px]">Rekening Penjual</Text>
-          <View className="flex-row items-center">
+          <View className="flex-row gap-5">
             <Image
               source={{ uri: data?.rekeningSeller?.logoUrl || "-" }}
-              style={{ width: 50, height: 50 }}
+              style={{ width: 50, height: 50, objectFit: "contain" }}
             />
             <View className="flex-row items-center">
               <Text className="text-[15px] font-medium">

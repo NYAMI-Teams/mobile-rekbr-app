@@ -23,6 +23,33 @@ export const getSellerTransactions = async () => {
   }
 };
 
+// Get History Seller Trx
+export const getHistorySeller = async (status) => {
+  try {
+    const res = await Api.get(`/seller/transactions`, {
+      params: {
+        status, //completed, refunded, cancelled
+      },
+    });
+    if (res) {
+      return res;
+    }
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const cancelTransaksiSeller = async (transactionId) => {
+  try {
+    const res = await Api.post(`/seller/transactions/${transactionId}/cancel`);
+    if (res) {
+      return res;
+    }
+  } catch (error) {
+    throw error;
+  }
+};
+
 // Get Detail Seller Trx
 export const getDetailSellerTransaction = async (id) => {
   try {

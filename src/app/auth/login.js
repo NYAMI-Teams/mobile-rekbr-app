@@ -27,7 +27,7 @@ export default function Login() {
 
   useEffect(() => {
     // development purposes, remove this in production
-    setEmail("seller@gmail.com");
+    setEmail("buyer@gmail.com");
     setPassword("pass123");
   }, []);
 
@@ -76,7 +76,7 @@ export default function Login() {
           </View>
 
           {/* Form */}
-          <View className="py-5 justify-between">
+          <View className="py-5 mx-5 justify-between">
             {/* Email */}
             <View className="mb-4 mt-5">
               <InputField

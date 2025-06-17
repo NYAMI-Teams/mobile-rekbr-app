@@ -91,11 +91,12 @@ export default function SellerEmptyContent({ isKYCCompleted }) {
               router.push("E-kyc/KYC_Intro");
             } else {
               console.log("Navigasi ke buat Rekber baru");
+              router.push("CreateTransaksi/CreateRekening/ChooseRekening");
             }
           }}>
           <Text className="text-white text-base font-semibold">
             {isKYCCompleted
-              ? "Bikin Rekber Baru"
+              ? "Bikin Rekbr Baru"
               : "Lengkapi KYC & Bikin Rekber"}
           </Text>
         </TouchableOpacity>

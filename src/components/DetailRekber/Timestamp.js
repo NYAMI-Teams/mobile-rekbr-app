@@ -4,27 +4,10 @@ import { Ionicons } from "@expo/vector-icons";
 import moment from "moment";
 import CountdownTimer from "../Countdown";
 
-// Helper function to safely parse dates
-const parseDate = (date) => {
-  if (!date) return null;
-  // Try different formats
-  const formats = [
-    "YYYY-MM-DD HH:mm:ss",
-    "YYYY-MM-DD",
-    "MM/DD/YYYY",
-    "DD/MM/YYYY",
-  ];
-  for (const format of formats) {
-    const parsed = moment(date, format, true);
-    if (parsed.isValid()) return parsed;
-  }
-  return null;
-};
-
 const TimestampDetail = ({ status, date }) => {
   const formatDateWIB = (dateTime) => {
     if (!dateTime) return "Invalid date";
-    return moment(dateTime).utcOffset(-7).format("DD MMMM YYYY, HH:mm [WIB]");
+    return moment(dateTime).utcOffset(0).format("DD MMMM YYYY, HH:mm [WIB]");
   };
 
   return (
@@ -58,7 +41,7 @@ const TimestampDetail = ({ status, date }) => {
 const Timestamp = ({ data, caption, date, details = [] }) => {
   const formatDateWIB = (dateTime) => {
     if (!dateTime) return "Invalid date";
-    return moment(dateTime).utcOffset(-7).format("DD MMMM YYYY, HH:mm [WIB]");
+    return moment(dateTime).utcOffset(0).format("DD MMMM YYYY, HH:mm [WIB]");
   };
   const [isExpanded, setIsExpanded] = useState(false);
 
