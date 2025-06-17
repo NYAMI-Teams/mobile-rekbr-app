@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import BuyerCard from "../../components/card-transaction/BuyerCard";
 import SellerCard from "../../components/card-transaction/SellerCard";
 import EmptyIllustration from "../../components/Ilustration";
-import { getHistoryBuyer } from "../../utils/api/seller";
+import { getHistoryBuyer } from "../../utils/api/buyer";
 import { getHistorySeller } from "../../utils/api/seller";
 
 export default function History() {
@@ -27,7 +27,7 @@ export default function History() {
 
   const getHistoryBuyerData = async () => {
     try {
-      const res = await getHistoryBuyer(`completed`);
+      const res = await getHistoryBuyer();
       if (res) {
         console.log("ini history buyer", res);
         setHistoryBuyer(res.data);
@@ -39,7 +39,7 @@ export default function History() {
 
   const getHistorySellerData = async () => {
     try {
-      const res = await getHistorySeller(`completed`);
+      const res = await getHistorySeller();
       if (res) {
         console.log("ini history seller", res);
         setHistorySeller(res.data);

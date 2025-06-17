@@ -84,8 +84,6 @@ const Timestamp = ({ data, caption, date, details = [] }) => {
         </Text>
       );
     }
-
-    return null;
   };
 
   return (
@@ -105,7 +103,9 @@ const Timestamp = ({ data, caption, date, details = [] }) => {
           data.fundReleaseRequest.status != "approved") ||
         (data.status == "completed" &&
           (data.fundReleaseRequest.status == "approved" ||
-            data.fundReleaseRequest.status == null)) ? null : (
+            data.fundReleaseRequest.status == null)) ||
+        data.status == "canceled" ||
+        data.status == "refunded" ? null : (
           <View
             style={{
               flexDirection: "row",

@@ -2,7 +2,11 @@ import Api from "../api";
 
 export const getBuyerTransactions = async () => {
   try {
-    const res = await Api.get(`/buyer/transactions`);
+    const res = await Api.get(`/buyer/transactions`, {
+      params: {
+        isHistory: false,
+      },
+    });
     if (res) {
       return res;
     }
@@ -12,11 +16,11 @@ export const getBuyerTransactions = async () => {
 };
 
 // Get History Buyer Trx
-export const getHistoryBuyer = async (status) => {
+export const getHistoryBuyer = async () => {
   try {
     const res = await Api.get(`/buyer/transactions`, {
       params: {
-        status, //completed, refunded, cancelled
+        isHistory: true,
       },
     });
     if (res) {

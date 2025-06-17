@@ -14,7 +14,11 @@ import Api from "../api";
 // Get All Seller Trx
 export const getSellerTransactions = async () => {
   try {
-    const res = await Api.get(`/seller/transactions`);
+    const res = await Api.get(`/seller/transactions`, {
+      params: {
+        isHistory: false,
+      },
+    });
     if (res) {
       return res;
     }
@@ -24,11 +28,11 @@ export const getSellerTransactions = async () => {
 };
 
 // Get History Seller Trx
-export const getHistorySeller = async (status) => {
+export const getHistorySeller = async () => {
   try {
     const res = await Api.get(`/seller/transactions`, {
       params: {
-        status, //completed, refunded, cancelled
+        isHistory: true,
       },
     });
     if (res) {

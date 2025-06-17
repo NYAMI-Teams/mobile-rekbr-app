@@ -87,11 +87,8 @@ export default function DetailTransaksiSeller({ data }) {
     if (status == "refunded") {
       return "Dikembalikan";
     }
-    if (status == "cancelled") {
+    if (status == "canceled") {
       return "Dibatalkan";
-    }
-    if (status == "dispute") {
-      return "Barang Terkendala";
     }
   };
 
@@ -194,6 +191,28 @@ export default function DetailTransaksiSeller({ data }) {
         ];
       }
     }
+    if (status == "canceled") {
+      if (data?.paidAt == null) {
+        return [
+          {
+            status: "Waktu bikin Rekbr",
+            date: data?.createdAt || "-",
+          },
+        ];
+      }
+      if (data?.paidAt != null) {
+        return [
+          {
+            status: "Waktu bikin Rekbr",
+            date: data?.createdAt || "-",
+          },
+          {
+            status: "Waktu pembeli Bayar",
+            date: data?.paidAt || "-",
+          },
+        ];
+      }
+    }
   };
 
   const setupCaptionTimeStamp = () => {
@@ -220,11 +239,8 @@ export default function DetailTransaksiSeller({ data }) {
     if (status == "refunded") {
       return "Dikembalikan";
     }
-    if (status == "cancelled") {
+    if (status == "canceled") {
       return "Dibatalkan";
-    }
-    if (status == "dispute") {
-      return "Waktu konfirmasi buyer pengembalian";
     }
   };
 
@@ -248,6 +264,14 @@ export default function DetailTransaksiSeller({ data }) {
     }
     if (status == "completed") {
       return data?.buyerConfirmedAt || "-";
+    }
+    if (status == "canceled") {
+      if (data?.paidAt == null) {
+        return data?.createdAt || "-";
+      }
+      if (data?.paidAt != null) {
+        return data?.paidAt || "-";
+      }
     }
   };
 

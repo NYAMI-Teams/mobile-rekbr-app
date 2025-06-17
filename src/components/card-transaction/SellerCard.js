@@ -66,6 +66,8 @@ const SellerCard = ({ data }) => {
         return "Dalam Pengiriman";
       case "completed":
         return "Barang Diterima";
+      case "canceled":
+        return "Dibatalkan";
       default:
         return "";
     }
@@ -79,7 +81,7 @@ const SellerCard = ({ data }) => {
           { label: "Nama Produk", value: data?.itemName || "-" },
           { label: "Pembeli", value: data?.buyerEmail || "-" },
           {
-            label: "VA Number",
+            label: "Nomor VA",
             value: data?.virtualAccount || "-",
             copyable: true,
           },
@@ -107,6 +109,19 @@ const SellerCard = ({ data }) => {
             copyable: true,
           },
           { label: "Ekspedisi", value: data?.shipment.courier || "-" },
+        ];
+      case "canceled":
+        return [
+          { label: "Nama Produk", value: data?.itemName || "-" },
+          { label: "Pembeli", value: data?.buyerEmail || "-" },
+          {
+            label: data?.shipmentDeadline == null ? "Nomor VA" : "Nomor Resi",
+            value:
+              data?.shipmentDeadline == null
+                ? data?.virtualAccount
+                : data?.shipment?.trackingNumber || "waiting_seller",
+            copyable: true,
+          },
         ];
       default:
         return [];
@@ -195,6 +210,20 @@ const SellerCard = ({ data }) => {
       );
     }
 
+    if (status === "canceled") {
+      return (
+        <View className="px-3 py-1 rounded-full">
+          <Text className="font-poppins-semibold text-xs text-gray-800">
+            {formatDateWIB(
+              data?.shipmentDeadline == null
+                ? data?.paymentDeadline
+                : data?.shipmentDeadline || "-"
+            )}
+          </Text>
+        </View>
+      );
+    }
+
     return null;
   };
 
@@ -228,16 +257,18 @@ const SellerCard = ({ data }) => {
                     ? "Resi belum diberikan seller"
                     : row.value || "-"}
                 </Text>
-                {row.copyable && !!row.value && (
-                  <Pressable
-                    onPress={() => handleCopy(row.value)}
-                    className="p-1 rounded-full">
-                    <Image
-                      source={require("../../assets/copy.png")}
-                      className="w-4 h-4 opacity-70"
-                    />
-                  </Pressable>
-                )}
+                {row.copyable &&
+                  !!row.value &&
+                  row.value !== "waiting_seller" && (
+                    <Pressable
+                      onPress={() => handleCopy(row.value)}
+                      className="p-1 rounded-full">
+                      <Image
+                        source={require("../../assets/copy.png")}
+                        className="w-4 h-4 opacity-70"
+                      />
+                    </Pressable>
+                  )}
               </View>
             </View>
           ))}
@@ -272,7 +303,11 @@ const SellerCard = ({ data }) => {
               <View
                 className={clsx(
                   "w-2 h-2 rounded-full mr-2",
-                  status === "completed" ? "bg-green-400" : "bg-yellow-400"
+                  status === "completed"
+                    ? "bg-green-400"
+                    : status === "canceled"
+                    ? "bg-red-400"
+                    : "bg-yellow-400"
                 )}
               />
               <Text className="font-poppins text-xs text-gray-800">
