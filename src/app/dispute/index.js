@@ -1,6 +1,7 @@
 import React from "react";
 import { View, Text, TouchableOpacity, Image, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import PrimaryButton from "../../components/PrimaryButton";
 
 export default function Dispute() {
   const complaints = [
@@ -26,38 +27,42 @@ export default function Dispute() {
     <SafeAreaView className="flex-1 bg-white">
       <ScrollView className="px-4 pt-4">
         {/* Header */}
-        <Text className="text-lg font-semibold mb-2">
+        <Text className="text-xl font-semibold mb-4 text-center">
           Permintaan Komplain Buyer
         </Text>
-        <View style={styles.information}>
+
+        {/* Informasi Admin */}
+        <View className="flex-row items-start bg-orange-50 p-4 rounded-xl mb-4 border border-orange-100 space-x-3">
           <Image
             source={require("../../assets/admin1.png")}
-            style={styles.logo_admin}
+            className="w-10 h-10 rounded-full"
+            resizeMode="contain"
           />
-          <Text style={styles.informationText}>
+          <Text className="text-sm text-gray-700 flex-1">
             Harap tinjau kembali dan pastikan seluruh data kamu sebelum
             melanjutkan, ya!
           </Text>
         </View>
 
         {/* Info Email */}
-        <Text className="text-sm font-medium text-black mb-1">
+        <Text className="text-lg font-medium text-black mb-3">
           Diskusi dengan{" "}
           <Text className="font-semibold">irgi168@gmail.com</Text>
         </Text>
-        <Text className="text-sm text-gray-500 mb-4">
+        <Text className="text-base text-gray-500 mb-4">
           Cari resolusi yang lebih cepat, diskusikan dulu kendalamu dengan
           penjual
         </Text>
 
-        {/* Button */}
-        <TouchableOpacity className="bg-black py-3 rounded-xl mb-6">
-          <Text className="text-white text-center font-semibold">
-            Diskusi via email dengan penjual
-          </Text>
-        </TouchableOpacity>
+        {/* Button Email */}
+        <View className="mb-6">
+          <PrimaryButton
+            title="Diskusi via email dengan penjual"
+            className="mb-6"
+          />
+        </View>
 
-        {/* Komplain Options */}
+        {/* Opsi Komplain */}
         <Text className="text-sm font-semibold mb-3">
           Pilih masalah untuk ajukan komplain
         </Text>
@@ -65,7 +70,7 @@ export default function Dispute() {
           {complaints.map((item, index) => (
             <TouchableOpacity
               key={index}
-              className="w-[48%] bg-[#FFF7ED] border border-gray-200 rounded-xl p-4 items-center space-y-2"
+              className="w-[48%] h-40 bg-white border border-gray-300 rounded-xl px-4 py-6 items-center justify-center space-y-4"
             >
               <Image
                 source={item.icon}
@@ -78,17 +83,16 @@ export default function Dispute() {
             </TouchableOpacity>
           ))}
         </View>
-
-        {/* Footer Help Link */}
-        <View className="mt-10 items-center mb-6">
-          <Text className="text-xs text-gray-400">
-            Terdapat kendala?{" "}
-            <Text className="text-blue-500 font-medium">
-              Silahkan Hubungi Kami
-            </Text>
-          </Text>
-        </View>
       </ScrollView>
+      {/* Footer */}
+      <View className="absolute bottom-16 left-0 right-0 items-center">
+        <Text className="text-xs text-gray-400">
+          Terdapat kendala?{" "}
+          <Text className="text-blue-500 font-medium">
+            Silahkan Hubungi Kami
+          </Text>
+        </Text>
+      </View>
     </SafeAreaView>
   );
 }
