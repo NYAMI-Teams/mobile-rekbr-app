@@ -134,8 +134,8 @@ export default function DetailTransaksiSeller({ data }) {
             date: data?.paidAt || "-",
           },
           {
-            status: "Waktu pembeli mengirimkan barang",
-            date: data?.shipmentDate || "-",
+            status: "Waktu penjual mengirimkan barang",
+            date: data?.shipment.shipmentDate || "-",
           },
           {
             status: "Waktu penjual meminta konfirmasi pembeli",
@@ -171,8 +171,8 @@ export default function DetailTransaksiSeller({ data }) {
             date: data?.paidAt || "-",
           },
           {
-            status: "Waktu pembeli mengirimkan barang",
-            date: data?.shipmentDate || "-",
+            status: "Waktu penjual mengirimkan barang",
+            date: data?.shipment.shipmentDate || "-",
           },
           {
             status: "Waktu penjual meminta konfirmasi pembeli",
@@ -194,8 +194,8 @@ export default function DetailTransaksiSeller({ data }) {
             date: data?.paidAt || "-",
           },
           {
-            status: "Waktu pembeli mengirimkan barang",
-            date: data?.shipmentDate || "-",
+            status: "Waktu penjual mengirimkan barang",
+            date: data?.shipment.shipmentDate || "-",
           },
         ];
       }
@@ -210,7 +210,7 @@ export default function DetailTransaksiSeller({ data }) {
       return "Penjual masukkan resi dan bukti pengiriman sebelum";
     }
     if (status == "shipped") {
-      if (data?.fundReleaseRequest?.status == "waiting") {
+      if (data?.fundReleaseRequest?.status == "pending") {
         return "Penjual mengajukan permintaan konfirmasi penerimaan barang";
       } else if (data?.fundReleaseRequest?.status == "approved") {
         return "Penjual, tunggu respon pembeli 1 x 24 jam";
@@ -242,14 +242,14 @@ export default function DetailTransaksiSeller({ data }) {
       return data?.shipmentDeadline || "-";
     }
     if (status == "shipped") {
-      if (data?.fundReleaseRequest?.status == "waiting") {
+      if (data?.fundReleaseRequest?.status == "pending") {
         return data?.fundReleaseRequest?.requestedAt || "-";
       } else if (data?.fundReleaseRequest?.status == "approved") {
         return data?.fundReleaseRequest?.resolvedAt || "-";
       } else if (data?.fundReleaseRequest?.status == "rejected") {
         return data?.fundReleaseRequest?.resolvedAt || "-";
       } else {
-        return data?.shipmentDate || "-";
+        return data?.shipment.shipmentDate || "-";
       }
     }
     if (status == "completed") {
@@ -304,7 +304,12 @@ export default function DetailTransaksiSeller({ data }) {
             />
             <PrimaryButton
               title="Masukkan Resi"
-              onPress={() => router.push("/InputResi", { id: data?.id })}
+              onPress={() =>
+                router.push({
+                  pathname: "/InputResi",
+                  params: { id: data?.id },
+                })
+              }
               height={50}
               width={"45%"}
             />
@@ -327,10 +332,15 @@ export default function DetailTransaksiSeller({ data }) {
       return (
         <PrimaryButton
           title="Kirim Permintaan Konfirmasi"
-          onPress={() => router.push("/FundReleaseRequest", { id: data?.id })}
+          onPress={() =>
+            router.push({
+              pathname: "/FundReleaseRequest",
+              params: { id: data?.id },
+            })
+          }
           disabled={
             data?.fundReleaseRequest?.status == "approved" ||
-            data?.fundReleaseRequest?.status == "waiting"
+            data?.fundReleaseRequest?.status == "pending"
           }
         />
       );
@@ -360,7 +370,7 @@ export default function DetailTransaksiSeller({ data }) {
   };
 
   const setupStatusFundReleaseRequest = () => {
-    if (data?.fundReleaseRequest?.status == "waiting") {
+    if (data?.fundReleaseRequest?.status == "pending") {
       return "Permintaan Ditinjau";
     }
     if (data?.fundReleaseRequest?.status == "rejected") {
@@ -476,7 +486,7 @@ export default function DetailTransaksiSeller({ data }) {
               <Text className="text-sm flex-1">
                 {status == "completed"
                   ? "Komplain dianggap tidak ada dan bakal selesai otomatis kalau pembeli nggak respon."
-                  : data?.fundReleaseRequest?.status == "waiting"
+                  : data?.fundReleaseRequest?.status == "pending"
                   ? "Tunggu approval kami, ya! Kalau bukti kamu oke, permintaan konfirmasi bakal langsung dikirim ke buyer!"
                   : data?.fundReleaseRequest?.status == "approved"
                   ? "Konfirmasi udah dikirim ke buyer! Sekarang tinggal tunggu respon mereka dalam 1 x 24 jam"
@@ -487,7 +497,7 @@ export default function DetailTransaksiSeller({ data }) {
         ) : null}
 
         {/* Status Rekbr (done)*/}
-        {data?.fundReleaseRequest?.status == "waiting" ||
+        {data?.fundReleaseRequest?.status == "pending" ||
         data?.fundReleaseRequest?.status == "rejected" ? (
           <View className="flex-col  gap-2 mx-3 p-3">
             <View className="flex-row justify-between">
@@ -524,7 +534,7 @@ export default function DetailTransaksiSeller({ data }) {
                     fontSize: 13,
                     fontWeight: "500",
                     color:
-                      data?.fundReleaseRequest?.status == "waiting"
+                      data?.fundReleaseRequest?.status == "pending"
                         ? "#FBBF24"
                         : "#CB3A31",
                   }}>

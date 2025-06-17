@@ -11,6 +11,7 @@ import Api from "../api";
 //   }
 // };
 
+// Get All Seller Trx
 export const getSellerTransactions = async () => {
   try {
     const res = await Api.get(`/seller/transactions`);
@@ -22,6 +23,7 @@ export const getSellerTransactions = async () => {
   }
 };
 
+// Get Detail Seller Trx
 export const getDetailSellerTransaction = async (id) => {
   try {
     const res = await Api.get(`/seller/transactions/${id}`);
@@ -33,6 +35,7 @@ export const getDetailSellerTransaction = async (id) => {
   }
 };
 
+// Post Resi
 export const postResi = async (id, courier_id, tracking_number, photo) => {
   try {
     const res = await Api.post(`/seller/transactions/${id}/shipping`, {
@@ -50,6 +53,7 @@ export const postResi = async (id, courier_id, tracking_number, photo) => {
   }
 };
 
+// Post Fund Release
 export const postFundRelease = async (id, evidence, reason) => {
   try {
     // Convert image URI to Blob
@@ -71,6 +75,42 @@ export const postFundRelease = async (id, evidence, reason) => {
     }
   } catch (error) {
     console.log("Error post fund release:", error);
+    throw error;
+  }
+};
+
+// Get List Courier
+export const getListCourier = async () => {
+  try {
+    const res = await Api.get(`/seller/courier-list`);
+    if (res) {
+      return res;
+    }
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Get List of Seller's Bank Account
+export const getListBankAccount = async () => {
+  try {
+    const res = await Api.get(`/bank/account-list`);
+    if (res) {
+      return res;
+    }
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Get List of All Bank
+export const getAllBankList = async () => {
+  try {
+    const res = await Api.get(`/bank/bank-list`);
+    if (res) {
+      return res;
+    }
+  } catch (error) {
     throw error;
   }
 };

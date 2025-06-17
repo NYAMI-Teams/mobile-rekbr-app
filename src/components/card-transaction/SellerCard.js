@@ -145,7 +145,7 @@ const SellerCard = ({ data }) => {
     }
 
     if (status === "shipped") {
-      if (data?.fundReleaseRequest?.status === "waiting") {
+      if (data?.fundReleaseRequest?.status === "pending") {
         return (
           <View className="bg-yellow-100 px-3 py-1 rounded-full">
             <Text className="font-poppins-semibold text-xs text-gray-800">
@@ -255,7 +255,7 @@ const SellerCard = ({ data }) => {
               <Text className="font-poppins text-xs text-gray-800 flex-1">
                 {data?.fundReleaseRequest?.status === null
                   ? "Cek no resi berkala, kalau pembeli nggak konfirmasi, minta konfirmasi pembeli lewat admin."
-                  : data?.fundReleaseRequest?.status === "waiting"
+                  : data?.fundReleaseRequest?.status === "pending"
                   ? "Tunggu approval kami, ya! Kalau bukti kamu oke, permintaan konfirmasi bakal langsung dikirim ke pembeli!"
                   : data?.fundReleaseRequest?.status === "rejected"
                   ? "Permintaan konfirmasi ke pembeli ditolak. Pastikan data atau bukti yang kamu kirim sudah lengkap dan sesuai."

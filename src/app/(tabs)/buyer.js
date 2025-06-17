@@ -4,8 +4,9 @@ import { useState, useEffect } from "react";
 import BuyerEmptyContent from "../../screens/buyer/index";
 import { StatusBar } from "expo-status-bar";
 import BuyerCard from "../../components/card-transaction/BuyerCard";
-import { ScrollView } from "react-native";
+import { ScrollView, RefreshControl } from "react-native";
 import { getBuyerTransactions } from "../../utils/api/buyer";
+import InputResi from "../../components/InputResi";
 
 export default function Home() {
   const [isEmptyTransaction, setIsEmptyTransaction] = useState(false);
@@ -48,7 +49,7 @@ export default function Home() {
           onNotificationPress={() => console.log("Notification pressed")}
           onProfilePress={() => console.log("Notification pressed")}
         />
-        <ScrollView
+        {/* <ScrollView
           className="flex flex-col gap-12"
           showsVerticalScrollIndicator={false}
           refreshControl={
@@ -61,7 +62,8 @@ export default function Home() {
               <BuyerCard key={transaction.id} data={transaction} />
             ))
           )}
-        </ScrollView>
+        </ScrollView> */}
+        <InputResi id={""} />
       </View>
     </View>
   );

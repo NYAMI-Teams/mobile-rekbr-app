@@ -12,6 +12,7 @@ import { ChevronLeftCircle } from "lucide-react-native";
 import * as ImagePicker from "expo-image-picker"; // Import ImagePicker
 import BuyerKonfirmasi from "../components/BuyerKonfirmasi";
 import { postResi } from "../utils/api/seller";
+import { getListCourier } from "../utils/api/seller";
 
 const mockCouriers = [
   {
@@ -46,9 +47,11 @@ export default function InputResi({ id }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [image, setImage] = useState(null); // State untuk menyimpan URI gambar
   const [hasCameraPermission, setHasCameraPermission] = useState(null); // State untuk izin kamera
-
+  const [resiNumberError, setResiNumberError] = useState("");
   const [resiNumber, setResiNumber] = useState("");
   const [courier, setCourier] = useState("");
+  const [courierId, setCourierId] = useState("");
+  const [courierList, setCourierList] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
 
   // Permintaan izin kamera saat komponen di-mount
@@ -57,7 +60,21 @@ export default function InputResi({ id }) {
       const cameraStatus = await ImagePicker.requestCameraPermissionsAsync();
       setHasCameraPermission(cameraStatus.status === "granted");
     })();
+    getCourier();
   }, []);
+
+  const getCourier = async () => {
+    try {
+      const res = await getListCourier();
+      if (res) {
+        console.log("ini res", res.data);
+        setCourierList(res.data);
+      }
+    } catch (error) {
+      console.log("Error get all courier:", error);
+      throw error;
+    }
+  };
 
   const closeModal = () => {
     setModalVisible(false);
@@ -106,9 +123,11 @@ export default function InputResi({ id }) {
   };
 
   const handleSelectCourier = (selectedCourier) => {
-    setCourier(selectedCourier);
-    console.log(selectedCourier);
+    setCourier(selectedCourier.name);
+    setCourierId(selectedCourier.id);
     setModalVisible(false);
+    console.log("ini courier id", courierId);
+    console.log("ini courier", courier);
   };
 
   const handleBtnPress = () => {
@@ -124,10 +143,22 @@ export default function InputResi({ id }) {
       console.log(error);
     }
     console.log("ini id", id);
-    console.log("ini courier", courier);
+    console.log("ini courier id", courierId);
     console.log("ini resiNumber", resiNumber);
     console.log("ini image", image);
     router.replace("/");
+  };
+
+  const handleResiNumberChange = (text) => {
+    const cleanedText = text.replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+    setResiNumber(cleanedText);
+    if (cleanedText.length === 0) {
+      setResiNumberError("Nomor resi tidak boleh kosong.");
+    } else if (cleanedText.length < 5) {
+      setResiNumberError("Nomor resi terlalu pendek.");
+    } else {
+      setResiNumberError("");
+    }
   };
 
   return (
@@ -156,7 +187,10 @@ export default function InputResi({ id }) {
             title="Masukkan Nomor Resi"
             placeholder="Masukkan Nomor Resi dengan benar"
             value={resiNumber}
-            onChangeText={setResiNumber}
+            onChangeText={handleResiNumberChange}
+            errorText={resiNumberError}
+            keyboardType="default"
+            autoCapitalize="characters"
           />
         </View>
         <TouchableOpacity className="mt-4" onPress={handleModal}>
@@ -225,7 +259,7 @@ export default function InputResi({ id }) {
           closeModal();
         }}>
         <View className="flex-1 bg-black/50 justify-end">
-          <View className="bg-white rounded-t-lg h-[50%]">
+          <View className="bg-white rounded-t-lg h-[55%]">
             {/* Close Button */}
             <View className="flex-row justify-start p-4">
               <TouchableOpacity
@@ -248,10 +282,10 @@ export default function InputResi({ id }) {
                 {" "}
                 {/* Sembunyikan indikator scroll */}
                 <View className="flex-col gap-4 bg-slate-100/50 p-5 rounded-lg border border-gray-300">
-                  {mockCouriers.map((courier) => (
+                  {courierList.map((courier) => (
                     <TouchableOpacity
                       className="p-5 border-b-2 border-gray-300/50 mb-4"
-                      onPress={() => handleSelectCourier(courier.id)}>
+                      onPress={() => handleSelectCourier(courier)}>
                       <Text className="text-[15px] font-semibold">
                         {courier.name}
                       </Text>
@@ -260,7 +294,7 @@ export default function InputResi({ id }) {
                 </View>
               </ScrollView>
               <TouchableOpacity
-                className="bg-[#00C2C2] rounded-lg p-4 mt-4" // Tambahkan margin-top
+                className="bg-[#00C2C2] rounded-lg p-4 mt-4 mb-6" // Tambahkan margin-top
                 onPress={() => console.log("Select courier")}>
                 <Text className="text-center text-white text-[15px] font-medium">
                   Pilih dari Daftar

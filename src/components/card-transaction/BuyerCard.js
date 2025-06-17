@@ -125,7 +125,7 @@ const BuyerCard = ({ data }) => {
             {/* Replace this with dynamic countdown logic */}
             <CountdownTimer
               deadline={data?.paymentDeadline || "-"}
-              fromTime={data?.createdAt || "-"}
+              fromTime={data?.currentTimestamp || "-"}
             />
           </Text>
         </View>
