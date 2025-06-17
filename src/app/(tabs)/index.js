@@ -10,6 +10,7 @@ import { getSellerTransactions } from "../../utils/api/seller";
 import { getProfile } from "../../utils/api/auth";
 import { removeAccessToken } from "../../store";
 
+
 export default function Seller() {
   const router = useRouter();
   const [isKYCCompleted, setIsKYCCompleted] = useState(true);

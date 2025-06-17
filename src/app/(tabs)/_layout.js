@@ -1,6 +1,7 @@
 import { FontAwesome } from "@expo/vector-icons";
 import { Stack, Tabs } from "expo-router";
 import { View, StyleSheet } from "react-native";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
 const styles = StyleSheet.create({
   tabStyle: {
@@ -44,13 +45,19 @@ export default function TabLayout() {
         tabBarInactiveTintColor: "#666",
         tabBarLabelStyle: styles.tabLabel,
         tabStyle: styles.tabStyle,
-      }}>
+      }}
+    >
       <Tabs.Screen
-        name="index" // nama filenya
+        name="index"
         options={{
           title: "As Seller",
-          tabBarIcon: ({ color }) => (
-            <FontAwesome name="user" size={24} color={color} />
+          tabBarIcon: ({ color, focused, size }) => (
+            <MaterialCommunityIcons
+              name="storefront"
+              size={24}
+              color={color}
+              style={{ opacity: focused ? 1 : 0.4 }}
+            />
           ),
         }}
       />
@@ -58,8 +65,13 @@ export default function TabLayout() {
         name="buyer"
         options={{
           title: "As Buyer",
-          tabBarIcon: ({ color }) => (
-            <FontAwesome name="shopping-cart" size={24} color={color} />
+          tabBarIcon: ({ color, focused, size }) => (
+            <MaterialCommunityIcons
+              name="wallet-outline"
+              size={24}
+              color={color}
+              style={{ opacity: focused ? 1 : 0.4 }}
+            />
           ),
         }}
       />
@@ -67,8 +79,13 @@ export default function TabLayout() {
         name="dispute"
         options={{
           title: "Dispute",
-          tabBarIcon: ({ color }) => (
-            <FontAwesome name="exclamation-circle" size={24} color={color} />
+          tabBarIcon: ({ color, focused, size }) => (
+            <MaterialCommunityIcons
+              name="chat-processing-outline"
+              size={24}
+              color={color}
+              style={{ opacity: focused ? 1 : 0.4 }}
+            />
           ),
         }}
       />
@@ -76,8 +93,13 @@ export default function TabLayout() {
         name="history"
         options={{
           title: "History",
-          tabBarIcon: ({ color }) => (
-            <FontAwesome name="home" size={24} color={color} />
+          tabBarIcon: ({ color, focused, size }) => (
+            <MaterialCommunityIcons
+              name="clock-time-three-outline"
+              size={24}
+              color={color}
+              style={{ opacity: focused ? 1 : 0.4 }}
+            />
           ),
         }}
       />

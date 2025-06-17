@@ -4,7 +4,7 @@ export const mockAPIBuyer = {
   data: {
     id: "abc123",
     transactionCode: "RKB -8080123456789",
-    status: "pending_payment", // pending_payment, waiting_shipment, shipped, completed, refunded, cancelled, dispute
+    status: "pending_paayment", // pending_payment, waiting_shipment, shipped, completed, refunded, cancelled, dispute
     itemName: "iPhone 13 Pro Max",
     itemPrice: 8000000,
     insuranceFee: 160000,
