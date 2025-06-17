@@ -12,7 +12,7 @@ import PrimaryButton from "../../components/PrimaryButton";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { login } from "../../utils/api/auth";
+// import { login } from "../../utils/api/auth";
 
 export default function Login() {
   const router = useRouter();

@@ -8,6 +8,7 @@ import { StatusBar } from "expo-status-bar";
 import SellerCard from "../../components/card-transaction/SellerCard";
 import { mockAPISeller } from "../../services/apiMock/api";
 
+
 export default function Seller() {
   const router = useRouter();
   const [isKYCCompleted, setIsKYCCompleted] = useState(true);
