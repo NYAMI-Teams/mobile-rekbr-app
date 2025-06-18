@@ -13,6 +13,7 @@ export default function InputField({
   className = '',
   errorText = '',
   autoCapitalize = 'none',
+  inputMode = 'text',
 }) {
   return (
     <View className={clsx("flex-col", className)}>
@@ -27,6 +28,7 @@ export default function InputField({
           secureTextEntry={secureTextEntry}
           keyboardType={keyboardType}
           autoCapitalize={autoCapitalize}
+          inputMode={inputMode}
         />
       </View>
       {errorText ? (

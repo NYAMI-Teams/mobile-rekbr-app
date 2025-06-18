@@ -14,7 +14,7 @@ import { Search } from 'lucide-react-native';
 const BankSelector = ({ banks, onSelectBank }) => {
     const [searchQuery, setSearchQuery] = useState('');
 
-    const filteredBanks = banks.filter((bank) =>
+    const filteredBanks = banks?.filter((bank) =>
         bank.bankName.toLowerCase().includes(searchQuery.toLowerCase())
     );
 

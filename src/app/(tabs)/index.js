@@ -8,42 +8,23 @@ import { StatusBar } from "expo-status-bar";
 import SellerCard from "../../components/card-transaction/SellerCard";
 import { getSellerTransactions } from "../../utils/api/seller";
 import { getProfile } from "../../utils/api/auth";
-import { removeAccessToken } from "../../store";
+import { getAccessToken, removeAccessToken } from "../../store";
+import { showToast } from "../../utils";
 
 export default function Seller() {
   const router = useRouter();
-  const [isKYCCompleted, setIsKYCCompleted] = useState(true);
+  const [isKYCCompleted, setIsKYCCompleted] = useState(false);
   const [isEmptyTransaction, setIsEmptyTransaction] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [transactions, setTransactions] = useState([]);
+  const [refreshing, setRefreshing] = useState(false);
+  const [profile, setProfile] = useState(null);
 
   useEffect(() => {
+    checkAuth();
     fetchTransactions();
   }, []);
 
-  const check = () => {
-    setIsLoading(true);
-    getProfile()
-      .then((res) => {
-        console.log("Profile data:", res);
-      })
-      .catch((err) => {
-        console.error(err);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  };
-
-  const handleLogout = () => {
-    removeAccessToken()
-      .then(() => {
-        router.replace("/auth/login");
-      })
-      .catch((err) => {
-        console.error("Logout failed:", err);
-      });
-  };
 
   const fetchTransactions = async () => {
     try {
@@ -54,16 +35,35 @@ export default function Seller() {
         setIsEmptyTransaction(true);
       }
       setTransactions(res.data);
-      console.log("Berhasil get all transaction seller");
+      // console.log("Berhasil get all transaction seller");
       // console.log(res.data);
     } catch (err) {
-      console.error("Error fetching transactions:", err);
+      showToast("Error", "Failed to fetch transactions. Please try again later.", "error");
     } finally {
       console.log("finally");
     }
-  };
+  }
 
-  const [refreshing, setRefreshing] = useState(false);
+  const checkAuth = async () => {
+    setIsLoading(true);
+    try {
+      const token = await getAccessToken();
+      if (!token) {
+        handleLogout();
+        return;
+      }
+      const res = await getProfile();
+      setProfile(res.data);
+      if (res.data?.kycStatus === "verified") {
+        setIsKYCCompleted(true);
+      }
+    } catch {
+      showToast("Session Invalid", "Your session has expired. Please log in again.", "error");
+      handleLogout();
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -71,17 +71,26 @@ export default function Seller() {
     setRefreshing(false);
   };
 
+  const handleLogout = async () => {
+    try {
+      await removeAccessToken();
+      router.replace("/auth/login");
+    } catch (err) {
+      console.error("Logout failed:", err);
+    }
+  }
+
   return (
     <View style={{ flex: 1, backgroundColor: "#fff" }}>
       <StatusBar style="dark" />
       <View style={{ flex: 1, padding: 16 }}>
         <NavigationBar
-          name="irgi168@gmail.com"
+          name={profile?.email}
           // onNotificationPress={() => console.log("Notification pressed")}
           onNotificationPress={() => handleLogout()}
           // onProfilePress={() => console.log("Profile pressed")}
           // onProfilePress={() => router.replace("/auth/login")}
-          onProfilePress={() => check()}
+          onProfilePress={() => checkAuth()}
         />
         <ScrollView
           className="flex flex-col gap-6"

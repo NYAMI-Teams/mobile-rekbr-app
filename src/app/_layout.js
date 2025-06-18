@@ -12,23 +12,27 @@ export default function RootLayout() {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    setIsLoading(true);
-    getAccessToken()
-      .then((token) => {
-        if (!token) return setIsLoggedIn(false);
-        getProfile()
-          .then((res) => {
-            console.log("Profile data:", res.data);
-            setIsLoggedIn(true);
-          })
-          .catch(() => {
-            showToast("Error", "Failed to fetch profile data", "error");
-            setIsLoggedIn(false);
-          });
-      })
-      .catch(() => setIsLoggedIn(false))
-      .finally(() => setIsLoading(false));
+    checkAuth();
   }, []);
+
+  const checkAuth = async () => {
+    setIsLoading(true);
+    try {
+      const token = await getAccessToken();
+      if (!token) {
+        setIsLoggedIn(false);
+        return;
+      }
+      const res = await getProfile();
+      // console.log("Profile data:", res.data);
+      setIsLoggedIn(true);
+    } catch {
+      showToast("Session Invalid", "Your session has expired. Please log in again.", "error");
+      setIsLoggedIn(false);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   if (isLoading) {
     return (

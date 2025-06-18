@@ -8,24 +8,75 @@ import {
   StyleSheet,
 } from "react-native";
 import Icon from "react-native-vector-icons/Feather";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import clsx from "clsx";
 import PrimaryButton from "../../components/PrimaryButton";
 import InputField from "../../components/InputField";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
+import { checkUser, sellerCreateTransaction } from "../../utils/api/transaction";
+import { showToast } from "../../utils";
 
 export default function CreateRekber({ bankData }) {
   const router = useRouter();
   const [isChecked, setIsChecked] = useState(false);
   const [email, setEmail] = useState("");
   const [itemName, setItemName] = useState("");
-  const [amount, setAmount] = useState("");
+  const [amount, setAmount] = useState(0);
+  const [isUserFound, setIsUserFound] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+
+  useEffect(() => {
+    // development only
+    setEmail("danilardi13@gmail.com");
+    setItemName("Iphone 13 Pro");
+    setAmount("7000000");
+  }, []);
 
   const handleCheckboxPress = () => {
     setIsChecked(!isChecked);
     console.log(isChecked);
   };
+
+  const handleCheckUser = async () => {
+    setIsLoading(true);
+    try {
+      await checkUser(email);
+      setIsUserFound(true);
+      showToast(
+        "Pengguna Ditemukan",
+        "Silakan lanjutkan untuk membuat transaksi",
+        "success"
+      );
+    } catch (error) {
+      showToast(
+        "Pengguna Tidak Ditemukan",
+        "Pastikan email yang dimasukkan benar",
+        "error"
+      );
+      setIsUserFound(false);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  const handleToConfirmPage = () => {
+    const payload = {
+      email,
+      itemName,
+      itemPrice: Number(amount),
+      withdrawalBankAccountId: bankData?.id,
+      isInsurance: isChecked,
+    }
+    router.push({
+      pathname: "/CreateTransaksi/CreateRekbr/GenerateVA",
+      params: {
+        payload: JSON.stringify(payload),
+        bankData: JSON.stringify(bankData),
+      },
+    });
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -69,7 +120,7 @@ export default function CreateRekber({ bankData }) {
                   />
                   <View className="flex flex-row items-center gap-2 w-full">
                     <TouchableOpacity
-                      onPress={() => console.log("Cari Email")}
+                      onPress={handleCheckUser}
                       className="flex-row h-[34px] w-20 rounded-lg items-center justify-center bg-black text-white gap-2">
                       <Icon name="search" size={16} color="white" />
                       <Text className="text-white text-xs font-medium">
@@ -97,6 +148,8 @@ export default function CreateRekber({ bankData }) {
                   value={amount}
                   onChangeText={setAmount}
                   className="w-full"
+                  keyboardType="numeric"
+                  inputMode="numeric"
                 />
 
                 {/* Insurance Checkbox */}
@@ -105,9 +158,9 @@ export default function CreateRekber({ bankData }) {
                     onPress={handleCheckboxPress}
                     className={`w-6 h-6 border ${
                       isChecked
-                        ? "bg-[#3ED6C5] border-[#3ED6C5]"
-                        : "bg-white border-gray-400"
-                    } rounded flex items-center justify-center`}>
+                      ? "bg-[#3ED6C5] border-[#3ED6C5]"
+                      : "bg-white border-gray-400"
+                      } rounded flex items-center justify-center`}>
                     {isChecked && (
                       <Text className="text-white text-lg font-medium items-center justify-center pb-7">
                         ✓
@@ -131,9 +184,7 @@ export default function CreateRekber({ bankData }) {
         <View className="w-full mb-5 px-4">
           <PrimaryButton
             title="Lanjut"
-            onPress={() =>
-              router.push("/CreateTransaksi/CreateRekbr/GenerateVA")
-            }
+            onPress={handleToConfirmPage}
           />
         </View>
       </View>

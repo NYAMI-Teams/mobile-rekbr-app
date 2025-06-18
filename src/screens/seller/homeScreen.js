@@ -90,7 +90,6 @@ export default function SellerEmptyContent({ isKYCCompleted }) {
               console.log("Navigasi ke halaman KYC");
               router.push("E-kyc/KYC_Intro");
             } else {
-              console.log("Navigasi ke buat Rekber baru");
               router.push("CreateTransaksi/CreateRekening/ChooseRekening");
             }
           }}>
