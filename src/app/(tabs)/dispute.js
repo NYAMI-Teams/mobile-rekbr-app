@@ -1,21 +1,25 @@
-import { View } from "react-native";
+import { View, ScrollView } from "react-native";
+import { useRouter } from "expo-router";
+import PrimaryButton from "../../components/PrimaryButton";
+import SellerEmptyContent from "../../screens/seller/homeScreen";
+import { useState } from "react";
 import NavigationBar from "../../components/NavigationBar";
-import AccountBalance from "../../components/AccountBalance";
-import QuickActions from "../../components/QuickActions";
-import Dispute from "../dispute";
+import { StatusBar } from "expo-status-bar";
+import SellerCard from "../../components/card-transaction/SellerCard";
+import { mockAPISeller } from "../../services/apiMock/api";
+import Dispute from "../Dispute/HomeDispute";
 
-export default function Home() {
-  const bankData = {
-    accountHolder: "Sdr Bayu Saptaji Rahman",
-    bankName: "Bank Negara Indonesia",
-    accountNumber: "0900604501",
-    logoSrc: require("../../assets/bni-logo2.png"),
-  };
+export default function DisputeScreen() {
+  const router = useRouter();
+  const [isKYCCompleted, setIsKYCCompleted] = useState(true);
+  const [isEmptyTransaction, setIsEmptyTransaction] = useState(false);
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#000000" }}>
-      <NavigationBar />
-      <Dispute />
+    <View style={{ flex: 1, backgroundColor: "#fff" }}>
+      <StatusBar style="dark" />
+      <View style={{ flex: 1, padding: 16 }}>
+        <Dispute/>
+      </View>
     </View>
   );
 }

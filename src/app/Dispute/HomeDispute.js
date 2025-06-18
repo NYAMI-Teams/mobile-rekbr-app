@@ -1,11 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import { View, Text, TouchableOpacity, Image, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import PrimaryButton from "../../components/PrimaryButton";
 import { ChevronLeft } from "lucide-react-native";
 import { useNavigation } from "expo-router";
+import { router } from "expo-router";
 
-export default function Dispute() {
+export default function HomeDispute() {
+  const [selectedComplaint, setSelectedComplaint] = useState(null);
   const navigation = useNavigation();
   const complaints = [
     {
@@ -70,6 +72,7 @@ export default function Dispute() {
         {/* Button Email */}
         <View className="mb-6">
           <PrimaryButton
+          onPress={() => router.push("/Dispute/DisputeCard")}
             title="Diskusi via email dengan penjual"
             className="mb-6"
           />
@@ -84,6 +87,7 @@ export default function Dispute() {
             <TouchableOpacity
               key={index}
               className="w-[48%] h-40 bg-white border border-gray-300 rounded-xl px-4 py-10 items-center justify-between"
+              onPress={() => router.push("/Dispute/HilangBarang")}
             >
               <Image
                 source={item.icon}
@@ -96,16 +100,18 @@ export default function Dispute() {
             </TouchableOpacity>
           ))}
         </View>
+
+        
       </ScrollView>
       {/* Footer */}
-      <View className="absolute bottom-16 left-0 right-0 items-center">
-        <Text className="text-xs text-gray-400">
-          Terdapat kendala?{" "}
-          <Text className="text-blue-500 font-medium">
-            Silahkan Hubungi Kami
+      <View className="absolute bottom-0 left-0 right-0 items-center pb-6">
+          <Text className="text-xs text-gray-400">
+            Terdapat kendala?{" "}
+            <Text className="text-blue-500 font-medium">
+              Silahkan Hubungi Kami
+            </Text>
           </Text>
-        </Text>
-      </View>
+        </View>
     </SafeAreaView>
   );
 }

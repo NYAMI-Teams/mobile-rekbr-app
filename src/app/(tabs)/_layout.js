@@ -36,6 +36,7 @@ const styles = StyleSheet.create({
 
 export default function TabLayout() {
   return (
+
     <Tabs
       screenOptions={{
         headerShown: false,
