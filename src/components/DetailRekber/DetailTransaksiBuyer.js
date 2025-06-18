@@ -7,7 +7,7 @@ import {
   ScrollView,
   SafeAreaView,
 } from "react-native";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import ProgressBar from "../ProgressBar";
 import Timestamp from "./Timestamp";
@@ -16,6 +16,38 @@ import Toast from "react-native-toast-message";
 import PrimaryButton from "../PrimaryButton";
 import Tagihan from "./Tagihan";
 import { useRouter } from "expo-router";
+
+const data = {
+  id: "6ee685c4-55d4-4629-a6cd-744dd8d2751e",
+  transactionCode: "TRX-181126-8978",
+  status: "pending_payment",
+  itemName: "Babi Ngepetss",
+  itemPrice: 75000000,
+  insuranceFee: 150000,
+  platformFee: 600000,
+  totalAmount: 75750000,
+  virtualAccount: "8888918877866",
+  sellerEmail: "seller@gmail.com",
+  createdAt: "2025-06-16T03:23:01.128Z",
+  paidAt: null,
+  paymentDeadline: "2025-06-16T05:23:01.100Z",
+  shipmentDeadline: null,
+  shipment: {
+    trackingNumber: null,
+    courier: null,
+    shipmentDate: null,
+    photoUrl: null,
+  },
+  fundReleaseRequest: {
+    requested: false,
+    status: null,
+    requestedAt: null,
+    resolvedAt: null,
+  },
+  buyerConfirmDeadline: null,
+  buyerConfirmedAt: null,
+  currentTimestamp: "2025-06-16T07:37:39.204Z",
+};
 
 export default function DetailTransaksiBuyer({ data }) {
   const router = useRouter();
@@ -43,124 +75,124 @@ export default function DetailTransaksiBuyer({ data }) {
   };
 
   const setupStatus = () => {
-    if (data.status == "pending_payment") {
+    if (data?.status == "pending_payment") {
       return "Menunggu Pembayaran";
     }
-    if (data.status == "waiting_shipment") {
+    if (data?.status == "waiting_shipment") {
       return "Menunggu Resi";
     }
-    if (data.status == "shipped") {
+    if (data?.status == "shipped") {
       return "Dalam Pengiriman";
     }
-    if (data.status == "completed") {
+    if (data?.status == "completed") {
       return "Barang Diterima";
     }
-    if (data.status == "refunded") {
+    if (data?.status == "refunded") {
       return "Dikembalikan";
     }
-    if (data.status == "cancelled") {
+    if (data?.status == "cancelled") {
       return "Dibatalkan";
     }
-    if (data.status == "dispute") {
+    if (data?.status == "dispute") {
       return "Barang Terkendala";
     }
   };
 
   const setupDetailTimestamp = () => {
-    if (data.status == "pending_payment") {
+    if (data?.status == "pending_payment") {
       return [
         {
           status: "Waktu bikin Rekbr",
-          date: data.createdAt,
+          date: data?.createdAt || "-",
         },
       ];
     }
-    if (data.status == "waiting_shipment") {
+    if (data?.status == "waiting_shipment") {
       return [
         {
           status: "Waktu bikin Rekbr",
-          date: data.createdAt,
+          date: data?.createdAt || "-",
         },
         {
           status: "Waktu pembeli Bayar",
-          date: data.paidAt,
+          date: data?.paidAt || "-",
         },
       ];
     }
-    if (data.status == "shipped") {
-      if (data.fundReleaseRequest.status == "approved") {
+    if (data?.status == "shipped") {
+      if (data?.fundReleaseRequest?.status == "approved") {
         return [
           {
             status: "Waktu bikin Rekbr",
-            date: data.createdAt,
+            date: data?.createdAt || "-",
           },
           {
             status: "Waktu pembeli Bayar",
-            date: data.paidAt,
+            date: data?.paidAt || "-",
           },
           {
             status: "Waktu pembeli mengirimkan barang",
-            date: data.shipmentDate,
+            date: data?.shipment?.shipmentDate || "-",
           },
           {
             status: "Waktu penjual meminta konfirmasi pembeli",
-            date: data.fundReleaseRequest.requestedAt,
+            date: data?.fundReleaseRequest.requestedAt || "-",
           },
           {
             status: "Waktu admin meneruskan permintaan konfirmasi pembeli",
-            date: data.fundReleaseRequest.resolvedAt,
+            date: data?.fundReleaseRequest.resolvedAt || "-",
           },
         ];
       } else {
         return [
           {
             status: "Waktu bikin Rekbr",
-            date: data.createdAt,
+            date: data?.createdAt || "-",
           },
           {
             status: "Waktu pembeli Bayar",
-            date: data.paidAt,
+            date: data?.paidAt || "-",
           },
         ];
       }
     }
-    if (data.status == "completed") {
-      if (data.fundReleaseRequest.status == "approved") {
+    if (data?.status == "completed") {
+      if (data?.fundReleaseRequest?.status == "approved") {
         return [
           {
             status: "Waktu bikin Rekbr",
-            date: data.createdAt,
+            date: data?.createdAt || "-",
           },
           {
             status: "Waktu pembeli Bayar",
-            date: data.paidAt,
+            date: data?.paidAt || "-",
           },
           {
             status: "Waktu pembeli mengirimkan barang",
-            date: data.shipmentDate,
+            date: data?.shipment?.shipmentDate || "-",
           },
           {
             status: "Waktu penjual meminta konfirmasi pembeli",
-            date: data.fundReleaseRequest.requestedAt,
+            date: data?.fundReleaseRequest.requestedAt || "-",
           },
           {
             status: "Waktu admin meneruskan permintaan konfirmasi pembeli",
-            date: data.fundReleaseRequest.resolvedAt,
+            date: data?.fundReleaseRequest.resolvedAt || "-",
           },
         ];
       } else {
         return [
           {
             status: "Waktu bikin Rekbr",
-            date: data.createdAt,
+            date: data?.createdAt || "-",
           },
           {
             status: "Waktu pembeli Bayar",
-            date: data.paidAt,
+            date: data?.paidAt || "-",
           },
           {
             status: "Waktu pembeli mengirimkan barang",
-            date: data.shipmentDate,
+            date: data?.shipment?.shipmentDate || "-",
           },
         ];
       }
@@ -168,49 +200,49 @@ export default function DetailTransaksiBuyer({ data }) {
   };
 
   const setupCaptionTimeStamp = () => {
-    if (data.status == "pending_payment") {
+    if (data?.status == "pending_payment") {
       return "Pembeli transfer sebelum";
     }
-    if (data.status == "waiting_shipment") {
+    if (data?.status == "waiting_shipment") {
       return "Penjual kirim barang sebelum";
     }
-    if (data.status == "shipped") {
-      if (data.fundReleaseRequest.status == "approved") {
+    if (data?.status == "shipped") {
+      if (data?.fundReleaseRequest?.status == "approved") {
         return "Mohon cek dan konfirmasi sebelum 1 x 24 jam";
       } else {
         return "Penjual sudah mengirimkan barang";
       }
     }
-    if (data.status == "completed") {
+    if (data?.status == "completed") {
       return "Waktu konfirmasi pembeli diterima";
     }
-    if (data.status == "refunded") {
+    if (data?.status == "refunded") {
       return "Dikembalikan";
     }
-    if (data.status == "cancelled") {
+    if (data?.status == "cancelled") {
       return "Dibatalkan";
     }
-    if (data.status == "dispute") {
+    if (data?.status == "dispute") {
       return "Waktu konfirmasi buyer pengembalian";
     }
   };
 
   const setupDateTimestamp = () => {
-    if (data.status == "pending_payment") {
-      return data.paymentDeadline;
+    if (data?.status == "pending_payment") {
+      return data?.paymentDeadline || "-";
     }
-    if (data.status == "waiting_shipment") {
-      return data.shipmentDeadline;
+    if (data?.status == "waiting_shipment") {
+      return data?.shipment?.shipmentDeadline || "-";
     }
-    if (data.status == "shipped") {
-      if (data.fundReleaseRequest.status == "approved") {
-        return data.buyerConfirmDeadline;
+    if (data?.status == "shipped") {
+      if (data?.fundReleaseRequest?.status == "approved") {
+        return data?.buyerConfirmDeadline || "-";
       } else {
-        return data.shipmentDate;
+        return data?.shipment?.shipmentDate || "-";
       }
     }
-    if (data.status == "completed") {
-      return data.buyerConfirmedAt;
+    if (data?.status == "completed") {
+      return data?.buyerConfirmedAt || "-";
     }
   };
 
@@ -222,13 +254,13 @@ export default function DetailTransaksiBuyer({ data }) {
   };
 
   const setupFooter = () => {
-    if (data.status == "pending_payment") {
+    if (data?.status == "pending_payment") {
       return (
         <View className="flex-col gap-4 w-full items-center">
           <PrimaryButton
             title="Cek Status Transaksi"
             onPress={() => console.log("Cek Status Transaksi pressed")}
-          // disabled={!isFormValid}
+            // disabled={!isFormValid}
           />
           <View className="flex-row w-9/12 items-center justify-between px-3">
             <Text className="text-sm items-start justify-start text-[#616161]">
@@ -245,7 +277,7 @@ export default function DetailTransaksiBuyer({ data }) {
         </View>
       );
     }
-    if (data.status == "waiting_shipment") {
+    if (data?.status == "waiting_shipment") {
       return (
         <View className="flex-row w-9/12 items-center justify-between px-3">
           <Text className="text-sm items-start justify-start text-[#616161]">
@@ -259,7 +291,7 @@ export default function DetailTransaksiBuyer({ data }) {
         </View>
       );
     }
-    if (data.status == "shipped") {
+    if (data?.status == "shipped") {
       return (
         <View className="flex flex-row items-center gap-4">
           <PrimaryButton
@@ -281,7 +313,7 @@ export default function DetailTransaksiBuyer({ data }) {
         </View>
       );
     }
-    if (data.status == "completed") {
+    if (data?.status == "completed") {
       return (
         <PrimaryButton
           title="Berikan Ulasan"
@@ -319,11 +351,11 @@ export default function DetailTransaksiBuyer({ data }) {
         const steps = ["Transfer", "Dikemas", "Dikirim", "Diterima"];
         let currentStep = 0;
 
-        switch (data.status) {
+        switch (data?.status) {
           case "pending_payment":
             currentStep = 0;
             break;
-          case "waiting_shipment":
+          case "waiting_shipment?":
             currentStep = 1;
             break;
           case "shipped":
@@ -337,11 +369,11 @@ export default function DetailTransaksiBuyer({ data }) {
         return <ProgressBar currentStep={currentStep} steps={steps} />;
       })()}
       <ScrollView>
-        {data.status == "pending_payment" ||
-          (data.status == "waiting_shipment" &&
-            data.shipment.trackingNumber != null) ||
-          data.status == "shipped" ||
-          data.status == "completed" ? (
+        {data?.status == "pending_payment" ||
+        (data?.status == "waiting_shipment?" &&
+          data?.shipment?.trackingNumber != null) ||
+        data?.status == "shipped" ||
+        data?.status == "completed" ? (
           <>
             {/* Copas Field */}
             <View
@@ -353,31 +385,30 @@ export default function DetailTransaksiBuyer({ data }) {
               }}
             >
               <Text
-                style={{ fontSize: 15, marginBottom: 12, fontWeight: "500" }}
-              >
-                {data.status == "pending_payment"
+                style={{ fontSize: 15, marginBottom: 12, fontWeight: "500" }}>
+                {data?.status == "pending_payment"
                   ? "Virtual Account"
                   : "No Resi"}
               </Text>
               <View
-                className={`flex-row items-center ${data.status == "waiting_shipment" ||
-                  data.status == "shipped" ||
-                  data.status == "completed"
+                className={`flex-row items-center ${
+                  data?.status == "waiting_shipment?" ||
+                  data?.status == "shipped" ||
+                  data?.status == "completed"
                     ? "mb-3"
                     : ""
-                }`}
-              >
+                }`}>
                 <Text style={{ fontSize: 17, fontWeight: "500" }}>
-                  {data.status == "pending_payment"
-                    ? data.virtualAccount
-                    : data.shipment.trackingNumber}
+                  {data?.status == "pending_payment"
+                    ? data?.virtualAccount
+                    : data?.shipment?.trackingNumber}
                 </Text>
                 <TouchableOpacity
                   onPress={() =>
                     handleCopy(
-                      data.status == "pending_payment"
-                        ? data.virtualAccount
-                        : data.shipment.trackingNumber
+                      data?.status == "pending_payment"
+                        ? data?.virtualAccount
+                        : data?.shipment?.trackingNumber
                     )
                   }
                 >
@@ -387,18 +418,17 @@ export default function DetailTransaksiBuyer({ data }) {
                   />
                 </TouchableOpacity>
               </View>
-              {data.status == "waiting_shipment" ||
-                data.status == "shipped" ||
-                data.status == "completed" ? (
+              {data?.status == "waiting_shipment?" ||
+              data?.status == "shipped" ||
+              data?.status == "completed" ? (
                 <Text
                   style={{
                     fontSize: 12,
                     // marginBottom: 12,
                     fontWeight: "400",
                     color: "#616161",
-                  }}
-                >
-                  {data.shipment.courier}
+                  }}>
+                  {data?.shipment?.courier || "-"}
                 </Text>
               ) : null}
             </View>
@@ -406,8 +436,8 @@ export default function DetailTransaksiBuyer({ data }) {
         ) : null}
 
         {/* Admin Message */}
-        {data.fundReleaseRequest.status == "approved" ||
-          data.status == "completed" ? (
+        {data?.fundReleaseRequest?.status == "approved" ||
+        data?.status == "completed" ? (
           <>
             <View className="flex-row mx-3 p-3 justify-between items-center gap-3">
               <Image
@@ -418,7 +448,7 @@ export default function DetailTransaksiBuyer({ data }) {
                 }}
               />
               <Text className="text-sm flex-1">
-                {data.status == "completed"
+                {data?.status == "completed"
                   ? "Komplain dianggap tidak ada dan bakal selesai otomatis kalau pembeli nggak respon."
                   : "Halo! Barang udah sampai. Cek dan konfirmasi, biar dana langsung ke penjual via BNI!"}
               </Text>
@@ -483,38 +513,42 @@ export default function DetailTransaksiBuyer({ data }) {
         {/* Seller Section */}
         <View className="flex-col justify-center gap-2 mx-3 p-3">
           <Text className="text-[15px]">Penjual</Text>
-          <Text className="text-[15px] font-medium">{data.sellerEmail}</Text>
+          <Text className="text-[15px] font-medium">
+            {data?.sellerEmail || "-"}
+          </Text>
         </View>
 
         {/* Items Name Section */}
         <View className="flex-col justify-center gap-2 mx-3 p-3">
           <Text className="text-[15px]">Nama Barang</Text>
-          <Text className="text-[15px] font-medium">{data.itemName}</Text>
+          <Text className="text-[15px] font-medium">
+            {data?.itemName || "-"}
+          </Text>
         </View>
 
         {/* Items Price Section */}
         <View className="flex-col justify-center gap-2 mx-3 p-3">
           {/* <Text className="text-[15px]">Harga Barang</Text>
           <Text className="text-[15px] font-medium">
-            {formatPrice(data.itemPrice)}
+            {formatPrice(data?.itemPrice)}
           </Text> */}
           <Tagihan
             caption="Harga Barang"
-            price={formatPrice(data.itemPrice)}
+            price={formatPrice(data?.itemPrice)}
             details={[
               {
                 status: "Nominal Barang",
-                price: formatPrice(data.itemPrice),
+                price: formatPrice(data?.itemPrice),
               },
               {
                 status: "Asuransi Pengiriman BNI Life (0.2%)",
-                price: formatPrice(data.insuranceFee),
+                price: formatPrice(data?.insuranceFee),
               },
               {
                 status: `Biaya Jasa Aplikasi (${calculatePlatformFee(
-                  data.itemPrice
+                  data?.itemPrice
                 )}%)`,
-                price: formatPrice(data.platformFee),
+                price: formatPrice(data?.platformFee),
               },
             ]}
           />
@@ -525,9 +559,9 @@ export default function DetailTransaksiBuyer({ data }) {
           <Text className="text-[15px]">ID Transaksi</Text>
           <View className="flex-row items-center">
             <Text className="text-[15px] font-medium">
-              {data.transactionCode}
+              {data?.transactionCode || "-"}
             </Text>
-            <TouchableOpacity onPress={() => handleCopy(data.transactionCode)}>
+            <TouchableOpacity onPress={() => handleCopy(data?.transactionCode)}>
               <Image
                 source={require("../../assets/copy.png")}
                 style={{ marginLeft: 4, width: 17, height: 16 }}
@@ -541,9 +575,9 @@ export default function DetailTransaksiBuyer({ data }) {
           <Text className="text-[15px]">Virtual Account</Text>
           <View className="flex-row items-center">
             <Text className="text-[15px] font-medium">
-              {data.virtualAccount}
+              {data?.virtualAccount || "-"}
             </Text>
-            <TouchableOpacity onPress={() => handleCopy(data.virtualAccount)}>
+            <TouchableOpacity onPress={() => handleCopy(data?.virtualAccount)}>
               <Image
                 source={require("../../assets/copy.png")}
                 style={{ marginLeft: 4, width: 17, height: 16 }}

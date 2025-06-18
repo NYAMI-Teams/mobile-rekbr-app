@@ -1,19 +1,43 @@
 import { View } from "react-native";
 import NavigationBar from "../../components/NavigationBar";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import BuyerEmptyContent from "../../screens/buyer/index";
-import { mockAPIBuyer } from "../../services/apiMock/api";
 import { StatusBar } from "expo-status-bar";
 import BuyerCard from "../../components/card-transaction/BuyerCard";
-import { ScrollView } from "react-native";
+import { ScrollView, RefreshControl } from "react-native";
+import { getBuyerTransactions } from "../../utils/api/buyer";
+import InputResi from "../../components/InputResi";
 
 export default function Home() {
   const [isEmptyTransaction, setIsEmptyTransaction] = useState(false);
-  const bankData = {
-    accountHolder: "Sdr Bayu Saptaji Rahman",
-    bankName: "Bank Negara Indonesia",
-    accountNumber: "0900604501",
-    logoSrc: require("../../assets/bni-logo2.png"),
+  const [transactions, setTransactions] = useState([]);
+  const [refreshing, setRefreshing] = useState(false);
+
+  useEffect(() => {
+    fetchTransactions();
+  }, []);
+
+  const fetchTransactions = async () => {
+    try {
+      const res = await getBuyerTransactions();
+      if (res.data.length > 0) {
+        setIsEmptyTransaction(false);
+      } else {
+        setIsEmptyTransaction(true);
+      }
+      console.log(res.data);
+      setTransactions(res.data);
+    } catch (err) {
+      console.error("Error fetching buyer transactions:", err);
+    } finally {
+      console.log("finally");
+    }
+  };
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchTransactions();
+    setRefreshing(false);
   };
 
   return (
@@ -25,15 +49,21 @@ export default function Home() {
           onNotificationPress={() => console.log("Notification pressed")}
           onProfilePress={() => console.log("Notification pressed")}
         />
-        <ScrollView
+        {/* <ScrollView
           className="flex flex-col gap-12"
-          showsVerticalScrollIndicator={false}>
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }>
           {isEmptyTransaction ? (
             <BuyerEmptyContent />
           ) : (
-            <BuyerCard data={mockAPIBuyer.data} />
+            transactions.map((transaction) => (
+              <BuyerCard key={transaction.id} data={transaction} />
+            ))
           )}
-        </ScrollView>
+        </ScrollView> */}
+        <InputResi id={""} />
       </View>
     </View>
   );

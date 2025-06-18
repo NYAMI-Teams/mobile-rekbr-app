@@ -1,18 +1,76 @@
-import { View, ScrollView } from "react-native";
+import { View, ScrollView, RefreshControl } from "react-native";
 import { useRouter } from "expo-router";
 import PrimaryButton from "../../components/PrimaryButton";
 import SellerEmptyContent from "../../screens/seller/homeScreen";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import NavigationBar from "../../components/NavigationBar";
 import { StatusBar } from "expo-status-bar";
 import SellerCard from "../../components/card-transaction/SellerCard";
-import { mockAPISeller } from "../../services/apiMock/api";
+import { getSellerTransactions } from "../../utils/api/seller";
+import { getProfile } from "../../utils/api/auth";
+import { removeAccessToken } from "../../store";
 
 
 export default function Seller() {
   const router = useRouter();
   const [isKYCCompleted, setIsKYCCompleted] = useState(true);
-  const [isEmptyTransaction, setIsEmptyTransaction] = useState(false);
+  const [isEmptyTransaction, setIsEmptyTransaction] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [transactions, setTransactions] = useState([]);
+
+  useEffect(() => {
+    fetchTransactions();
+  }, []);
+
+  const check = () => {
+    setIsLoading(true);
+    getProfile()
+      .then((res) => {
+        console.log("Profile data:", res);
+      })
+      .catch((err) => {
+        console.error(err);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
+
+  const handleLogout = () => {
+    removeAccessToken()
+      .then(() => {
+        router.replace("/auth/login");
+      })
+      .catch((err) => {
+        console.error("Logout failed:", err);
+      });
+  };
+
+  const fetchTransactions = async () => {
+    try {
+      const res = await getSellerTransactions();
+      if (res.data.length > 0) {
+        setIsEmptyTransaction(false);
+      } else {
+        setIsEmptyTransaction(true);
+      }
+      setTransactions(res.data);
+      console.log("Berhasil get all transaction seller");
+      // console.log(res.data);
+    } catch (err) {
+      console.error("Error fetching transactions:", err);
+    } finally {
+      console.log("finally");
+    }
+  };
+
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchTransactions();
+    setRefreshing(false);
+  };
 
   return (
     <View style={{ flex: 1, backgroundColor: "#fff" }}>
@@ -20,16 +78,24 @@ export default function Seller() {
       <View style={{ flex: 1, padding: 16 }}>
         <NavigationBar
           name="irgi168@gmail.com"
-          onNotificationPress={() => console.log("Notification pressed")}
-          onProfilePress={() => console.log("Notification pressed")}
+          // onNotificationPress={() => console.log("Notification pressed")}
+          onNotificationPress={() => handleLogout()}
+          // onProfilePress={() => console.log("Profile pressed")}
+          // onProfilePress={() => router.replace("/auth/login")}
+          onProfilePress={() => check()}
         />
         <ScrollView
           className="flex flex-col gap-12"
-          showsVerticalScrollIndicator={false}>
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }>
           {isEmptyTransaction ? (
             <SellerEmptyContent isKYCCompleted={isKYCCompleted} />
           ) : (
-            <SellerCard data={mockAPISeller.data} />
+            transactions.map((transaction) => (
+              <SellerCard key={transaction.id} data={transaction} />
+            ))
           )}
         </ScrollView>
         {isKYCCompleted && !isEmptyTransaction && (
