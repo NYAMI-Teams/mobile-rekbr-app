@@ -17,7 +17,6 @@ export const checkAccountBank = async (email, password) => {
 }
 
 export const saveAccountBank = async (bankId, accountNumber, accountName) => {
-    console.log(bankId, "==========>");
     try {
         const res = await Api.post(`/bank/account`, {
             bank_id: bankId,

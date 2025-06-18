@@ -80,11 +80,9 @@ export const postResi = async (id, courier_id, tracking_number, photo) => {
     formData.append("tracking_number", tracking_number);
     const res = await Api.post(`/seller/transactions/${id}/shipping`, formData);
     if (res) {
-      console.log("ini res", res);
       return res;
     }
   } catch (error) {
-    console.log("Error post resi:", error);
     throw error;
   }
 };
@@ -106,11 +104,9 @@ export const postFundRelease = async (id, evidence, reason) => {
       formData
     );
     if (res) {
-      console.log("ini res", res);
       return res;
     }
   } catch (error) {
-    console.log("Error post fund release:", error);
     throw error;
   }
 };

@@ -40,16 +40,13 @@ export default function Seller() {
         setIsEmptyTransaction(true);
       }
       setTransactions(res.data);
-      // console.log("Berhasil get all transaction seller");
-      // console.log(res.data);
     } catch (err) {
       showToast(
-        "Error",
-        "Failed to fetch transactions. Please try again later.",
+        "Gagal",
+        "Gagal mengambil data transaksi. Silahkan coba lagi.",
         "error"
       );
     } finally {
-      console.log("finally");
     }
   };
 
@@ -68,8 +65,8 @@ export default function Seller() {
       }
     } catch {
       showToast(
-        "Session Invalid",
-        "Your session has expired. Please log in again.",
+        "Sesi Berakhir",
+        "Sesi Anda telah berakhir. Silahkan login kembali.",
         "error"
       );
       handleLogout();
@@ -88,8 +85,9 @@ export default function Seller() {
     try {
       await removeAccessToken();
       router.replace("Onboarding");
+      showToast("Logout Berhasil", "Anda telah berhasil logout.", "success");
     } catch (err) {
-      console.error("Logout failed:", err);
+      showToast("Logout Gagal", "Gagal logout. Silahkan coba lagi.", "error");
     }
   };
 

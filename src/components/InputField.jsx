@@ -34,9 +34,9 @@ export default function InputField({
             inputMode={inputMode}
           />
       </View>
-      {errorText ? (
+      {errorText && (
         <Text style={styles.errorText}>{errorText}</Text>
-      ) : null}
+      )}
     </View>
   );
 }

@@ -1,4 +1,13 @@
-import { View, Text, Modal, ScrollView, Image, Alert } from "react-native";
+import {
+  View,
+  Text,
+  Modal,
+  ScrollView,
+  Image,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import InputField from "./InputField";
 import AttachmentFilled from "./AttachmentFilled";
@@ -70,12 +79,10 @@ export default function InputResi({ id }) {
     try {
       const res = await getListCourier();
       if (res) {
-        console.log("ini res", res.data);
         setCourierList(res.data);
       }
     } catch (error) {
-      console.log("Error get all courier:", error);
-      throw error;
+      showToast("Gagal", "Gagal mengambil data ekspedisi", "error");
     }
   };
 
@@ -162,7 +169,6 @@ export default function InputResi({ id }) {
             { compress: quality, format: ImageManipulator.SaveFormat.JPEG }
           );
         }
-        console.log("ini compressed", compressed);
       } while (size > 1024 * 1024 && quality >= 0.2);
 
       setImage({
@@ -184,8 +190,6 @@ export default function InputResi({ id }) {
     setCourier(selectedCourier.name);
     setCourierId(selectedCourier.id);
     setModalVisible(false);
-    console.log("ini courier id", courierId);
-    console.log("ini courier", courier);
   };
 
   const handleBtnPress = () => {
@@ -197,15 +201,10 @@ export default function InputResi({ id }) {
       await postResi(id, courierId, resiNumber, image);
       router.replace("/");
     } catch (error) {
-      console.log(error);
-      showToast("error", "Gagal mengunggah resi", "error");
+      showToast("Gagal", "Gagal mengunggah resi", "error");
     } finally {
       setShowPopup(false);
     }
-    console.log("ini id", id);
-    console.log("ini courier id", courierId);
-    console.log("ini resiNumber", resiNumber);
-    console.log("ini image", image);
   };
 
   const handleResiNumberChange = (text) => {
@@ -221,16 +220,14 @@ export default function InputResi({ id }) {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white items-center justify-between">
+    <SafeAreaView className="flex-1 bg-white justify-between">
       {/* Header */}
       <View className="flex-row justify-between items-center w-full px-4 pt-4">
-        {" "}
         {/* Tambahkan padding horizontal */}
         <TouchableOpacity onPress={() => router.back()}>
           <Ionicons name="chevron-back-outline" size={24} color="#000" />
         </TouchableOpacity>
         <Text className="text-[16px] font-semibold text-black">
-          {" "}
           {/* Hapus items-center, karena sudah di flex-row justify-between */}
           Form Pengiriman
         </Text>
@@ -238,64 +235,70 @@ export default function InputResi({ id }) {
       </View>
 
       {/* Content */}
-      <ScrollView className="flex-1 w-full px-4 mt-5">
-        {" "}
-        {/* Wrap content dengan ScrollView */}
-        <View className="mt-4">
-          <InputField
-            title="Masukkan Nomor Resi"
-            placeholder="Masukkan Nomor Resi dengan benar"
-            value={resiNumber}
-            onChangeText={handleResiNumberChange}
-            errorText={resiNumberError}
-            keyboardType="default"
-            autoCapitalize="characters"
-          />
-        </View>
-        <TouchableOpacity className="mt-4" onPress={handleModal}>
-          <DropDownField
-            title="Pilih Ekspedisi"
-            placeholder="Pilih Ekspedisi pengiriman kamu"
-            value={courier}
-            onChangeText={setCourier}
-            editable={false}
-          />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={handleUpload} className="mt-4">
-          <AttachmentFilled
-            title="Unggah Bukti"
-            caption={
-              isUploaded
-                ? image?.uri?.split("/").pop()
-                : "Berikan bukti berupa screenshot cek resi"
-            }
-            captionColor={isUploaded ? "#08B20F" : "#9E9E9E"}
-            iconName={"camera"} // Pastikan AttachmentFilled Anda bisa menerima string 'camera' untuk ikon
-            boxColor={isUploaded ? "#F9F9F9" : "#49DBC8"}
-            iconsColor={isUploaded ? "#C2C2C2" : "#FFFFFF"}
-            cardColor={"#FFF"}
-            alertText="Pastikan keterbacaan foto dan hindari bayangan"
-            alertColor={isUploaded ? "#08B20F" : "#C2C2C2"}
-            alertIconName={isUploaded ? "checkmark-circle" : "alert-circle"} // Pastikan ini juga sesuai dengan AttachmentFilled
-            alertIconColor={isUploaded ? "#08B20F" : "#C2C2C2"}
-            onPress={handleUpload}
-          />
-        </TouchableOpacity>
-        <View className="mt-4 mb-4">
-          {" "}
-          {/* Tambahkan margin vertikal */}
-          {/* Image Preview */}
-          {!image ? null : (
-            <Image
-              source={{ uri: image.uri }}
-              className="w-full h-64 rounded-lg"
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{ flex: 1 }}>
+        <ScrollView
+          className="flex-1 w-full px-4 mt-5"
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+          hideKeyboardOnScroll={true}
+          keyboardDismissMode="on-drag">
+          {/* Wrap content dengan ScrollView */}
+          <View className="mt-4">
+            <InputField
+              title="Masukkan Nomor Resi"
+              placeholder="Masukkan Nomor Resi dengan benar"
+              value={resiNumber}
+              onChangeText={handleResiNumberChange}
+              errorText={resiNumberError}
+              keyboardType="default"
+              autoCapitalize="characters"
             />
-          )}
-        </View>
-      </ScrollView>
+          </View>
+          <TouchableOpacity className="mt-4" onPress={handleModal}>
+            <DropDownField
+              title="Pilih Ekspedisi"
+              placeholder="Pilih Ekspedisi pengiriman kamu"
+              value={courier}
+              onChangeText={setCourier}
+              editable={false}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={handleUpload} className="mt-4">
+            <AttachmentFilled
+              title="Unggah Bukti"
+              caption={
+                isUploaded
+                  ? image?.uri?.split("/").pop()
+                  : "Berikan bukti berupa screenshot cek resi"
+              }
+              captionColor={isUploaded ? "#08B20F" : "#9E9E9E"}
+              iconName={"camera"} // Pastikan AttachmentFilled Anda bisa menerima string 'camera' untuk ikon
+              boxColor={isUploaded ? "#F9F9F9" : "#49DBC8"}
+              iconsColor={isUploaded ? "#C2C2C2" : "#FFFFFF"}
+              cardColor={"#FFF"}
+              alertText="Pastikan keterbacaan foto dan hindari bayangan"
+              alertColor={isUploaded ? "#08B20F" : "#C2C2C2"}
+              alertIconName={isUploaded ? "checkmark-circle" : "alert-circle"} // Pastikan ini juga sesuai dengan AttachmentFilled
+              alertIconColor={isUploaded ? "#08B20F" : "#C2C2C2"}
+              onPress={handleUpload}
+            />
+          </TouchableOpacity>
+          <View className="mt-4 mb-4">
+            {/* Tambahkan margin vertikal */}
+            {/* Image Preview */}
+            {!image ? null : (
+              <Image
+                source={{ uri: image.uri }}
+                className="w-full h-64 rounded-lg"
+              />
+            )}
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
       {/* Button */}
       <View className="w-full px-4 py-4">
-        {" "}
         {/* Tambahkan padding horizontal dan vertikal */}
         <PrimaryButton
           title="Kirim"
@@ -347,15 +350,21 @@ export default function InputResi({ id }) {
               <ScrollView className="my-2" showsVerticalScrollIndicator={false}>
                 {/* Sembunyikan indikator scroll */}
                 <View className="flex-col gap-4 bg-slate-100/50 m-5 p-5 rounded-lg border border-gray-300">
-                  {courierList.map((courier) => (
-                    <TouchableOpacity
-                      className="p-5 border-b-2 border-gray-300/50 mb-4"
-                      onPress={() => handleSelectCourier(courier)}>
-                      <Text className="text-[15px] font-semibold">
-                        {courier.name}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
+                  {courierList.map(
+                    (
+                      courier,
+                      index
+                    ) => (
+                      <TouchableOpacity
+                        key={index}
+                        className="p-5 border-b-2 border-gray-300/50 mb-4"
+                        onPress={() => handleSelectCourier(courier)}>
+                        <Text className="text-[15px] font-semibold">
+                          {courier.name}
+                        </Text>
+                      </TouchableOpacity>
+                    )
+                  )}
                 </View>
               </ScrollView>
             </View>

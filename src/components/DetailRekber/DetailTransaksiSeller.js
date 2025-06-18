@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   ScrollView,
   SafeAreaView,
+  Alert,
 } from "react-native";
 import { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
@@ -18,33 +19,23 @@ import PrimaryButton from "../PrimaryButton";
 import Tagihan from "./Tagihan";
 import { useRouter } from "expo-router";
 import { cancelTransaksiSeller } from "../../utils/api/seller";
+import BuyerKonfirmasi from "../BuyerKonfirmasi";
 
 export default function DetailTransaksiSeller({ data }) {
   const status = data?.status || "";
   const router = useRouter();
   const [isExpanded, setIsExpanded] = useState(false);
+  const [showPopup, setShowPopup] = useState(false);
 
   const handleCancelTransaksiSeller = async () => {
     try {
       const res = await cancelTransaksiSeller(data?.id);
       if (res) {
-        console.log(res);
-        Toast.show({
-          type: "success",
-          text1: "Berhasil",
-          text2: "Transaksi berhasil dibatalkan",
-          position: "top",
-        });
+        showToast("Berhasil", "Transaksi berhasil dibatalkan", "success");
         router.replace("/");
       }
     } catch (error) {
-      console.log(error);
-      Toast.show({
-        type: "error",
-        text1: "Gagal",
-        text2: "Transaksi gagal dibatalkan",
-        position: "top",
-      });
+      showToast("Gagal", "Transaksi gagal dibatalkan", "error");
     }
   };
 
@@ -53,21 +44,9 @@ export default function DetailTransaksiSeller({ data }) {
     if (!text) return;
     try {
       await Clipboard.setStringAsync(text);
-      Toast.show({
-        type: "success",
-        text1: "Berhasil",
-        text2: "Disalin ke clipboard",
-        position: "top",
-      });
-      console.log("Copied to clipboard:", text);
+      showToast("Berhasil", "Disalin ke clipboard", "success");
     } catch (error) {
-      Toast.show({
-        type: "error",
-        text1: "Gagal",
-        text2: "Tidak dapat menyalin",
-        position: "top",
-      });
-      console.log("Failed to copy to clipboard:", error);
+      showToast("Gagal", "Tidak dapat menyalin", "error");
     }
   };
 
@@ -288,7 +267,7 @@ export default function DetailTransaksiSeller({ data }) {
         <View className="flex-col gap-4 w-full items-center">
           <PrimaryButton
             title="Batalkan Rekbr"
-            onPress={handleCancelTransaksiSeller}
+            onPress={() => setShowPopup(true)}
             // disabled={!isFormValid}
             btnColor="#FEF0E9"
             textColor="#000"
@@ -313,7 +292,7 @@ export default function DetailTransaksiSeller({ data }) {
           <View className="flex flex-row items-center gap-4">
             <PrimaryButton
               title="Batalkan Rekbr"
-              onPress={handleCancelTransaksiSeller}
+              onPress={() => setShowPopup(true)}
               // disabled={!isFormValid}
               height={50}
               width={"45%"}
@@ -367,7 +346,7 @@ export default function DetailTransaksiSeller({ data }) {
       return (
         <PrimaryButton
           title="Berikan Ulasan"
-          onPress={() => console.log("Berikan Ulasan pressed")}
+          onPress={() => Alert.alert("Berikan Ulasan")}
           // disabled={true}
           btnColor="#F9F9F9"
           textColor="#000"
@@ -429,90 +408,91 @@ export default function DetailTransaksiSeller({ data }) {
       })()}
       <ScrollView>
         {status == "pending_payment" ||
-        (status == "waiting_shipment" &&
-          data?.shipment?.trackingNumber != null) ||
-        status == "shipped" ||
-        status == "completed" ? (
-          <>
-            {/* Copas Field */}
-            <View
-              style={{
-                padding: 12,
-                marginHorizontal: 12,
-                backgroundColor: "#EDFBFA",
-                borderRadius: 12,
-              }}>
-              <Text
-                style={{ fontSize: 15, marginBottom: 12, fontWeight: "500" }}>
-                {status == "pending_payment" ? "Virtual Account" : "No Resi"}
-              </Text>
+          (status == "waiting_shipment" &&
+            data?.shipment?.trackingNumber != null) ||
+          status == "shipped" ||
+          (status == "completed" && (
+            <>
+              {/* Copas Field */}
               <View
-                className={`flex-row items-center ${
-                  status == "waiting_shipment" ||
-                  status == "shipped" ||
-                  status == "completed"
-                    ? "mb-3"
-                    : ""
-                }`}>
-                <Text style={{ fontSize: 17, fontWeight: "500" }}>
-                  {status == "pending_payment"
-                    ? data?.virtualAccount || "-"
-                    : data?.shipment?.trackingNumber || "-"}
-                </Text>
-                <TouchableOpacity
-                  onPress={() =>
-                    handleCopy(
-                      status == "pending_payment"
-                        ? data?.virtualAccount || "-"
-                        : data?.shipment?.trackingNumber || "-"
-                    )
-                  }>
-                  <Image
-                    source={require("../../assets/copy.png")}
-                    style={{ marginLeft: 4, width: 17, height: 16 }}
-                  />
-                </TouchableOpacity>
-              </View>
-              {status == "waiting_shipment" ||
-              status == "shipped" ||
-              status == "completed" ? (
+                style={{
+                  padding: 12,
+                  marginHorizontal: 12,
+                  backgroundColor: "#EDFBFA",
+                  borderRadius: 12,
+                }}>
                 <Text
-                  style={{
-                    fontSize: 12,
-                    // marginBottom: 12,
-                    fontWeight: "400",
-                    color: "#616161",
-                  }}>
-                  {data?.shipment?.courier || "-"}
+                  style={{ fontSize: 15, marginBottom: 12, fontWeight: "500" }}>
+                  {status == "pending_payment" ? "Virtual Account" : "No Resi"}
                 </Text>
-              ) : null}
-            </View>
-          </>
-        ) : null}
+                <View
+                  className={`flex-row items-center ${
+                    status == "waiting_shipment" ||
+                    status == "shipped" ||
+                    status == "completed"
+                      ? "mb-3"
+                      : ""
+                  }`}>
+                  <Text style={{ fontSize: 17, fontWeight: "500" }}>
+                    {status == "pending_payment"
+                      ? data?.virtualAccount || "-"
+                      : data?.shipment?.trackingNumber || "-"}
+                  </Text>
+                  <TouchableOpacity
+                    onPress={() =>
+                      handleCopy(
+                        status == "pending_payment"
+                          ? data?.virtualAccount || "-"
+                          : data?.shipment?.trackingNumber || "-"
+                      )
+                    }>
+                    <Image
+                      source={require("../../assets/copy.png")}
+                      style={{ marginLeft: 4, width: 17, height: 16 }}
+                    />
+                  </TouchableOpacity>
+                </View>
+                {status == "waiting_shipment" ||
+                  status == "shipped" ||
+                  (status == "completed" && (
+                    <Text
+                      style={{
+                        fontSize: 12,
+                        // marginBottom: 12,
+                        fontWeight: "400",
+                        color: "#616161",
+                      }}>
+                      {data?.shipment?.courier || "-"}
+                    </Text>
+                  ))}
+              </View>
+            </>
+          ))}
 
         {/* Admin Message (done)*/}
-        {data?.fundReleaseRequest?.status != null || status == "completed" ? (
-          <>
-            <View className="flex-row mx-3 p-3 justify-between items-center gap-3">
-              <Image
-                source={require("../../assets/admin1.png")}
-                style={{
-                  width: 20,
-                  height: 20,
-                }}
-              />
-              <Text className="text-sm flex-1">
-                {status == "completed"
-                  ? "Komplain dianggap tidak ada dan bakal selesai otomatis kalau pembeli nggak respon."
-                  : data?.fundReleaseRequest?.status == "pending"
-                  ? "Tunggu approval kami, ya! Kalau bukti kamu oke, permintaan konfirmasi bakal langsung dikirim ke buyer!"
-                  : data?.fundReleaseRequest?.status == "approved"
-                  ? "Konfirmasi udah dikirim ke buyer! Sekarang tinggal tunggu respon mereka dalam 1 x 24 jam"
-                  : "Permintaan konfirmasi ke buyer ditolak. Pastikan data atau bukti yang kamu kirim sudah lengkap dan sesuai"}
-              </Text>
-            </View>
-          </>
-        ) : null}
+        {data?.fundReleaseRequest?.status != null ||
+          (status == "completed" && (
+            <>
+              <View className="flex-row mx-3 p-3 justify-between items-center gap-3">
+                <Image
+                  source={require("../../assets/admin1.png")}
+                  style={{
+                    width: 20,
+                    height: 20,
+                  }}
+                />
+                <Text className="text-sm flex-1">
+                  {status == "completed"
+                    ? "Komplain dianggap tidak ada dan bakal selesai otomatis kalau pembeli nggak respon."
+                    : data?.fundReleaseRequest?.status == "pending"
+                    ? "Tunggu approval kami, ya! Kalau bukti kamu oke, permintaan konfirmasi bakal langsung dikirim ke buyer!"
+                    : data?.fundReleaseRequest?.status == "approved"
+                    ? "Konfirmasi udah dikirim ke buyer! Sekarang tinggal tunggu respon mereka dalam 1 x 24 jam"
+                    : "Permintaan konfirmasi ke buyer ditolak. Pastikan data atau bukti yang kamu kirim sudah lengkap dan sesuai"}
+                </Text>
+              </View>
+            </>
+          ))}
 
         {/* Status Rekbr (done)*/}
         {data?.fundReleaseRequest?.status == "pending" ||
@@ -532,7 +512,7 @@ export default function DetailTransaksiSeller({ data }) {
               </View>
             </View>
             {/* <View className="flex-col"> */}
-            {isExpanded ? (
+            {isExpanded && (
               <View
                 style={{
                   backgroundColor: "#fff",
@@ -560,7 +540,7 @@ export default function DetailTransaksiSeller({ data }) {
                 </Text>
                 {/* </View> */}
               </View>
-            ) : null}
+            )}
           </View>
         ) : (
           <>
@@ -688,6 +668,20 @@ export default function DetailTransaksiSeller({ data }) {
       <View className="p-3 border-t-2 rounded-t-3xl border-x-2 border-gray-200 drop-shadow-xl items-center">
         {setupFooter()}
       </View>
+
+      {/* Modal */}
+      {showPopup &&
+        (status == "pending_payment" || status == "waiting_shipment") && (
+          <BuyerKonfirmasi
+            onClose={() => setShowPopup(false)}
+            onBtn2={handleCancelTransaksiSeller}
+            onBtn1={() => setShowPopup(false)}
+            title="Apakah kamu yakin ingin membatalkan transaksi Rekbr ini?"
+            btn1="Kembali"
+            btn2="Batalkan"
+            isBatalkan={true}
+          />
+        )}
     </SafeAreaView>
   );
 }

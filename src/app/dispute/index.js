@@ -33,8 +33,7 @@ export default function Dispute() {
           {/* Tombol Back di kiri */}
           <TouchableOpacity
             onPress={() => navigation.goBack()}
-            className="absolute left-0"
-          >
+            className="absolute left-0">
             <ChevronLeft size={24} color="black" />
           </TouchableOpacity>
 
@@ -59,7 +58,7 @@ export default function Dispute() {
 
         {/* Info Email */}
         <Text className="text-lg font-medium text-black mb-3">
-          Diskusi dengan{" "}
+          Diskusi dengan
           <Text className="font-semibold">irgi168@gmail.com</Text>
         </Text>
         <Text className="text-base text-gray-500 mb-4">
@@ -83,8 +82,7 @@ export default function Dispute() {
           {complaints.map((item, index) => (
             <TouchableOpacity
               key={index}
-              className="w-[48%] h-40 bg-white border border-gray-300 rounded-xl px-4 py-10 items-center justify-between"
-            >
+              className="w-[48%] h-40 bg-white border border-gray-300 rounded-xl px-4 py-10 items-center justify-between">
               <Image
                 source={item.icon}
                 className="w-10 h-10"
@@ -100,7 +98,7 @@ export default function Dispute() {
       {/* Footer */}
       <View className="absolute bottom-16 left-0 right-0 items-center">
         <Text className="text-xs text-gray-400">
-          Terdapat kendala?{" "}
+          Terdapat kendala?
           <Text className="text-blue-500 font-medium">
             Silahkan Hubungi Kami
           </Text>

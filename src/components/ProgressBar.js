@@ -26,14 +26,16 @@ const StepProgressBar = ({ currentStep, steps }) => {
                     size={16}
                     color={isFinalStep ? "#4CD964" : "#4CD7D0"}
                   />
-                ) : isActive ? (
-                  <View
-                    style={[
-                      styles.dot,
-                      isFinalStep && { backgroundColor: "#4CD964" },
-                    ]}
-                  />
-                ) : null}
+                ) : (
+                  isActive && (
+                    <View
+                      style={[
+                        styles.dot,
+                        isFinalStep && { backgroundColor: "#4CD964" },
+                      ]}
+                    />
+                  )
+                )}
               </View>
               <Text
                 style={[
