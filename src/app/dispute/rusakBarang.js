@@ -18,6 +18,9 @@ import PrimaryButton from "../../components/PrimaryButton";
 import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system";
 import * as MediaLibrary from "expo-media-library";
+import ProblemDisplay from "../../components/dispute/problemDisplay";
+import ProductCard from "../../components/dispute/productCard";
+import { InputField } from "../../components/dispute/InputField";
 
 export default function DisputeDetail() {
   const navigation = useNavigation();
@@ -121,61 +124,13 @@ export default function DisputeDetail() {
         </View>
 
         {/* Masalah */}
-        <Text className="text-sm font-semibold text-black mb-2">Masalah yang dipilih</Text>
-        <View className="flex-row justify-between items-center bg-white border border-gray-200 rounded-xl px-4 py-3 mb-6 shadow-sm">
-          <View className="flex-row items-center space-x-2">
-            <Image source={require("../../assets/barangrusak.png")} className="w-6 h-6" resizeMode="contain" />
-            <Text className="text-sm font-medium">Barang rusak</Text>
-          </View>
-          <TouchableOpacity>
-            <Text className="text-sm text-blue-500 font-medium">Ganti</Text>
-          </TouchableOpacity>
-        </View>
+        <ProblemDisplay image={require("../../assets/barangrusak.png")} problemType="Barang rusak" />
 
         {/* Info Barang */}
-        <Text className="text-sm font-semibold text-black mb-2">Barang yang belum diterima</Text>
-        <View className="bg-[#EAFBF8] p-4 rounded-xl mb-6 space-y-2">
-          <Text className="font-semibold text-sm text-black">iPhone 13 Pro Max</Text>
-          <Text className="text-xs text-gray-600">RKB - 8080123456789</Text>
-          <View className="flex-row justify-between">
-            <Text className="text-xs text-gray-500">Seller</Text>
-            <Text className="text-xs text-black">irgi168@gmail.com</Text>
-          </View>
-          <View className="flex-row justify-between items-center">
-            <Text className="text-xs text-gray-500">No Resi</Text>
-            <View className="flex-row items-center space-x-1">
-              <ClipboardPaste size={14} color="#999" />
-              <Text className="text-xs text-blue-600 font-medium">JX3474124013</Text>
-            </View>
-          </View>
-          <View className="flex-row justify-between">
-            <Text className="text-xs text-gray-500">Ekspedisi</Text>
-            <Text className="text-xs text-black">J&T Express Indonesia</Text>
-          </View>
-          <View className="flex-row justify-between">
-            <Text className="text-xs text-gray-500">Nominal Rekber</Text>
-            <Text className="text-sm font-semibold text-black">Rp. 8.080.000,00</Text>
-          </View>
-        </View>
+        <ProductCard productName="iPhone 13 Pro Max" idx="RKB - 8080123456789" sellerMail="irgi168@gmail.com" noResi="JX3474124013" expedisi="J&T Express Indonesia" nominal="1000000" />
 
         {/* Alasan */}
-        <Text className="text-sm font-semibold text-black mb-2">Alasan kerusakan (Min. 25 karakter)</Text>
-        <TextInput
-          placeholder="Jelaskan kerusakan barang dan lampirkan foto."
-          placeholderTextColor="#999"
-          multiline
-          numberOfLines={4}
-          style={{
-            backgroundColor: "#fff",
-            borderWidth: 1,
-            borderColor: "#E0E0E0",
-            borderRadius: 12,
-            padding: 12,
-            fontSize: 14,
-            textAlignVertical: "top",
-            marginBottom: 24,
-          }}
-        />
+        <InputField title="Alasan kerusakan" placeholder="Jelaskan kerusakan barang dan lampirkan foto." />
 
         {/* Bukti */}
         <Text className="text-sm font-semibold text-black mb-2">Bukti foto & video</Text>
