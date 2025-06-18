@@ -43,8 +43,8 @@ const AttachmentFilled = ({
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    marginHorizontal: 20,
+    // flex: 1,
+    // marginHorizontal: 20,
   },
   title: {
     marginBottom: 8,

@@ -12,7 +12,9 @@ import PrimaryButton from "../../components/PrimaryButton";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-// import { login } from "../../utils/api/auth";
+import { login } from "../../utils/api/auth";
+import { showToast } from "../../utils";
+import { setAccessToken } from "../../store";
 
 export default function Login() {
   const router = useRouter();
@@ -23,12 +25,41 @@ export default function Login() {
   const [errorMsg, setErrorMsg] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
+  useEffect(() => {
+    // development purposes, remove this in production
+    setEmail("seller@gmail.com");
+    setPassword("pass123");
+  }, []);
 
   const togglePasswordVisibility = () => {
     setIsPasswordVisible(!isPasswordVisible);
   };
 
   const handleLogin = () => {
+    setError(false);
+    if (!email.trim() || !password.trim()) {
+      setErrorMsg("Please enter both email and password.");
+      return;
+    }
+
+    setIsLoading(true);
+
+    // Call the login API
+    login(email, password)
+      .then((res) => {
+        showToast("Login Successful", "Welcome back!");
+        setAccessToken(res?.data?.accessToken);
+        router.replace("/");
+      })
+      .catch((err) => {
+        console.log(err);
+        setError(true);
+        setErrorMsg("Login failed. Please try again.");
+        showToast("Login Failed", err?.message, "error");
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
 
   return (
@@ -103,7 +134,11 @@ export default function Login() {
                 />
               </View>
               <View className="px-5 py-5 w-full">
-                <PrimaryButton title="Masuk" onPress={handleLogin} />
+                <PrimaryButton
+                  title="Masuk"
+                  onPress={handleLogin}
+                  disabled={isLoading}
+                />
               </View>
 
               {/* Registrasi / Hubungi Kami */}

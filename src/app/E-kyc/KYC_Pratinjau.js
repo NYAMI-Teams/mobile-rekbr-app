@@ -19,6 +19,11 @@ export default function Pratinjau() {
   const router = useRouter();
   const [isChecked, setIsChecked] = useState(false);
 
+  const handleSubmitKyc = () => {
+    console.log("KYC submitted");
+    router.replace("/E-kyc/KYC_Success");
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar style="dark" />
@@ -104,7 +109,7 @@ export default function Pratinjau() {
 
         <PrimaryButton
           title="Lanjut"
-          onPress={() => router.push("/E-kyc/KYC_Success")}
+          onPress={handleSubmitKyc}
           disabled={!isChecked}
         />
 

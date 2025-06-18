@@ -11,6 +11,8 @@ export default function InputField({
   secureTextEntry = false,
   keyboardType = 'default',
   className = '',
+  errorText = '',
+  autoCapitalize = 'none',
 }) {
   return (
     <View className={clsx("flex-col mx-5", className)}>
@@ -24,9 +26,12 @@ export default function InputField({
           onChangeText={onChangeText}
           secureTextEntry={secureTextEntry}
           keyboardType={keyboardType}
-          autoCapitalize="none"
+          autoCapitalize={autoCapitalize}
         />
       </View>
+      {errorText ? (
+        <Text style={styles.errorText}>{errorText}</Text>
+      ) : null}
     </View>
   );
 }
@@ -52,5 +57,11 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#333',
 
+  },
+  errorText: { 
+    fontSize: 12,
+    color: 'red',
+    marginTop: 4,
+    marginLeft: 5,
   },
 });

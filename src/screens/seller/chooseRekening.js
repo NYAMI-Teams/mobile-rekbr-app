@@ -20,10 +20,9 @@ import {
 import { useRouter } from "expo-router";
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import BankSelector from "../../components/BankScreens";
-import { mockBank } from "../../services/apiMock/api";
 import { ChevronLeftCircle } from "lucide-react-native";
 import PrimaryButton from "../../components/PrimaryButton";
-import CreateRekber from "../../app/CreateTransaksi/CreateRekbr/index";
+import { getListBankAccount, getAllBankList } from "../../utils/api/seller";
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
 
@@ -36,41 +35,6 @@ if (
 
 const initialFavorites = [];
 
-const initialSaved = [
-  {
-    id: "1",
-    name: "Bayu",
-    bank: "Bank Negara Indonesia",
-    accountNumber: "0900604501",
-    bankLogo: require("../../assets/logo-bni.png"),
-    isFavorite: false,
-  },
-  {
-    id: "2",
-    name: "Zhirazzi",
-    bank: "Bank Negara Indonesia",
-    accountNumber: "0900604502",
-    bankLogo: require("../../assets/logo-bni.png"),
-    isFavorite: false,
-  },
-  {
-    id: "3",
-    name: "Diffa",
-    bank: "Bank Negara Indonesia",
-    accountNumber: "0900604503",
-    bankLogo: require("../../assets/logo-bni.png"),
-    isFavorite: false,
-  },
-  {
-    id: "4",
-    name: "Reynhard",
-    bank: "Bank Negara Indonesia",
-    accountNumber: "0900604504",
-    bankLogo: require("../../assets/logo-bni.png"),
-    isFavorite: false,
-  },
-];
-
 const keys = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "x"]; // The null will be handled in the map function
 
 const formatAccountNumber = (number) => {
@@ -81,8 +45,8 @@ const formatAccountNumber = (number) => {
 export default function PilihRekeningScreen() {
   const router = useRouter();
   const [favorites, setFavorites] = useState(initialFavorites);
-  const [saved, setSaved] = useState(initialSaved);
-
+  const [saved, setSaved] = useState([]);
+  const [bankList, setBankList] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [isSelectBankDone, setIsSelectBankDone] = useState(false);
   const [selectedBank, setSelectedBank] = useState(null);
@@ -90,6 +54,35 @@ export default function PilihRekeningScreen() {
   const [isAlreadyCheckedRekening, setIsAlreadyCheckedRekening] =
     useState(false);
   const slideAnim = useRef(new Animated.Value(250)).current;
+
+  useEffect(() => {
+    fetchBankAccount();
+    fetchBankList();
+  }, []);
+
+  const fetchBankAccount = async () => {
+    try {
+      const res = await getListBankAccount();
+      if (res) {
+        console.log("ini rekening user", res);
+        setSaved(res.data);
+      }
+    } catch (error) {
+      console.log("Error get list bank account:", error);
+    }
+  };
+
+  const fetchBankList = async () => {
+    try {
+      const res = await getAllBankList();
+      if (res) {
+        console.log("ini all bank", res);
+        setBankList(res.data);
+      }
+    } catch (error) {
+      console.log("Error get list bank account:", error);
+    }
+  };
 
   const closeModal = () => {
     setModalVisible(false);
@@ -255,7 +248,6 @@ export default function PilihRekeningScreen() {
             transparent={true}
             visible={modalVisible}
             onRequestClose={() => {
-              Alert.alert("Modal has been closed.");
               closeModal();
             }}
           >
@@ -271,28 +263,27 @@ export default function PilihRekeningScreen() {
                       : isSelectBankDone
                       ? handleBackToBankSelection
                       : closeModal
-                  }
-                >
+                  }>
                   <View className="flex-row items-center mb-6">
                     <ChevronLeftCircle size={24} color="#00C2C2" />
                     <Text className="text-lg font-normal text-gray-800 ml-2">
                       {!isSelectBankDone
                         ? "Pilih Bank Kamu"
                         : !isAlreadyCheckedRekening
-                          ? "Masukan No Rekening Kamu"
-                          : "Rekening Kamu Ditemukan"}
+                        ? "Masukan No Rekening Kamu"
+                        : "Rekening Kamu Ditemukan"}
                     </Text>
                   </View>
                 </Pressable>
 
                 {!isSelectBankDone ? (
                   <BankSelector
-                    banks={mockBank.data}
+                    banks={bankList.data}
                     onSelectBank={(bank) => {
                       setSelectedBank({
                         logoSrc: bank.logoUrl,
                         name: bank.bankName,
-                        bankId: bank.bankId,
+                        bankId: bank.id,
                       });
                       setIsSelectBankDone(true);
                     }}
@@ -484,10 +475,10 @@ const AnimatedAccountItem = ({
       ]}
     >
       <View style={{ flexDirection: "row", alignItems: "center", flex: 1 }}>
-        <Image source={item.bankLogo} style={styles.bankLogo} />
+        <Image source={{ uri: item.bank.logoUrl }} style={styles.bankLogo} />
         <View style={{ marginLeft: 12 }}>
-          <Text style={styles.accountName}>{item.name}</Text>
-          <Text style={styles.bankName}>{item.bank}</Text>
+          <Text style={styles.accountName}>{item.accountHolderName}</Text>
+          <Text style={styles.bankName}>{item.bank.bankName}</Text>
           <Text style={styles.accountNumber}>
             {formatAccountNumber(item.accountNumber)}
           </Text>
