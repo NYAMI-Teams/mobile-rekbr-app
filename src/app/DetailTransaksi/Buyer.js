@@ -13,7 +13,7 @@ export default function BuyerDetail() {
         const res = await getDetailBuyerTransaction(id);
         // console.log(res);
         setDetailTransaction(res.data);
-        console.log("Berhasil get detail transaction buyer");
+        // console.log("Berhasil get detail transaction buyer");
       } catch (err) {
         console.error("Error fetching buyer transaction details:", err);
       } finally {
