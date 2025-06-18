@@ -15,7 +15,6 @@ import { getSellerTransactions } from "../../utils/api/seller";
 import { getProfile } from "../../utils/api/auth";
 import { getAccessToken, removeAccessToken } from "../../store";
 import { showToast } from "../../utils";
-import Toast from "react-native-toast-message";
 
 export default function Seller() {
   const router = useRouter();
@@ -98,11 +97,11 @@ export default function Seller() {
           <NavigationBar
             name={profile?.email}
             onNotificationPress={() =>
-              Toast.show({
-                type: "success",
-                text1: "Notification pressed",
-                position: "top",
-              })
+              showToast(
+                "Notification pressed",
+                "Notification pressed",
+                "success"
+              )
             }
             onLogoutPress={() => handleLogout()}
           />

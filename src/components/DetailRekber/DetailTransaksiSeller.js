@@ -1,4 +1,3 @@
-import { StatusBar } from "expo-status-bar";
 import {
   StyleSheet,
   View,
@@ -14,12 +13,12 @@ import { Ionicons } from "@expo/vector-icons";
 import ProgressBar from "../ProgressBar";
 import Timestamp from "./Timestamp";
 import * as Clipboard from "expo-clipboard";
-import Toast from "react-native-toast-message";
 import PrimaryButton from "../PrimaryButton";
 import Tagihan from "./Tagihan";
 import { useRouter } from "expo-router";
 import { cancelTransaksiSeller } from "../../utils/api/seller";
 import BuyerKonfirmasi from "../BuyerKonfirmasi";
+import { showToast } from "../../utils";
 
 export default function DetailTransaksiSeller({ data }) {
   const status = data?.status || "";
@@ -40,7 +39,6 @@ export default function DetailTransaksiSeller({ data }) {
   };
 
   const handleCopy = async (text) => {
-    // belum bisa jalan toastnya
     if (!text) return;
     try {
       await Clipboard.setStringAsync(text);

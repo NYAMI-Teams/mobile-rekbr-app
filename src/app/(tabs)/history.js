@@ -6,7 +6,6 @@ import { useState, useEffect } from "react";
 import { getProfile } from "../../utils/api/auth";
 import { getAccessToken, removeAccessToken } from "../../store";
 import { showToast } from "../../utils";
-import Toast from "react-native-toast-message";
 import { useRouter } from "expo-router";
 
 export default function Home() {
@@ -45,11 +44,7 @@ export default function Home() {
       await removeAccessToken();
       router.replace("Onboarding");
     } catch (err) {
-      showToast(
-        "Logout Gagal",
-        "Gagal logout. Silahkan coba lagi.",
-        "error"
-      );
+      showToast("Logout Gagal", "Gagal logout. Silahkan coba lagi.", "error");
     }
   };
 
@@ -60,11 +55,7 @@ export default function Home() {
         <NavigationBar
           name={profile?.email}
           onNotificationPress={() =>
-            Toast.show({
-              type: "success",
-              text1: "Notification pressed",
-              position: "top",
-            })
+            showToast("Notification pressed", "Notification pressed", "success")
           }
           onLogoutPress={() => handleLogout()}
         />

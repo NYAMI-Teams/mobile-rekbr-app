@@ -12,7 +12,6 @@ import { Ionicons } from "@expo/vector-icons";
 import ProgressBar from "../ProgressBar";
 import Timestamp from "./Timestamp";
 import * as Clipboard from "expo-clipboard";
-import Toast from "react-native-toast-message";
 import PrimaryButton from "../PrimaryButton";
 import Tagihan from "./Tagihan";
 import { useRouter } from "expo-router";

@@ -29,7 +29,7 @@ export default function TransactionSummaryScreen({ payload, bankData }) {
     setIsLoading(true);
     try {
       await sellerCreateTransaction(payload);
-      showToast("Berhasil", "Transaksi berhasil dibuat");
+      showToast("Berhasil", "Transaksi berhasil dibuat", "success");
       router.replace("/");
     } catch (error) {
       showToast(

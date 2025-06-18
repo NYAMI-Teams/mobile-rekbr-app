@@ -21,7 +21,6 @@ import { ChevronLeftCircle } from "lucide-react-native";
 import BuyerKonfirmasi from "../components/BuyerKonfirmasi";
 import { postResi } from "../utils/api/seller";
 import { getListCourier } from "../utils/api/seller";
-import Toast from "react-native-toast-message";
 import * as ImagePicker from "expo-image-picker";
 import * as ImageManipulator from "expo-image-manipulator";
 import { showToast } from "../utils";
