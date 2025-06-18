@@ -42,6 +42,17 @@ export const verifyEmail = async (email, otpCode) => {
     }
 }
 
+export const verifyKyc = async () => {
+    try {
+        const res = await Api.post(`/user/verify-kyc`);
+        if (res) {
+            return res;
+        }
+    } catch (error) {
+        throw error;
+    }
+}
+
 export const getProfile = async () => {
     try {
         const res = await Api.get(`/user/profile`);
@@ -52,4 +63,5 @@ export const getProfile = async () => {
         throw error;
     }
 }
+
 

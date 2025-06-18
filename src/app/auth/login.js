@@ -35,31 +35,26 @@ export default function Login() {
     setIsPasswordVisible(!isPasswordVisible);
   };
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     setError(false);
     if (!email.trim() || !password.trim()) {
       setErrorMsg("Please enter both email and password.");
       return;
     }
-
     setIsLoading(true);
-
-    // Call the login API
-    login(email, password)
-      .then((res) => {
-        showToast("Login Successful", "Welcome back!");
-        setAccessToken(res?.data?.accessToken);
-        router.replace("/");
-      })
-      .catch((err) => {
-        console.log(err);
-        setError(true);
-        setErrorMsg("Login failed. Please try again.");
-        showToast("Login Failed", err?.message, "error");
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
+    try {
+      const res = await login(email, password);
+      showToast("Login Successful", "Welcome back!");
+      await setAccessToken(res?.data?.accessToken);
+      router.replace("/");
+    } catch (err) {
+      console.log(err);
+      setError(true);
+      setErrorMsg("Login failed. Please try again.");
+      showToast("Login Failed", err?.message, "error");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
