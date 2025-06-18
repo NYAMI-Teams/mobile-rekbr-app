@@ -7,30 +7,13 @@ import clsx from "clsx";
 import CountdownTimer from "../Countdown";
 import { useRouter } from "expo-router";
 
-const parseDate = (date) => {
-  if (!date) return null;
-  // Try different formats
-  const formats = [
-    "YYYY-MM-DD HH:mm:ss",
-    "YYYY-MM-DD",
-    "MM/DD/YYYY",
-    "DD/MM/YYYY",
-  ];
-  for (const format of formats) {
-    const parsed = moment(date, format, true);
-    if (parsed.isValid()) return parsed;
-  }
-  return null;
-};
-
 const SellerCard = ({ data }) => {
   const status = data?.status || "";
   const router = useRouter();
 
   const formatDateWIB = (dateTime) => {
-    const parsedDate = parseDate(dateTime);
-    if (!parsedDate) return "Invalid date";
-    return parsedDate.utcOffset(0).format("DD MMMM YYYY, HH:mm [WIB]");
+    if (!dateTime) return "Invalid date";
+    return moment(dateTime).utcOffset(0).format("DD MMMM YYYY, HH:mm [WIB]");
   };
 
   const handleCopy = async (text) => {
