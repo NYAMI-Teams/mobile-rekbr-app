@@ -19,7 +19,6 @@ export default function BuyerDetail() {
           "Gagal mengambil data transaksi. Silahkan coba lagi.",
           "error"
         );
-      } finally {
       }
     };
 

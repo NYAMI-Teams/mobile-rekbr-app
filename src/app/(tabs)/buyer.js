@@ -40,7 +40,6 @@ export default function Home() {
         "Gagal mengambil data transaksi. Silahkan coba lagi.",
         "error"
       );
-    } finally {
     }
   };
 

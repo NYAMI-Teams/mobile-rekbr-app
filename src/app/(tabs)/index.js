@@ -46,7 +46,6 @@ export default function Seller() {
         "Gagal mengambil data transaksi. Silahkan coba lagi.",
         "error"
       );
-    } finally {
     }
   };
 
