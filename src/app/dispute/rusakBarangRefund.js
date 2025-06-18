@@ -38,35 +38,81 @@ export default function DetailKomplain() {
 
         {/* Stepper */}
         <StepProgressBar
-          currentStep={0}
+          currentStep={2}
           steps={["Menunggu", "Kembaliin", "Refund", "Selesai"]}
         />
 
         {/* Alert Info */}
-        <InfoBanner
+        {/* <InfoBanner
           contentBefore="Jika seller nggak respon sampai "
           dateTime="18 Juni 2025, 10 : 00 WIB"
           contentAfter="pengajuanmu bakal otomatis disetujui ya!"
-        />
+        /> */}
 
         {/* Status Komplain */}
-        <StatusKomplain status="Menunggu" />
+        <StatusKomplain status="Menunggu Refund Dana" />
 
         {/* Pengajuan */}
         <TrackDispute
-          title="Pengajuan komplain buyer"
-          dateTime="16 Juni 2025, 10:00 WIB"
-          details={[
+          title="Konfirmasi seller barang diterima"
+          dateTime="22 Juni 2025, 10:00 WIB"
+        />
+        <TrackDispute
+          title="Admin meneruskan permintaan konfirmasi"
+          dateTime="20 Juni 2025, 10:00 WIB"
+        />
+         <TrackDispute
+          title="Permintaan konfirmasi buyer"
+          dateTime="21 Juni 2025, 10:00 WIB"
+        details={[
             {
               content:
-                "Buyer mau ngembaliin barang yang bermasalah. Dana rekber bakal dikembalikan setelah komplain disetujui, ya!",
+                "Melalui resi harusnya barang sudah sampai di seller",
+            },
+            {
+              imgTitle: "Bukti foto & video",
+                images: [require("../../assets/barangrusak.png")]
+            },
+          ]}
+          />
+          <TrackDispute
+          title="Refund barang oleh buyer"
+          dateTime="20 Juni 2025, 10:00 WIB"
+        />
+        <CopyField title="No Resi Refund" content="J X 3 4 7 4 1 2 4 0 1 3" />
+        <TextView title="Ekspedisi" content="J&T Express Indonesia" />
+        <TrackDispute
+          title="Persetujuan komplain seller"
+          dateTime="19 Juni 2025, 10:00 WIB"
+        details={[
+            {
+              content:
+                "Seller setuju untuk Refund dana pada barang yang bermasalah.",
+            },
+            {
+              imgTitle: "Bukti foto & video",
+                images: [require("../../assets/barangrusak.png")]
+            },
+          ]}
+          />
+          <TrackDispute
+          title="Persetujuan komplain buyer"
+          dateTime="16 Juni 2025, 10:00 WIB"
+        details={[
+            {
+              content:
+                "Buyer mau ngembaliin barang yang bermasalah. Barang yg bermasalah bakalan diganti yang baru.",
             },
             {
               content:
                 "Layar barang pecah di bagian tengah dan ada goresan dalam di sisi kiri.",
             },
+            {
+              imgTitle: "Bukti foto & video",
+                images: [require("../../assets/barangrusak.png")]
+            },
           ]}
-        />
+          />
 
         {/* Data Seller & Transaksi */}
         <TextView title="Seller" content="zhirazzi@gmail.com" />
@@ -78,56 +124,7 @@ export default function DetailKomplain() {
         <CopyField title="Virtual Account" content="8 0 8 0 1 2 3 4 5 6 7 8 9" />
       </ScrollView>
 
-      {/* Footer */}
-      <View className="flex-row items-center px-4 py-3 border-t border-gray-100 bg-white">
-        {/* Tombol titik tiga horizontal */}
-        <TouchableOpacity
-          onPress={() => setShowOptionModal(true)}
-          className="h-11 w-16 bg-white rounded-xl border border-black items-center justify-center"
-        >
-          <Text className="text-black text-[20px] font-semibold">⋯</Text>
-        </TouchableOpacity>
-
-        {/* Tombol utama */}
-        <TouchableOpacity className="flex-1 ml-2 h-11 bg-black rounded-xl items-center justify-center">
-          <Text className="text-white font-semibold text-sm">
-            Kirim Seller Email
-          </Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Modal Slide Popup - Lainnya */}
-      <Modal
-        visible={showOptionModal}
-        transparent
-        animationType="slide"
-        onRequestClose={() => setShowOptionModal(false)}
-      >
-        <TouchableWithoutFeedback onPress={() => setShowOptionModal(false)}>
-          <View className="flex-1 bg-black/40" />
-        </TouchableWithoutFeedback>
-
-        <View className="bg-white rounded-t-3xl pt-3 pb-8 px-6">
-          {/* Drag handle */}
-          <View className="w-10 h-1.5 bg-gray-300 rounded-full self-center mb-5" />
-
-          <Text className="text-base font-semibold text-black mb-4">
-            Lainnya
-          </Text>
-
-          <TouchableOpacity className="mb-4">
-            <Text className="text-sm font-medium text-black">
-              Ubah Detail Komplain
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity>
-            <Text className="text-sm font-medium text-black">
-              Batalkan Komplain
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </Modal>
+     
     </SafeAreaView>
   );
 }
