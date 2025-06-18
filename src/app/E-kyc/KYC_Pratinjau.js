@@ -14,10 +14,25 @@ import ProgressBar from "../../components/ProgressBar";
 import PrimaryButton from "../../components/PrimaryButton";
 import DropDownField from "../../components/DropDownField";
 import { useRouter } from "expo-router";
+import { verifyKyc } from "../../utils/api/auth";
+import { showToast } from "../../utils";
 
 export default function Pratinjau() {
   const router = useRouter();
   const [isChecked, setIsChecked] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubmitKyc = async () => {
+    setIsLoading(true);
+    try {
+      await verifyKyc();
+      router.replace("/E-kyc/KYC_Success");
+    } catch (error) {
+      showToast("KYC Submission Failed", error?.message, "error");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -104,8 +119,8 @@ export default function Pratinjau() {
 
         <PrimaryButton
           title="Lanjut"
-          onPress={() => router.push("/E-kyc/KYC_Success")}
-          disabled={!isChecked}
+          onPress={handleSubmitKyc}
+          disabled={!isChecked || isLoading}
         />
 
         <View style={styles.footer}>

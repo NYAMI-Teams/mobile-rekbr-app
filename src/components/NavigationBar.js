@@ -3,19 +3,32 @@ import React from "react";
 import {
   View,
   Text,
+  SafeAreaView,
   Image,
   TouchableOpacity,
   StyleSheet,
   Platform,
   StatusBar,
-  SafeAreaView,
 } from "react-native";
+import Modal from "react-native-modal";
+import { useState } from "react";
+import { Pressable } from "react-native";
 
 export default function NavigationBar({
   name,
   onNotificationPress,
-  onProfilePress,
+  onLogoutPress,
 }) {
+  const [showPopup, setShowPopup] = useState(false);
+
+  const handleEdit = () => {
+    setShowPopup(true);
+  };
+
+  const handleCancel = () => {
+    setShowPopup(false);
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
@@ -52,9 +65,7 @@ export default function NavigationBar({
             <Text style={styles.actionText}>Notifikasi</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.actionButton}
-            onPress={onProfilePress}>
+          <TouchableOpacity style={styles.actionButton} onPress={handleEdit}>
             <Image
               source={require("../assets/icon-profile.png")}
               style={styles.actionIcon}
@@ -64,6 +75,53 @@ export default function NavigationBar({
           </TouchableOpacity>
         </View>
       </View>
+
+      {/* Modal */}
+      {showPopup && (
+        <Modal
+          visible={showPopup}
+          transparent
+          animationType="slide"
+          onRequestClose={() => setShowPopup(false)}
+          style={{ margin: 0, padding: 0 }}>
+          {/* <SafeAreaView className="flex-1"> */}
+          <Pressable
+            className="flex-1 bg-black/40 justify-end"
+            onPress={() => setShowPopup(false)}>
+            <Pressable
+              className="bg-white rounded-t-2xl px-5"
+              style={{
+                height: "30%",
+                width: "100%",
+                position: "absolute",
+                bottom: 0,
+                left: 0,
+                right: 0,
+              }}
+              onPress={() => {}}>
+              <View className="flex-col justify-center p-4">
+                <Text className="text-lg font-semibold mb-8">Atur Profile</Text>
+                <TouchableOpacity onPress={handleEdit} className="mb-4">
+                  <Text className="text-black text-base font-medium mb-6">
+                    Ubah Password
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={handleEdit} className="mb-4">
+                  <Text className="text-black text-base font-medium mb-6">
+                    Ubah Email
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={onLogoutPress} className="mb-10">
+                  <Text className="text-red-500 text-base font-medium">
+                    Keluar
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </Pressable>
+          </Pressable>
+          {/* </SafeAreaView> */}
+        </Modal>
+      )}
     </SafeAreaView>
   );
 }

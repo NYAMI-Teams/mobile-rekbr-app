@@ -1,4 +1,4 @@
-import { View, ScrollView } from "react-native";
+import { View, ScrollView, StatusBar } from "react-native";
 import { useRouter } from "expo-router";
 import PrimaryButton from "../../components/PrimaryButton";
 import SellerEmptyContent from "../../screens/seller/homeScreen";

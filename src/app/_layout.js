@@ -1,24 +1,68 @@
 import { Stack } from "expo-router";
 import "../../global.css";
 import { useEffect, useState } from "react";
-import { GestureHandlerRootView } from "react-native-gesture-handler"; // Tambahkan ini
+import Toast from "react-native-toast-message";
+import { getProfile } from "../utils/api/auth";
+import { showToast } from "../utils";
+import { getAccessToken, setProfileStore } from "../store";
+import SplashScreen from "../assets/splash.png";
+import { Image, View } from "react-native";
 
 export default function RootLayout() {
-  const [isLoggedIn, setIsLoggedIn] = useState(true); // sementara true
+  const [appIsReady, setAppIsReady] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    // cek token login valid atau tidak
+    const checkAuth = async () => {
+      try {
+        const token = await getAccessToken();
+        if (!token) {
+          setIsLoggedIn(false);
+          return;
+        }
+        const res = await getProfile();
+        setProfileStore(res.data);
+        setIsLoggedIn(true);
+      } catch (error) {
+        if (!error.includes("Error getting access token")) {
+          // showToast("Error", "Failed to fetch profile. Please try again later.", "error");
+        }
+        setIsLoggedIn(false);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    const splashTimeout = async() => {
+      await new Promise(resolve => setTimeout(resolve, 3000)); 
+      setAppIsReady(true);
+    }
+    splashTimeout();
+    checkAuth();
   }, []);
 
+  if (!appIsReady || isLoading) {
+    return (
+      <View className="flex-1 bg-white justify-center items-center">
+        <Image
+          source={SplashScreen}
+          className="w-full h-full"
+        />
+      </View>
+    );
+  }
+
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
+    <>
       <Stack screenOptions={{ headerShown: false }}>
         {isLoggedIn ? (
           <Stack.Screen name="(tabs)" />
         ) : (
-          <Stack.Screen name="auth/login" />
+          <Stack.Screen name="Onboarding/index" />
         )}
       </Stack>
-    </GestureHandlerRootView>
+      <Toast />
+    </>
   );
 }

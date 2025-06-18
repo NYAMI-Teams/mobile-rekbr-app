@@ -14,14 +14,18 @@ import Icon from "react-native-vector-icons/Ionicons";
 import { PinInput } from "@pakenfit/react-native-pin-input";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
+import { verifyEmail, resendVerifyEmail } from "../utils/api/auth";
+import { showToast } from "../utils";
+import { setAccessToken } from "../store";
 
-export default function OTPScreen() {
+export default function OTPScreen({ email }) {
   const router = useRouter();
   const [timeLeft, setTimeLeft] = useState(299);
   const [isError, setIsError] = useState(false);
   const [isValid, setIsValid] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const inputRefs = useRef([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (timeLeft > 0) {
@@ -41,31 +45,33 @@ export default function OTPScreen() {
   const handleResendCode = () => {
     setTimeLeft(299);
     inputRefs[0]?.focus();
+    resendVerifyEmail(email)
+      .then((res) => {
+        showToast("Success", res?.message);
+      })
+      .catch((error) => {
+        showToast("Error", error?.message);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
 
   const submitOtp = (otpValue) => {
-    try {
-      console.log("Submitting OTP:", otpValue);
-      // Simulasi validasi OTP
-      setTimeout(() => {
-        if (otpValue === "123456") {
-          setIsError(false);
-          setIsValid(true);
-          setTimeLeft(0);
-          setErrorMessage("");
-          console.log("OTP valid!");
-          // Navigasi atau aksi selanjutnya
-          router.push("/auth/SuccessLogin");
-        } else {
-          setIsError(true);
-          setErrorMessage("Kode OTP yang Anda masukkan salah.");
-        }
-      }, 1000);
-    } catch (error) {
-      console.error("Error submitting OTP:", error);
-      setIsError(true);
-      setErrorMessage("Terjadi kesalahan saat memverifikasi OTP");
-    }
+    setIsLoading(true);
+    verifyEmail(email, otpValue)
+      .then((res) => {
+        showToast("Welcome", res?.message);
+        setAccessToken(res?.data?.accessToken);
+        router.replace("/auth/SuccessLogin");
+      })
+      .catch((error) => {
+        setIsError(true);
+        setErrorMessage("Kode OTP yang Anda masukkan salah.");
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
 
   return (
@@ -90,7 +96,7 @@ export default function OTPScreen() {
             </Text>
             <Text style={styles.emailInfo}>
               Sudah dikirim ke email kamu{" "}
-              <Text style={styles.email}>irgi168@gmail.com</Text>
+              <Text style={styles.email}>{email}</Text>
             </Text>
 
             {/* OTP Input */}

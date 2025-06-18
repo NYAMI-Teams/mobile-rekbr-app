@@ -7,10 +7,26 @@ import moment from "moment";
 import clsx from "clsx";
 import CountdownTimer from "../Countdown";
 import { useRouter } from "expo-router";
+import { buyerConfirmReceivedTransaction } from "../../utils/api/buyer";
+import BuyerKonfirmasi from "../BuyerKonfirmasi";
 
 const BuyerCard = ({ data }) => {
+  const [showPopup, setShowPopup] = useState(false);
+  const formatDateWIB = (dateTime) => {
+    if (!dateTime) return "Invalid date";
+    return moment(dateTime).utcOffset(0).format("DD MMMM YYYY, HH:mm [WIB]");
+  };
   const router = useRouter();
-  const status = data.status;
+  const status = data?.status;
+
+  const handleConfirmReceived = async () => {
+    try {
+      const res = await buyerConfirmReceivedTransaction(data?.id);
+      setShowPopup(false);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const handleCopy = async (text) => {
     // belum bisa jalan toastnya
@@ -39,37 +55,54 @@ const BuyerCard = ({ data }) => {
     switch (status) {
       case "pending_payment":
         return [
-          { label: "Nama Produk", value: data.itemName },
-          { label: "Penjual", value: data.sellerEmail },
-          { label: "VA Number", value: data.virtualAccount, copyable: true },
+          { label: "Nama Produk", value: data?.itemName || "-" },
+          { label: "Penjual", value: data?.sellerEmail || "-" },
+          {
+            label: "Nomor VA",
+            value: data?.virtualAccount || "-",
+            copyable: true,
+          },
         ];
       case "waiting_shipment":
         return [
-          { label: "Nama Produk", value: data.itemName },
-          { label: "Penjual", value: data.sellerEmail },
+          { label: "Nama Produk", value: data?.itemName || "-" },
+          { label: "Penjual", value: data?.sellerEmail || "-" },
           { label: "Nomor Resi", value: "waiting_seller" },
         ];
       case "shipped":
         return [
-          { label: "Nama Produk", value: data.itemName },
-          { label: "Penjual", value: data.sellerEmail },
+          { label: "Nama Produk", value: data?.itemName || "-" },
+          { label: "Penjual", value: data?.sellerEmail || "-" },
           {
             label: "Nomor Resi",
-            value: data.shipment.trackingNumber,
+            value: data?.shipment?.trackingNumber || "-",
             copyable: true,
           },
-          { label: "Ekspedisi", value: data.shipment.courier },
+          { label: "Ekspedisi", value: data?.shipment?.courier || "-" },
         ];
       case "completed":
         return [
-          { label: "Nama Produk", value: data.itemName },
-          { label: "Penjual", value: data.sellerEmail },
+          { label: "Nama Produk", value: data?.itemName || "-" },
+          { label: "Penjual", value: data?.sellerEmail || "-" },
           {
             label: "Nomor Resi",
-            value: data.shipment.trackingNumber,
+            value: data?.shipment?.trackingNumber || "-",
             copyable: true,
           },
-          { label: "Ekspedisi", value: data.shipment.courier },
+          { label: "Ekspedisi", value: data?.shipment?.courier || "-" },
+        ];
+      case "canceled":
+        return [
+          { label: "Nama Produk", value: data?.itemName || "-" },
+          { label: "Penjual", value: data?.sellerEmail || "-" },
+          {
+            label: data?.shipmentDeadline == null ? "Nomor VA" : "Nomor Resi",
+            value:
+              data?.shipmentDeadline == null
+                ? data?.virtualAccount
+                : data?.shipment?.trackingNumber || "waiting_seller",
+            copyable: true,
+          },
         ];
       default:
         return [];
@@ -86,6 +119,8 @@ const BuyerCard = ({ data }) => {
         return "Dalam Pengiriman";
       case "completed":
         return "Barang Diterima";
+      case "canceled":
+        return "Dibatalkan";
       default:
         return "";
     }
@@ -98,8 +133,8 @@ const BuyerCard = ({ data }) => {
           <Text className="font-poppins-semibold text-xs text-gray-800">
             {/* Replace this with dynamic countdown logic */}
             <CountdownTimer
-              deadline={data.paymentDeadline}
-              fromTime={data.createdAt}
+              deadline={data?.paymentDeadline || "-"}
+              fromTime={data?.currentTimestamp || "-"}
             />
           </Text>
         </View>
@@ -110,7 +145,7 @@ const BuyerCard = ({ data }) => {
       return (
         <View className="bg-yellow-100 px-3 py-1 rounded-full">
           <Text className="font-poppins-semibold text-xs text-gray-800">
-            {formatDateWIB(data.resiDeadline)}
+            {formatDateWIB(data?.shipmentDeadline || "-")}
           </Text>
         </View>
       );
@@ -118,16 +153,16 @@ const BuyerCard = ({ data }) => {
 
     if (status === "shipped") {
       if (
-        data.fundReleaseRequest.requested &&
-        data.fundReleaseRequest.status === "approved"
+        data?.fundReleaseRequest?.requested &&
+        data?.fundReleaseRequest?.status === "approved"
       ) {
         return (
           <View className="bg-yellow-100 px-3 py-1 rounded-full">
             <Text className="font-poppins-semibold text-xs text-gray-800">
               {/* Replace this with actual countdown (e.g., 24 jam mundur dari requestAt) */}
               <CountdownTimer
-                deadline={data.buyerConfirmDeadline}
-                fromTime={data.fundReleaseRequest.resolvedAt}
+                deadline={data?.buyerConfirmDeadline || "-"}
+                fromTime={data?.fundReleaseRequest?.resolvedAt || "-"}
               />
             </Text>
           </View>
@@ -135,7 +170,7 @@ const BuyerCard = ({ data }) => {
       } else {
         return (
           <TouchableOpacity
-            onPress={data.onConfirmReceived}
+            onPress={() => setShowPopup(true)}
             className="bg-black px-3 py-1 rounded-full">
             <Text className="font-poppins-semibold text-xs text-white">
               Barang Diterima
@@ -149,7 +184,21 @@ const BuyerCard = ({ data }) => {
       return (
         <View className="px-3 py-1 rounded-full">
           <Text className="font-poppins-semibold text-xs text-gray-800">
-            {formatDateWIB(data.buyerConfirmedAt)}
+            {formatDateWIB(data?.buyerConfirmedAt || "-")}
+          </Text>
+        </View>
+      );
+    }
+
+    if (status === "canceled") {
+      return (
+        <View className="px-3 py-1 rounded-full">
+          <Text className="font-poppins-semibold text-xs text-gray-800">
+            {formatDateWIB(
+              data?.shipmentDeadline == null
+                ? data?.paymentDeadline
+                : data?.shipmentDeadline || "-"
+            )}
           </Text>
         </View>
       );
@@ -158,13 +207,16 @@ const BuyerCard = ({ data }) => {
     return null;
   };
 
-  // Format waktu jadi: 11 Juni 2025, 17:00 WIB
-  const formatDateWIB = (datetime) => {
-    return moment(datetime).utcOffset(-7).format("DD MMMM YYYY, HH:mm [WIB]");
-  };
-
   return (
-    <TouchableOpacity onPress={() => router.push("/DetailTransaksi/Buyer")}>
+    <TouchableOpacity
+      onPress={() =>
+        router.push({
+          pathname: "/DetailTransaksi/Buyer",
+          params: {
+            id: data?.id,
+          },
+        })
+      }>
       <View className="border border-gray-200 rounded-lg overflow-hidden my-2 w-full bg-white">
         {/* Detail Section */}
         <View className="p-3">
@@ -187,16 +239,18 @@ const BuyerCard = ({ data }) => {
                     ? "Resi belum diberikan seller"
                     : row.value || "-"}
                 </Text>
-                {row.copyable && !!row.value && (
-                  <Pressable
-                    onPress={() => handleCopy(row.value)}
-                    className="p-1 rounded-full">
-                    <Image
-                      source={require("../../assets/copy.png")}
-                      className="w-4 h-4 opacity-70"
-                    />
-                  </Pressable>
-                )}
+                {row.copyable &&
+                  !!row.value &&
+                  row.value !== "waiting_seller" && (
+                    <Pressable
+                      onPress={() => handleCopy(row.value)}
+                      className="p-1 rounded-full">
+                      <Image
+                        source={require("../../assets/copy.png")}
+                        className="w-4 h-4 opacity-70"
+                      />
+                    </Pressable>
+                  )}
               </View>
             </View>
           ))}
@@ -206,7 +260,7 @@ const BuyerCard = ({ data }) => {
         <View className="bg-gray-100 border-t border-gray-200 p-3">
           {/* Admin Message */}
           {status === "shipped" &&
-            data.fundReleaseRequest.status === "approved" && (
+            data?.fundReleaseRequest?.status === "approved" && (
               <View className="flex-row gap-1 mb-3">
                 <Image
                   source={require("../../assets/admin1.png")}
@@ -225,7 +279,11 @@ const BuyerCard = ({ data }) => {
               <View
                 className={clsx(
                   "w-2 h-2 rounded-full mr-2",
-                  status === "completed" ? "bg-green-400" : "bg-yellow-400"
+                  status === "completed"
+                    ? "bg-green-400"
+                    : status === "canceled"
+                    ? "bg-red-400"
+                    : "bg-yellow-400"
                 )}
               />
               <Text className="font-poppins text-xs text-gray-800">
@@ -236,6 +294,16 @@ const BuyerCard = ({ data }) => {
           </View>
         </View>
       </View>
+      {showPopup && (
+        <BuyerKonfirmasi
+          onClose={() => setShowPopup(false)}
+          onBtn2={handleConfirmReceived}
+          onBtn1={() => setShowPopup(false)}
+          title="Pastikan semua data di form sudah benar dan lengkap sebelum kamu kirim. Cek lagi, ya!"
+          btn1="Kembali"
+          btn2="Konfirmasi"
+        />
+      )}
     </TouchableOpacity>
   );
 };

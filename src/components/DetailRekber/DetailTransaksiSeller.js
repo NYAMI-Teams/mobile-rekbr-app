@@ -16,9 +16,38 @@ import * as Clipboard from "expo-clipboard";
 import Toast from "react-native-toast-message";
 import PrimaryButton from "../PrimaryButton";
 import Tagihan from "./Tagihan";
+import { useRouter } from "expo-router";
+import { cancelTransaksiSeller } from "../../utils/api/seller";
 
 export default function DetailTransaksiSeller({ data }) {
+  const status = data?.status || "";
+  const router = useRouter();
   const [isExpanded, setIsExpanded] = useState(false);
+
+  const handleCancelTransaksiSeller = async () => {
+    try {
+      const res = await cancelTransaksiSeller(data?.id);
+      if (res) {
+        console.log(res);
+        Toast.show({
+          type: "success",
+          text1: "Berhasil",
+          text2: "Transaksi berhasil dibatalkan",
+          position: "top",
+        });
+        router.replace("/");
+      }
+    } catch (error) {
+      console.log(error);
+      Toast.show({
+        type: "error",
+        text1: "Gagal",
+        text2: "Transaksi gagal dibatalkan",
+        position: "top",
+      });
+    }
+  };
+
   const handleCopy = async (text) => {
     // belum bisa jalan toastnya
     if (!text) return;
@@ -28,7 +57,7 @@ export default function DetailTransaksiSeller({ data }) {
         type: "success",
         text1: "Berhasil",
         text2: "Disalin ke clipboard",
-        position: "bottom",
+        position: "top",
       });
       console.log("Copied to clipboard:", text);
     } catch (error) {
@@ -36,131 +65,150 @@ export default function DetailTransaksiSeller({ data }) {
         type: "error",
         text1: "Gagal",
         text2: "Tidak dapat menyalin",
-        position: "bottom",
+        position: "top",
       });
       console.log("Failed to copy to clipboard:", error);
     }
   };
 
   const setupStatus = () => {
-    if (data.status == "pending_payment") {
+    if (status == "pending_payment") {
       return "Menunggu Pembayaran";
     }
-    if (data.status == "waiting_shipment") {
+    if (status == "waiting_shipment") {
       return "Masukkan Resi";
     }
-    if (data.status == "shipped") {
+    if (status == "shipped") {
       return "Dalam Pengiriman";
     }
-    if (data.status == "completed") {
+    if (status == "completed") {
       return "Barang Diterima";
     }
-    if (data.status == "refunded") {
+    if (status == "refunded") {
       return "Dikembalikan";
     }
-    if (data.status == "cancelled") {
+    if (status == "canceled") {
       return "Dibatalkan";
-    }
-    if (data.status == "dispute") {
-      return "Barang Terkendala";
     }
   };
 
   const setupDetailTimestamp = () => {
-    if (data.status == "pending_payment") {
+    if (status == "pending_payment") {
       return [
         {
           status: "Waktu bikin Rekbr",
-          date: data.createdAt,
+          date: data?.createdAt || "-",
         },
       ];
     }
-    if (data.status == "waiting_shipment") {
+    if (status == "waiting_shipment") {
       return [
         {
           status: "Waktu bikin Rekbr",
-          date: data.createdAt,
+          date: data?.createdAt || "-",
         },
         {
           status: "Waktu pembeli Bayar",
-          date: data.paidAt,
+          date: data?.paidAt || "-",
         },
       ];
     }
-    if (data.status == "shipped") {
-      if (data.fundReleaseRequest.status == "approved") {
+    if (status == "shipped") {
+      if (data?.fundReleaseRequest?.status == "approved") {
         return [
           {
             status: "Waktu bikin Rekbr",
-            date: data.createdAt,
+            date: data?.createdAt || "-",
           },
           {
             status: "Waktu pembeli Bayar",
-            date: data.paidAt,
+            date: data?.paidAt || "-",
           },
           {
-            status: "Waktu pembeli mengirimkan barang",
-            date: data.shipmentDate,
+            status: "Waktu penjual mengirimkan barang",
+            date: data?.shipment.shipmentDate || "-",
           },
           {
             status: "Waktu penjual meminta konfirmasi pembeli",
-            date: data.fundReleaseRequest.requestedAt,
+            date: data?.fundReleaseRequest?.requestedAt || "-",
           },
           {
             status: "Waktu admin meneruskan permintaan konfirmasi pembeli",
-            date: data.fundReleaseRequest.resolvedAt,
+            date: data?.fundReleaseRequest?.resolvedAt || "-",
           },
         ];
       } else {
         return [
           {
             status: "Waktu bikin Rekbr",
-            date: data.createdAt,
+            date: data?.createdAt || "-",
           },
           {
             status: "Waktu pembeli Bayar",
-            date: data.paidAt,
+            date: data?.paidAt || "-",
           },
         ];
       }
     }
-    if (data.status == "completed") {
-      if (data.fundReleaseRequest.status == "approved") {
+    if (status == "completed") {
+      if (data?.fundReleaseRequest?.status == "approved") {
         return [
           {
             status: "Waktu bikin Rekbr",
-            date: data.createdAt,
+            date: data?.createdAt || "-",
           },
           {
             status: "Waktu pembeli Bayar",
-            date: data.paidAt,
+            date: data?.paidAt || "-",
           },
           {
-            status: "Waktu pembeli mengirimkan barang",
-            date: data.shipmentDate,
+            status: "Waktu penjual mengirimkan barang",
+            date: data?.shipment.shipmentDate || "-",
           },
           {
             status: "Waktu penjual meminta konfirmasi pembeli",
-            date: data.fundReleaseRequest.requestedAt,
+            date: data?.fundReleaseRequest?.requestedAt || "-",
           },
           {
             status: "Waktu admin meneruskan permintaan konfirmasi pembeli",
-            date: data.fundReleaseRequest.resolvedAt,
+            date: data?.fundReleaseRequest?.resolvedAt || "-",
           },
         ];
       } else {
         return [
           {
             status: "Waktu bikin Rekbr",
-            date: data.createdAt,
+            date: data?.createdAt || "-",
           },
           {
             status: "Waktu pembeli Bayar",
-            date: data.paidAt,
+            date: data?.paidAt || "-",
           },
           {
-            status: "Waktu pembeli mengirimkan barang",
-            date: data.shipmentDate,
+            status: "Waktu penjual mengirimkan barang",
+            date: data?.shipment.shipmentDate || "-",
+          },
+        ];
+      }
+    }
+    if (status == "canceled") {
+      if (data?.paidAt == null) {
+        return [
+          {
+            status: "Waktu bikin Rekbr",
+            date: data?.createdAt || "-",
+          },
+        ];
+      }
+      if (data?.paidAt != null) {
+        return [
+          {
+            status: "Waktu bikin Rekbr",
+            date: data?.createdAt || "-",
+          },
+          {
+            status: "Waktu pembeli Bayar",
+            date: data?.paidAt || "-",
           },
         ];
       }
@@ -168,57 +216,62 @@ export default function DetailTransaksiSeller({ data }) {
   };
 
   const setupCaptionTimeStamp = () => {
-    if (data.status == "pending_payment") {
+    if (status == "pending_payment") {
       return "Pembeli transfer sebelum";
     }
-    if (data.status == "waiting_shipment") {
+    if (status == "waiting_shipment") {
       return "Penjual masukkan resi dan bukti pengiriman sebelum";
     }
-    if (data.status == "shipped") {
-      if (data.fundReleaseRequest.status == "waiting") {
+    if (status == "shipped") {
+      if (data?.fundReleaseRequest?.status == "pending") {
         return "Penjual mengajukan permintaan konfirmasi penerimaan barang";
-      } else if (data.fundReleaseRequest.status == "approved") {
+      } else if (data?.fundReleaseRequest?.status == "approved") {
         return "Penjual, tunggu respon pembeli 1 x 24 jam";
-      } else if (data.fundReleaseRequest.status == "rejected") {
+      } else if (data?.fundReleaseRequest?.status == "rejected") {
         return "Admin menolak permintaan konfirmasi penerimaan barang";
       } else {
         return "Penjual sudah mengirimkan barang";
       }
     }
-    if (data.status == "completed") {
+    if (status == "completed") {
       return "Waktu konfirmasi pembeli diterima";
     }
-    if (data.status == "refunded") {
+    if (status == "refunded") {
       return "Dikembalikan";
     }
-    if (data.status == "cancelled") {
+    if (status == "canceled") {
       return "Dibatalkan";
-    }
-    if (data.status == "dispute") {
-      return "Waktu konfirmasi buyer pengembalian";
     }
   };
 
   const setupDateTimestamp = () => {
-    if (data.status == "pending_payment") {
-      return data.paymentDeadline;
+    if (status == "pending_payment") {
+      return data?.paymentDeadline || "-";
     }
-    if (data.status == "waiting_shipment") {
-      return data.shipmentDeadline;
+    if (status == "waiting_shipment") {
+      return data?.shipmentDeadline || "-";
     }
-    if (data.status == "shipped") {
-      if (data.fundReleaseRequest.status == "waiting") {
-        return data.fundReleaseRequest.requestedAt;
-      } else if (data.fundReleaseRequest.status == "approved") {
-        return data.fundReleaseRequest.resolvedAt;
-      } else if (data.fundReleaseRequest.status == "rejected") {
-        return data.fundReleaseRequest.resolvedAt;
+    if (status == "shipped") {
+      if (data?.fundReleaseRequest?.status == "pending") {
+        return data?.fundReleaseRequest?.requestedAt || "-";
+      } else if (data?.fundReleaseRequest?.status == "approved") {
+        return data?.fundReleaseRequest?.resolvedAt || "-";
+      } else if (data?.fundReleaseRequest?.status == "rejected") {
+        return data?.fundReleaseRequest?.resolvedAt || "-";
       } else {
-        return data.shipmentDate;
+        return data?.shipment.shipmentDate || "-";
       }
     }
-    if (data.status == "completed") {
-      return data.buyerConfirmedAt;
+    if (status == "completed") {
+      return data?.buyerConfirmedAt || "-";
+    }
+    if (status == "canceled") {
+      if (data?.paidAt == null) {
+        return data?.createdAt || "-";
+      }
+      if (data?.paidAt != null) {
+        return data?.paidAt || "-";
+      }
     }
   };
 
@@ -230,12 +283,12 @@ export default function DetailTransaksiSeller({ data }) {
   };
 
   const setupFooter = () => {
-    if (data.status == "pending_payment") {
+    if (status == "pending_payment") {
       return (
         <View className="flex-col gap-4 w-full items-center">
           <PrimaryButton
             title="Batalkan Rekbr"
-            onPress={() => console.log("Batalkan Rekbr pressed")}
+            onPress={handleCancelTransaksiSeller}
             // disabled={!isFormValid}
             btnColor="#FEF0E9"
             textColor="#000"
@@ -254,13 +307,13 @@ export default function DetailTransaksiSeller({ data }) {
         </View>
       );
     }
-    if (data.status == "waiting_shipment") {
+    if (status == "waiting_shipment") {
       return (
         <View className="flex-col gap-4 w-full items-center">
           <View className="flex flex-row items-center gap-4">
             <PrimaryButton
               title="Batalkan Rekbr"
-              onPress={() => console.log("Batalkan Rekbr pressed")}
+              onPress={handleCancelTransaksiSeller}
               // disabled={!isFormValid}
               height={50}
               width={"45%"}
@@ -269,8 +322,12 @@ export default function DetailTransaksiSeller({ data }) {
             />
             <PrimaryButton
               title="Masukkan Resi"
-              onPress={() => console.log("Masukkan Resi pressed")}
-              // disabled={!isFormValid}
+              onPress={() =>
+                router.push({
+                  pathname: "/InputResi",
+                  params: { id: data?.id },
+                })
+              }
               height={50}
               width={"45%"}
             />
@@ -289,19 +346,24 @@ export default function DetailTransaksiSeller({ data }) {
         </View>
       );
     }
-    if (data.status == "shipped") {
+    if (status == "shipped") {
       return (
         <PrimaryButton
           title="Kirim Permintaan Konfirmasi"
-          onPress={() => console.log("Kirim Permintaan Konfirmasi pressed")}
+          onPress={() =>
+            router.push({
+              pathname: "/FundReleaseRequest",
+              params: { id: data?.id },
+            })
+          }
           disabled={
-            data.fundReleaseRequest.status == "approved" ||
-            data.fundReleaseRequest.status == "waiting"
+            data?.fundReleaseRequest?.status == "approved" ||
+            data?.fundReleaseRequest?.status == "pending"
           }
         />
       );
     }
-    if (data.status == "completed") {
+    if (status == "completed") {
       return (
         <PrimaryButton
           title="Berikan Ulasan"
@@ -326,10 +388,10 @@ export default function DetailTransaksiSeller({ data }) {
   };
 
   const setupStatusFundReleaseRequest = () => {
-    if (data.fundReleaseRequest.status == "waiting") {
+    if (data?.fundReleaseRequest?.status == "pending") {
       return "Permintaan Ditinjau";
     }
-    if (data.fundReleaseRequest.status == "rejected") {
+    if (data?.fundReleaseRequest?.status == "rejected") {
       return "Permintaan Ditolak";
     }
   };
@@ -338,7 +400,7 @@ export default function DetailTransaksiSeller({ data }) {
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => console.log("Back pressed")}>
+        <TouchableOpacity onPress={() => router.back()}>
           <Ionicons name="chevron-back-outline" size={24} color="#000" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Detail Transaksi</Text>
@@ -348,7 +410,7 @@ export default function DetailTransaksiSeller({ data }) {
         const steps = ["Transfer", "Dikemas", "Dikirim", "Diterima"];
         let currentStep = 0;
 
-        switch (data.status) {
+        switch (status) {
           case "pending_payment":
             currentStep = 0;
             break;
@@ -366,11 +428,11 @@ export default function DetailTransaksiSeller({ data }) {
         return <ProgressBar currentStep={currentStep} steps={steps} />;
       })()}
       <ScrollView>
-        {data.status == "pending_payment" ||
-          (data.status == "waiting_shipment" &&
-            data.shipment.trackingNumber != null) ||
-          data.status == "shipped" ||
-          data.status == "completed" ? (
+        {status == "pending_payment" ||
+        (status == "waiting_shipment" &&
+          data?.shipment?.trackingNumber != null) ||
+        status == "shipped" ||
+        status == "completed" ? (
           <>
             {/* Copas Field */}
             <View
@@ -382,28 +444,27 @@ export default function DetailTransaksiSeller({ data }) {
               }}>
               <Text
                 style={{ fontSize: 15, marginBottom: 12, fontWeight: "500" }}>
-                {data.status == "pending_payment"
-                  ? "Virtual Account"
-                  : "No Resi"}
+                {status == "pending_payment" ? "Virtual Account" : "No Resi"}
               </Text>
               <View
-                className={`flex-row items-center ${data.status == "waiting_shipment" ||
-                    data.status == "shipped" ||
-                    data.status == "completed"
+                className={`flex-row items-center ${
+                  status == "waiting_shipment" ||
+                  status == "shipped" ||
+                  status == "completed"
                     ? "mb-3"
                     : ""
-                  }`}>
+                }`}>
                 <Text style={{ fontSize: 17, fontWeight: "500" }}>
-                  {data.status == "pending_payment"
-                    ? data.virtualAccount
-                    : data.shipment.trackingNumber}
+                  {status == "pending_payment"
+                    ? data?.virtualAccount || "-"
+                    : data?.shipment?.trackingNumber || "-"}
                 </Text>
                 <TouchableOpacity
                   onPress={() =>
                     handleCopy(
-                      data.status == "pending_payment"
-                        ? data.virtualAccount
-                        : data.shipment.trackingNumber
+                      status == "pending_payment"
+                        ? data?.virtualAccount || "-"
+                        : data?.shipment?.trackingNumber || "-"
                     )
                   }>
                   <Image
@@ -412,9 +473,9 @@ export default function DetailTransaksiSeller({ data }) {
                   />
                 </TouchableOpacity>
               </View>
-              {data.status == "waiting_shipment" ||
-                data.status == "shipped" ||
-                data.status == "completed" ? (
+              {status == "waiting_shipment" ||
+              status == "shipped" ||
+              status == "completed" ? (
                 <Text
                   style={{
                     fontSize: 12,
@@ -422,7 +483,7 @@ export default function DetailTransaksiSeller({ data }) {
                     fontWeight: "400",
                     color: "#616161",
                   }}>
-                  {data.shipment.courier}
+                  {data?.shipment?.courier || "-"}
                 </Text>
               ) : null}
             </View>
@@ -430,8 +491,7 @@ export default function DetailTransaksiSeller({ data }) {
         ) : null}
 
         {/* Admin Message (done)*/}
-        {data.fundReleaseRequest.status != null ||
-          data.status == "completed" ? (
+        {data?.fundReleaseRequest?.status != null || status == "completed" ? (
           <>
             <View className="flex-row mx-3 p-3 justify-between items-center gap-3">
               <Image
@@ -442,21 +502,21 @@ export default function DetailTransaksiSeller({ data }) {
                 }}
               />
               <Text className="text-sm flex-1">
-                {data.status == "completed"
+                {status == "completed"
                   ? "Komplain dianggap tidak ada dan bakal selesai otomatis kalau pembeli nggak respon."
-                  : data.fundReleaseRequest.status == "waiting"
-                    ? "Tunggu approval kami, ya! Kalau bukti kamu oke, permintaan konfirmasi bakal langsung dikirim ke buyer!"
-                    : data.fundReleaseRequest.status == "approved"
-                      ? "Konfirmasi udah dikirim ke buyer! Sekarang tinggal tunggu respon mereka dalam 1 x 24 jam"
-                      : "Permintaan konfirmasi ke buyer ditolak. Pastikan data atau bukti yang kamu kirim sudah lengkap dan sesuai"}
+                  : data?.fundReleaseRequest?.status == "pending"
+                  ? "Tunggu approval kami, ya! Kalau bukti kamu oke, permintaan konfirmasi bakal langsung dikirim ke buyer!"
+                  : data?.fundReleaseRequest?.status == "approved"
+                  ? "Konfirmasi udah dikirim ke buyer! Sekarang tinggal tunggu respon mereka dalam 1 x 24 jam"
+                  : "Permintaan konfirmasi ke buyer ditolak. Pastikan data atau bukti yang kamu kirim sudah lengkap dan sesuai"}
               </Text>
             </View>
           </>
         ) : null}
 
         {/* Status Rekbr (done)*/}
-        {data.fundReleaseRequest.status == "waiting" ||
-          data.fundReleaseRequest.status == "rejected" ? (
+        {data?.fundReleaseRequest?.status == "pending" ||
+        data?.fundReleaseRequest?.status == "rejected" ? (
           <View className="flex-col  gap-2 mx-3 p-3">
             <View className="flex-row justify-between">
               <Text className="text-[15px]">Status Rekbr:</Text>
@@ -492,7 +552,7 @@ export default function DetailTransaksiSeller({ data }) {
                     fontSize: 13,
                     fontWeight: "500",
                     color:
-                      data.fundReleaseRequest.status == "waiting"
+                      data?.fundReleaseRequest?.status == "pending"
                         ? "#FBBF24"
                         : "#CB3A31",
                   }}>
@@ -524,7 +584,9 @@ export default function DetailTransaksiSeller({ data }) {
         {/* Buyer Section (done)*/}
         <View className="flex-col justify-center gap-2 mx-3 p-3">
           <Text className="text-[15px]">Pembeli</Text>
-          <Text className="text-[15px] font-medium">{data.buyerEmail}</Text>
+          <Text className="text-[15px] font-medium">
+            {data?.buyerEmail || "-"}
+          </Text>
         </View>
 
         {/* Virtual Account Section (done)*/}
@@ -532,9 +594,10 @@ export default function DetailTransaksiSeller({ data }) {
           <Text className="text-[15px]">Virtual Account</Text>
           <View className="flex-row items-center">
             <Text className="text-[15px] font-medium">
-              {data.virtualAccount}
+              {data?.virtualAccount || "-"}
             </Text>
-            <TouchableOpacity onPress={() => handleCopy(data.virtualAccount)}>
+            <TouchableOpacity
+              onPress={() => handleCopy(data?.virtualAccount || "-")}>
               <Image
                 source={require("../../assets/copy.png")}
                 style={{ marginLeft: 4, width: 17, height: 16 }}
@@ -546,32 +609,34 @@ export default function DetailTransaksiSeller({ data }) {
         {/* Items Name Section (done)*/}
         <View className="flex-col justify-center gap-2 mx-3 p-3">
           <Text className="text-[15px]">Nama Barang</Text>
-          <Text className="text-[15px] font-medium">{data.itemName}</Text>
+          <Text className="text-[15px] font-medium">
+            {data?.itemName || "-"}
+          </Text>
         </View>
 
         {/* Items Price Section (done)*/}
         <View className="flex-col justify-center gap-2 mx-3 p-3">
           {/* <Text className="text-[15px]">Harga Barang</Text>
           <Text className="text-[15px] font-medium">
-            {formatPrice(data.itemPrice)}
+            {formatPrice(data?.itemPrice)}
           </Text> */}
           <Tagihan
             caption="Harga Barang"
-            price={formatPrice(data.itemPrice)}
+            price={formatPrice(data?.totalAmount || "-")}
             details={[
               {
                 status: "Nominal Barang",
-                price: formatPrice(data.itemPrice),
+                price: formatPrice(data?.itemPrice || "-"),
               },
               {
                 status: "Asuransi Pengiriman BNI Life (0.2%)",
-                price: formatPrice(data.insuranceFee),
+                price: formatPrice(data?.insuranceFee || "-"),
               },
               {
                 status: `Biaya Jasa Aplikasi (${calculatePlatformFee(
-                  data.itemPrice
+                  data?.itemPrice
                 )}%)`,
-                price: formatPrice(data.platformFee),
+                price: formatPrice(data?.platformFee || "-"),
               },
             ]}
           />
@@ -580,17 +645,19 @@ export default function DetailTransaksiSeller({ data }) {
         {/* Seller Bank Section (done)*/}
         <View className="flex-col justify-center gap-2 mx-3 p-3">
           <Text className="text-[15px]">Rekening Penjual</Text>
-          <View className="flex-row items-center">
+          <View className="flex-row gap-5">
             <Image
-              source={{ uri: data.sellerBank.bankLogoUrl }}
-              style={{ width: 50, height: 50 }}
+              source={{ uri: data?.rekeningSeller?.logoUrl || "-" }}
+              style={{ width: 50, height: 50, objectFit: "contain" }}
             />
             <View className="flex-row items-center">
               <Text className="text-[15px] font-medium">
-                {data.withdrawalBankAccountId}
+                {data?.rekeningSeller?.accountNumber || "-"}
               </Text>
               <TouchableOpacity
-                onPress={() => handleCopy(data.withdrawalBankAccountId)}>
+                onPress={() =>
+                  handleCopy(data?.rekeningSeller?.accountNumber || "-")
+                }>
                 <Image
                   source={require("../../assets/copy.png")}
                   style={{ marginLeft: 4, width: 17, height: 16 }}
@@ -605,9 +672,10 @@ export default function DetailTransaksiSeller({ data }) {
           <Text className="text-[15px]">ID Transaksi</Text>
           <View className="flex-row items-center">
             <Text className="text-[15px] font-medium">
-              {data.transactionCode}
+              {data?.transactionCode}
             </Text>
-            <TouchableOpacity onPress={() => handleCopy(data.transactionCode)}>
+            <TouchableOpacity
+              onPress={() => handleCopy(data?.transactionCode || "-")}>
               <Image
                 source={require("../../assets/copy.png")}
                 style={{ marginLeft: 4, width: 17, height: 16 }}

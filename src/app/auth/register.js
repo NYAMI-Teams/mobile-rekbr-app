@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, Image, ScrollView, TouchableOpacity } from "react-native";
 import InputField from "../../components/InputField";
 import PrimaryButton from "../../components/PrimaryButton";
@@ -8,16 +8,26 @@ import { Feather } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { Alert } from "react-native";
+import { register } from "../../utils/api/auth";
+import { showToast } from "../../utils";
 
 export default function Register() {
   const router = useRouter();
-  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    //dev (DELETE)
+    setEmail("bayuseptyan43@gmail.com");
+    setPassword("Mobilmerah123#");
+    setConfirmPassword("Mobilmerah123#");
+    setIsChecked(true);
+  }, []);
 
   const togglePasswordVisibility = () => {
     setIsPasswordVisible(!isPasswordVisible);
@@ -25,6 +35,10 @@ export default function Register() {
 
   const toggleConfirmPasswordVisibility = () => {
     setConfirmPasswordVisible(!confirmPasswordVisible);
+  };
+
+  const isEmailValid = () => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   };
 
   const isPasswordValid = () => {
@@ -39,18 +53,29 @@ export default function Register() {
 
   const isFormValid = () => {
     return (
-      //   name &&
-      //   email &&
-      //   isPasswordValid() &&
-      //   password === confirmPassword &&
-      //   isChecked
-      true
+      isEmailValid() &&
+      isPasswordValid() &&
+      password === confirmPassword &&
+      isChecked
     );
   };
 
   const handleRegister = () => {
-    // console.log("Registering with:", { name, email, password });
-    router.push("/auth/otp");
+    setIsLoading(true);
+    register(email, password)
+      .then((res) => {
+        showToast("Success", res?.message, "success");
+        router.push({
+          pathname: "/auth/otp",
+          params: { email: email },
+        });
+      })
+      .catch((err) => {
+        showToast("Registrasi Gagal", err?.message, "error");
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
 
   return (
@@ -64,7 +89,7 @@ export default function Register() {
           />
         </View>
 
-        <View className="py-5">
+        <View className="py-5 px-5">
           {/* Email */}
           <View className="mb-4">
             <InputField
@@ -75,6 +100,20 @@ export default function Register() {
               keyboardType="email-address"
               inputClassName="pr-12"
             />
+            {/* Alert Validasi Email*/}
+            <View className="flex-row items-center mt-2 mx-5">
+              <Feather
+                name={isEmailValid() ? "check-circle" : "x-circle"}
+                size={18}
+                color={isEmailValid() ? "#4ade80" : "#f87171"}
+              />
+              <Text
+                className={`ml-2 text-sm ${
+                  isEmailValid() ? "text-green-600" : "text-red-400"
+                }`}>
+                {isEmailValid() ? "Email valid" : "Email tidak valid"}
+              </Text>
+            </View>
           </View>
 
           {/* Password */}
@@ -134,10 +173,11 @@ export default function Register() {
                   color={confirmPassword === password ? "#4ade80" : "#f87171"}
                 />
                 <Text
-                  className={`ml-2 text-sm ${confirmPassword === password
-                    ? "text-green-600"
-                    : "text-red-400"
-                    }`}>
+                  className={`ml-2 text-sm ${
+                    confirmPassword === password
+                      ? "text-green-600"
+                      : "text-red-400"
+                  }`}>
                   {confirmPassword === password
                     ? "Kata sandi sesuai"
                     : "Kata sandi tidak sesuai"}
@@ -150,8 +190,9 @@ export default function Register() {
           <View className="flex-row items-start  mt-4 px-5">
             <TouchableOpacity
               onPress={() => setIsChecked(!isChecked)}
-              className={`w-5 h-5 rounded border ${isChecked ? "bg-[#3ED6C5] border-[#3ED6C5]" : "border-gray-400"
-                } items-center justify-center`}>
+              className={`w-5 h-5 rounded border ${
+                isChecked ? "bg-[#3ED6C5] border-[#3ED6C5]" : "border-gray-400"
+              } items-center justify-center`}>
               {isChecked && <Text className="text-white text-xs">✓</Text>}
             </TouchableOpacity>
 
@@ -162,7 +203,7 @@ export default function Register() {
 
           <View className="px-5 py-5">
             <PrimaryButton
-              title="Masuk"
+              title="Daftar"
               onPress={handleRegister}
               disabled={!isFormValid()}
             />

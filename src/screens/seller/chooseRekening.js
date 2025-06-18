@@ -20,10 +20,15 @@ import {
 import { useRouter } from "expo-router";
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import BankSelector from "../../components/BankScreens";
-import { mockBank } from "../../services/apiMock/api";
 import { ChevronLeftCircle } from "lucide-react-native";
 import PrimaryButton from "../../components/PrimaryButton";
-import CreateRekber from "../../app/CreateTransaksi/CreateRekbr/index";
+import {
+  getListBankAccount,
+  getAllBankList,
+  checkRekeningExist,
+} from "../../utils/api/seller";
+import { saveAccountBank } from "../../utils/api/bank";
+import { showToast } from "../../utils";
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
 
@@ -36,41 +41,6 @@ if (
 
 const initialFavorites = [];
 
-const initialSaved = [
-  {
-    id: "1",
-    name: "Bayu",
-    bank: "Bank Negara Indonesia",
-    accountNumber: "0900604501",
-    bankLogo: require("../../assets/logo-bni.png"),
-    isFavorite: false,
-  },
-  {
-    id: "2",
-    name: "Zhirazzi",
-    bank: "Bank Negara Indonesia",
-    accountNumber: "0900604502",
-    bankLogo: require("../../assets/logo-bni.png"),
-    isFavorite: false,
-  },
-  {
-    id: "3",
-    name: "Diffa",
-    bank: "Bank Negara Indonesia",
-    accountNumber: "0900604503",
-    bankLogo: require("../../assets/logo-bni.png"),
-    isFavorite: false,
-  },
-  {
-    id: "4",
-    name: "Reynhard",
-    bank: "Bank Negara Indonesia",
-    accountNumber: "0900604504",
-    bankLogo: require("../../assets/logo-bni.png"),
-    isFavorite: false,
-  },
-];
-
 const keys = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "x"]; // The null will be handled in the map function
 
 const formatAccountNumber = (number) => {
@@ -81,20 +51,67 @@ const formatAccountNumber = (number) => {
 export default function PilihRekeningScreen() {
   const router = useRouter();
   const [favorites, setFavorites] = useState(initialFavorites);
-  const [saved, setSaved] = useState(initialSaved);
-
+  const [saved, setSaved] = useState([]);
+  const [bankList, setBankList] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [isSelectBankDone, setIsSelectBankDone] = useState(false);
   const [selectedBank, setSelectedBank] = useState(null);
   const [accountNumber, setAccountNumber] = useState("");
+  const [accountName, setAccountName] = useState("");
   const [isAlreadyCheckedRekening, setIsAlreadyCheckedRekening] =
     useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const slideAnim = useRef(new Animated.Value(250)).current;
+
+  useEffect(() => {
+    fetchBankAccount();
+    fetchBankList();
+  }, []);
+
+  const fetchBankAccount = async () => {
+    try {
+      const res = await getListBankAccount();
+      if (res) {
+        // console.log("ini rekening user", res);
+        setSaved(res.data);
+        return res.data;
+      }
+    } catch (error) {
+      console.error("Error get list bank account:", error);
+    }
+  };
+
+  const fetchBankList = async () => {
+    try {
+      const res = await getAllBankList();
+      if (res) {
+        // console.log("ini all bank", res);
+        setBankList(res.data);
+      }
+    } catch (error) {
+      console.error("Error get list bank account:", error);
+    }
+  };
+
+  const checkRekening = async () => {
+    try {
+      const res = await checkRekeningExist(accountNumber, selectedBank.id);
+      if (res.success === true) {
+        console.log("rekening user ditemukan", res);
+        setAccountName(res.data.accountName);
+        setIsAlreadyCheckedRekening(true);
+      }
+      if (res.success === false) {
+        console.log("rekening user tidak ditemukan", res);
+        setIsAlreadyCheckedRekening(false);
+      }
+    } catch (error) {
+      console.error("Error get list bank account:", error);
+    }
+  };
 
   const closeModal = () => {
     setModalVisible(false);
-    setIsSelectBankDone(false);
-    setAccountNumber("");
   };
 
   const handleKeyPress = (key) => {
@@ -114,10 +131,38 @@ export default function PilihRekeningScreen() {
     setIsAlreadyCheckedRekening(false);
   };
 
-  const handleToCreateRekbr = () => {
-    setIsAlreadyCheckedRekening(true);
-    setModalVisible(false);
-    router.push("/CreateTransaksi/CreateRekbr");
+  const handleToCreateRekbr = async () => {
+    setIsLoading(true);
+    try {
+      await saveAccountBank(selectedBank.bankId, accountNumber, accountName);
+      showToast("Sukses", "Rekening berhasil disimpan", "success");
+      const resData = await fetchBankAccount();
+      const bankData = resData.find(
+        (item) =>
+          item.bankId == selectedBank.bankId &&
+          item.accountNumber == accountNumber
+      );
+      console.log(bankData, "ini data rekening yang disimpan");
+      router.push({
+        pathname: "/CreateTransaksi/CreateRekbr",
+        params: {
+          selectedBank: JSON.stringify(bankData),
+        },
+      });
+    } catch (error) {
+      showToast(
+        "Gagal",
+        "Gagal menyimpan rekening. Silakan coba lagi.",
+        "error"
+      );
+    } finally {
+      setIsLoading(false);
+      closeModal();
+    }
+    // setModalVisible(false);
+    // router.push("/CreateTransaksi/CreateRekbr");
+    // handleBackToInputRekening();
+    // handleBackToBankSelection();
   };
 
   const toggleFavorite = (item, fromFavorites) => {
@@ -140,6 +185,7 @@ export default function PilihRekeningScreen() {
         fromFavorites={fromFavorites}
         toggleFavorite={() => toggleFavorite(item, fromFavorites)}
         index={index}
+        key={index}
       />
       // </View>
     );
@@ -203,10 +249,10 @@ export default function PilihRekeningScreen() {
                   paddingHorizontal: 16,
                   paddingTop: 16,
                 }}>
-                <Text style={styles.sectionTitle}>Tujuan Favorit kamu!</Text>
+                <Text style={styles.sectionTitle}>Rekening Favorit kamu!</Text>
                 {favorites.length === 0 ? (
                   <Text style={styles.noFavoritesText}>
-                    Tambah tujuan favorit kamu biar lebih gampang nyarinya
+                    Tambah rekening favorit kamu biar lebih gampang nyarinya
                     nanti, biar nggak ribet!
                   </Text>
                 ) : (
@@ -218,7 +264,7 @@ export default function PilihRekeningScreen() {
                 {!isSavedEmpty && (
                   <>
                     <Text style={[styles.sectionTitle, { marginTop: 24 }]}>
-                      Tujuan Tersimpan
+                      Rekening Tersimpan
                     </Text>
                     {saved.map((item, index) =>
                       renderAccountItem(item, false, index)
@@ -241,18 +287,20 @@ export default function PilihRekeningScreen() {
         <View style={styles.buttonContainer}>
           <TouchableOpacity
             style={styles.addButton}
-            onPress={() => setModalVisible(true)}>
-            <Text style={styles.addButtonText}>＋ Rekening</Text>
+            onPress={() => {
+              setModalVisible(true);
+              // console.log("bank list", bankList);
+            }}>
+            <Text style={styles.addButtonText}>+ Rekening</Text>
           </TouchableOpacity>
         </View>
 
-        <View className="flex-1 w-full h-full bg-red-500">
+        <View className="flex-1 w-full h-full">
           <Modal
             animationType="slide"
             transparent={true}
             visible={modalVisible}
             onRequestClose={() => {
-              Alert.alert("Modal has been closed.");
               closeModal();
             }}>
             <View className="bg-black/50 w-full h-full">
@@ -264,8 +312,8 @@ export default function PilihRekeningScreen() {
                     isAlreadyCheckedRekening
                       ? handleBackToInputRekening
                       : isSelectBankDone
-                        ? handleBackToBankSelection
-                        : closeModal
+                      ? handleBackToBankSelection
+                      : closeModal
                   }>
                   <View className="flex-row items-center mb-6">
                     <ChevronLeftCircle size={24} color="#00C2C2" />
@@ -273,37 +321,39 @@ export default function PilihRekeningScreen() {
                       {!isSelectBankDone
                         ? "Pilih Bank Kamu"
                         : !isAlreadyCheckedRekening
-                          ? "Masukan No Rekening Kamu"
-                          : "Rekening Kamu Ditemukan"}
+                        ? "Masukan No Rekening Kamu"
+                        : "Rekening Kamu Ditemukan"}
                     </Text>
                   </View>
                 </Pressable>
 
                 {!isSelectBankDone ? (
+                  // <View className="bg-red-300">
                   <BankSelector
-                    banks={mockBank.data}
+                    banks={bankList}
                     onSelectBank={(bank) => {
                       setSelectedBank({
-                        logoSrc: bank.logoUrl,
-                        name: bank.bankName,
-                        bankId: bank.bankId,
+                        logoUrl: bank.logoUrl,
+                        bankName: bank.bankName,
+                        bankId: bank.id,
                       });
                       setIsSelectBankDone(true);
                     }}
                   />
-                ) : !isAlreadyCheckedRekening ? (
+                ) : // </View>
+                !isAlreadyCheckedRekening ? (
                   <>
                     {selectedBank && (
                       <View className="flex-row items-center mt-2 mb-2 gap-4">
                         <View className="w-20 h-10 rounded bg-[#EDFBFA] justify-center items-center py-2">
                           <Image
-                            source={{ uri: selectedBank.logo }}
+                            source={{ uri: selectedBank.logoUrl }}
                             className="w-12 h-12 object-contain"
                             resizeMode="contain"
                           />
                         </View>
                         <Text className="text-base font-normal">
-                          {selectedBank.name}
+                          {selectedBank.bankName}
                         </Text>
                       </View>
                     )}
@@ -320,42 +370,48 @@ export default function PilihRekeningScreen() {
                       />
                     </View>
 
-                    <View className="w-[100%] justify-center items-center">
-                      <View className="flex-row flex-wrap justify-between items-center mt-7 px-6 w-[80%]">
+                    <View className="w-full items-center justify-center">
+                      <View className="flex-row flex-wrap justify-center items-center mt-8 px-6 w-[80%]">
                         {keys.map((key, index) => {
-                          // Skip the first 9 keys (1-9) and handle them normally
+                          // Tombol 1-9
                           if (index < 9) {
                             return (
-                              <TouchableOpacity
+                              <View
                                 key={index}
-                                onPress={() => handleKeyPress(key)}
-                                className="size-[62px] aspect-square rounded-full bg-white border border-gray-300 justify-center items-center mb-4 shadow-sm">
-                                <Text className="text-2xl font-normal text-gray-800">
-                                  {key}
-                                </Text>
-                              </TouchableOpacity>
+                                className="w-1/3 items-center justify-center mb-4">
+                                <TouchableOpacity
+                                  onPress={() => handleKeyPress(key)}
+                                  className="size-[62px] aspect-square rounded-full bg-white border border-gray-300 justify-center items-center shadow-sm">
+                                  <Text className="text-2xl font-normal text-gray-800">
+                                    {key}
+                                  </Text>
+                                </TouchableOpacity>
+                              </View>
                             );
                           }
-                          // For the last two keys (0 and x), handle them in a single row
-                          else if (index === 9) {
+
+                          // Tombol baris terakhir (0 dan x)
+                          if (index === 9) {
                             return (
-                              <View className="flex-row w-full justify-between">
-                                {/* Empty space on the left */}
-                                <View className="size-[62px] aspect-square" />
-                                {/* 0 in the middle */}
+                              <View
+                                key="last-row"
+                                className="flex-row w-full justify-around items-center mt-2">
+                                {/* Spacer kiri biar seimbang */}
+                                <View className="size-[62px] aspect-square opacity-0" />
+
+                                {/* Tombol 0 */}
                                 <TouchableOpacity
-                                  key={9}
                                   onPress={() => handleKeyPress("0")}
-                                  className="size-[62px] aspect-square rounded-full bg-white border border-gray-300 justify-center items-center mb-4 shadow-sm">
+                                  className="size-[62px] aspect-square rounded-full bg-white border border-gray-300 justify-center items-center shadow-sm">
                                   <Text className="text-2xl font-normal text-gray-800">
                                     0
                                   </Text>
                                 </TouchableOpacity>
-                                {/* x on the right */}
+
+                                {/* Tombol x */}
                                 <TouchableOpacity
-                                  key={10}
                                   onPress={() => handleKeyPress("x")}
-                                  className="size-[62px] aspect-square rounded-full bg-white border border-gray-300 justify-center items-center mb-4 shadow-sm">
+                                  className="size-[62px] aspect-square rounded-full bg-white border border-gray-300 justify-center items-center shadow-sm">
                                   <Text className="text-2xl font-normal text-gray-800">
                                     x
                                   </Text>
@@ -363,13 +419,14 @@ export default function PilihRekeningScreen() {
                               </View>
                             );
                           }
+
                           return null;
                         })}
                       </View>
                     </View>
 
                     <TouchableOpacity
-                      onPress={() => setIsAlreadyCheckedRekening(true)}
+                      onPress={checkRekening}
                       className="bg-black rounded-lg py-4 mt-3">
                       <Text className="text-white text-center font-semibold text-base">
                         Cek Rekening
@@ -388,11 +445,11 @@ export default function PilihRekeningScreen() {
                         }}>
                         <View className="flex-col gap-2 w-full">
                           <Text className="text-base font-medium">
-                            Bayu Septyan Nur Hidayat
+                            {accountName}
                           </Text>
                           <View className="flex-row mt-2 justify-start items-center gap-2">
                             <Image
-                              source={{ uri: selectedBank.logo }}
+                              source={{ uri: selectedBank.logoUrl }}
                               style={{
                                 width: 60,
                                 height: 32,
@@ -401,7 +458,7 @@ export default function PilihRekeningScreen() {
                             />
                             <View className="flex-col justify-center items-start p-2">
                               <Text className="text-sm font-medium">
-                                {selectedBank.name}
+                                {selectedBank.bankName}
                               </Text>
                               <Text className="text-sm font-normal">
                                 {formatAccountNumber(accountNumber)}
@@ -414,6 +471,7 @@ export default function PilihRekeningScreen() {
                     <PrimaryButton
                       onPress={() => handleToCreateRekbr()}
                       title="Simpan dan Gunakan Rekening"
+                      disabled={isLoading}
                     />
                   </Animated.View>
                 )}
@@ -432,6 +490,7 @@ const AnimatedAccountItem = ({
   toggleFavorite,
   index = 0,
 }) => {
+  const router = useRouter();
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.8)).current;
 
@@ -454,35 +513,46 @@ const AnimatedAccountItem = ({
   }, []);
 
   return (
-    <Animated.View
-      style={[
-        styles.accountItem,
-        {
-          opacity: fadeAnim,
-          transform: [{ scale: scaleAnim }],
-        },
-      ]}>
-      <View style={{ flexDirection: "row", alignItems: "center", flex: 1 }}>
-        <Image source={item.bankLogo} style={styles.bankLogo} />
-        <View style={{ marginLeft: 12 }}>
-          <Text style={styles.accountName}>{item.name}</Text>
-          <Text style={styles.bankName}>{item.bank}</Text>
-          <Text style={styles.accountNumber}>
-            {formatAccountNumber(item.accountNumber)}
-          </Text>
+    <TouchableOpacity
+      onPress={() => {
+        console.log(item, "ini item rekening");
+        router.push({
+          pathname: "/CreateTransaksi/CreateRekbr",
+          params: {
+            selectedBank: JSON.stringify(item),
+          },
+        });
+      }}>
+      <Animated.View
+        style={[
+          styles.accountItem,
+          {
+            opacity: fadeAnim,
+            transform: [{ scale: scaleAnim }],
+          },
+        ]}>
+        <View style={{ flexDirection: "row", alignItems: "center", flex: 1 }}>
+          <Image source={{ uri: item.bank.logoUrl }} style={styles.bankLogo} />
+          <View style={{ marginLeft: 12 }}>
+            <Text style={styles.accountName}>{item.accountHolderName}</Text>
+            <Text style={styles.bankName}>{item.bank.bankName}</Text>
+            <Text style={styles.accountNumber}>
+              {formatAccountNumber(item.accountNumber)}
+            </Text>
+          </View>
         </View>
-      </View>
-      <TouchableOpacity onPress={() => toggleFavorite(item, fromFavorites)}>
-        <Image
-          source={
-            item.isFavorite
-              ? require("../../assets/icon-star-filled.png")
-              : require("../../assets/icon-star-outline.png")
-          }
-          style={styles.favoriteIcon}
-        />
-      </TouchableOpacity>
-    </Animated.View>
+        <TouchableOpacity onPress={() => toggleFavorite(item, fromFavorites)}>
+          <Image
+            source={
+              item.isFavorite
+                ? require("../../assets/icon-star-filled.png")
+                : require("../../assets/icon-star-outline.png")
+            }
+            style={styles.favoriteIcon}
+          />
+        </TouchableOpacity>
+      </Animated.View>
+    </TouchableOpacity>
   );
 };
 
@@ -496,7 +566,7 @@ const styles = StyleSheet.create({
     paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
     backgroundColor: "#fff",
     justifyContent: "center",
-    alignItems: "center",
+    // alignItems: "center",
   },
   appBar: {
     flexDirection: "row",

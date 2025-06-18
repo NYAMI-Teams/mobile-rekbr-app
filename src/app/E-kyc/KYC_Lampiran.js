@@ -44,7 +44,7 @@ export default function Lampiran() {
       />
 
       {/* Content */}
-      <ScrollView>
+      <ScrollView className="mx-5">
         {/* Foto KTP */}
         <View style={styles.content}>
           <AttachmentFilled

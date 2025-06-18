@@ -110,6 +110,7 @@ const styles = StyleSheet.create({
         height: 2,
         backgroundColor: "#ccc",
         marginHorizontal: 5,
+        marginBottom: 10,
     },
     completedLine: {
         backgroundColor: "#4CD7D0",
