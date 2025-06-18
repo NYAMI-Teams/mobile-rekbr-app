@@ -24,7 +24,7 @@ export default function Register() {
 
   useEffect(() => {
     // development purposes, remove this in production
-    setEmail("danilardi13@gmail.com")
+    setEmail("danilardi13@gmail.com");
     setPassword("pass123");
     setConfirmPassword("pass123");
   }, []);
@@ -60,22 +60,24 @@ export default function Register() {
 
   const handleRegister = () => {
     setIsLoading(true);
-    register(email, password).then((res) => {
-      showToast("Success", res?.message, "success");
-      router.push({
-        pathname: "/auth/otp",
-        params: { email: email }
+    register(email, password)
+      .then((res) => {
+        showToast("Success", res?.message, "success");
+        router.push({
+          pathname: "/auth/otp",
+          params: { email: email },
+        });
+      })
+      .catch((err) => {
+        showToast("Registrasi Gagal", err?.message, "error");
+      })
+      .finally(() => {
+        // setEmail("");
+        // setPassword("");
+        // setConfirmPassword("");
+        // setIsChecked(false);
+        setIsLoading(false);
       });
-    }).catch((err) => {
-      showToast("Registrasi Gagal", err?.message, "error");
-    }).finally(() => {
-      // setEmail("");
-      // setPassword("");
-      // setConfirmPassword("");
-      // setIsChecked(false);
-      setIsLoading(false);
-    });
-
   };
 
   return (
@@ -89,7 +91,7 @@ export default function Register() {
           />
         </View>
 
-        <View className="py-5">
+        <View className="py-5 px-5">
           {/* Email */}
           <View className="mb-4">
             <InputField
@@ -159,10 +161,11 @@ export default function Register() {
                   color={confirmPassword === password ? "#4ade80" : "#f87171"}
                 />
                 <Text
-                  className={`ml-2 text-sm ${confirmPassword === password
-                    ? "text-green-600"
-                    : "text-red-400"
-                    }`}>
+                  className={`ml-2 text-sm ${
+                    confirmPassword === password
+                      ? "text-green-600"
+                      : "text-red-400"
+                  }`}>
                   {confirmPassword === password
                     ? "Kata sandi sesuai"
                     : "Kata sandi tidak sesuai"}
@@ -175,8 +178,9 @@ export default function Register() {
           <View className="flex-row items-start  mt-4 px-5">
             <TouchableOpacity
               onPress={() => setIsChecked(!isChecked)}
-              className={`w-5 h-5 rounded border ${isChecked ? "bg-[#3ED6C5] border-[#3ED6C5]" : "border-gray-400"
-                } items-center justify-center`}>
+              className={`w-5 h-5 rounded border ${
+                isChecked ? "bg-[#3ED6C5] border-[#3ED6C5]" : "border-gray-400"
+              } items-center justify-center`}>
               {isChecked && <Text className="text-white text-xs">✓</Text>}
             </TouchableOpacity>
 
