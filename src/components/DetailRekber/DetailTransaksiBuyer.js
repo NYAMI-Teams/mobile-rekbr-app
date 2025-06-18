@@ -431,7 +431,7 @@ export default function DetailTransaksiBuyer({ data }) {
           <>
             <View className="flex-row items-center bg-yellow-200 px-4 py-3 rounded-lg w-full">
               <Image
-                source={require("../../../assets/icon-warning.png")}
+                source={require("../../assets/icon-warning.png")}
                 className="w-5 h-5"
                 resizeMode="contain"
               />
@@ -449,7 +449,7 @@ export default function DetailTransaksiBuyer({ data }) {
           <>
             <View className="flex-row mx-3 p-3 justify-between items-center gap-3">
               <Image
-                source={require("../../../assets/admin1.png")}
+                source={require("../../assets/admin1.png")}
                 style={{
                   width: 20,
                   height: 20,
