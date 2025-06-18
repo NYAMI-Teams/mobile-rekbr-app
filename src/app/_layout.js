@@ -26,7 +26,11 @@ export default function RootLayout() {
         setIsLoggedIn(true);
       } catch (error) {
         if (!error.includes("Error getting access token")) {
-          // showToast("Error", "Failed to fetch profile. Please try again later.", "error");
+          showToast(
+            "Error",
+            "Gagal mengambil data profile. Silahkan coba lagi.",
+            "error"
+          );
         }
         setIsLoggedIn(false);
       } finally {
@@ -34,10 +38,10 @@ export default function RootLayout() {
       }
     };
 
-    const splashTimeout = async() => {
-      await new Promise(resolve => setTimeout(resolve, 3000)); 
+    const splashTimeout = async () => {
+      await new Promise((resolve) => setTimeout(resolve, 3000));
       setAppIsReady(true);
-    }
+    };
     splashTimeout();
     checkAuth();
   }, []);
@@ -45,10 +49,7 @@ export default function RootLayout() {
   if (!appIsReady || isLoading) {
     return (
       <View className="flex-1 bg-white justify-center items-center">
-        <Image
-          source={SplashScreen}
-          className="w-full h-full"
-        />
+        <Image source={SplashScreen} className="w-full h-full" />
       </View>
     );
   }

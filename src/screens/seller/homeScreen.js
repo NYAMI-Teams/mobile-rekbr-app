@@ -44,7 +44,6 @@ export default function SellerEmptyContent({ isKYCCompleted }) {
           className="w-full py-4 rounded-xl bg-black items-center justify-center"
           onPress={() => {
             if (!isKYCCompleted) {
-              console.log("Navigasi ke halaman KYC");
               router.push("E-kyc/KYC_Intro");
             } else {
               router.push("CreateTransaksi/CreateRekening/ChooseRekening");

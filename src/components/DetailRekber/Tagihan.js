@@ -59,7 +59,7 @@ const Tagihan = ({ caption, price, details = [] }) => {
           <TagihanDetail key={index} status={item.status} price={item.price} />
         ))}
 
-      <Text className={`text-[15px] font-medium ${isExpanded ? "mt-4" : null}`}>
+      <Text className={`text-[15px] font-medium ${isExpanded ? "mt-4" : ""}`}>
         {/* {formatCurrency(price)} */}
         {price}
       </Text>

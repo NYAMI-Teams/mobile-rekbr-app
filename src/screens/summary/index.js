@@ -23,18 +23,17 @@ export default function TransactionSummaryScreen({ payload, bankData }) {
     setInsuranceFee(_insuranceFee);
     setServiceFee(_serviceFee);
     setTotalAmount(price + _serviceFee + _insuranceFee);
-    console.log("payload", payload);
   }, [payload]);
 
   const handleCreateTransaction = async () => {
     setIsLoading(true);
     try {
       await sellerCreateTransaction(payload);
-      showToast("Success", "Transaksi berhasil dibuat");
+      showToast("Berhasil", "Transaksi berhasil dibuat");
       router.replace("/");
     } catch (error) {
       showToast(
-        "Error",
+        "Gagal",
         error?.message || "Terjadi kesalahan saat membuat transaksi",
         "error"
       );

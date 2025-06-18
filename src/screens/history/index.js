@@ -84,7 +84,7 @@ export default function History() {
   };
 
   return (
-    <View className="bg-white items-center w-full h-[80%] gap-5">
+    <View className="bg-white items-center w-full h-[80%] gap-2">
       <View className="flex-row w-full mt-4">
         <TouchableOpacity
           onPress={() => handleTabPress("pembelian")}
@@ -115,7 +115,7 @@ export default function History() {
           </Text>
         </TouchableOpacity>
       </View>
-      <ScrollView className="w-full pt-8" showsVerticalScrollIndicator={false}>
+      <ScrollView className="w-full" showsVerticalScrollIndicator={false}>
         {renderContent()}
       </ScrollView>
     </View>

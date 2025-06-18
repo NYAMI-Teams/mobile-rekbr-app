@@ -3,7 +3,7 @@ import { View, Text, Modal, TouchableOpacity } from 'react-native';
 import { Info } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-export default function BuyerKonfirmasi({ visible, onBtn2, onBtn1, title, btn1, btn2 }) {
+export default function BuyerKonfirmasi({ visible, onBtn2, onBtn1, title, btn1, btn2, isBatalkan = false }) {
     return (
         // <View className="absolute inset-0 z-50 justify-center items-center bg-black/30 ">
         //     {/* <SafeAreaView className="w-[90%] bg-white rounded-xl shadow-md p-4 border border-gray-200"> */}
@@ -30,7 +30,7 @@ export default function BuyerKonfirmasi({ visible, onBtn2, onBtn1, title, btn1, 
                                 </TouchableOpacity>
                                 <TouchableOpacity
                                     onPress={onBtn2}
-                                    className="flex-1 p-4 rounded-lg bg-blue-100 ml-2"
+                                    className={`flex-1 p-4 rounded-lg ${isBatalkan ? "bg-red-100" : "bg-blue-100"} ml-2`}
                                 >
                                     <Text className="text-center text-black font-medium">{btn2}</Text>
                                 </TouchableOpacity>

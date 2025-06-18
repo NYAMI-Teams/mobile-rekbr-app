@@ -30,8 +30,8 @@ export default function Home() {
       setProfile(res.data);
     } catch {
       showToast(
-        "Session Invalid",
-        "Your session has expired. Please log in again.",
+        "Sesi Berakhir",
+        "Sesi Anda telah berakhir. Silahkan login kembali.",
         "error"
       );
       handleLogout();
@@ -46,8 +46,8 @@ export default function Home() {
       router.replace("Onboarding");
     } catch (err) {
       showToast(
-        "Logout Failed",
-        "Failed to logout. Please try again later.",
+        "Logout Gagal",
+        "Gagal logout. Silahkan coba lagi.",
         "error"
       );
     }

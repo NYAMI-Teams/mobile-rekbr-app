@@ -79,7 +79,7 @@ const Timestamp = ({ data, caption, date, details = [] }) => {
           {/* Replace this with actual countdown (e.g., 24 jam mundur dari requestAt) */}
           <CountdownTimer
             deadline={data.buyerConfirmDeadline}
-            fromTime={data.fundReleaseRequest.resolvedAt}
+            fromTime={data.currentTimestamp}
           />
         </Text>
       );

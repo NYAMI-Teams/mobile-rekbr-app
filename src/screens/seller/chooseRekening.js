@@ -72,12 +72,15 @@ export default function PilihRekeningScreen() {
     try {
       const res = await getListBankAccount();
       if (res) {
-        // console.log("ini rekening user", res);
         setSaved(res.data);
         return res.data;
       }
     } catch (error) {
-      console.error("Error get list bank account:", error);
+      showToast(
+        "Gagal",
+        "Gagal mengambil data rekening. Silahkan coba lagi.",
+        "error"
+      );
     }
   };
 
@@ -85,11 +88,14 @@ export default function PilihRekeningScreen() {
     try {
       const res = await getAllBankList();
       if (res) {
-        // console.log("ini all bank", res);
         setBankList(res.data);
       }
     } catch (error) {
-      console.error("Error get list bank account:", error);
+      showToast(
+        "Gagal",
+        "Gagal mengambil data bank. Silahkan coba lagi.",
+        "error"
+      );
     }
   };
 
@@ -97,16 +103,18 @@ export default function PilihRekeningScreen() {
     try {
       const res = await checkRekeningExist(accountNumber, selectedBank.id);
       if (res.success === true) {
-        console.log("rekening user ditemukan", res);
         setAccountName(res.data.accountName);
         setIsAlreadyCheckedRekening(true);
       }
       if (res.success === false) {
-        console.log("rekening user tidak ditemukan", res);
         setIsAlreadyCheckedRekening(false);
       }
     } catch (error) {
-      console.error("Error get list bank account:", error);
+      showToast(
+        "Gagal",
+        "Rekening tidak ditemukan, silahkan coba lagi",
+        "error"
+      );
     }
   };
 
@@ -142,7 +150,6 @@ export default function PilihRekeningScreen() {
           item.bankId == selectedBank.bankId &&
           item.accountNumber == accountNumber
       );
-      console.log(bankData, "ini data rekening yang disimpan");
       router.push({
         pathname: "/CreateTransaksi/CreateRekbr",
         params: {
@@ -152,17 +159,13 @@ export default function PilihRekeningScreen() {
     } catch (error) {
       showToast(
         "Gagal",
-        "Gagal menyimpan rekening. Silakan coba lagi.",
+        "Gagal menyimpan rekening. Silahkan coba lagi.",
         "error"
       );
     } finally {
       setIsLoading(false);
       closeModal();
     }
-    // setModalVisible(false);
-    // router.push("/CreateTransaksi/CreateRekbr");
-    // handleBackToInputRekening();
-    // handleBackToBankSelection();
   };
 
   const toggleFavorite = (item, fromFavorites) => {
@@ -179,7 +182,6 @@ export default function PilihRekeningScreen() {
 
   const renderAccountItem = (item, fromFavorites, index) => {
     return (
-      // <View style={styles.accountItemContainer}>
       <AnimatedAccountItem
         item={item}
         fromFavorites={fromFavorites}
@@ -187,7 +189,6 @@ export default function PilihRekeningScreen() {
         index={index}
         key={index}
       />
-      // </View>
     );
   };
 
@@ -289,7 +290,6 @@ export default function PilihRekeningScreen() {
             style={styles.addButton}
             onPress={() => {
               setModalVisible(true);
-              // console.log("bank list", bankList);
             }}>
             <Text style={styles.addButtonText}>+ Rekening</Text>
           </TouchableOpacity>
@@ -515,7 +515,6 @@ const AnimatedAccountItem = ({
   return (
     <TouchableOpacity
       onPress={() => {
-        console.log(item, "ini item rekening");
         router.push({
           pathname: "/CreateTransaksi/CreateRekbr",
           params: {

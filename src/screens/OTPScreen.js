@@ -47,10 +47,10 @@ export default function OTPScreen({ email }) {
     inputRefs[0]?.focus();
     resendVerifyEmail(email)
       .then((res) => {
-        showToast("Success", res?.message);
+        showToast("Berhasil", res?.message, "success");
       })
       .catch((error) => {
-        showToast("Error", error?.message);
+        showToast("Gagal", error?.message, "error");
       })
       .finally(() => {
         setIsLoading(false);
@@ -61,7 +61,7 @@ export default function OTPScreen({ email }) {
     setIsLoading(true);
     verifyEmail(email, otpValue)
       .then((res) => {
-        showToast("Welcome", res?.message);
+        showToast("Selamat datang, " + email, res?.message, "success");
         setAccessToken(res?.data?.accessToken);
         router.replace("/auth/SuccessLogin");
       })
@@ -95,7 +95,7 @@ export default function OTPScreen({ email }) {
               Masukkan kode yang kami kirimkan
             </Text>
             <Text style={styles.emailInfo}>
-              Sudah dikirim ke email kamu{" "}
+              Sudah dikirim ke email kamu
               <Text style={styles.email}>{email}</Text>
             </Text>
 

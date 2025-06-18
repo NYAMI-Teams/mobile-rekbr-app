@@ -41,14 +41,6 @@ export default function LainnyaPage() {
     bidangUsaha !== "";
 
   const handleNext = () => {
-    console.log("Data disubmit:");
-    console.log({
-      namaIbu,
-      pendidikan,
-      kodePos,
-      namaUsaha,
-      bidangUsaha,
-    });
     router.push("/E-kyc/KYC_Lampiran");
   };
 

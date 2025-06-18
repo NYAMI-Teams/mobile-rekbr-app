@@ -1,11 +1,11 @@
 import React from "react";
 import { View, Text, Image, Pressable, TouchableOpacity } from "react-native";
 import * as Clipboard from "expo-clipboard";
-import Toast from "react-native-toast-message";
 import moment from "moment";
 import clsx from "clsx";
 import CountdownTimer from "../Countdown";
 import { useRouter } from "expo-router";
+import { showToast } from "../../utils";
 
 const SellerCard = ({ data }) => {
   const status = data?.status || "";
@@ -21,21 +21,9 @@ const SellerCard = ({ data }) => {
     if (!text) return;
     try {
       await Clipboard.setStringAsync(text);
-      Toast.show({
-        type: "success",
-        text1: "Berhasil",
-        text2: "Disalin ke clipboard",
-        position: "bottom",
-      });
-      console.log("Copied to clipboard:", text);
+      showToast("Berhasil", "Disalin ke clipboard", "success");
     } catch (error) {
-      Toast.show({
-        type: "error",
-        text1: "Gagal",
-        text2: "Tidak dapat menyalin",
-        position: "bottom",
-      });
-      console.log("Failed to copy to clipboard:", error);
+      showToast("Gagal", "Tidak dapat menyalin", "error");
     }
   };
 
@@ -70,8 +58,6 @@ const SellerCard = ({ data }) => {
           },
         ];
       case "shipped":
-        console.log("data", data);
-
         return [
           { label: "Nama Produk", value: data?.itemName || "-" },
           { label: "Pembeli", value: data?.buyerEmail || "-" },
@@ -157,7 +143,7 @@ const SellerCard = ({ data }) => {
             <Text className="font-poppins-semibold text-xs text-gray-800">
               <CountdownTimer
                 deadline={data?.buyerConfirmDeadline || "-"}
-                fromTime={data?.fundReleaseRequest.resolvedAt || "-"}
+                fromTime={data?.currentTimestamp || "-"}
               />
             </Text>
           </View>

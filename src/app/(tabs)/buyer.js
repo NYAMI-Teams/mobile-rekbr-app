@@ -33,16 +33,13 @@ export default function Home() {
       } else {
         setIsEmptyTransaction(true);
       }
-      console.log(res.data);
       setTransactions(res.data);
     } catch (err) {
       showToast(
-        "Error",
-        "Failed to fetch transactions. Please try again later.",
+        "Gagal",
+        "Gagal mengambil data transaksi. Silahkan coba lagi.",
         "error"
       );
-    } finally {
-      console.log("finally");
     }
   };
 
@@ -64,8 +61,8 @@ export default function Home() {
       setProfile(res.data);
     } catch {
       showToast(
-        "Session Invalid",
-        "Your session has expired. Please log in again.",
+        "Sesi Berakhir",
+        "Sesi Anda telah berakhir. Silahkan login kembali.",
         "error"
       );
       handleLogout();
@@ -79,11 +76,7 @@ export default function Home() {
       await removeAccessToken();
       router.replace("Onboarding");
     } catch (err) {
-      showToast(
-        "Logout Failed",
-        "Failed to logout. Please try again later.",
-        "error"
-      );
+      showToast("Logout Gagal", "Gagal logout. Silahkan coba lagi.", "error");
     }
   };
 
@@ -93,13 +86,8 @@ export default function Home() {
       <View style={{ flex: 1, padding: 16 }}>
         <NavigationBar
           name={profile?.email}
-          // onNotificationPress={() => console.log("Notification pressed")}
           onNotificationPress={() =>
-            Toast.show({
-              type: "success",
-              text1: "Notification pressed",
-              position: "top",
-            })
+            showToast("Notification", "Notification pressed", "success")
           }
           onLogoutPress={() => handleLogout()}
         />
