@@ -9,11 +9,13 @@ import PrimaryButton from "./PrimaryButton";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { ChevronLeftCircle } from "lucide-react-native";
-import * as ImagePicker from "expo-image-picker"; // Import ImagePicker
 import BuyerKonfirmasi from "../components/BuyerKonfirmasi";
 import { postResi } from "../utils/api/seller";
 import { getListCourier } from "../utils/api/seller";
 import Toast from "react-native-toast-message";
+import * as ImagePicker from "expo-image-picker";
+import * as ImageManipulator from "expo-image-manipulator";
+import { showToast } from "../utils";
 
 const mockCouriers = [
   {
@@ -82,7 +84,6 @@ export default function InputResi({ id }) {
     setCourier("");
   };
 
-  // Fungsi untuk mengambil gambar dari kamera
   const handleUpload = async () => {
     if (hasCameraPermission === false) {
       Alert.alert(
@@ -93,7 +94,6 @@ export default function InputResi({ id }) {
     }
 
     if (hasCameraPermission === null) {
-      // Izin masih dalam proses permintaan
       Alert.alert(
         "Meminta Izin",
         "Aplikasi sedang meminta izin kamera. Mohon tunggu sebentar."
@@ -101,19 +101,76 @@ export default function InputResi({ id }) {
       return;
     }
 
-    let result = await ImagePicker.launchCameraAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true, // Memungkinkan pengguna untuk mengedit/memotong gambar
-      quality: 1, // Kualitas gambar (0-1)
-    });
+    Alert.alert(
+      "Pilih Sumber Gambar",
+      "Ambil foto baru atau pilih dari galeri?",
+      [
+        {
+          text: "Kamera",
+          onPress: async () => {
+            await pickImage("camera");
+          },
+        },
+        {
+          text: "Galeri",
+          onPress: async () => {
+            await pickImage("gallery");
+          },
+        },
+        { text: "Batal", style: "cancel" },
+      ]
+    );
+  };
 
-    console.log(result); // Untuk debugging, lihat struktur hasil
+  const pickImage = async (source) => {
+    let result;
+    if (source === "camera") {
+      result = await ImagePicker.launchCameraAsync({
+        mediaTypes: "Images",
+        allowsEditing: true,
+        quality: 1,
+      });
+    } else {
+      result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: "Images",
+        allowsEditing: true,
+        quality: 1,
+      });
+    }
 
     if (!result.canceled && result.assets && result.assets.length > 0) {
-      setImage(result.assets[0].uri);
+      let imageAsset = result.assets[0];
+      let quality = 0.7;
+      let compressed = await ImageManipulator.manipulateAsync(
+        imageAsset.uri,
+        [],
+        { compress: quality, format: ImageManipulator.SaveFormat.JPEG }
+      );
+
+      // Loop kompresi hingga < 1MB atau quality terlalu kecil
+      let blob, size;
+      do {
+        const response = await fetch(compressed.uri);
+        blob = await response.blob();
+        size = blob.size;
+        if (size > 1024 * 1024) {
+          quality -= 0.2;
+          if (quality < 0.2) break;
+          compressed = await ImageManipulator.manipulateAsync(
+            imageAsset.uri,
+            [],
+            { compress: quality, format: ImageManipulator.SaveFormat.JPEG }
+          );
+        }
+        console.log("ini compressed", compressed);
+      } while (size > 1024 * 1024 && quality >= 0.2);
+
+      setImage({
+        ...imageAsset,
+        uri: compressed.uri,
+      });
       setIsUploaded(true);
     } else {
-      // Jika pengguna membatalkan atau tidak ada gambar yang dipilih
       setImage(null);
       setIsUploaded(false);
     }
@@ -135,18 +192,20 @@ export default function InputResi({ id }) {
     setShowPopup(true);
   };
 
-  const handleUploadResi = () => {
+  const handleUploadResi = async () => {
     try {
-      postResi(id, courier, resiNumber, image);
-      setShowPopup(false);
+      await postResi(id, courierId, resiNumber, image);
+      router.replace("/");
     } catch (error) {
       console.log(error);
+      showToast("error", "Gagal mengunggah resi", "error");
+    } finally {
+      setShowPopup(false);
     }
     console.log("ini id", id);
     console.log("ini courier id", courierId);
     console.log("ini resiNumber", resiNumber);
     console.log("ini image", image);
-    router.replace("/");
   };
 
   const handleResiNumberChange = (text) => {
@@ -202,13 +261,13 @@ export default function InputResi({ id }) {
             editable={false}
           />
         </TouchableOpacity>
-        <View className="mt-4">
+        <TouchableOpacity onPress={handleUpload} className="mt-4">
           <AttachmentFilled
-            title="Unggah Resi Pengiriman"
+            title="Unggah Bukti"
             caption={
               isUploaded
-                ? image.split("/").pop()
-                : "Ambil foto resi kamu disini"
+                ? image?.uri?.split("/").pop()
+                : "Berikan bukti berupa screenshot cek resi"
             }
             captionColor={isUploaded ? "#08B20F" : "#9E9E9E"}
             iconName={"camera"} // Pastikan AttachmentFilled Anda bisa menerima string 'camera' untuk ikon
@@ -221,13 +280,16 @@ export default function InputResi({ id }) {
             alertIconColor={isUploaded ? "#08B20F" : "#C2C2C2"}
             onPress={handleUpload}
           />
-        </View>
+        </TouchableOpacity>
         <View className="mt-4 mb-4">
           {" "}
           {/* Tambahkan margin vertikal */}
           {/* Image Preview */}
           {!image ? null : (
-            <Image source={{ uri: image }} className="w-full h-64 rounded-lg" />
+            <Image
+              source={{ uri: image.uri }}
+              className="w-full h-64 rounded-lg"
+            />
           )}
         </View>
       </ScrollView>

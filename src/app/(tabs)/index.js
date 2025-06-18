@@ -87,7 +87,7 @@ export default function Seller() {
   const handleLogout = async () => {
     try {
       await removeAccessToken();
-      router.replace("/auth/login");
+      router.replace("Onboarding");
     } catch (err) {
       console.error("Logout failed:", err);
     }
@@ -100,7 +100,6 @@ export default function Seller() {
         <View style={{ flex: 1, padding: 16 }}>
           <NavigationBar
             name={profile?.email}
-            // onNotificationPress={() => console.log("Notification pressed")}
             onNotificationPress={() =>
               Toast.show({
                 type: "success",
@@ -108,8 +107,6 @@ export default function Seller() {
                 position: "top",
               })
             }
-            // onProfilePress={() => console.log("Profile pressed")}
-            // onProfilePress={() => router.replace("/auth/login")}
             onLogoutPress={() => handleLogout()}
           />
           {isLoading ? (

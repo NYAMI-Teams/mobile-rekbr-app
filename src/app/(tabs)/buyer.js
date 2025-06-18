@@ -36,7 +36,11 @@ export default function Home() {
       console.log(res.data);
       setTransactions(res.data);
     } catch (err) {
-      console.error("Error fetching buyer transactions:", err);
+      showToast(
+        "Error",
+        "Failed to fetch transactions. Please try again later.",
+        "error"
+      );
     } finally {
       console.log("finally");
     }
@@ -73,9 +77,13 @@ export default function Home() {
   const handleLogout = async () => {
     try {
       await removeAccessToken();
-      router.replace("/auth/login");
+      router.replace("Onboarding");
     } catch (err) {
-      console.error("Logout failed:", err);
+      showToast(
+        "Logout Failed",
+        "Failed to logout. Please try again later.",
+        "error"
+      );
     }
   };
 

@@ -84,7 +84,7 @@ export default function History() {
   };
 
   return (
-    <View className="bg-white items-center w-full h-[80%]">
+    <View className="bg-white items-center w-full h-[80%] gap-5">
       <View className="flex-row w-full mt-4">
         <TouchableOpacity
           onPress={() => handleTabPress("pembelian")}

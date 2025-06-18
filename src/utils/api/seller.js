@@ -69,11 +69,16 @@ export const getDetailSellerTransaction = async (id) => {
 // Post Resi
 export const postResi = async (id, courier_id, tracking_number, photo) => {
   try {
-    const res = await Api.post(`/seller/transactions/${id}/shipping`, {
-      courier_id,
-      tracking_number,
-      photo,
-    });
+    const file = {
+      uri: photo.uri,
+      name: photo.fileName || photo.uri.split("/").pop(),
+      type: photo.type || "image/jpeg", // default jika tidak ada type
+    };
+    const formData = new FormData();
+    formData.append("photo", file);
+    formData.append("courier_id", courier_id);
+    formData.append("tracking_number", tracking_number);
+    const res = await Api.post(`/seller/transactions/${id}/shipping`, formData);
     if (res) {
       console.log("ini res", res);
       return res;
@@ -89,7 +94,7 @@ export const postFundRelease = async (id, evidence, reason) => {
   try {
     const file = {
       uri: evidence.uri,
-      name: evidence.fileName || evidence.uri.split('/').pop(),
+      name: evidence.fileName || evidence.uri.split("/").pop(),
       type: evidence.type || "image/jpeg", // default jika tidak ada type
     };
     const formData = new FormData();

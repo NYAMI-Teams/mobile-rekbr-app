@@ -555,7 +555,7 @@ export default function DetailTransaksiBuyer({ data }) {
           </Text> */}
           <Tagihan
             caption="Harga Barang"
-            price={formatPrice(data?.itemPrice)}
+            price={formatPrice(data?.totalAmount)}
             details={[
               {
                 status: "Nominal Barang",

@@ -21,6 +21,14 @@ export default function Register() {
   const [isChecked, setIsChecked] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
+  useEffect(() => {
+    //dev (DELETE)
+    setEmail("bayuseptyan43@gmail.com");
+    setPassword("Mobilmerah123#");
+    setConfirmPassword("Mobilmerah123#");
+    setIsChecked(true);
+  }, []);
+
   const togglePasswordVisibility = () => {
     setIsPasswordVisible(!isPasswordVisible);
   };
@@ -93,7 +101,6 @@ export default function Register() {
               inputClassName="pr-12"
             />
             {/* Alert Validasi Email*/}
-            {/* {email.length > 0 && ( */}
             <View className="flex-row items-center mt-2 mx-5">
               <Feather
                 name={isEmailValid() ? "check-circle" : "x-circle"}
@@ -107,7 +114,6 @@ export default function Register() {
                 {isEmailValid() ? "Email valid" : "Email tidak valid"}
               </Text>
             </View>
-            {/* )} */}
           </View>
 
           {/* Password */}

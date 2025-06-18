@@ -43,9 +43,13 @@ export default function Home() {
   const handleLogout = async () => {
     try {
       await removeAccessToken();
-      router.replace("/auth/login");
+      router.replace("Onboarding");
     } catch (err) {
-      console.error("Logout failed:", err);
+      showToast(
+        "Logout Failed",
+        "Failed to logout. Please try again later.",
+        "error"
+      );
     }
   };
 

@@ -42,6 +42,19 @@ export const verifyEmail = async (email, otpCode) => {
     }
 }
 
+export const resendVerifyEmail = async (email) => {
+    try {
+        const res = await Api.post(`/user/resend-verify-email`, {
+            email,
+        });
+        if (res) {
+            return res;
+        }
+    } catch (err) {
+        throw err;
+    }
+}
+
 export const verifyKyc = async () => {
     try {
         const res = await Api.post(`/user/verify-kyc`);

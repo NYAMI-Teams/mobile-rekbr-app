@@ -141,6 +141,8 @@ export default function FundReleaseRequestScreen() {
     try {
       await postFundRelease(id, image, alasanText);
       setShowPopup(false);
+      showToast("success", "Permintaan konfirmasi pengiriman berhasil dibuat");
+      router.replace("/");
     } catch (error) {
       console.log(error);
     } finally {
@@ -193,13 +195,20 @@ export default function FundReleaseRequestScreen() {
         </TouchableOpacity>
         <View className="mt-4 mb-4">
           {!image ? null : (
-            <Image source={{ uri: image?.uri }} className="w-full h-64 rounded-lg" />
+            <Image
+              source={{ uri: image?.uri }}
+              className="w-full h-64 rounded-lg"
+            />
           )}
         </View>
       </ScrollView>
       {/* Button */}
       <View className="w-full px-4 py-4">
-        <PrimaryButton title="Kirim" onPress={handleBtnPress} disabled={isLoading} />
+        <PrimaryButton
+          title="Kirim"
+          onPress={handleBtnPress}
+          disabled={isLoading}
+        />
       </View>
 
       {showPopup && (
