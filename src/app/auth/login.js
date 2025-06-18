@@ -12,9 +12,9 @@ import PrimaryButton from "../../components/PrimaryButton";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { login } from "../../utils/api/auth";
+import { getProfile, login } from "../../utils/api/auth";
 import { showToast } from "../../utils";
-import { setAccessToken } from "../../store";
+import { setAccessToken, setProfileStore } from "../../store";
 
 export default function Login() {
   const router = useRouter();
@@ -40,12 +40,23 @@ export default function Login() {
       const res = await login(email, password);
       showToast("Login Successful", "Welcome back!");
       await setAccessToken(res?.data?.accessToken);
-      router.replace("/");
+      getUserProfile();
     } catch (err) {
       console.log(err);
       setError(true);
       setErrorMsg("Login failed. Please try again.");
       showToast("Login Failed", err?.message, "error");
+      setIsLoading(false);
+    }
+  };
+
+  const getUserProfile = async () => {
+    try {
+      const res = await getProfile();
+      await setProfileStore(res?.data);
+      router.replace("/");
+    } catch (error) {
+      showToast("Error", "Failed to fetch user profile. Please try again later.", "error");
     } finally {
       setIsLoading(false);
     }
