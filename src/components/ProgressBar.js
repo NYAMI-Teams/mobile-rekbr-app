@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons"; // ganti di sini
 
-const StepProgressBar = ({ currentStep, steps}) => {
+const StepProgressBar = ({ currentStep, steps, isRejected }) => {
   return (
     <View style={styles.container}>
       {steps.map((label, index) => {
@@ -17,7 +17,9 @@ const StepProgressBar = ({ currentStep, steps}) => {
                 style={[
                   styles.circle,
                   isCompleted && styles.completedCircle,
-                  isActive && !isFinalStep && styles.activeCircle,
+                  isActive &&
+                    !isFinalStep &&
+                    (isRejected ? styles.rejectedCircle : styles.activeCircle),
                   isFinalStep && styles.finalCircle,
                 ]}
               >
@@ -28,19 +30,24 @@ const StepProgressBar = ({ currentStep, steps}) => {
                     color={isFinalStep ? "#4CD964" : "#4CD7D0"}
                   />
                 ) : isActive ? (
-                  <View
-                    style={[
-                      styles.dot,
-                      isFinalStep && { backgroundColor: "#4CD964" },
-                    ]}
-                  />
+                  isRejected ? (
+                    <MaterialIcons name="close" size={16} color="#F44336" />
+                  ) : (
+                    <View
+                      style={[
+                        styles.dot,
+                        isFinalStep && { backgroundColor: "#4CD964" },
+                      ]}
+                    />
+                  )
                 ) : null}
               </View>
               <Text
                 style={[
                   styles.label,
                   isCompleted && styles.completedLabel,
-                  isActive && !isFinalStep && styles.activeLabel,
+                  isActive &&
+                    (isRejected ? styles.rejectedLabel : styles.activeLabel),
                   isFinalStep && styles.finalLabel,
                 ]}
               >
@@ -129,6 +136,14 @@ const styles = StyleSheet.create({
   },
   finalLabel: {
     color: "#4CD964",
+    fontWeight: "600",
+  },
+  rejectedCircle: {
+    backgroundColor: "#FFEBEE",
+    borderColor: "#F44336",
+  },
+  rejectedLabel: {
+    color: "#F44336",
     fontWeight: "600",
   },
 });

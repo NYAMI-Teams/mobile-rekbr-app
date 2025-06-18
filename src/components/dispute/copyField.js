@@ -28,7 +28,7 @@ const handleCopy = async (text) => {
 // Komponen utama
 const CopyField = ({ title, content }) => {
   return (
-    <View className="flex-col justify-center gap-2 mx-3 p-3">
+    <View className="flex-col justify-center gap-2 p-3 mt-2">
       <Text className="text-[15px]">{title}</Text>
       <View className="flex-row items-center">
         <Text className="text-[15px] font-medium">{content}</Text>
