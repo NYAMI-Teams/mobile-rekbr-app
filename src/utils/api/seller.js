@@ -87,11 +87,11 @@ export const postResi = async (id, courier_id, tracking_number, photo) => {
 // Post Fund Release
 export const postFundRelease = async (id, evidence, reason) => {
   try {
-    // Convert image URI to Blob
-    const response = await fetch(evidence);
-    const blob = await response.blob();
-    const file = new File([blob], "evidence.jpg", { type: "image/jpeg" });
-
+    const file = {
+      uri: evidence.uri,
+      name: evidence.fileName || evidence.uri.split('/').pop(),
+      type: evidence.type || "image/jpeg", // default jika tidak ada type
+    };
     const formData = new FormData();
     formData.append("evidence", file);
     formData.append("reason", reason);
