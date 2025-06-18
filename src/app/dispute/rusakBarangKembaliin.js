@@ -15,6 +15,8 @@ import { useNavigation } from "expo-router";
 import PrimaryButton from "../../components/PrimaryButton";
 import { InfoBanner } from "../../components/dispute/InfoBanner";
 import StepProgressBar from "../../components/ProgressBar";
+import { StatusKomplain } from "../../components/dispute/statusKomplain";
+import { TrackDispute } from "../../components/dispute/TrackDispute";
 
 export default function RusakBarangKembaliinPage() {
   return (
@@ -38,6 +40,25 @@ export default function RusakBarangKembaliinPage() {
           steps={["Menunggu", "Kembaliin", "Refund", "Selesai"]}
         />
         <InfoBanner contentBefore="Pastikan barang dalam kondisi baik, kemasan terjaga, dan lampirkan bukti pengiriman!" />
+        <StatusKomplain status="Menunggu Pengembalian Barang" />
+
+        <View className="h4 bg-[#f5f5f5]"/>
+
+        <TrackDispute
+          title="Riwayat Dispute"
+          dateTime="18 Juni 2025, 10:00 WIB"
+          details={[
+            { content: "Seller sudah kirim bukti." },
+            { content: "Buyer setuju refund." },
+            {
+              imgTitle: "Bukti Barang & Transfer",
+              images: [
+                require("../../assets/barangrusak.png"),
+                require("../../assets/barangrusak.png"),
+              ],
+            },
+          ]}
+        />
       </ScrollView>
     </SafeAreaView>
   );
