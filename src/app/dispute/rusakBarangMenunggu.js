@@ -10,6 +10,26 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { ClipboardPaste, ChevronLeft, MoreVertical, ChevronDown } from "lucide-react-native";
 import CopyField from "../../components/dispute/copyField";
 import TextView from "../../components/dispute/textView";
+import {InfoBanner }from "../../components/dispute/InfoBanner";
+
+/**
+ * Renders the detailed view for a complaint in the dispute process.
+ * 
+ * This component displays information regarding a buyer's complaint,
+ * including the complaint status, submission details, and related transaction data.
+ * It also features a stepper indicating the current stage of the dispute process
+ * and allows interaction for sending an email to the seller.
+ *
+ * Components used:
+ * - SafeAreaView: Ensures the view is rendered within the safe area boundaries of a device.
+ * - ScrollView: Enables scrolling to accommodate potentially lengthy content.
+ * - InfoBanner: Displays important information about the complaint.
+ * - TextView: Shows various details such as seller info, item name, and billing.
+ * - CopyField: Provides fields with copyable content, such as tracking number and transaction ID.
+ *
+ * Returns:
+ * A React component that can be rendered to display the complaint details.
+ */
 
 export default function DetailKomplain() {
   return (
@@ -35,12 +55,16 @@ export default function DetailKomplain() {
         </View>
 
         {/* Alert Info */}
-        <View className="flex-row items-start bg-[#FFF4E5] border border-[#FFD7A8] rounded-xl px-3 py-3 mb-3">
+        {/* <View className="flex-row items-start bg-[#FFF4E5] border border-[#FFD7A8] rounded-xl px-3 py-3 mb-3">
           <Image source={require("../../assets/admin1.png")} className="w-5 h-5 mt-0.5" />
           <Text className="text-xs text-black ml-2">
             Jika seller nggak respon sampai <Text className="font-semibold">18 Juni 2025, 10 : 00 WIB</Text>, pengajuanmu bakal otomatis disetujui ya!
           </Text>
-        </View>
+        </View> */}
+        <InfoBanner
+          contentBefore="Jika seller nggak respon sampai "
+          dateTime="18 Juni 2025, 10 : 00 WIB"
+          contentAfter="pengajuanmu bakal otomatis disetujui ya!"/>
 
         {/* Status Komplain */}
         <View className="flex-row justify-between items-center border-b border-gray-100 pb-3 mb-3">
