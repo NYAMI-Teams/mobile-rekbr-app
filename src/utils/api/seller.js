@@ -14,7 +14,38 @@ import Api from "../api";
 // Get All Seller Trx
 export const getSellerTransactions = async () => {
   try {
-    const res = await Api.get(`/seller/transactions`);
+    const res = await Api.get(`/seller/transactions`, {
+      params: {
+        isHistory: false,
+      },
+    });
+    if (res) {
+      return res;
+    }
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Get History Seller Trx
+export const getHistorySeller = async () => {
+  try {
+    const res = await Api.get(`/seller/transactions`, {
+      params: {
+        isHistory: true,
+      },
+    });
+    if (res) {
+      return res;
+    }
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const cancelTransaksiSeller = async (transactionId) => {
+  try {
+    const res = await Api.post(`/seller/transactions/${transactionId}/cancel`);
     if (res) {
       return res;
     }
@@ -38,11 +69,16 @@ export const getDetailSellerTransaction = async (id) => {
 // Post Resi
 export const postResi = async (id, courier_id, tracking_number, photo) => {
   try {
-    const res = await Api.post(`/seller/transactions/${id}/shipping`, {
-      courier_id,
-      tracking_number,
-      photo,
-    });
+    const file = {
+      uri: photo.uri,
+      name: photo.fileName || photo.uri.split("/").pop(),
+      type: photo.type || "image/jpeg", // default jika tidak ada type
+    };
+    const formData = new FormData();
+    formData.append("photo", file);
+    formData.append("courier_id", courier_id);
+    formData.append("tracking_number", tracking_number);
+    const res = await Api.post(`/seller/transactions/${id}/shipping`, formData);
     if (res) {
       console.log("ini res", res);
       return res;
@@ -56,11 +92,11 @@ export const postResi = async (id, courier_id, tracking_number, photo) => {
 // Post Fund Release
 export const postFundRelease = async (id, evidence, reason) => {
   try {
-    // Convert image URI to Blob
-    const response = await fetch(evidence);
-    const blob = await response.blob();
-    const file = new File([blob], "evidence.jpg", { type: "image/jpeg" });
-
+    const file = {
+      uri: evidence.uri,
+      name: evidence.fileName || evidence.uri.split("/").pop(),
+      type: evidence.type || "image/jpeg", // default jika tidak ada type
+    };
     const formData = new FormData();
     formData.append("evidence", file);
     formData.append("reason", reason);
@@ -107,6 +143,23 @@ export const getListBankAccount = async () => {
 export const getAllBankList = async () => {
   try {
     const res = await Api.get(`/bank/bank-list`);
+    if (res) {
+      return res;
+    }
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Check Rekening Exist
+export const checkRekeningExist = async (account_number, bank_id) => {
+  try {
+    const res = await Api.get(`/bank/account`, {
+      params: {
+        account_number,
+        bank_id,
+      },
+    });
     if (res) {
       return res;
     }

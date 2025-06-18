@@ -8,6 +8,7 @@ const DateField = ({
   value,
   onChangeText,
   secureTextEntry = false,
+  editable = true,
   keyboardType = "default",
 }) => {
   return (
@@ -22,6 +23,7 @@ const DateField = ({
           placeholderTextColor="#999"
           value={value}
           onChangeText={onChangeText}
+          editable={editable}
           secureTextEntry={secureTextEntry}
           keyboardType={keyboardType}
           autoCapitalize="none"
@@ -34,7 +36,6 @@ const DateField = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginHorizontal: 20,
   },
   title: {
     marginBottom: 8,

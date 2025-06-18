@@ -2,40 +2,55 @@ import { Stack } from "expo-router";
 import "../../global.css";
 import { useEffect, useState } from "react";
 import Toast from "react-native-toast-message";
-import { ActivityIndicator, View } from "react-native";
 import { getProfile } from "../utils/api/auth";
 import { showToast } from "../utils";
-import { getAccessToken } from "../store";
+import { getAccessToken, setProfileStore } from "../store";
+import SplashScreen from "../assets/splash.png";
+import { Image, View } from "react-native";
 
 export default function RootLayout() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // Ini harusnya false, gua bikin true biar langsung masuk home
-  const [isLoading, setIsLoading] = useState(false);
+  const [appIsReady, setAppIsReady] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    setIsLoading(true);
-    getAccessToken()
-      .then(token => {
-        if (!token) return setIsLoggedIn(false);
-        getProfile()
-          .then(res => {
-            console.log("Profile data:", res.data);
-            setIsLoggedIn(true);
-          })
-          .catch(() => {
-            showToast("Error", "Failed to fetch profile data", "error");
-            setIsLoggedIn(false);
-          });
-      })
-      .catch(() => setIsLoggedIn(false))
-      .finally(() => setIsLoading(false));
+    const checkAuth = async () => {
+      try {
+        const token = await getAccessToken();
+        if (!token) {
+          setIsLoggedIn(false);
+          return;
+        }
+        const res = await getProfile();
+        setProfileStore(res.data);
+        setIsLoggedIn(true);
+      } catch (error) {
+        if (!error.includes("Error getting access token")) {
+          // showToast("Error", "Failed to fetch profile. Please try again later.", "error");
+        }
+        setIsLoggedIn(false);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    const splashTimeout = async() => {
+      await new Promise(resolve => setTimeout(resolve, 3000)); 
+      setAppIsReady(true);
+    }
+    splashTimeout();
+    checkAuth();
   }, []);
 
-  if (isLoading) {
+  if (!appIsReady || isLoading) {
     return (
-      <View className="flex-1 items-center justify-center">
-        <ActivityIndicator size="large" color="#0000ff" />
+      <View className="flex-1 bg-white justify-center items-center">
+        <Image
+          source={SplashScreen}
+          className="w-full h-full"
+        />
       </View>
-    )
+    );
   }
 
   return (
@@ -44,7 +59,7 @@ export default function RootLayout() {
         {isLoggedIn ? (
           <Stack.Screen name="(tabs)" />
         ) : (
-          <Stack.Screen name="auth/login" />
+          <Stack.Screen name="Onboarding/index" />
         )}
       </Stack>
       <Toast />

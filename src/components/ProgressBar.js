@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons"; // ganti di sini
 
-const StepProgressBar = ({ currentStep, steps}) => {
+const StepProgressBar = ({ currentStep, steps }) => {
   return (
     <View style={styles.container}>
       {steps.map((label, index) => {
@@ -19,8 +19,7 @@ const StepProgressBar = ({ currentStep, steps}) => {
                   isCompleted && styles.completedCircle,
                   isActive && !isFinalStep && styles.activeCircle,
                   isFinalStep && styles.finalCircle,
-                ]}
-              >
+                ]}>
                 {isCompleted || isFinalStep ? (
                   <MaterialIcons
                     name="check"
@@ -42,8 +41,7 @@ const StepProgressBar = ({ currentStep, steps}) => {
                   isCompleted && styles.completedLabel,
                   isActive && !isFinalStep && styles.activeLabel,
                   isFinalStep && styles.finalLabel,
-                ]}
-              >
+                ]}>
                 {label}
               </Text>
             </View>
@@ -110,6 +108,7 @@ const styles = StyleSheet.create({
     height: 2,
     backgroundColor: "#ccc",
     marginHorizontal: 5,
+    marginBottom: 10,
   },
   completedLine: {
     backgroundColor: "#4CD7D0",

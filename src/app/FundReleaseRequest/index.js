@@ -3,6 +3,7 @@ import { useRouter } from "expo-router";
 import { useState, useEffect } from "react";
 import { Alert } from "react-native";
 import * as ImagePicker from "expo-image-picker";
+import * as ImageManipulator from "expo-image-manipulator";
 import {
   SafeAreaView,
   View,
@@ -26,6 +27,7 @@ export default function FundReleaseRequestScreen() {
 
   const [alasanText, setAlasanText] = useState("");
   const [showPopup, setShowPopup] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const { id } = useLocalSearchParams();
 
@@ -46,7 +48,6 @@ export default function FundReleaseRequestScreen() {
     }
 
     if (hasCameraPermission === null) {
-      // Izin masih dalam proses permintaan
       Alert.alert(
         "Meminta Izin",
         "Aplikasi sedang meminta izin kamera. Mohon tunggu sebentar."
@@ -54,19 +55,75 @@ export default function FundReleaseRequestScreen() {
       return;
     }
 
-    let result = await ImagePicker.launchCameraAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true, // Memungkinkan pengguna untuk mengedit/memotong gambar
-      quality: 1, // Kualitas gambar (0-1)
-    });
+    Alert.alert(
+      "Pilih Sumber Gambar",
+      "Ambil foto baru atau pilih dari galeri?",
+      [
+        {
+          text: "Kamera",
+          onPress: async () => {
+            await pickImage("camera");
+          },
+        },
+        {
+          text: "Galeri",
+          onPress: async () => {
+            await pickImage("gallery");
+          },
+        },
+        { text: "Batal", style: "cancel" },
+      ]
+    );
+  };
 
-    console.log(result); // Untuk debugging, lihat struktur hasil
+  const pickImage = async (source) => {
+    let result;
+    if (source === "camera") {
+      result = await ImagePicker.launchCameraAsync({
+        mediaTypes: "Images",
+        allowsEditing: true,
+        quality: 1,
+      });
+    } else {
+      result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: "Images",
+        allowsEditing: true,
+        quality: 1,
+      });
+    }
 
     if (!result.canceled && result.assets && result.assets.length > 0) {
-      setImage(result.assets[0].uri);
+      let imageAsset = result.assets[0];
+      let quality = 0.7;
+      let compressed = await ImageManipulator.manipulateAsync(
+        imageAsset.uri,
+        [],
+        { compress: quality, format: ImageManipulator.SaveFormat.JPEG }
+      );
+
+      // Loop kompresi hingga < 1MB atau quality terlalu kecil
+      let blob, size;
+      do {
+        const response = await fetch(compressed.uri);
+        blob = await response.blob();
+        size = blob.size;
+        if (size > 1024 * 1024) {
+          quality -= 0.2;
+          if (quality < 0.2) break;
+          compressed = await ImageManipulator.manipulateAsync(
+            imageAsset.uri,
+            [],
+            { compress: quality, format: ImageManipulator.SaveFormat.JPEG }
+          );
+        }
+      } while (size > 1024 * 1024 && quality >= 0.2);
+
+      setImage({
+        ...imageAsset,
+        uri: compressed.uri,
+      });
       setIsUploaded(true);
     } else {
-      // Jika pengguna membatalkan atau tidak ada gambar yang dipilih
       setImage(null);
       setIsUploaded(false);
     }
@@ -79,28 +136,28 @@ export default function FundReleaseRequestScreen() {
     console.log("ini alasanText ", alasanText);
   };
 
-  const handleUploadFundRelease = () => {
+  const handleUploadFundRelease = async () => {
+    setIsLoading(true);
     try {
-      postFundRelease(id, image, alasanText);
+      await postFundRelease(id, image, alasanText);
       setShowPopup(false);
+      showToast("success", "Permintaan konfirmasi pengiriman berhasil dibuat");
+      router.replace("/");
     } catch (error) {
       console.log(error);
+    } finally {
+      setIsLoading(false);
     }
-    router.replace("/");
   };
 
   return (
     <SafeAreaView className="flex-1 bg-white items-center justify-between">
       {/* Header */}
       <View className="flex-row justify-between items-center w-full px-4 pt-4">
-        {" "}
-        {/* Tambahkan padding horizontal */}
         <TouchableOpacity onPress={() => router.back()}>
           <Ionicons name="chevron-back-outline" size={24} color="#000" />
         </TouchableOpacity>
         <Text className="text-[16px] font-semibold text-black">
-          {" "}
-          {/* Hapus items-center, karena sudah di flex-row justify-between */}
           Permintaan Konfirmasi
         </Text>
         <View style={{ width: 24 }} />
@@ -108,8 +165,6 @@ export default function FundReleaseRequestScreen() {
 
       {/* Content */}
       <ScrollView className="flex-1 w-full px-4 mt-5">
-        {" "}
-        {/* Wrap content dengan ScrollView */}
         <View className="mt-4">
           <InputField
             title="Alasan Permintaan Konfirmasi"
@@ -123,7 +178,7 @@ export default function FundReleaseRequestScreen() {
             title="Unggah Bukti"
             caption={
               isUploaded
-                ? image.split("/").pop()
+                ? image?.uri?.split("/").pop()
                 : "Berikan bukti berupa screenshot cek resi"
             }
             captionColor={isUploaded ? "#08B20F" : "#9E9E9E"}
@@ -139,19 +194,21 @@ export default function FundReleaseRequestScreen() {
           />
         </TouchableOpacity>
         <View className="mt-4 mb-4">
-          {" "}
-          {/* Tambahkan margin vertikal */}
-          {/* Image Preview */}
           {!image ? null : (
-            <Image source={{ uri: image }} className="w-full h-64 rounded-lg" />
+            <Image
+              source={{ uri: image?.uri }}
+              className="w-full h-64 rounded-lg"
+            />
           )}
         </View>
       </ScrollView>
       {/* Button */}
       <View className="w-full px-4 py-4">
-        {" "}
-        {/* Tambahkan padding horizontal dan vertikal */}
-        <PrimaryButton title="Kirim" onPress={handleBtnPress} />
+        <PrimaryButton
+          title="Kirim"
+          onPress={handleBtnPress}
+          disabled={isLoading}
+        />
       </View>
 
       {showPopup && (

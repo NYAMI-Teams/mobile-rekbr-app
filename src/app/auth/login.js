@@ -12,9 +12,9 @@ import PrimaryButton from "../../components/PrimaryButton";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { login } from "../../utils/api/auth";
+import { getProfile, login } from "../../utils/api/auth";
 import { showToast } from "../../utils";
-import { setAccessToken } from "../../store";
+import { setAccessToken, setProfileStore } from "../../store";
 
 export default function Login() {
   const router = useRouter();
@@ -25,41 +25,41 @@ export default function Login() {
   const [errorMsg, setErrorMsg] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    // development purposes, remove this in production
-    setEmail("seller@gmail.com");
-    setPassword("pass123");
-  }, []);
-
   const togglePasswordVisibility = () => {
     setIsPasswordVisible(!isPasswordVisible);
   };
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     setError(false);
     if (!email.trim() || !password.trim()) {
       setErrorMsg("Please enter both email and password.");
       return;
     }
-
     setIsLoading(true);
+    try {
+      const res = await login(email, password);
+      showToast("Login Successful", "Welcome back!");
+      await setAccessToken(res?.data?.accessToken);
+      getUserProfile();
+    } catch (err) {
+      console.log(err);
+      setError(true);
+      setErrorMsg("Login failed. Please try again.");
+      showToast("Login Failed", err?.message, "error");
+      setIsLoading(false);
+    }
+  };
 
-    // Call the login API
-    login(email, password)
-      .then((res) => {
-        showToast("Login Successful", "Welcome back!");
-        setAccessToken(res?.data?.accessToken);
-        router.replace("/");
-      })
-      .catch((err) => {
-        console.log(err);
-        setError(true);
-        setErrorMsg("Login failed. Please try again.");
-        showToast("Login Failed", err?.message, "error");
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
+  const getUserProfile = async () => {
+    try {
+      const res = await getProfile();
+      await setProfileStore(res?.data);
+      router.replace("/");
+    } catch (error) {
+      showToast("Error", "Failed to fetch user profile. Please try again later.", "error");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -76,7 +76,7 @@ export default function Login() {
           </View>
 
           {/* Form */}
-          <View className="py-5 justify-between">
+          <View className="py-5 mx-5 justify-between">
             {/* Email */}
             <View className="mb-4 mt-5">
               <InputField
@@ -137,7 +137,7 @@ export default function Login() {
                 <PrimaryButton
                   title="Masuk"
                   onPress={handleLogin}
-                  disabled={isLoading}
+                  disabled={isLoading || !email || !password}
                 />
               </View>
 

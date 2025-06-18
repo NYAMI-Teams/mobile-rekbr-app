@@ -1,14 +1,56 @@
-import { View } from "react-native";
+import { View, ActivityIndicator } from "react-native";
 import NavigationBar from "../../components/NavigationBar";
 import History from "../../screens/history";
 import { StatusBar } from "expo-status-bar";
+import { useState, useEffect } from "react";
+import { getProfile } from "../../utils/api/auth";
+import { getAccessToken, removeAccessToken } from "../../store";
+import { showToast } from "../../utils";
+import Toast from "react-native-toast-message";
+import { useRouter } from "expo-router";
 
 export default function Home() {
-  const bankData = {
-    accountHolder: "Sdr Bayu Saptaji Rahman",
-    bankName: "Bank Negara Indonesia",
-    accountNumber: "0900604501",
-    logoSrc: require("../../assets/bni-logo2.png"),
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+  const [profile, setProfile] = useState(null);
+
+  useEffect(() => {
+    checkAuth();
+  }, []);
+
+  const checkAuth = async () => {
+    setIsLoading(true);
+    try {
+      const token = await getAccessToken();
+      if (!token) {
+        handleLogout();
+        return;
+      }
+      const res = await getProfile();
+      setProfile(res.data);
+    } catch {
+      showToast(
+        "Session Invalid",
+        "Your session has expired. Please log in again.",
+        "error"
+      );
+      handleLogout();
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await removeAccessToken();
+      router.replace("Onboarding");
+    } catch (err) {
+      showToast(
+        "Logout Failed",
+        "Failed to logout. Please try again later.",
+        "error"
+      );
+    }
   };
 
   return (
@@ -16,20 +58,24 @@ export default function Home() {
       <StatusBar style="dark" />
       <View style={{ flex: 1, padding: 16 }}>
         <NavigationBar
-          name="irgi168@gmail.com"
-          onNotificationPress={() => console.log("Notification pressed")}
-          onProfilePress={() => console.log("Notification pressed")}
+          name={profile?.email}
+          onNotificationPress={() =>
+            Toast.show({
+              type: "success",
+              text1: "Notification pressed",
+              position: "top",
+            })
+          }
+          onLogoutPress={() => handleLogout()}
         />
-        {/* <ScrollView
-          className="flex flex-col gap-12"
-          showsVerticalScrollIndicator={false}>
-          {isEmptyTransaction ? (
-            <BuyerEmptyContent />
-          ) : (
-            <BuyerCard data={mockAPIBuyer.data} />
-          )}
-        </ScrollView> */}
-        <History />
+
+        {isLoading ? (
+          <View className="flex-1 justify-center items-center">
+            <ActivityIndicator size="large" color="#000" />
+          </View>
+        ) : (
+          <History />
+        )}
       </View>
     </View>
   );

@@ -1,58 +1,15 @@
-import { StatusBar } from "expo-status-bar";
 import {
   View,
   Text,
   Image,
   TouchableOpacity,
   SafeAreaView,
-  ActivityIndicator,
 } from "react-native";
-import { useState, useEffect } from "react";
 import EmptyIllustration from "../../components/Ilustration";
 import { useRouter } from "expo-router";
 
 export default function SellerEmptyContent({ isKYCCompleted }) {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchUserProfile = async () => {
-      try {
-        const token = "YOUR_ACCESS_TOKEN_HERE";
-
-        const response = await fetch("https://api.rekbr.com/user/profile", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        console.log("User profile:", data);
-
-        // setIsKycCompleted(data.kycStatus === "COMPLETED");
-      } catch (error) {
-        console.error("Error fetching user profile:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchUserProfile();
-  }, []);
-
-  if (isLoading) {
-    return (
-      <SafeAreaView className="flex-1 justify-center items-center">
-        <ActivityIndicator size="large" color="#000" />
-      </SafeAreaView>
-    );
-  }
 
   return (
     <SafeAreaView className="flex-1 bg-white pt-4 justify-start">
@@ -90,12 +47,12 @@ export default function SellerEmptyContent({ isKYCCompleted }) {
               console.log("Navigasi ke halaman KYC");
               router.push("E-kyc/KYC_Intro");
             } else {
-              console.log("Navigasi ke buat Rekber baru");
+              router.push("CreateTransaksi/CreateRekening/ChooseRekening");
             }
           }}>
           <Text className="text-white text-base font-semibold">
             {isKYCCompleted
-              ? "Bikin Rekber Baru"
+              ? "Bikin Rekbr Baru"
               : "Lengkapi KYC & Bikin Rekber"}
           </Text>
         </TouchableOpacity>
