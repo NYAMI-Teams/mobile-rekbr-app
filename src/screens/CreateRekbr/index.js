@@ -14,7 +14,10 @@ import PrimaryButton from "../../components/PrimaryButton";
 import InputField from "../../components/InputField";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import { checkUser, sellerCreateTransaction } from "../../utils/api/transaction";
+import {
+  checkUser,
+  sellerCreateTransaction,
+} from "../../utils/api/transaction";
 import { showToast } from "../../utils";
 
 export default function CreateRekber({ bankData }) {
@@ -25,14 +28,6 @@ export default function CreateRekber({ bankData }) {
   const [amount, setAmount] = useState(0);
   const [isUserFound, setIsUserFound] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-
-
-  useEffect(() => {
-    // development only
-    setEmail("danilardi13@gmail.com");
-    setItemName("Iphone 13 Pro");
-    setAmount("7000000");
-  }, []);
 
   const handleCheckboxPress = () => {
     setIsChecked(!isChecked);
@@ -59,7 +54,7 @@ export default function CreateRekber({ bankData }) {
     } finally {
       setIsLoading(false);
     }
-  }
+  };
 
   const handleToConfirmPage = () => {
     const payload = {
@@ -68,7 +63,7 @@ export default function CreateRekber({ bankData }) {
       itemPrice: Number(amount),
       withdrawalBankAccountId: bankData?.id,
       isInsurance: isChecked,
-    }
+    };
     router.push({
       pathname: "/CreateTransaksi/CreateRekbr/GenerateVA",
       params: {
@@ -76,7 +71,7 @@ export default function CreateRekber({ bankData }) {
         bankData: JSON.stringify(bankData),
       },
     });
-  }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -158,9 +153,9 @@ export default function CreateRekber({ bankData }) {
                     onPress={handleCheckboxPress}
                     className={`w-6 h-6 border ${
                       isChecked
-                      ? "bg-[#3ED6C5] border-[#3ED6C5]"
-                      : "bg-white border-gray-400"
-                      } rounded flex items-center justify-center`}>
+                        ? "bg-[#3ED6C5] border-[#3ED6C5]"
+                        : "bg-white border-gray-400"
+                    } rounded flex items-center justify-center`}>
                     {isChecked && (
                       <Text className="text-white text-lg font-medium items-center justify-center pb-7">
                         ✓
@@ -182,10 +177,7 @@ export default function CreateRekber({ bankData }) {
         </ScrollView>
         {/* Continue Button */}
         <View className="w-full mb-5 px-4">
-          <PrimaryButton
-            title="Lanjut"
-            onPress={handleToConfirmPage}
-          />
+          <PrimaryButton title="Lanjut" onPress={handleToConfirmPage} />
         </View>
       </View>
     </SafeAreaView>

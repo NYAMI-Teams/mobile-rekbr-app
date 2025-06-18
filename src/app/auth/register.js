@@ -13,7 +13,6 @@ import { showToast } from "../../utils";
 
 export default function Register() {
   const router = useRouter();
-  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -22,19 +21,16 @@ export default function Register() {
   const [isChecked, setIsChecked] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    // development purposes, remove this in production
-    setEmail("danilardi13@gmail.com");
-    setPassword("pass123");
-    setConfirmPassword("pass123");
-  }, []);
-
   const togglePasswordVisibility = () => {
     setIsPasswordVisible(!isPasswordVisible);
   };
 
   const toggleConfirmPasswordVisibility = () => {
     setConfirmPasswordVisible(!confirmPasswordVisible);
+  };
+
+  const isEmailValid = () => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   };
 
   const isPasswordValid = () => {
@@ -49,12 +45,10 @@ export default function Register() {
 
   const isFormValid = () => {
     return (
-      //   name &&
-      //   email &&
-      //   isPasswordValid() &&
-      //   password === confirmPassword &&
-      //   isChecked
-      true
+      isEmailValid() &&
+      isPasswordValid() &&
+      password === confirmPassword &&
+      isChecked
     );
   };
 
@@ -72,10 +66,6 @@ export default function Register() {
         showToast("Registrasi Gagal", err?.message, "error");
       })
       .finally(() => {
-        // setEmail("");
-        // setPassword("");
-        // setConfirmPassword("");
-        // setIsChecked(false);
         setIsLoading(false);
       });
   };
@@ -102,6 +92,22 @@ export default function Register() {
               keyboardType="email-address"
               inputClassName="pr-12"
             />
+            {/* Alert Validasi Email*/}
+            {/* {email.length > 0 && ( */}
+            <View className="flex-row items-center mt-2 mx-5">
+              <Feather
+                name={isEmailValid() ? "check-circle" : "x-circle"}
+                size={18}
+                color={isEmailValid() ? "#4ade80" : "#f87171"}
+              />
+              <Text
+                className={`ml-2 text-sm ${
+                  isEmailValid() ? "text-green-600" : "text-red-400"
+                }`}>
+                {isEmailValid() ? "Email valid" : "Email tidak valid"}
+              </Text>
+            </View>
+            {/* )} */}
           </View>
 
           {/* Password */}

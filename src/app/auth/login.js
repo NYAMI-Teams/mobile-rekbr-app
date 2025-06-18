@@ -25,12 +25,6 @@ export default function Login() {
   const [errorMsg, setErrorMsg] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    // development purposes, remove this in production
-    setEmail("buyer@gmail.com");
-    setPassword("pass123");
-  }, []);
-
   const togglePasswordVisibility = () => {
     setIsPasswordVisible(!isPasswordVisible);
   };
@@ -132,7 +126,7 @@ export default function Login() {
                 <PrimaryButton
                   title="Masuk"
                   onPress={handleLogin}
-                  disabled={isLoading}
+                  disabled={isLoading || !email || !password}
                 />
               </View>
 
