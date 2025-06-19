@@ -23,6 +23,7 @@ import { TrackDispute } from "../../components/dispute/TrackDispute";
 
 export default function DetailKomplain() {
   const [showOptionModal, setShowOptionModal] = useState(false);
+  const [ditolak, setDitolak] = useState(false); // ✅ perbaikan useState
 
   return (
     <SafeAreaView className="flex-1 bg-white">
@@ -40,6 +41,7 @@ export default function DetailKomplain() {
         <StepProgressBar
           currentStep={2}
           steps={["Menunggu", "Kembaliin", "Refund", "Selesai"]}
+          isRejected={ditolak}
         />
 
         {/* Status Komplain */}
@@ -127,6 +129,16 @@ export default function DetailKomplain() {
         <TextView title="Ekspedisi" content="J&T Express Indonesia" />
         <CopyField title="ID Transaksi" content="1 2 3 4 5 6 7 8 9" />
         <CopyField title="Virtual Account" content="8 0 8 0 1 2 3 4 5 6 7 8 9" />
+
+        {/* ✅ Tombol untuk mengaktifkan setDitolak(true) */}
+        <TouchableOpacity
+          onPress={() => setDitolak(true)}
+          className="mt-6 bg-red-500 py-3 rounded-xl"
+        >
+          <Text className="text-white text-center font-semibold">
+            Tandai Komplain Ditolak
+          </Text>
+        </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
   );
