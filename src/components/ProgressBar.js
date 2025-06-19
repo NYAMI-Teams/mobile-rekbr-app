@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons"; // ganti di sini
 
-const StepProgressBar = ({ currentStep, steps }) => {
+const StepProgressBar = ({ currentStep, steps, isRejected }) => {
   return (
     <View style={styles.container}>
       {steps.map((label, index) => {
@@ -21,15 +21,18 @@ const StepProgressBar = ({ currentStep, steps }) => {
                     !isFinalStep &&
                     (isRejected ? styles.rejectedCircle : styles.activeCircle),
                   isFinalStep && styles.finalCircle,
-                ]}>
+                ]}
+              >
                 {isCompleted || isFinalStep ? (
                   <MaterialIcons
                     name="check"
                     size={16}
                     color={isFinalStep ? "#4CD964" : "#4CD7D0"}
                   />
-                ) : (
-                  isActive && (
+                ) : isActive ? (
+                  isRejected ? (
+                    <MaterialIcons name="close" size={16} color="#F44336" />
+                  ) : (
                     <View
                       style={[
                         styles.dot,
@@ -37,7 +40,7 @@ const StepProgressBar = ({ currentStep, steps }) => {
                       ]}
                     />
                   )
-                )}
+                ) : null}
               </View>
               <Text
                 style={[
@@ -46,7 +49,8 @@ const StepProgressBar = ({ currentStep, steps }) => {
                   isActive &&
                     (isRejected ? styles.rejectedLabel : styles.activeLabel),
                   isFinalStep && styles.finalLabel,
-                ]}>
+                ]}
+              >
                 {label}
               </Text>
             </View>
