@@ -1,4 +1,5 @@
 import Api from "../api";
+import QueryString from "qs";
 
 export const getBuyerTransactions = async () => {
   const params = ["pending_payment", "waiting_shipment", "shipped"];
