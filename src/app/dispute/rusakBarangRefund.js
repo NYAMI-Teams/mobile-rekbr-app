@@ -33,7 +33,7 @@ export default function DetailKomplain() {
           <TouchableOpacity>
             <ChevronLeft size={24} color="black" />
           </TouchableOpacity>
-          <Text className="text-base font-semibold">Detail Komplain</Text>
+          <Text className="text-xl font-semibold">Detail Komplain</Text>
           <View style={{ width: 24 }} />
         </View>
 
