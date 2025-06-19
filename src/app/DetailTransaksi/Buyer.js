@@ -23,7 +23,10 @@ import CountdownTimer from "@/components/Countdown";
 import PrimaryButton from "@/components/PrimaryButton";
 import { getDetailBuyerTransaction } from "@/utils/api/buyer";
 import moment from "moment";
-import { updateBuyerTransaction, buyerConfirmReceivedTransaction } from "@/utils/api/buyer";
+import {
+  updateBuyerTransaction,
+  buyerConfirmReceivedTransaction,
+} from "@/utils/api/buyer";
 import { Alert } from "react-native";
 import BuyerKonfirmasi from "@/components/BuyerKonfirmasi";
 import { showToast } from "@/utils";
@@ -53,7 +56,6 @@ export default function DetailTransaksiBuyer() {
 
     fetchTransactionDetails();
   }, [id]);
-
 
   const updateTransaction = async () => {
     try {
@@ -310,7 +312,7 @@ export default function DetailTransaksiBuyer() {
           <PrimaryButton
             title="Cek Status Transaksi"
             onPress={handleSimulatePayment}
-          // disabled={!isFormValid}
+            // disabled={!isFormValid}
           />
           <View className="flex-row w-9/12 items-center justify-between px-3">
             <Text className="text-sm items-start justify-start text-[#616161]">
@@ -438,12 +440,13 @@ export default function DetailTransaksiBuyer() {
                     : "No Resi"}
                 </Text>
                 <View
-                  className={`flex-row items-center ${data?.status == "waiting_shipment" ||
+                  className={`flex-row items-center ${
+                    data?.status == "waiting_shipment" ||
                     data?.status == "shipped" ||
                     data?.status == "completed"
-                    ? "mb-3"
-                    : ""
-                    }`}>
+                      ? "mb-3"
+                      : ""
+                  }`}>
                   <Text style={{ fontSize: 17, fontWeight: "500" }}>
                     {data?.status == "pending_payment"
                       ? data?.virtualAccount
@@ -771,4 +774,3 @@ const styles = StyleSheet.create({
     color: "#000",
   },
 });
-
