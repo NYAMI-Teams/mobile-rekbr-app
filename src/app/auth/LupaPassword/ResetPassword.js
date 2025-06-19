@@ -9,22 +9,20 @@ import {
   Platform,
 } from "react-native";
 import { Feather, Ionicons, MaterialIcons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import { useRouter, useLocalSearchParams } from "expo-router";
 import InputField from "@/components/InputField";
 import { useState } from "react";
 import { showToast } from "@/utils";
-import { changePassword } from "@/utils/api/auth";
+import { resetPassword } from "@/utils/api/auth";
 import PrimaryButton from "@/components/PrimaryButton";
 import PasswordChecklist from "@/components/PasswordChecklist";
 import BuyerKonfirmasi from "@/components/BuyerKonfirmasi";
 
 export default function ChangePasswordScreen() {
   const router = useRouter();
-  const [kataSandiSaatIni, setKataSandiSaatIni] = useState("");
+  const { email } = useLocalSearchParams();
   const [kataSandiBaru, setKataSandiBaru] = useState("");
   const [konfirmasiKataSandiBaru, setKonfirmasiKataSandiBaru] = useState("");
-  const [isKataSandiSaatIniVisible, setIsKataSandiSaatIniVisible] =
-    useState(false);
   const [isKataSandiBaruVisible, setIsKataSandiBaruVisible] = useState(false);
   const [
     isKonfirmasiKataSandiBaruVisible,
@@ -33,10 +31,6 @@ export default function ChangePasswordScreen() {
 
   const [showPopup, setShowPopup] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-
-  const toggleKataSandiSaatIniVisibility = () => {
-    setIsKataSandiSaatIniVisible(!isKataSandiSaatIniVisible);
-  };
 
   const toggleKataSandiBaruVisibility = () => {
     setIsKataSandiBaruVisible(!isKataSandiBaruVisible);
@@ -68,21 +62,16 @@ export default function ChangePasswordScreen() {
 
   const handleChangePassword = async () => {
     setIsLoading(true);
-    if (
-      !isPasswordValid() ||
-      !kataSandiSaatIni ||
-      !konfirmasiKataSandiBaru ||
-      !kataSandiBaru
-    ) {
+    if (!isPasswordValid() || !konfirmasiKataSandiBaru || !kataSandiBaru) {
       showToast("Gagal", "Password tidak valid", "error");
       return;
     }
 
     try {
-      await changePassword(kataSandiSaatIni, konfirmasiKataSandiBaru);
+      const res = await resetPassword(email, konfirmasiKataSandiBaru);
       setShowPopup(false);
-      showToast("Berhasil", "Password valid", "success");
-      router.replace("/");
+      showToast("Berhasil", res?.message, "success");
+      router.replace("/auth/login");
     } catch (error) {
       showToast("Gagal", error.message, "error");
     } finally {
@@ -98,7 +87,7 @@ export default function ChangePasswordScreen() {
           <Ionicons name="chevron-back-outline" size={24} color="#000" />
         </TouchableOpacity>
         <Text className="text-[16px] font-semibold text-black">
-          Ganti Kata Sandi
+          Pulihkan Akses Akun Anda
         </Text>
         <View style={{ width: 24 }} />
       </View>
@@ -114,35 +103,11 @@ export default function ChangePasswordScreen() {
           hideKeyboardOnScroll={true}
           keyboardDismissMode="on-drag">
           <View className="mt-4">
-            <View className="relative mb-4">
-              <InputField
-                title="Kata Sandi Rekbr Saat Ini"
-                placeholder="Masukkan kata sandi kamu saat ini"
-                value={kataSandiSaatIni}
-                onChangeText={setKataSandiSaatIni}
-                secureTextEntry={!isKataSandiSaatIniVisible}
-                isPassword={true}
-                inputClassName="pr-12"
-              />
-
-              <TouchableOpacity
-                className="absolute top-11 right-10"
-                onPress={toggleKataSandiSaatIniVisibility}>
-                <MaterialIcons
-                  name={
-                    isKataSandiSaatIniVisible ? "visibility" : "visibility-off"
-                  }
-                  size={22}
-                  color="#666"
-                />
-              </TouchableOpacity>
-            </View>
-
             {/* Password */}
             <View className="relative mb-4">
               <InputField
-                title="Kata Sandi Rekbr"
-                placeholder="Masukkan kata sandi kamu"
+                title="Kata Sandi Baru Rekbr"
+                placeholder="Masukkan kata sandi baru kamu"
                 value={kataSandiBaru}
                 onChangeText={setKataSandiBaru}
                 secureTextEntry={!isKataSandiBaruVisible}
@@ -167,7 +132,7 @@ export default function ChangePasswordScreen() {
             {/* Confirm Password */}
             <View className="relative mb-4">
               <InputField
-                title="Konfirmasi Kata Sandi Rekbr Kamu"
+                title="Konfirmasi Kata Sandi Baru Rekbr"
                 placeholder="Pastikan sama, ya!"
                 value={konfirmasiKataSandiBaru}
                 onChangeText={setKonfirmasiKataSandiBaru}
@@ -236,9 +201,9 @@ export default function ChangePasswordScreen() {
           onClose={() => setShowPopup(false)}
           onBtn2={handleChangePassword}
           onBtn1={() => setShowPopup(false)}
-          title="Pastikan semua data di form sudah benar dan lengkap sebelum kamu kirim. Cek lagi, ya!"
+          title="Pastikan semuanya sudah benar yaa sebelum kamu kirim!"
           btn1="Kembali"
-          btn2="Konfirmasi"
+          btn2="Kirim"
         />
       )}
     </SafeAreaView>
