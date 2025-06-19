@@ -1,4 +1,13 @@
-import { View, Text, Modal, ScrollView, Image, Alert } from "react-native";
+import {
+  View,
+  Text,
+  Modal,
+  ScrollView,
+  Image,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import InputField from "./InputField";
 import AttachmentFilled from "./AttachmentFilled";
@@ -9,10 +18,13 @@ import PrimaryButton from "./PrimaryButton";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { ChevronLeftCircle } from "lucide-react-native";
-import * as ImagePicker from "expo-image-picker"; // Import ImagePicker
 import BuyerKonfirmasi from "../components/BuyerKonfirmasi";
 import { postResi } from "../utils/api/seller";
 import { getListCourier } from "../utils/api/seller";
+import Toast from "react-native-toast-message";
+import * as ImagePicker from "expo-image-picker";
+import * as ImageManipulator from "expo-image-manipulator";
+import { showToast } from "../utils";
 
 const mockCouriers = [
   {
@@ -67,12 +79,10 @@ export default function InputResi({ id }) {
     try {
       const res = await getListCourier();
       if (res) {
-        console.log("ini res", res.data);
         setCourierList(res.data);
       }
     } catch (error) {
-      console.log("Error get all courier:", error);
-      throw error;
+      showToast("Gagal", "Gagal mengambil data ekspedisi", "error");
     }
   };
 
@@ -81,7 +91,6 @@ export default function InputResi({ id }) {
     setCourier("");
   };
 
-  // Fungsi untuk mengambil gambar dari kamera
   const handleUpload = async () => {
     if (hasCameraPermission === false) {
       Alert.alert(
@@ -92,7 +101,6 @@ export default function InputResi({ id }) {
     }
 
     if (hasCameraPermission === null) {
-      // Izin masih dalam proses permintaan
       Alert.alert(
         "Meminta Izin",
         "Aplikasi sedang meminta izin kamera. Mohon tunggu sebentar."
@@ -100,19 +108,75 @@ export default function InputResi({ id }) {
       return;
     }
 
-    let result = await ImagePicker.launchCameraAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true, // Memungkinkan pengguna untuk mengedit/memotong gambar
-      quality: 1, // Kualitas gambar (0-1)
-    });
+    Alert.alert(
+      "Pilih Sumber Gambar",
+      "Ambil foto baru atau pilih dari galeri?",
+      [
+        {
+          text: "Kamera",
+          onPress: async () => {
+            await pickImage("camera");
+          },
+        },
+        {
+          text: "Galeri",
+          onPress: async () => {
+            await pickImage("gallery");
+          },
+        },
+        { text: "Batal", style: "cancel" },
+      ]
+    );
+  };
 
-    console.log(result); // Untuk debugging, lihat struktur hasil
+  const pickImage = async (source) => {
+    let result;
+    if (source === "camera") {
+      result = await ImagePicker.launchCameraAsync({
+        mediaTypes: "Images",
+        allowsEditing: true,
+        quality: 1,
+      });
+    } else {
+      result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: "Images",
+        allowsEditing: true,
+        quality: 1,
+      });
+    }
 
     if (!result.canceled && result.assets && result.assets.length > 0) {
-      setImage(result.assets[0].uri);
+      let imageAsset = result.assets[0];
+      let quality = 0.7;
+      let compressed = await ImageManipulator.manipulateAsync(
+        imageAsset.uri,
+        [],
+        { compress: quality, format: ImageManipulator.SaveFormat.JPEG }
+      );
+
+      // Loop kompresi hingga < 1MB atau quality terlalu kecil
+      let blob, size;
+      do {
+        const response = await fetch(compressed.uri);
+        blob = await response.blob();
+        size = blob.size;
+        if (size > 1024 * 1024) {
+          quality -= 0.2;
+          if (quality < 0.2) break;
+          compressed = await ImageManipulator.manipulateAsync(
+            imageAsset.uri,
+            [],
+            { compress: quality, format: ImageManipulator.SaveFormat.JPEG }
+          );
+        }
+      } while (size > 1024 * 1024 && quality >= 0.2);
+
+      setImage({
+        ...imageAsset,
+        uri: compressed.uri,
+      });
       setIsUploaded(true);
     } else {
-      // Jika pengguna membatalkan atau tidak ada gambar yang dipilih
       setImage(null);
       setIsUploaded(false);
     }
@@ -126,27 +190,21 @@ export default function InputResi({ id }) {
     setCourier(selectedCourier.name);
     setCourierId(selectedCourier.id);
     setModalVisible(false);
-    console.log("ini courier id", courierId);
-    console.log("ini courier", courier);
   };
 
   const handleBtnPress = () => {
     setShowPopup(true);
   };
 
-  const handleUploadResi = () => {
-    // setShowPopup(true);
+  const handleUploadResi = async () => {
     try {
-      postResi(id, courier, resiNumber, image);
-      setShowPopup(false);
+      await postResi(id, courierId, resiNumber, image);
+      router.replace("/");
     } catch (error) {
-      console.log(error);
+      showToast("Gagal", "Gagal mengunggah resi", "error");
+    } finally {
+      setShowPopup(false);
     }
-    console.log("ini id", id);
-    console.log("ini courier id", courierId);
-    console.log("ini resiNumber", resiNumber);
-    console.log("ini image", image);
-    router.replace("/");
   };
 
   const handleResiNumberChange = (text) => {
@@ -162,16 +220,14 @@ export default function InputResi({ id }) {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white items-center justify-between">
+    <SafeAreaView className="flex-1 bg-white justify-between">
       {/* Header */}
       <View className="flex-row justify-between items-center w-full px-4 pt-4">
-        {" "}
         {/* Tambahkan padding horizontal */}
         <TouchableOpacity onPress={() => router.back()}>
           <Ionicons name="chevron-back-outline" size={24} color="#000" />
         </TouchableOpacity>
         <Text className="text-[16px] font-semibold text-black">
-          {" "}
           {/* Hapus items-center, karena sudah di flex-row justify-between */}
           Form Pengiriman
         </Text>
@@ -179,63 +235,76 @@ export default function InputResi({ id }) {
       </View>
 
       {/* Content */}
-      <ScrollView className="flex-1 w-full px-4 mt-5">
-        {" "}
-        {/* Wrap content dengan ScrollView */}
-        <View className="mt-4">
-          <InputField
-            title="Masukkan Nomor Resi"
-            placeholder="Masukkan Nomor Resi dengan benar"
-            value={resiNumber}
-            onChangeText={handleResiNumberChange}
-            errorText={resiNumberError}
-            keyboardType="default"
-            autoCapitalize="characters"
-          />
-        </View>
-        <TouchableOpacity className="mt-4" onPress={handleModal}>
-          <DropDownField
-            title="Pilih Ekspedisi"
-            placeholder="Pilih Ekspedisi pengiriman kamu"
-            value={courier}
-            onChangeText={setCourier}
-            editable={false}
-          />
-        </TouchableOpacity>
-        <View className="mt-4">
-          <AttachmentFilled
-            title="Unggah Resi Pengiriman"
-            caption={
-              isUploaded
-                ? image.split("/").pop()
-                : "Ambil foto resi kamu disini"
-            }
-            captionColor={isUploaded ? "#08B20F" : "#9E9E9E"}
-            iconName={"camera"} // Pastikan AttachmentFilled Anda bisa menerima string 'camera' untuk ikon
-            boxColor={isUploaded ? "#F9F9F9" : "#49DBC8"}
-            iconsColor={isUploaded ? "#C2C2C2" : "#FFFFFF"}
-            cardColor={"#FFF"}
-            alertText="Pastikan keterbacaan foto dan hindari bayangan"
-            alertColor={isUploaded ? "#08B20F" : "#C2C2C2"}
-            alertIconName={isUploaded ? "checkmark-circle" : "alert-circle"} // Pastikan ini juga sesuai dengan AttachmentFilled
-            alertIconColor={isUploaded ? "#08B20F" : "#C2C2C2"}
-            onPress={handleUpload}
-          />
-        </View>
-        <View className="mt-4 mb-4">
-          {" "}
-          {/* Tambahkan margin vertikal */}
-          {/* Image Preview */}
-          {!image ? null : (
-            <Image source={{ uri: image }} className="w-full h-64 rounded-lg" />
-          )}
-        </View>
-      </ScrollView>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{ flex: 1 }}>
+        <ScrollView
+          className="flex-1 w-full px-4 mt-5"
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+          hideKeyboardOnScroll={true}
+          keyboardDismissMode="on-drag">
+          {/* Wrap content dengan ScrollView */}
+          <View className="mt-4">
+            <InputField
+              title="Masukkan Nomor Resi"
+              placeholder="Masukkan Nomor Resi dengan benar"
+              value={resiNumber}
+              onChangeText={handleResiNumberChange}
+              errorText={resiNumberError}
+              keyboardType="default"
+              autoCapitalize="characters"
+            />
+          </View>
+          <TouchableOpacity className="mt-4" onPress={handleModal}>
+            <DropDownField
+              title="Pilih Ekspedisi"
+              placeholder="Pilih Ekspedisi pengiriman kamu"
+              value={courier}
+              onChangeText={setCourier}
+              editable={false}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={handleUpload} className="mt-4">
+            <AttachmentFilled
+              title="Unggah Bukti"
+              caption={
+                isUploaded
+                  ? image?.uri?.split("/").pop()
+                  : "Berikan bukti berupa screenshot cek resi"
+              }
+              captionColor={isUploaded ? "#08B20F" : "#9E9E9E"}
+              iconName={"camera"} // Pastikan AttachmentFilled Anda bisa menerima string 'camera' untuk ikon
+              boxColor={isUploaded ? "#F9F9F9" : "#49DBC8"}
+              iconsColor={isUploaded ? "#C2C2C2" : "#FFFFFF"}
+              cardColor={"#FFF"}
+              alertText="Pastikan keterbacaan foto dan hindari bayangan"
+              alertColor={isUploaded ? "#08B20F" : "#C2C2C2"}
+              alertIconName={isUploaded ? "checkmark-circle" : "alert-circle"} // Pastikan ini juga sesuai dengan AttachmentFilled
+              alertIconColor={isUploaded ? "#08B20F" : "#C2C2C2"}
+              onPress={handleUpload}
+            />
+          </TouchableOpacity>
+          <View className="mt-4 mb-4">
+            {/* Tambahkan margin vertikal */}
+            {/* Image Preview */}
+            {!image ? null : (
+              <Image
+                source={{ uri: image.uri }}
+                className="w-full h-64 rounded-lg"
+              />
+            )}
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
       {/* Button */}
       <View className="w-full px-4 py-4">
-        {" "}
         {/* Tambahkan padding horizontal dan vertikal */}
-        <PrimaryButton title="Simpan" onPress={handleBtnPress} />
+        <PrimaryButton
+          title="Kirim"
+          onPress={handleBtnPress}
+          // disabled={courier == "" || resiNumber == "" || image == null}
+        />
       </View>
 
       {showPopup && (
@@ -258,14 +327,15 @@ export default function InputResi({ id }) {
           // Alert.alert("Modal has been closed."); // Komentar atau hapus ini untuk UX yang lebih baik
           closeModal();
         }}>
-        <View className="flex-1 bg-black/50 justify-end">
+        <TouchableOpacity
+          className="flex-1 bg-black/50 justify-end"
+          onPress={closeModal}>
           <View className="bg-white rounded-t-lg h-[55%]">
             {/* Close Button */}
-            <View className="flex-row justify-start p-4">
+            <View className="flex-row justify-start p-4 ">
               <TouchableOpacity
                 onPress={closeModal}
                 className="flex-row items-center mb-6">
-                {" "}
                 {/* Tambahkan onPress untuk menutup modal */}
                 <ChevronLeftCircle size={24} color="#00C2C2" />
                 <Text className="text-lg font-normal text-gray-800 ml-2">
@@ -275,34 +345,31 @@ export default function InputResi({ id }) {
             </View>
 
             {/* Modal Content */}
-            <View className="p-4 justify-between flex-1">
-              {" "}
+            <View className="justify-between flex-1">
               {/* Ubah h-[70%] menjadi flex-1 agar menyesuaikan sisa ruang */}
               <ScrollView className="my-2" showsVerticalScrollIndicator={false}>
-                {" "}
                 {/* Sembunyikan indikator scroll */}
-                <View className="flex-col gap-4 bg-slate-100/50 p-5 rounded-lg border border-gray-300">
-                  {courierList.map((courier) => (
-                    <TouchableOpacity
-                      className="p-5 border-b-2 border-gray-300/50 mb-4"
-                      onPress={() => handleSelectCourier(courier)}>
-                      <Text className="text-[15px] font-semibold">
-                        {courier.name}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
+                <View className="flex-col gap-4 bg-slate-100/50 m-5 p-5 rounded-lg border border-gray-300">
+                  {courierList.map(
+                    (
+                      courier,
+                      index
+                    ) => (
+                      <TouchableOpacity
+                        key={index}
+                        className="p-5 border-b-2 border-gray-300/50 mb-4"
+                        onPress={() => handleSelectCourier(courier)}>
+                        <Text className="text-[15px] font-semibold">
+                          {courier.name}
+                        </Text>
+                      </TouchableOpacity>
+                    )
+                  )}
                 </View>
               </ScrollView>
-              <TouchableOpacity
-                className="bg-[#00C2C2] rounded-lg p-4 mt-4 mb-6" // Tambahkan margin-top
-                onPress={() => console.log("Select courier")}>
-                <Text className="text-center text-white text-[15px] font-medium">
-                  Pilih dari Daftar
-                </Text>
-              </TouchableOpacity>
             </View>
           </View>
-        </View>
+        </TouchableOpacity>
       </Modal>
     </SafeAreaView>
   );

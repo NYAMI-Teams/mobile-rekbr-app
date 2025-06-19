@@ -84,8 +84,7 @@ export default function Register() {
 
           <TouchableOpacity
             className="absolute top-11 right-10"
-            onPress={togglePasswordVisibility}
-          >
+            onPress={togglePasswordVisibility}>
             <MaterialIcons
               name={isPasswordVisible ? "visibility" : "visibility-off"}
               size={22}
@@ -109,8 +108,7 @@ export default function Register() {
 
           <TouchableOpacity
             className="absolute top-11 right-10"
-            onPress={togglePasswordVisibility}
-          >
+            onPress={togglePasswordVisibility}>
             <MaterialIcons
               name={isPasswordVisible ? "visibility" : "visibility-off"}
               size={22}
@@ -129,11 +127,11 @@ export default function Register() {
                 color={confirmPassword === password ? "#4ade80" : "#f87171"}
               />
               <Text
-                className={`ml-2 text-sm ${confirmPassword === password
+                className={`ml-2 text-sm ${
+                  confirmPassword === password
                     ? "text-green-600"
                     : "text-red-400"
-                  }`}
-              >
+                }`}>
                 {confirmPassword === password
                   ? "Kata sandi sesuai"
                   : "Kata sandi tidak sesuai"}
@@ -144,9 +142,9 @@ export default function Register() {
         <View className="flex-row items-center justify-center mt-4">
           <TouchableOpacity
             onPress={() => setIsChecked(!isChecked)}
-            className={`w-5 h-5 rounded border ${isChecked ? "bg-blue-600 border-blue-600" : "border-gray-400"
-              } items-center justify-center`}
-          >
+            className={`w-5 h-5 rounded border ${
+              isChecked ? "bg-blue-600 border-blue-600" : "border-gray-400"
+            } items-center justify-center`}>
             {isChecked && <Text className="text-white text-xs">✓</Text>}
           </TouchableOpacity>
 
@@ -173,13 +171,13 @@ export default function Register() {
 
         <View className="items-center space-y-1 mt-3">
           <Text className="text-sm mb-4">
-            Belum punya akun?{" "}
+            Belum punya akun?
             <Text className="text-blue-600 font-medium">
               Silakan Registrasi
             </Text>
           </Text>
           <Text className="text-sm mb-2">
-            Terdapat kendala?{" "}
+            Terdapat kendala?
             <Text className="text-blue-600 font-medium">
               Silakan Hubungi Kami
             </Text>

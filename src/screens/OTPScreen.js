@@ -14,7 +14,7 @@ import Icon from "react-native-vector-icons/Ionicons";
 import { PinInput } from "@pakenfit/react-native-pin-input";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import { verifyEmail } from "../utils/api/auth";
+import { verifyEmail, resendVerifyEmail } from "../utils/api/auth";
 import { showToast } from "../utils";
 import { setAccessToken } from "../store";
 
@@ -45,21 +45,34 @@ export default function OTPScreen({ email }) {
   const handleResendCode = () => {
     setTimeLeft(299);
     inputRefs[0]?.focus();
+    resendVerifyEmail(email)
+      .then((res) => {
+        showToast("Berhasil", res?.message, "success");
+      })
+      .catch((error) => {
+        showToast("Gagal", error?.message, "error");
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
 
   const submitOtp = (otpValue) => {
     setIsLoading(true);
-    verifyEmail(email, otpValue).then((res) => {
-      showToast("Welcome", res?.message);
-      setAccessToken(res?.data?.accessToken);
-      router.replace("/auth/SuccessLogin");
-    }).catch((error) => {
-      setIsError(true);
-      setErrorMessage("Kode OTP yang Anda masukkan salah.");
-    }).finally(() => {
-      setIsLoading(false);
-    });
-  }
+    verifyEmail(email, otpValue)
+      .then((res) => {
+        showToast("Selamat datang, " + email, res?.message, "success");
+        setAccessToken(res?.data?.accessToken);
+        router.replace("/auth/SuccessLogin");
+      })
+      .catch((error) => {
+        setIsError(true);
+        setErrorMessage("Kode OTP yang Anda masukkan salah.");
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
 
   return (
     <SafeAreaView className="bg-white flex-1 p-4">
@@ -82,7 +95,7 @@ export default function OTPScreen({ email }) {
               Masukkan kode yang kami kirimkan
             </Text>
             <Text style={styles.emailInfo}>
-              Sudah dikirim ke email kamu{" "}
+              Sudah dikirim ke email kamu
               <Text style={styles.email}>{email}</Text>
             </Text>
 
@@ -98,8 +111,8 @@ export default function OTPScreen({ email }) {
                   borderColor: isValid
                     ? "#009688"
                     : isError
-                      ? "#FF3B30"
-                      : "#ccc",
+                    ? "#FF3B30"
+                    : "#ccc",
                   borderRadius: 8,
                   textAlign: "center",
                   justifyContent: "center",

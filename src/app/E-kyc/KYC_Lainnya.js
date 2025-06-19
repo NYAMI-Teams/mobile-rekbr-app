@@ -41,14 +41,6 @@ export default function LainnyaPage() {
     bidangUsaha !== "";
 
   const handleNext = () => {
-    console.log("Data disubmit:");
-    console.log({
-      namaIbu,
-      pendidikan,
-      kodePos,
-      namaUsaha,
-      bidangUsaha,
-    });
     router.push("/E-kyc/KYC_Lampiran");
   };
 
@@ -67,7 +59,7 @@ export default function LainnyaPage() {
 
       {/* Progress Bar */}
       <ProgressBar
-        currentStep={2}
+        currentStep={1}
         steps={["Data diri", "Lainnya", "Lampiran", "Pratinjau"]}
       />
 
@@ -79,6 +71,7 @@ export default function LainnyaPage() {
             placeholder="Tuliskan nama lengkap ibu kandung kamu"
             value={namaIbu}
             onChangeText={setNamaIbu}
+            editable={false}
           />
         </View>
 
@@ -88,6 +81,7 @@ export default function LainnyaPage() {
             placeholder="Pilih pendidikan terakhir anda"
             value={pendidikan}
             onChangeText={setPendidikan}
+            editable={false}
           />
         </View>
 
@@ -97,6 +91,7 @@ export default function LainnyaPage() {
             placeholder="Masukkan kode pos kamu"
             value={kodePos}
             onChangeText={setKodePos}
+            editable={false}
           />
         </View>
 
@@ -106,6 +101,7 @@ export default function LainnyaPage() {
             placeholder="Masukkan nama usaha kamu"
             value={namaUsaha}
             onChangeText={setNamaUsaha}
+            editable={false}
           />
         </View>
 
@@ -115,6 +111,7 @@ export default function LainnyaPage() {
             placeholder="Pilih bidang usaha kamu"
             value={bidangUsaha}
             onChangeText={setBidangUsaha}
+            editable={false}
           />
         </View>
       </ScrollView>

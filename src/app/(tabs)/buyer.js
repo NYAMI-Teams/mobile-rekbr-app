@@ -4,16 +4,24 @@ import { useState, useEffect } from "react";
 import BuyerEmptyContent from "../../screens/buyer/index";
 import { StatusBar } from "expo-status-bar";
 import BuyerCard from "../../components/card-transaction/BuyerCard";
-import { ScrollView, RefreshControl } from "react-native";
+import { ScrollView, RefreshControl, ActivityIndicator } from "react-native";
 import { getBuyerTransactions } from "../../utils/api/buyer";
-import InputResi from "../../components/InputResi";
+import { getAccessToken, removeAccessToken } from "../../store";
+import { useRouter } from "expo-router";
+import Toast from "react-native-toast-message";
+import { showToast } from "../../utils";
+import { getProfile } from "../../utils/api/auth";
 
 export default function Home() {
+  const router = useRouter();
   const [isEmptyTransaction, setIsEmptyTransaction] = useState(false);
   const [transactions, setTransactions] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
+  const [profile, setProfile] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
+    checkAuth();
     fetchTransactions();
   }, []);
 
@@ -25,12 +33,13 @@ export default function Home() {
       } else {
         setIsEmptyTransaction(true);
       }
-      console.log(res.data);
       setTransactions(res.data);
     } catch (err) {
-      console.error("Error fetching buyer transactions:", err);
-    } finally {
-      console.log("finally");
+      showToast(
+        "Gagal",
+        "Gagal mengambil data transaksi. Silahkan coba lagi.",
+        "error"
+      );
     }
   };
 
@@ -40,30 +49,68 @@ export default function Home() {
     setRefreshing(false);
   };
 
+  const checkAuth = async () => {
+    setIsLoading(true);
+    try {
+      const token = await getAccessToken();
+      if (!token) {
+        handleLogout();
+        return;
+      }
+      const res = await getProfile();
+      setProfile(res.data);
+    } catch {
+      showToast(
+        "Sesi Berakhir",
+        "Sesi Anda telah berakhir. Silahkan login kembali.",
+        "error"
+      );
+      handleLogout();
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await removeAccessToken();
+      router.replace("Onboarding");
+    } catch (err) {
+      showToast("Logout Gagal", "Gagal logout. Silahkan coba lagi.", "error");
+    }
+  };
+
   return (
     <View style={{ flex: 1, backgroundColor: "#fff" }}>
       <StatusBar style="dark" />
       <View style={{ flex: 1, padding: 16 }}>
         <NavigationBar
-          name="irgi168@gmail.com"
-          onNotificationPress={() => console.log("Notification pressed")}
-          onProfilePress={() => console.log("Notification pressed")}
+          name={profile?.email}
+          onNotificationPress={() =>
+            showToast("Notification", "Notification pressed", "success")
+          }
+          onLogoutPress={() => handleLogout()}
         />
-        {/* <ScrollView
-          className="flex flex-col gap-12"
-          showsVerticalScrollIndicator={false}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }>
-          {isEmptyTransaction ? (
-            <BuyerEmptyContent />
-          ) : (
-            transactions.map((transaction) => (
-              <BuyerCard key={transaction.id} data={transaction} />
-            ))
-          )}
-        </ScrollView> */}
-        <InputResi id={""} />
+        {isLoading ? (
+          <View className="flex-1 justify-center items-center">
+            <ActivityIndicator size="large" color="#000" />
+          </View>
+        ) : (
+          <ScrollView
+            className="flex flex-col gap-6"
+            showsVerticalScrollIndicator={false}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }>
+            {isEmptyTransaction ? (
+              <BuyerEmptyContent />
+            ) : (
+              transactions.map((transaction) => (
+                <BuyerCard key={transaction.id} data={transaction} />
+              ))
+            )}
+          </ScrollView>
+        )}
       </View>
     </View>
   );

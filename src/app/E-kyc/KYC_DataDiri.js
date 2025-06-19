@@ -123,6 +123,7 @@ export default function DataDiri() {
             placeholder="Masukkan nomor KTP kamu"
             value={ktpNumber}
             onChangeText={setKtpNumber}
+            editable={false}
           />
         </View>
         <View style={styles.content}>
@@ -131,6 +132,7 @@ export default function DataDiri() {
             placeholder="Tuliskan nama lengkap kamu"
             value={fullName}
             onChangeText={setFullName}
+            editable={false}
           />
         </View>
         <View style={styles.content}>
@@ -139,6 +141,7 @@ export default function DataDiri() {
             placeholder="Pilih tanggal lahir kamu"
             value={birthDate}
             onChangeText={setBirthDate}
+            editable={false}
           />
         </View>
         <View style={styles.content}>
@@ -147,6 +150,7 @@ export default function DataDiri() {
             placeholder="Pilih jenis kelamin kamu"
             value={gender}
             onChangeText={setGender}
+            editable={false}
           />
         </View>
         <View style={styles.content}>
@@ -155,6 +159,7 @@ export default function DataDiri() {
             placeholder="Pilih agama anda"
             value={religion}
             onChangeText={setReligion}
+            editable={false}
           />
         </View>
         <View style={styles.content}>
@@ -163,6 +168,7 @@ export default function DataDiri() {
             placeholder="Pilih status perkawinan anda"
             value={maritalStatus}
             onChangeText={setMaritalStatus}
+            editable={false}
           />
         </View>
         <View style={styles.content}>
@@ -171,6 +177,7 @@ export default function DataDiri() {
             placeholder="Masukkan alamat anda sesuai dengan KTP"
             value={address}
             onChangeText={setAddress}
+            editable={false}
           />
         </View>
         <View style={styles.content}>
@@ -179,6 +186,7 @@ export default function DataDiri() {
             placeholder="Pilih provinsi anda"
             value={province}
             onChangeText={setProvince}
+            editable={false}
           />
         </View>
         <View style={styles.content}>
@@ -187,6 +195,7 @@ export default function DataDiri() {
             placeholder="Pilih kota / kabupaten anda"
             value={city}
             onChangeText={setCity}
+            editable={false}
           />
         </View>
         <View style={styles.content}>
@@ -195,6 +204,7 @@ export default function DataDiri() {
             placeholder="Pilih kecamatan anda"
             value={district}
             onChangeText={setDistrict}
+            editable={false}
           />
         </View>
         <View style={styles.content}>
@@ -203,6 +213,7 @@ export default function DataDiri() {
             placeholder="Pilih kelurahan / desa anda"
             value={village}
             onChangeText={setVillage}
+            editable={false}
           />
         </View>
       </ScrollView>

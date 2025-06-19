@@ -1,59 +1,40 @@
 import React, { useState, useEffect } from "react";
-import { useNavigation } from "@react-navigation/native";
 import { View, Text, Image, Pressable, TouchableOpacity } from "react-native";
 import * as Clipboard from "expo-clipboard";
-import Toast from "react-native-toast-message";
 import moment from "moment";
 import clsx from "clsx";
 import CountdownTimer from "../Countdown";
 import { useRouter } from "expo-router";
-
-// Helper function to safely parse dates
-const parseDate = (date) => {
-  if (!date) return null;
-  // Try different formats
-  const formats = [
-    "YYYY-MM-DD HH:mm:ss",
-    "YYYY-MM-DD",
-    "MM/DD/YYYY",
-    "DD/MM/YYYY",
-  ];
-  for (const format of formats) {
-    const parsed = moment(date, format, true);
-    if (parsed.isValid()) return parsed;
-  }
-  return null;
-};
+import { buyerConfirmReceivedTransaction } from "../../utils/api/buyer";
+import BuyerKonfirmasi from "../BuyerKonfirmasi";
+import { showToast } from "../../utils";
 
 const BuyerCard = ({ data }) => {
+  const [showPopup, setShowPopup] = useState(false);
   const formatDateWIB = (dateTime) => {
-    const parsedDate = parseDate(dateTime);
-    if (!parsedDate) return "Invalid date";
-    return parsedDate.utcOffset(-7).format("DD MMMM YYYY, HH:mm [WIB]");
+    if (!dateTime) return "Invalid date";
+    return moment(dateTime).utcOffset(0).format("DD MMMM YYYY, HH:mm [WIB]");
   };
   const router = useRouter();
   const status = data?.status;
+
+  const handleConfirmReceived = async () => {
+    try {
+      const res = await buyerConfirmReceivedTransaction(data?.id);
+      setShowPopup(false);
+    } catch (error) {
+      showToast("Gagal", "Gagal mengkonfirmasi pembayaran", "error");
+    }
+  };
 
   const handleCopy = async (text) => {
     // belum bisa jalan toastnya
     if (!text) return;
     try {
       await Clipboard.setStringAsync(text);
-      Toast.show({
-        type: "success",
-        text1: "Berhasil",
-        text2: "Disalin ke clipboard",
-        position: "bottom",
-      });
-      console.log("Copied to clipboard:", text);
+      showToast("Berhasil", "Disalin ke clipboard", "success");
     } catch (error) {
-      Toast.show({
-        type: "error",
-        text1: "Gagal",
-        text2: "Tidak dapat menyalin",
-        position: "bottom",
-      });
-      console.log("Failed to copy to clipboard:", error);
+      showToast("Gagal", "Tidak dapat menyalin", "error");
     }
   };
 
@@ -64,7 +45,7 @@ const BuyerCard = ({ data }) => {
           { label: "Nama Produk", value: data?.itemName || "-" },
           { label: "Penjual", value: data?.sellerEmail || "-" },
           {
-            label: "VA Number",
+            label: "Nomor VA",
             value: data?.virtualAccount || "-",
             copyable: true,
           },
@@ -97,6 +78,19 @@ const BuyerCard = ({ data }) => {
           },
           { label: "Ekspedisi", value: data?.shipment?.courier || "-" },
         ];
+      case "canceled":
+        return [
+          { label: "Nama Produk", value: data?.itemName || "-" },
+          { label: "Penjual", value: data?.sellerEmail || "-" },
+          {
+            label: data?.shipmentDeadline == null ? "Nomor VA" : "Nomor Resi",
+            value:
+              data?.shipmentDeadline == null
+                ? data?.virtualAccount
+                : data?.shipment?.trackingNumber || "waiting_seller",
+            copyable: true,
+          },
+        ];
       default:
         return [];
     }
@@ -112,6 +106,8 @@ const BuyerCard = ({ data }) => {
         return "Dalam Pengiriman";
       case "completed":
         return "Barang Diterima";
+      case "canceled":
+        return "Dibatalkan";
       default:
         return "";
     }
@@ -153,7 +149,7 @@ const BuyerCard = ({ data }) => {
               {/* Replace this with actual countdown (e.g., 24 jam mundur dari requestAt) */}
               <CountdownTimer
                 deadline={data?.buyerConfirmDeadline || "-"}
-                fromTime={data?.fundReleaseRequest?.resolvedAt || "-"}
+                fromTime={data?.currentTimestamp || "-"}
               />
             </Text>
           </View>
@@ -161,7 +157,7 @@ const BuyerCard = ({ data }) => {
       } else {
         return (
           <TouchableOpacity
-            onPress={() => console.log("Barang Diterima Pressed")}
+            onPress={() => setShowPopup(true)}
             className="bg-black px-3 py-1 rounded-full">
             <Text className="font-poppins-semibold text-xs text-white">
               Barang Diterima
@@ -176,6 +172,20 @@ const BuyerCard = ({ data }) => {
         <View className="px-3 py-1 rounded-full">
           <Text className="font-poppins-semibold text-xs text-gray-800">
             {formatDateWIB(data?.buyerConfirmedAt || "-")}
+          </Text>
+        </View>
+      );
+    }
+
+    if (status === "canceled") {
+      return (
+        <View className="px-3 py-1 rounded-full">
+          <Text className="font-poppins-semibold text-xs text-gray-800">
+            {formatDateWIB(
+              data?.shipmentDeadline == null
+                ? data?.paymentDeadline
+                : data?.shipmentDeadline || "-"
+            )}
           </Text>
         </View>
       );
@@ -216,16 +226,18 @@ const BuyerCard = ({ data }) => {
                     ? "Resi belum diberikan seller"
                     : row.value || "-"}
                 </Text>
-                {row.copyable && !!row.value && (
-                  <Pressable
-                    onPress={() => handleCopy(row.value)}
-                    className="p-1 rounded-full">
-                    <Image
-                      source={require("../../assets/copy.png")}
-                      className="w-4 h-4 opacity-70"
-                    />
-                  </Pressable>
-                )}
+                {row.copyable &&
+                  !!row.value &&
+                  row.value !== "waiting_seller" && (
+                    <Pressable
+                      onPress={() => handleCopy(row.value)}
+                      className="p-1 rounded-full">
+                      <Image
+                        source={require("../../assets/copy.png")}
+                        className="w-4 h-4 opacity-70"
+                      />
+                    </Pressable>
+                  )}
               </View>
             </View>
           ))}
@@ -254,7 +266,11 @@ const BuyerCard = ({ data }) => {
               <View
                 className={clsx(
                   "w-2 h-2 rounded-full mr-2",
-                  status === "completed" ? "bg-green-400" : "bg-yellow-400"
+                  status === "completed"
+                    ? "bg-green-400"
+                    : status === "canceled"
+                    ? "bg-red-400"
+                    : "bg-yellow-400"
                 )}
               />
               <Text className="font-poppins text-xs text-gray-800">
@@ -265,6 +281,16 @@ const BuyerCard = ({ data }) => {
           </View>
         </View>
       </View>
+      {showPopup && (
+        <BuyerKonfirmasi
+          onClose={() => setShowPopup(false)}
+          onBtn2={handleConfirmReceived}
+          onBtn1={() => setShowPopup(false)}
+          title="Pastikan semua data di form sudah benar dan lengkap sebelum kamu kirim. Cek lagi, ya!"
+          btn1="Kembali"
+          btn2="Konfirmasi"
+        />
+      )}
     </TouchableOpacity>
   );
 };

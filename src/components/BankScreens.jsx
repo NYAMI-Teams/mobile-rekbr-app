@@ -14,7 +14,7 @@ import { Search } from 'lucide-react-native';
 const BankSelector = ({ banks, onSelectBank }) => {
     const [searchQuery, setSearchQuery] = useState('');
 
-    const filteredBanks = banks.filter((bank) =>
+    const filteredBanks = banks?.filter((bank) =>
         bank.bankName.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
@@ -37,7 +37,8 @@ const BankSelector = ({ banks, onSelectBank }) => {
 
             <FlatList
                 data={filteredBanks}
-                keyExtractor={(item) => item.bankId}
+                keyExtractor={(item) => item.id}
+                className="mb-5 h-[50%]"
                 renderItem={({ item }) => (
                     <TouchableOpacity
                         onPress={() => onSelectBank(item)}

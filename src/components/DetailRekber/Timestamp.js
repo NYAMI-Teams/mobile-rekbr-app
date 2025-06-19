@@ -4,27 +4,10 @@ import { Ionicons } from "@expo/vector-icons";
 import moment from "moment";
 import CountdownTimer from "../Countdown";
 
-// Helper function to safely parse dates
-const parseDate = (date) => {
-  if (!date) return null;
-  // Try different formats
-  const formats = [
-    "YYYY-MM-DD HH:mm:ss",
-    "YYYY-MM-DD",
-    "MM/DD/YYYY",
-    "DD/MM/YYYY",
-  ];
-  for (const format of formats) {
-    const parsed = moment(date, format, true);
-    if (parsed.isValid()) return parsed;
-  }
-  return null;
-};
-
 const TimestampDetail = ({ status, date }) => {
   const formatDateWIB = (dateTime) => {
     if (!dateTime) return "Invalid date";
-    return moment(dateTime).utcOffset(-7).format("DD MMMM YYYY, HH:mm [WIB]");
+    return moment(dateTime).utcOffset(0).format("DD MMMM YYYY, HH:mm [WIB]");
   };
 
   return (
@@ -58,7 +41,7 @@ const TimestampDetail = ({ status, date }) => {
 const Timestamp = ({ data, caption, date, details = [] }) => {
   const formatDateWIB = (dateTime) => {
     if (!dateTime) return "Invalid date";
-    return moment(dateTime).utcOffset(-7).format("DD MMMM YYYY, HH:mm [WIB]");
+    return moment(dateTime).utcOffset(0).format("DD MMMM YYYY, HH:mm [WIB]");
   };
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -74,7 +57,7 @@ const Timestamp = ({ data, caption, date, details = [] }) => {
           {/* Replace this with dynamic countdown logic */}
           <CountdownTimer
             deadline={data.paymentDeadline}
-            fromTime={data.createdAt}
+            fromTime={data.currentTimestamp}
           />
         </Text>
       );
@@ -96,13 +79,11 @@ const Timestamp = ({ data, caption, date, details = [] }) => {
           {/* Replace this with actual countdown (e.g., 24 jam mundur dari requestAt) */}
           <CountdownTimer
             deadline={data.buyerConfirmDeadline}
-            fromTime={data.fundReleaseRequest.resolvedAt}
+            fromTime={data.currentTimestamp}
           />
         </Text>
       );
     }
-
-    return null;
   };
 
   return (
@@ -122,7 +103,9 @@ const Timestamp = ({ data, caption, date, details = [] }) => {
           data.fundReleaseRequest.status != "approved") ||
         (data.status == "completed" &&
           (data.fundReleaseRequest.status == "approved" ||
-            data.fundReleaseRequest.status == null)) ? null : (
+            data.fundReleaseRequest.status == null)) ||
+        data.status == "canceled" ||
+        data.status == "refunded" ? null : (
           <View
             style={{
               flexDirection: "row",

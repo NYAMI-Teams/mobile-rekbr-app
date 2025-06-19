@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons"; // ganti di sini
 
-const StepProgressBar = ({ currentStep, steps, isRejected }) => {
+const StepProgressBar = ({ currentStep, steps }) => {
   return (
     <View style={styles.container}>
       {steps.map((label, index) => {
@@ -21,18 +21,15 @@ const StepProgressBar = ({ currentStep, steps, isRejected }) => {
                     !isFinalStep &&
                     (isRejected ? styles.rejectedCircle : styles.activeCircle),
                   isFinalStep && styles.finalCircle,
-                ]}
-              >
+                ]}>
                 {isCompleted || isFinalStep ? (
                   <MaterialIcons
                     name="check"
                     size={16}
                     color={isFinalStep ? "#4CD964" : "#4CD7D0"}
                   />
-                ) : isActive ? (
-                  isRejected ? (
-                    <MaterialIcons name="close" size={16} color="#F44336" />
-                  ) : (
+                ) : (
+                  isActive && (
                     <View
                       style={[
                         styles.dot,
@@ -40,7 +37,7 @@ const StepProgressBar = ({ currentStep, steps, isRejected }) => {
                       ]}
                     />
                   )
-                ) : null}
+                )}
               </View>
               <Text
                 style={[
@@ -49,8 +46,7 @@ const StepProgressBar = ({ currentStep, steps, isRejected }) => {
                   isActive &&
                     (isRejected ? styles.rejectedLabel : styles.activeLabel),
                   isFinalStep && styles.finalLabel,
-                ]}
-              >
+                ]}>
                 {label}
               </Text>
             </View>
@@ -117,6 +113,7 @@ const styles = StyleSheet.create({
     height: 2,
     backgroundColor: "#ccc",
     marginHorizontal: 5,
+    marginBottom: 10,
   },
   completedLine: {
     backgroundColor: "#4CD7D0",

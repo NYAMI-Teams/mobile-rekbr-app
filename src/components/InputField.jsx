@@ -9,29 +9,34 @@ export default function InputField({
   value,
   onChangeText,
   secureTextEntry = false,
+  editable = true,
   keyboardType = 'default',
   className = '',
   errorText = '',
   autoCapitalize = 'none',
+  inputMode = 'text',
+  renderValue,
 }) {
   return (
-    <View className={clsx("flex-col mx-5", className)}>
+    <View className={clsx("flex-col", className)}>
       <Text className="text-[15px] text-black font-normal mb-2">{title}</Text>
       <View style={styles.card}>
-        <TextInput
-          style={styles.input}
-          placeholder={placeholder}
-          placeholderTextColor="#999"
-          value={value}
-          onChangeText={onChangeText}
-          secureTextEntry={secureTextEntry}
-          keyboardType={keyboardType}
-          autoCapitalize={autoCapitalize}
-        />
+          <TextInput
+            style={styles.input}
+            placeholder={placeholder}
+            placeholderTextColor="#999"
+            value={renderValue ? renderValue(value) : value}
+            onChangeText={onChangeText}
+            editable={editable}
+            secureTextEntry={secureTextEntry}
+            keyboardType={keyboardType}
+            autoCapitalize={autoCapitalize}
+            inputMode={inputMode}
+          />
       </View>
-      {errorText ? (
+      {errorText && (
         <Text style={styles.errorText}>{errorText}</Text>
-      ) : null}
+      )}
     </View>
   );
 }
