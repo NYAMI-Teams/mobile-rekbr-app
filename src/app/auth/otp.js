@@ -14,13 +14,19 @@ import Icon from "react-native-vector-icons/Ionicons";
 import { PinInput } from "@pakenfit/react-native-pin-input";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { verifyEmail, resendVerifyEmail } from "../../utils/api/auth";
+import {
+  verifyEmail,
+  resendVerifyEmail,
+  resetPasswordOTP,
+  changeEmail,
+} from "../../utils/api/auth";
 import { showToast } from "../../utils";
 import { setAccessToken } from "../../store";
 
 export default function OTP() {
   const { email } = useLocalSearchParams();
   const { isFromLogin } = useLocalSearchParams();
+  const { isFromResetPassword } = useLocalSearchParams();
   const router = useRouter();
   const [timeLeft, setTimeLeft] = useState(299);
   const [isError, setIsError] = useState(false);
@@ -61,28 +67,62 @@ export default function OTP() {
 
   const submitOtp = (otpValue) => {
     setIsLoading(true);
-    verifyEmail(email, otpValue)
-      .then((res) => {
-        setAccessToken(res?.data?.accessToken);
-        if (isFromLogin) {
+    if (isFromLogin) {
+      verifyEmail(email, otpValue)
+        .then((res) => {
+          setAccessToken(res?.data?.accessToken);
           showToast("Selamat datang, " + email, res?.message, "success");
           router.replace("/auth/SuccessLogin");
-        } else {
+        })
+        .catch((error) => {
+          setIsError(true);
+          setErrorMessage("Kode OTP yang Anda masukkan salah.");
+          showToast("Gagal", error?.message, "error");
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
+    } else if (isFromResetPassword) {
+      console.log("hitted from reset password", otpValue);
+
+      resetPasswordOTP(email, otpValue)
+        .then((res) => {
+          showToast("Berhasil", res?.message, "success");
+          router.replace({
+            pathname: "/auth/LupaPassword/ResetPassword",
+            params: { email },
+          });
+        })
+        .catch((error) => {
+          console.log(error, "error from reset password otp");
+
+          setIsError(true);
+          setErrorMessage("Kode OTP yang Anda masukkan salah.");
+          showToast("Gagal", error?.message, "error");
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
+    } else {
+      //Backend Belum Siap (DEV)
+      changeEmail(email)
+        .then((res) => {
           showToast(
             "Berhasil ganti email",
             "Email kamu sudah berganti menjadi " + email,
             "success"
           );
-          router.replace("/Profile");
-        }
-      })
-      .catch((error) => {
-        setIsError(true);
-        setErrorMessage("Kode OTP yang Anda masukkan salah.");
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
+          router.replace("/auth/LupaPassword/ResetPassword");
+        })
+        .catch((error) => {
+          setIsError(true);
+          setErrorMessage("Kode OTP yang Anda masukkan salah.");
+          showToast("Gagal", error?.message, "error");
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
+    }
   };
 
   return (

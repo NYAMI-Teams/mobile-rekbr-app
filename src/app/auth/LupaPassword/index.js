@@ -15,6 +15,7 @@ import InputField from "@/components/InputField";
 import { Ionicons } from "@expo/vector-icons";
 import { showToast } from "@/utils";
 import { checkUser } from "@/utils/api/transaction";
+import { forgotPassword } from "@/utils/api/auth";
 
 export default function MasukkanEmailScreen() {
   const router = useRouter();
@@ -31,22 +32,21 @@ export default function MasukkanEmailScreen() {
   };
 
   const handleBtnPress = async () => {
-    console.log(email);
     try {
-      const res = await checkUser(email);
-      console.log(res);
-      if (res.data) {
+      const resCheckUser = await checkUser(email);
+      if (resCheckUser.data) {
         setEmailFound(true);
-        showToast("Berhasil", "Email ditemukan", "success");
+        const resForgotPassword = await forgotPassword(email);
+        showToast("Email Ditemukan", resForgotPassword.message, "success");
         //Next Router ke OTP
-        // router.push({
-        //   pathname: "/auth/otp",
-        //   params: { email: res.data.email, isFromLogin: false },
-        // });
+        router.push({
+          pathname: "/auth/otp",
+          params: { email: resCheckUser.data.email, isFromResetPassword: true },
+        });
       }
     } catch (err) {
       setEmailFound(false);
-      showToast("Gagal", "Email tidak ditemukan", "error");
+      showToast("Gagal", err.message, "error");
     }
   };
 
