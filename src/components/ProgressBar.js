@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons"; // ganti di sini
 
-const StepProgressBar = ({ currentStep, steps }) => {
+const StepProgressBar = ({ currentStep, steps, isRejected }) => {
   return (
     <View style={styles.container}>
       {steps.map((label, index) => {

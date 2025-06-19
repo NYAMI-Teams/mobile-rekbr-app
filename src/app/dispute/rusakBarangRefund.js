@@ -42,17 +42,19 @@ export default function DetailKomplain() {
           steps={["Menunggu", "Kembaliin", "Refund", "Selesai"]}
         />
 
-        {/* Alert Info */}
-        {/* <InfoBanner
-          contentBefore="Jika seller nggak respon sampai "
-          dateTime="18 Juni 2025, 10 : 00 WIB"
-          contentAfter="pengajuanmu bakal otomatis disetujui ya!"
-        /> */}
-
         {/* Status Komplain */}
         <StatusKomplain status="Menunggu Refund Dana" />
 
-        {/* Pengajuan */}
+        {/* Estimasi Box */}
+        <View className="bg-[#F9FAFB] rounded-xl px-4 py-3 mb-4">
+          <Text className="text-sm text-black leading-relaxed">
+            Estimasi dana terkirim dan selesai paling lambat{" "}
+            <Text className="font-semibold">23 Juni 2025</Text>, waktu dan
+            tanggal pasti tergantung pada pihak terkait
+          </Text>
+        </View>
+
+        {/* Track Dispute */}
         <TrackDispute
           title="Konfirmasi seller barang diterima"
           dateTime="22 Juni 2025, 10:00 WIB"
@@ -61,48 +63,47 @@ export default function DetailKomplain() {
           title="Admin meneruskan permintaan konfirmasi"
           dateTime="20 Juni 2025, 10:00 WIB"
         />
-         <TrackDispute
+        <TrackDispute
           title="Permintaan konfirmasi buyer"
           dateTime="21 Juni 2025, 10:00 WIB"
-        details={[
+          details={[
             {
-              content:
-                "Melalui resi harusnya barang sudah sampai di seller",
+              content: "Melalui resi harusnya barang sudah sampai di seller",
             },
             {
               imgTitle: "Bukti foto & video",
-                images: [require("../../assets/barangrusak.png")]
+              images: [require("../../assets/barangrusak.png")],
             },
           ]}
-          />
+        />
         <TrackDispute
           title="Refund bayar oleh buyer"
           dateTime="20 Juni 2025, 10:00 WIB"
-        details={[
+          details={[
             {
               resiNumber: "J X 3 4 7 4 1 2 4 0 1 3",
-                expedition: "J&T Express Indonesia",
+              expedition: "J&T Express Indonesia",
             },
-        ]}
-            />
+          ]}
+        />
         <TrackDispute
           title="Persetujuan komplain seller"
           dateTime="19 Juni 2025, 10:00 WIB"
-        details={[
+          details={[
             {
               content:
                 "Seller setuju untuk Refund dana pada barang yang bermasalah.",
             },
             {
               imgTitle: "Bukti foto & video",
-                images: [require("../../assets/barangrusak.png")]
+              images: [require("../../assets/barangrusak.png")],
             },
           ]}
-          />
-          <TrackDispute
+        />
+        <TrackDispute
           title="Pengajuan komplain buyer"
           dateTime="16 Juni 2025, 10:00 WIB"
-        details={[
+          details={[
             {
               content:
                 "Buyer mau ngembaliin barang yang bermasalah. Barang yg bermasalah bakalan diganti yang baru.",
@@ -113,10 +114,10 @@ export default function DetailKomplain() {
             },
             {
               imgTitle: "Bukti foto & video",
-                images: [require("../../assets/barangrusak.png")]
+              images: [require("../../assets/barangrusak.png")],
             },
           ]}
-          />
+        />
 
         {/* Data Seller & Transaksi */}
         <TextView title="Seller" content="zhirazzi@gmail.com" />
@@ -127,8 +128,6 @@ export default function DetailKomplain() {
         <CopyField title="ID Transaksi" content="1 2 3 4 5 6 7 8 9" />
         <CopyField title="Virtual Account" content="8 0 8 0 1 2 3 4 5 6 7 8 9" />
       </ScrollView>
-
-     
     </SafeAreaView>
   );
 }
