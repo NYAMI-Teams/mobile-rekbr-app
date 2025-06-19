@@ -13,20 +13,28 @@ import {
 import Modal from "react-native-modal";
 import { useState } from "react";
 import { Pressable } from "react-native";
+import { useRouter } from "expo-router";
 
 export default function NavigationBar({
   name,
   onNotificationPress,
   onLogoutPress,
 }) {
+  const router = useRouter();
   const [showPopup, setShowPopup] = useState(false);
 
   const handleEdit = () => {
     setShowPopup(true);
   };
 
-  const handleCancel = () => {
+  const handleChangePassword = () => {
     setShowPopup(false);
+    router.push("/Profile/ChangePassword");
+  };
+
+  const handleChangeEmail = () => {
+    setShowPopup(false);
+    router.push("/Profile/ChangeEmail");
   };
 
   return (
@@ -101,12 +109,14 @@ export default function NavigationBar({
               onPress={() => {}}>
               <View className="flex-col justify-center p-4">
                 <Text className="text-lg font-semibold mb-8">Atur Profile</Text>
-                <TouchableOpacity onPress={handleEdit} className="mb-4">
+                <TouchableOpacity
+                  onPress={handleChangePassword}
+                  className="mb-4">
                   <Text className="text-black text-base font-medium mb-6">
                     Ubah Password
                   </Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={handleEdit} className="mb-4">
+                <TouchableOpacity onPress={handleChangeEmail} className="mb-4">
                   <Text className="text-black text-base font-medium mb-6">
                     Ubah Email
                   </Text>

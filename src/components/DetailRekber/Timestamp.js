@@ -50,14 +50,14 @@ const Timestamp = ({ data, caption, date, details = [] }) => {
   };
 
   const renderBottomSection = () => {
-    const status = data.status;
+    const status = data?.status;
     if (status === "pending_payment") {
       return (
         <Text className="font-poppins-semibold text-gray-800">
           {/* Replace this with dynamic countdown logic */}
           <CountdownTimer
-            deadline={data.paymentDeadline}
-            fromTime={data.currentTimestamp}
+            deadline={data?.paymentDeadline}
+            fromTime={data?.currentTimestamp}
           />
         </Text>
       );
@@ -71,15 +71,15 @@ const Timestamp = ({ data, caption, date, details = [] }) => {
 
     if (
       status === "shipped" &&
-      data.fundReleaseRequest.requested &&
-      data.fundReleaseRequest.status === "approved"
+      data?.fundReleaseRequest?.requested &&
+      data?.fundReleaseRequest?.status === "approved"
     ) {
       return (
         <Text className="font-poppins-semibold text-gray-800">
           {/* Replace this with actual countdown (e.g., 24 jam mundur dari requestAt) */}
           <CountdownTimer
-            deadline={data.buyerConfirmDeadline}
-            fromTime={data.currentTimestamp}
+            deadline={data?.buyerConfirmDeadline}
+            fromTime={data?.currentTimestamp}
           />
         </Text>
       );
@@ -99,13 +99,13 @@ const Timestamp = ({ data, caption, date, details = [] }) => {
           {caption}
         </Text>
         {/* Countdown */}
-        {(data.status == "shipped" &&
-          data.fundReleaseRequest.status != "approved") ||
-        (data.status == "completed" &&
-          (data.fundReleaseRequest.status == "approved" ||
-            data.fundReleaseRequest.status == null)) ||
-        data.status == "canceled" ||
-        data.status == "refunded" ? null : (
+        {(data?.status == "shipped" &&
+          data?.fundReleaseRequest?.status != "approved") ||
+        (data?.status == "completed" &&
+          (data?.fundReleaseRequest?.status == "approved" ||
+            data?.fundReleaseRequest?.status == null)) ||
+        data?.status == "canceled" ||
+        data?.status == "refunded" ? null : (
           <View
             style={{
               flexDirection: "row",
@@ -131,7 +131,11 @@ const Timestamp = ({ data, caption, date, details = [] }) => {
 
       {isExpanded &&
         details.map((item, index) => (
-          <TimestampDetail key={index} status={item.status} date={item.date} />
+          <TimestampDetail
+            key={index}
+            status={item?.status}
+            date={item?.date}
+          />
         ))}
 
       <View
@@ -140,28 +144,28 @@ const Timestamp = ({ data, caption, date, details = [] }) => {
           marginTop: isExpanded ? 12 : 0,
           borderRadius: 8,
           padding:
-            (data.status == "shipped" &&
-              data.fundReleaseRequest.status != "approved") ||
-            (data.status == "completed" &&
-              (data.fundReleaseRequest.status == "approved" ||
-                data.fundReleaseRequest.status == null))
+            (data?.status == "shipped" &&
+              data?.fundReleaseRequest?.status != "approved") ||
+            (data?.status == "completed" &&
+              (data?.fundReleaseRequest?.status == "approved" ||
+                data?.fundReleaseRequest?.status == null))
               ? 0
               : 16,
           backgroundColor:
-            (data.status == "shipped" &&
-              data.fundReleaseRequest.status != "approved") ||
-            (data.status == "completed" &&
-              (data.fundReleaseRequest.status == "approved" ||
-                data.fundReleaseRequest.status == null))
+            (data?.status == "shipped" &&
+              data?.fundReleaseRequest?.status != "approved") ||
+            (data?.status == "completed" &&
+              (data?.fundReleaseRequest?.status == "approved" ||
+                data?.fundReleaseRequest?.status == null))
               ? "#fff"
               : "#FEF2D3",
           alignItems: "center",
         }}>
-        {(data.status == "shipped" &&
-          data.fundReleaseRequest.status != "approved") ||
-        (data.status == "completed" &&
-          (data.fundReleaseRequest.status == "approved" ||
-            data.fundReleaseRequest.status == null)) ? null : (
+        {(data?.status == "shipped" &&
+          data?.fundReleaseRequest?.status != "approved") ||
+        (data?.status == "completed" &&
+          (data?.fundReleaseRequest?.status == "approved" ||
+            data?.fundReleaseRequest?.status == null)) ? null : (
           <Image
             source={require("../../assets/timer.png")}
             style={{ width: 24, height: 24 }}
@@ -170,11 +174,11 @@ const Timestamp = ({ data, caption, date, details = [] }) => {
         <Text
           style={{
             marginLeft:
-              (data.status == "shipped" &&
-                data.fundReleaseRequest.status != "approved") ||
-              (data.status == "completed" &&
-                (data.fundReleaseRequest.status == "approved" ||
-                  data.fundReleaseRequest.status == null))
+              (data?.status == "shipped" &&
+                data?.fundReleaseRequest?.status != "approved") ||
+              (data?.status == "completed" &&
+                (data?.fundReleaseRequest?.status == "approved" ||
+                  data?.fundReleaseRequest?.status == null))
                 ? 0
                 : 10,
             fontSize: 17,

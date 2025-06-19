@@ -20,6 +20,7 @@ import { setAccessToken } from "../../store";
 
 export default function OTP() {
   const { email } = useLocalSearchParams();
+  const { isFromLogin } = useLocalSearchParams();
   const router = useRouter();
   const [timeLeft, setTimeLeft] = useState(299);
   const [isError, setIsError] = useState(false);
@@ -62,9 +63,18 @@ export default function OTP() {
     setIsLoading(true);
     verifyEmail(email, otpValue)
       .then((res) => {
-        showToast("Selamat datang, " + email, res?.message, "success");
         setAccessToken(res?.data?.accessToken);
-        router.replace("/auth/SuccessLogin");
+        if (isFromLogin) {
+          showToast("Selamat datang, " + email, res?.message, "success");
+          router.replace("/auth/SuccessLogin");
+        } else {
+          showToast(
+            "Berhasil ganti email",
+            "Email kamu sudah berganti menjadi " + email,
+            "success"
+          );
+          router.replace("/Profile");
+        }
       })
       .catch((error) => {
         setIsError(true);
@@ -95,10 +105,12 @@ export default function OTP() {
             <Text style={styles.subtitle}>
               Masukkan kode yang kami kirimkan
             </Text>
-            <Text style={styles.emailInfo}>
-              Sudah dikirim ke email kamu
-              <Text style={styles.email}>{email}</Text>
-            </Text>
+            <View className="flex-col items-center">
+              <Text style={styles.emailInfo}>
+                Sudah dikirim ke email kamu
+                <Text style={styles.email}> {email}</Text>
+              </Text>
+            </View>
 
             {/* OTP Input */}
             <View style={styles.otpContainer}>

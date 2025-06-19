@@ -140,11 +140,7 @@ export default function Home() {
         <NavigationBar
           name={profile?.email}
           onNotificationPress={() =>
-            Toast.show({
-              type: "success",
-              text1: "Notification pressed",
-              position: "top",
-            })
+            showToast("Notification pressed", "Notification pressed", "success")
           }
           onLogoutPress={() => handleLogout()}
         />

@@ -77,4 +77,35 @@ export const getProfile = async () => {
     }
 }
 
+// BELUM FIX NUNGGU BE
+
+export const checkKataSandiSaatIniValid = async (kataSandiSaatIni) => {
+    try {
+        const res = await Api.post(`/user/check-kata-sandi-saat-ini`, {
+            kataSandiSaatIni,
+        });
+        if (res) {
+            return res;
+        }
+    } catch (error) {
+        throw error;
+    }
+}
+
+// BELUM FIX NUNGGU BE
+export const changePassword = async (kataSandiBaru, konfirmasiKataSandiBaru) => {
+    try {
+        const res = await Api.post(`/user/change-password`, {
+            kataSandiBaru,
+            konfirmasiKataSandiBaru,
+        });
+        if (res) {
+            return res;
+        }
+    } catch (error) {
+        throw error;
+    }
+}
+
+
 

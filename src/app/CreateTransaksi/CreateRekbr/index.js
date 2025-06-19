@@ -23,10 +23,13 @@ import {
 import { showToast } from "../../../utils";
 import { Feather } from "@expo/vector-icons";
 
-export default function CreateRekber({ bankData }) {
+export default function CreateRekber() {
   const router = useRouter();
   const params = useLocalSearchParams();
-  const selectedBank = typeof params.selectedBank === "string" ? JSON.parse(params.selectedBank) : params.selectedBank;
+  const bankData =
+    typeof params.selectedBank === "string"
+      ? JSON.parse(params.selectedBank)
+      : params.selectedBank;
   const [isChecked, setIsChecked] = useState(false);
   const [email, setEmail] = useState("");
   const [itemName, setItemName] = useState("");
@@ -89,7 +92,7 @@ export default function CreateRekber({ bankData }) {
           behavior={Platform.OS === "ios" ? "padding" : "height"}
           style={{ flex: 1 }}>
           <ScrollView
-            className="flex-1 w-full"
+            className="flex-1 w-full px-5"
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
             hideKeyboardOnScroll={true}
@@ -111,14 +114,14 @@ export default function CreateRekber({ bankData }) {
               <View className="flex flex-col items-center gap-4 px-4 py-0 relative self-stretch w-full">
                 {bankData?.bankId !==
                   "484f56b2-4f2e-49e6-aec3-6050f1b8e091" && (
-                    <View className="flex-row items-center gap-2 bg-[#FEF2D3] p-2 rounded-lg mx-4">
-                      <Icon name="info" size={16} color="#FBBF24" />
-                      <Text className="text-neutral-950 text-sm font-normal">
-                        Pilih bank selain BNI? Biaya admin akan kami potong
-                        otomatis dari pembayaran kamu, ya!
-                      </Text>
-                    </View>
-                  )}
+                  <View className="flex-row items-center gap-2 bg-[#FEF2D3] p-2 rounded-lg mx-4">
+                    <Icon name="info" size={16} color="#FBBF24" />
+                    <Text className="text-neutral-950 text-sm font-normal">
+                      Pilih bank selain BNI? Biaya admin akan kami potong
+                      otomatis dari pembayaran kamu, ya!
+                    </Text>
+                  </View>
+                )}
                 {/* Bank Account Section */}
                 <RekeningKamu bankData={bankData} />
 
@@ -157,12 +160,13 @@ export default function CreateRekber({ bankData }) {
                           }
                         />
                         <Text
-                          className={`ml-2 text-sm ${isEmailValid()
+                          className={`ml-2 text-sm ${
+                            isEmailValid()
                               ? isUserFound
                                 ? "text-green-600"
                                 : "text-yellow-600"
                               : "text-red-400"
-                            }`}>
+                          }`}>
                           {isEmailValid()
                             ? isUserFound
                               ? "Pengguna ditemukan"
@@ -174,8 +178,9 @@ export default function CreateRekber({ bankData }) {
                     <View className="flex flex-row items-center gap-2 w-full">
                       <TouchableOpacity
                         onPress={handleCheckUser}
-                        className={`flex-row h-[34px] w-20 rounded-lg items-center justify-center text-white gap-2 ${!isEmailValid() ? "bg-gray-400" : "bg-black"
-                          }`}
+                        className={`flex-row h-[34px] w-20 rounded-lg items-center justify-center text-white gap-2 ${
+                          !isEmailValid() ? "bg-gray-400" : "bg-black"
+                        }`}
                         disabled={!isEmailValid()}>
                         <Icon name="search" size={16} color="white" />
                         <Text className="text-white text-xs font-medium">
@@ -229,10 +234,11 @@ export default function CreateRekber({ bankData }) {
                   <View className="flex-row items-start gap-2 w-full">
                     <TouchableOpacity
                       onPress={handleCheckboxPress}
-                      className={`w-6 h-6 border ${isChecked
+                      className={`w-6 h-6 border ${
+                        isChecked
                           ? "bg-[#3ED6C5] border-[#3ED6C5]"
                           : "bg-white border-gray-400"
-                        } rounded flex items-center justify-center`}>
+                      } rounded flex items-center justify-center`}>
                       {isChecked && (
                         <Text className="text-white text-lg font-medium items-center justify-center pb-7">
                           ✓
@@ -274,4 +280,3 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
 });
-

@@ -1,12 +1,12 @@
 import { Stack } from "expo-router";
 import "../../global.css";
 import { useEffect, useState } from "react";
-import Toast from "react-native-toast-message";
 import { getProfile } from "../utils/api/auth";
 import { showToast } from "../utils";
 import { getAccessToken, setProfileStore } from "../store";
 import SplashScreen from "../assets/splash.png";
 import { Image, View } from "react-native";
+import Toast from "react-native-toast-message";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 export default function RootLayout() {
