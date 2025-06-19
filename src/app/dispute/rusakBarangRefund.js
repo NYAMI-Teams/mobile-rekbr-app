@@ -75,12 +75,16 @@ export default function DetailKomplain() {
             },
           ]}
           />
-          <TrackDispute
-          title="Refund barang oleh buyer"
+        <TrackDispute
+          title="Refund bayar oleh buyer"
           dateTime="20 Juni 2025, 10:00 WIB"
-        />
-        <CopyField title="No Resi Refund" content="J X 3 4 7 4 1 2 4 0 1 3" />
-        <TextView title="Ekspedisi" content="J&T Express Indonesia" />
+        details={[
+            {
+              resiNumber: "J X 3 4 7 4 1 2 4 0 1 3",
+                expedition: "J&T Express Indonesia",
+            },
+        ]}
+            />
         <TrackDispute
           title="Persetujuan komplain seller"
           dateTime="19 Juni 2025, 10:00 WIB"
@@ -96,7 +100,7 @@ export default function DetailKomplain() {
           ]}
           />
           <TrackDispute
-          title="Persetujuan komplain buyer"
+          title="Pengajuan komplain buyer"
           dateTime="16 Juni 2025, 10:00 WIB"
         details={[
             {
