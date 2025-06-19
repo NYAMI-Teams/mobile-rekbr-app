@@ -76,7 +76,7 @@ export default function ChooseRekening() {
         return res.data;
       }
     } catch (error) {
-      showToastt(
+      showToast(
         "Gagal",
         "Gagal mengambil data rekening. Silahkan coba lagi.",
         "error"

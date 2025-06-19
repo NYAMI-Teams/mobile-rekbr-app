@@ -7,9 +7,9 @@ import { ScrollView, RefreshControl, ActivityIndicator } from "react-native";
 import { getBuyerTransactions } from "../../utils/api/buyer";
 import { getAccessToken, removeAccessToken } from "../../store";
 import { useRouter } from "expo-router";
-import Toast from "react-native-toast-message";
 import { showToast } from "../../utils";
 import { getProfile } from "../../utils/api/auth";
+import EmptyIllustration from "@/components/Ilustration";
 
 export default function Home() {
   const router = useRouter();

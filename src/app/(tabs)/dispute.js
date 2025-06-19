@@ -2,7 +2,7 @@ import { View, StatusBar } from "react-native";
 import NavigationBar from "../../components/NavigationBar";
 import AccountBalance from "../../components/AccountBalance";
 import QuickActions from "../../components/QuickActions";
-import Dispute from "../dispute";
+import Dispute from "../Dispute";
 
 export default function Home() {
   return (
