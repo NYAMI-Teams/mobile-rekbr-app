@@ -27,7 +27,7 @@ export default function DisputeDetailScreen() {
     status === "approved" ? "Disetujui" : "Ditolak",
   ];
 
-  const currentStep = 1;
+  const currentStep = 0;
 
   const getStatusLabel = (status) => {
     switch (status) {

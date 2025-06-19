@@ -14,8 +14,6 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import OrderSummaryCard from "../../components/OrderSummaryCard";
 import PrimaryButton from "../../components/PrimaryButton";
 import NavigationBar from "../../components/NavigationBar";
-import SellerCard from "../../components/card-transaction/SellerCard";
-import { mockAPISeller } from "../../services/apiMock/api";
 
 export default function DisputeScreen() {
   const router = useRouter();
@@ -81,7 +79,7 @@ export default function DisputeScreen() {
       {/* Content */}
       <ScrollView className="p-4">
         <Pressable onPress={() => router.push("/Dispute/HilangDisputeDetail")}>
-          <OrderSummaryCard status="selesai" />
+          <OrderSummaryCard status="investigasi" />
         </Pressable>
         {/* Tambahkan lebih banyak OrderSummaryCard jika diperlukan */}
         <PrimaryButton

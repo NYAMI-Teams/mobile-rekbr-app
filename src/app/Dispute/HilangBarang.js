@@ -190,7 +190,7 @@ export default function DetailMasalahScreen({ onCancel, onConfirm }) {
       <View className="mb-6">
         {/* Tombol yang membuka modal */}
         <PrimaryButton
-          title="Diskusi via email dengan penjual"
+          title="Kirim"
           className="mb-6"
           onPress={() => setModalVisible(true)}
         />
