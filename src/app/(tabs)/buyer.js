@@ -1,7 +1,6 @@
 import { View } from "react-native";
 import NavigationBar from "../../components/NavigationBar";
 import { useState, useEffect } from "react";
-import BuyerEmptyContent from "../../screens/buyer/index";
 import { StatusBar } from "expo-status-bar";
 import BuyerCard from "../../components/card-transaction/BuyerCard";
 import { ScrollView, RefreshControl, ActivityIndicator } from "react-native";
@@ -103,7 +102,9 @@ export default function Home() {
               <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
             }>
             {isEmptyTransaction ? (
-              <BuyerEmptyContent />
+              <View className="items-center mt-8">
+                <EmptyIllustration text={`Belum ada Rekber yang masuk.\nTunggu seller kirimkan Rekber untuk kamu`} />
+              </View>
             ) : (
               transactions.map((transaction) => (
                 <BuyerCard key={transaction.id} data={transaction} />
