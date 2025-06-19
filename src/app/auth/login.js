@@ -130,7 +130,9 @@ export default function Login() {
                   </TouchableOpacity>
                 </View>
 
-                <TouchableOpacity className="self-end mt-2 mb-2 px-5">
+                <TouchableOpacity
+                  className="self-end mt-2 mb-2 px-5"
+                  onPress={() => router.push("/auth/LupaPassword")}>
                   <Text className="text-blue-600 text-sm">
                     Lupa Kata Sandi?
                   </Text>
