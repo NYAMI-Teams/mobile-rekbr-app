@@ -6,25 +6,28 @@ import {
   ScrollView,
   TouchableOpacity,
   Modal,
+  Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams } from "expo-router";
 import StepKomplainBar from "../../components/KomplainBar";
-import { ChevronLeft } from "lucide-react-native";
+import { ChevronLeft, Copy } from "lucide-react-native";
 import { useNavigation } from "expo-router";
 import { useRouter } from "expo-router";
+import * as Clipboard from "expo-clipboard";
 
 export default function DisputeDetailScreen() {
   const router = useRouter();
   const navigation = useNavigation();
 
-  const status = "rejected"; // atau "approved", "pending", dll
+  const status = "rejected"; // bisa juga "approved", "pending", dll
+
   const steps = [
-    "Diajukan",
-    "Sedang Diproses",
+    "Investigasi",
     status === "approved" ? "Disetujui" : "Ditolak",
   ];
-  const currentStep = 2;
+
+  const currentStep = 1;
 
   const getStatusLabel = (status) => {
     switch (status) {
@@ -39,6 +42,13 @@ export default function DisputeDetailScreen() {
       default:
         return "-";
     }
+  };
+
+  const resi = "JX3474124013";
+  const tranksaksi = "123456789";
+  const handleCopy = async () => {
+    await Clipboard.setStringAsync(resi);
+    Alert.alert("Disalin", "Nomor resi berhasil disalin.");
   };
 
   const [showPopup, setShowPopup] = useState(false);
@@ -97,29 +107,24 @@ export default function DisputeDetailScreen() {
             </Text>
           </View>
 
-          {currentStep >= 2 && (
+          {currentStep >= 1 && (
             <View className="border-t border-b border-gray-200 py-4">
               <Text className="text-base font-semibold">
                 {status === "approved"
                   ? "Tim kami memberikan Refund dana"
-                  : "Sayangnya, kami tidak bisa memproses klaim barang hilang karena pengiriman sudah terkonfirmasi sukses oleh kurir."}
+                  : "Admin menolak atas komplain kamu"}
               </Text>
               <Text className="text-sm text-gray-500">
                 17 Juni 2025, 10:05 WIB
               </Text>
-            </View>
-          )}
-
-          {currentStep >= 1 && (
-            <View className="border-b border-gray-200 py-4">
-              <Text className="text-base font-semibold">
-                {status === "approved"
-                  ? "Admin setujui atas komplain kamu"
-                  : "Sayangnya, kami tidak bisa memproses klaim barang hilang karena pengiriman sudah terkonfirmasi sukses oleh kurir."}
-              </Text>
-              <Text className="text-sm text-gray-500">
-                16 Juni 2025, 10:05 WIB
-              </Text>
+              {status === "rejected" && (
+                <View className="bg-gray-100 mt-3 p-3 rounded-md">
+                  <Text className="text-sm text-gray-700">
+                    Sayangnya, kami tidak bisa memproses klaim barang hilang
+                    karena pengiriman sudah terkonfirmasi sukses oleh kurir.
+                  </Text>
+                </View>
+              )}
             </View>
           )}
 
@@ -154,13 +159,27 @@ export default function DisputeDetailScreen() {
               Rp. 8.080.000,00
             </Text>
           </View>
-          <View className="mb-2">
-            <Text className="text-gray-600 text-base">ID Transaksi</Text>
-            <Text className="text-black text-xl font-medium">123456789</Text>
+
+          <View className="mb-4">
+            <Text className="text-gray-600 text-base mb-1">ID Transaksi</Text>
+            <View className="flex-row justify-start items-center space-x-1">
+              <Text className="text-black text-xl font-medium mr-2">123456789</Text>
+              <Pressable onPress={() => handleCopy("123456789")}>
+                <Copy size={20} color="#999" />
+              </Pressable>
+            </View>
           </View>
-          <View className="mb-2">
-            <Text className="text-gray-600 text-base">No Resi</Text>
-            <Text className="text-black text-xl font-medium">JX3474124013</Text>
+
+          <View className="mb-4">
+            <Text className="text-gray-600 text-base mb-1">No Resi</Text>
+            <View className="flex-row justify-start items-center space-x-1">
+              <Text className="text-black text-xl font-medium mr-2">
+                JX3474124013
+              </Text>
+              <Pressable onPress={() => handleCopy("JX3474124013")}>
+                <Copy size={20} color="#999" />
+              </Pressable>
+            </View>
           </View>
           <View className="mb-2">
             <Text className="text-gray-600 text-base">Ekspedisi</Text>
@@ -205,13 +224,18 @@ export default function DisputeDetailScreen() {
                       <View className="w-12 h-1.5 bg-gray-300 rounded-full mb-4" />
                     </View>
                     <Text className="text-lg font-semibold mb-8">Lainnya</Text>
-                    <TouchableOpacity onPress={handleEdit} className="mb-4">
+                    <TouchableOpacity
+                      onPress={() => router.push("/Dispute/HilangKomplain")}
+                      className="mb-4"
+                    >
                       <Text className="text-black text-base font-medium mb-6">
                         Ubah Detail Komplain
                       </Text>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={handleCancel}>
-                      <Text className="text-red-500 text-base font-medium mb-10">
+                    <TouchableOpacity
+                      onPress={() => router.push("../(tabs)/dispute")}
+                    >
+                      <Text className="text-black text-base font-medium mb-10">
                         Batalkan Komplain
                       </Text>
                     </TouchableOpacity>
@@ -222,7 +246,7 @@ export default function DisputeDetailScreen() {
 
             {/* Tombol teks */}
             <Pressable
-              onPress={() => router.push("/Dispute/HilangKomplain")} // ganti dengan path tujuanmu
+              onPress={() => router.push("../(tabs)/dispute")} // ganti dengan path tujuanmu
               className="flex-1 bg-black py-3 rounded-xl justify-center items-center"
             >
               <Text className="text-white font-semibold text-base">

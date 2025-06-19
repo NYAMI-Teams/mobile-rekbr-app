@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { ChevronLeft } from "lucide-react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useNavigation } from "expo-router";
+import { router, useNavigation } from "expo-router";
 import { TextInput } from "react-native-gesture-handler";
 import * as ImagePicker from "expo-image-picker";
 import PrimaryButton from "../../components/PrimaryButton";
@@ -281,7 +281,7 @@ export default function DetailMasalahScreen() {
         {/* Button */}
         <PrimaryButton
           title="Ajukan Komplain Kembali"
-          onPress={() => console.log("Ajukan Komplain")}
+          onPress={() => router.push("../(tabs)/dispute")}
           style={{ marginBottom: 24 }} // ganti className dengan style inline
         />
       </ScrollView>

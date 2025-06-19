@@ -8,16 +8,29 @@ import {
   Linking,
   Modal,
   Pressable,
+  Alert,
 } from "react-native";
-import { ChevronLeft, Info, ChevronDown, ChevronUp } from "lucide-react-native";
+import {
+  ChevronLeft,
+  Info,
+  ChevronDown,
+  ChevronUp,
+  Copy,
+} from "lucide-react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import PrimaryButton from "../../components/PrimaryButton";
 import { router, useNavigation } from "expo-router";
+import * as Clipboard from "expo-clipboard";
 
 export default function DetailMasalahScreen({ onCancel, onConfirm }) {
   const navigation = useNavigation();
   const [showBreakdown, setShowBreakdown] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
+  const resi = "JX3474124013";
+  const handleCopy = async () => {
+    await Clipboard.setStringAsync(resi);
+    Alert.alert("Disalin", "Nomor resi berhasil disalin.");
+  };
   return (
     <SafeAreaView className="flex-1 bg-white">
       <ScrollView className="px-4 pt-4">
@@ -73,10 +86,10 @@ export default function DetailMasalahScreen({ onCancel, onConfirm }) {
         </View>
 
         {/* Barang yang belum diterima */}
-       <Text className="text-base font-semibold mb-2">
+        <Text className="text-base font-semibold mb-2">
           Barang yang belum diterima
         </Text>
-        <View  className="bg-[#E5F7F9] rounded-xl p-4 border border-[#D6F0F3]">
+        <View className="bg-[#E5F7F9] rounded-xl p-4 border border-[#D6F0F3]">
           <Text className="font-semibold text-base mb-2">
             iPhone 13 Pro Max
           </Text>
@@ -90,14 +103,17 @@ export default function DetailMasalahScreen({ onCancel, onConfirm }) {
               <Text className="text-base text-black">irgil68@gmail.com</Text>
             </View>
 
-            <View className="flex-row justify-between mb-2">
-              <Text className="text-base text-gray-600">No Resi</Text>
-              <Text
-                className="text-base text-blue-600 underline"
-                onPress={() => Linking.openURL("https://cekresi.com")}
+            <View className="flex-row justify-between items-center mb-4">
+              <Text className="text-base text-black">No Resi</Text>
+              <Pressable
+                onPress={handleCopy}
+                className="flex-row items-center space-x-1"
               >
-                JX3474124013
-              </Text>
+                <Copy size={16} color="#999" />
+                <Text className="text-base text-blue-500 font-semibold">
+                  {resi}
+                </Text>
+              </Pressable>
             </View>
 
             <View className="flex-row justify-between mb-2">

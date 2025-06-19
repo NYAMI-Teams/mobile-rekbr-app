@@ -2,7 +2,9 @@ import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 
-const StepKomplainBar = ({ currentStep, steps, status }) => {
+const StepKomplainBar = ({ currentStep, status }) => {
+  const steps = ["Investigasi", status === "rejected" ? "Ditolak" : "Disetujui"];
+
   return (
     <View style={styles.container}>
       {steps.map((label, index) => {
@@ -67,6 +69,7 @@ const StepKomplainBar = ({ currentStep, steps, status }) => {
     </View>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {

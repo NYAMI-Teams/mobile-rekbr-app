@@ -72,7 +72,7 @@ export default function HomeDispute() {
         {/* Button Email */}
         <View className="mb-6">
           <PrimaryButton
-          onPress={() => router.push("/Dispute/DisputeCard")}
+            onPress={() => router.push("../(tabs)/dispute")}
             title="Diskusi via email dengan penjual"
             className="mb-6"
           />
@@ -100,18 +100,16 @@ export default function HomeDispute() {
             </TouchableOpacity>
           ))}
         </View>
-
-        
       </ScrollView>
       {/* Footer */}
       <View className="absolute bottom-0 left-0 right-0 items-center pb-6">
-          <Text className="text-xs text-gray-400">
-            Terdapat kendala?{" "}
-            <Text className="text-blue-500 font-medium">
-              Silahkan Hubungi Kami
-            </Text>
+        <Text className="text-xs text-gray-400">
+          Terdapat kendala?{" "}
+          <Text className="text-blue-500 font-medium">
+            Silahkan Hubungi Kami
           </Text>
-        </View>
+        </Text>
+      </View>
     </SafeAreaView>
   );
 }

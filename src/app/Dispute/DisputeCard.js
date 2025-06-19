@@ -5,13 +5,17 @@ import {
   View,
   Text,
   TouchableOpacity,
+  Pressable,
 } from "react-native"; // pastikan path sesuai struktur proyekmu
 import OrderSummaryCard from "../../components/OrderSummaryCard";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useRouter } from "expo-router";
+
 
 export default function OrderScreen() {
   const [activeTab, setActiveTab] = useState("pembelian");
   const insets = useSafeAreaInsets();
+  const router = useRouter();
 
   return (
     <SafeAreaView
@@ -54,7 +58,9 @@ export default function OrderScreen() {
 
       {/* Content */}
       <ScrollView className="p-4">
-        <OrderSummaryCard status="selesai" />
+        <Pressable onPress={() => router.push("/Dispute/HilangDisputeDetail")}>
+          <OrderSummaryCard status="selesai" />
+        </Pressable>
         {/* investigasi, selesai, dibatalkan, ditolak */}
         {/* Tambahkan lebih banyak OrderSummaryCard jika diperlukan */}
       </ScrollView>

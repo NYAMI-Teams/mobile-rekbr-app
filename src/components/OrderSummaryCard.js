@@ -1,25 +1,52 @@
 import React from "react";
-import { View, Text, Image } from "react-native";
-import { ClipboardCopy } from "lucide-react-native";
+import { View, Text, Image, Pressable, Alert } from "react-native";
+import { Copy } from "lucide-react-native";
+import * as Clipboard from "expo-clipboard";
 
 // Helper untuk menentukan warna berdasarkan status
 const getStatusStyle = (status) => {
   switch (status) {
     case "selesai":
-      return { dotColor: "bg-green-500", textColor: "text-green-600", label: "Transaksi Selesai" };
+      return {
+        dotColor: "bg-green-500",
+        textColor: "text-green-600",
+        label: "Transaksi Selesai",
+      };
     case "investigasi":
-      return { dotColor: "bg-orange-400", textColor: "text-orange-500", label: "Investigasi Pengiriman" };
+      return {
+        dotColor: "bg-orange-400",
+        textColor: "text-orange-500",
+        label: "Investigasi Pengiriman",
+      };
     case "dibatalkan":
-      return { dotColor: "bg-gray-400", textColor: "text-gray-500", label: "Komplain Dibatalkan" };
+      return {
+        dotColor: "bg-gray-400",
+        textColor: "text-gray-500",
+        label: "Komplain Dibatalkan",
+      };
     case "ditolak":
-      return { dotColor: "bg-red-400", textColor: "text-red-500", label: "Komplain Ditolak" };
+      return {
+        dotColor: "bg-red-400",
+        textColor: "text-red-500",
+        label: "Komplain Ditolak",
+      };
     default:
-      return { dotColor: "bg-gray-300", textColor: "text-gray-400", label: "Status Tidak Diketahui" };
+      return {
+        dotColor: "bg-gray-300",
+        textColor: "text-gray-400",
+        label: "Status Tidak Diketahui",
+      };
   }
 };
 
 export default function OrderSummaryCard({ status = "selesai" }) {
   const { dotColor, textColor, label } = getStatusStyle(status);
+  const resi = "JX3474124013";
+
+  const handleCopy = async () => {
+    await Clipboard.setStringAsync(resi);
+    Alert.alert("Disalin", "Nomor resi berhasil disalin.");
+  };
 
   return (
     <View className="bg-white rounded-2xl border border-gray-200 p-4 space-y-4 mb-4">
@@ -40,12 +67,12 @@ export default function OrderSummaryCard({ status = "selesai" }) {
       {/* No Resi */}
       <View className="flex-row justify-between items-center mb-4">
         <Text className="text-base text-black">No Resi</Text>
-        <View className="flex-row items-center space-x-1">
-          <ClipboardCopy size={16} color="#999" />
+        <Pressable onPress={handleCopy} className="flex-row items-center space-x-1">
+          <Copy size={16} color="#999" />
           <Text className="text-base text-blue-500 font-semibold">
-            JX3474124013
+            {resi}
           </Text>
-        </View>
+        </Pressable>
       </View>
 
       {/* Ekspedisi */}
