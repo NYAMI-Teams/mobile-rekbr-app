@@ -29,12 +29,12 @@ export default function NavigationBar({
 
   const handleChangePassword = () => {
     setShowPopup(false);
-    router.push("/Profile");
+    router.push("/Profile/ChangePassword");
   };
 
   const handleChangeEmail = () => {
     setShowPopup(false);
-    router.push("/ChangeEmail");
+    router.push("/Profile/ChangeEmail");
   };
 
   return (

@@ -10,18 +10,18 @@ import {
 } from "react-native";
 import { Feather, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import InputField from "../../components/InputField";
+import InputField from "@/components/InputField";
 import { useState } from "react";
-import { showToast } from "../../utils";
+import { showToast } from "@/utils";
 import {
   postCheckKataSandiSaatIniValid,
   postChangePassword,
-} from "../../utils/api/auth";
-import PrimaryButton from "../../components/PrimaryButton";
-import PasswordChecklist from "../../components/PasswordChecklist";
-import BuyerKonfirmasi from "../../components/BuyerKonfirmasi";
+} from "@/utils/api/auth";
+import PrimaryButton from "@/components/PrimaryButton";
+import PasswordChecklist from "@/components/PasswordChecklist";
+import BuyerKonfirmasi from "@/components/BuyerKonfirmasi";
 
-export default function Profile() {
+export default function ChangePasswordScreen() {
   const router = useRouter();
 
   const [kataSandiSaatIni, setKataSandiSaatIni] = useState("");
