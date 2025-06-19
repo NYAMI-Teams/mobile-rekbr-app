@@ -28,7 +28,7 @@ export default function Pratinjau() {
       await verifyKyc();
       router.replace("/E-kyc/KYC_Success");
     } catch (error) {
-      showToast("KYC Submission Failed", error?.message, "error");
+      showToast("KYC Submission Gagal", "Silahkan coba lagi.", "error");
     } finally {
       setIsLoading(false);
     }

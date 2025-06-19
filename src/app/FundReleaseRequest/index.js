@@ -11,6 +11,8 @@ import {
   TouchableOpacity,
   ScrollView,
   Image,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import PrimaryButton from "../../components/PrimaryButton";
@@ -18,6 +20,7 @@ import AttachmentFilled from "../../components/AttachmentFilled";
 import InputField from "../../components/InputField";
 import BuyerKonfirmasi from "../../components/BuyerKonfirmasi";
 import { useLocalSearchParams } from "expo-router";
+import { showToast } from "../../utils";
 
 export default function FundReleaseRequestScreen() {
   const router = useRouter();
@@ -131,9 +134,6 @@ export default function FundReleaseRequestScreen() {
 
   const handleBtnPress = () => {
     setShowPopup(true);
-    console.log("ini id ", id);
-    console.log("ini image ", image);
-    console.log("ini alasanText ", alasanText);
   };
 
   const handleUploadFundRelease = async () => {
@@ -141,17 +141,17 @@ export default function FundReleaseRequestScreen() {
     try {
       await postFundRelease(id, image, alasanText);
       setShowPopup(false);
-      showToast("success", "Permintaan konfirmasi pengiriman berhasil dibuat");
+      showToast("Berhasil", "Permintaan konfirmasi pengiriman berhasil dibuat", "success");
       router.replace("/");
     } catch (error) {
-      console.log(error);
+      showToast("Gagal", "Gagal membuat permintaan konfirmasi pengiriman", "error");
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white items-center justify-between">
+    <SafeAreaView className="flex-1 bg-white justify-between">
       {/* Header */}
       <View className="flex-row justify-between items-center w-full px-4 pt-4">
         <TouchableOpacity onPress={() => router.back()}>
@@ -164,44 +164,53 @@ export default function FundReleaseRequestScreen() {
       </View>
 
       {/* Content */}
-      <ScrollView className="flex-1 w-full px-4 mt-5">
-        <View className="mt-4">
-          <InputField
-            title="Alasan Permintaan Konfirmasi"
-            placeholder="Contohnya, barang telah diterima pembeli sejak 2 hari kemarin"
-            value={alasanText}
-            onChangeText={setAlasanText}
-          />
-        </View>
-        <TouchableOpacity onPress={handleUpload} className="mt-4">
-          <AttachmentFilled
-            title="Unggah Bukti"
-            caption={
-              isUploaded
-                ? image?.uri?.split("/").pop()
-                : "Berikan bukti berupa screenshot cek resi"
-            }
-            captionColor={isUploaded ? "#08B20F" : "#9E9E9E"}
-            iconName={"camera"} // Pastikan AttachmentFilled Anda bisa menerima string 'camera' untuk ikon
-            boxColor={isUploaded ? "#F9F9F9" : "#49DBC8"}
-            iconsColor={isUploaded ? "#C2C2C2" : "#FFFFFF"}
-            cardColor={"#FFF"}
-            alertText="Pastikan keterbacaan foto dan hindari bayangan"
-            alertColor={isUploaded ? "#08B20F" : "#C2C2C2"}
-            alertIconName={isUploaded ? "checkmark-circle" : "alert-circle"} // Pastikan ini juga sesuai dengan AttachmentFilled
-            alertIconColor={isUploaded ? "#08B20F" : "#C2C2C2"}
-            onPress={handleUpload}
-          />
-        </TouchableOpacity>
-        <View className="mt-4 mb-4">
-          {!image ? null : (
-            <Image
-              source={{ uri: image?.uri }}
-              className="w-full h-64 rounded-lg"
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{ flex: 1 }}>
+        <ScrollView
+          className="flex-1 w-full px-4 mt-5"
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+          hideKeyboardOnScroll={true}
+          keyboardDismissMode="on-drag">
+          <View className="mt-4">
+            <InputField
+              title="Alasan Permintaan Konfirmasi"
+              placeholder="Contohnya, barang telah diterima pembeli sejak 2 hari kemarin"
+              value={alasanText}
+              onChangeText={setAlasanText}
             />
-          )}
-        </View>
-      </ScrollView>
+          </View>
+          <TouchableOpacity onPress={handleUpload} className="mt-4">
+            <AttachmentFilled
+              title="Unggah Bukti"
+              caption={
+                isUploaded
+                  ? image?.uri?.split("/").pop()
+                  : "Berikan bukti berupa screenshot cek resi"
+              }
+              captionColor={isUploaded ? "#08B20F" : "#9E9E9E"}
+              iconName={"camera"} // Pastikan AttachmentFilled Anda bisa menerima string 'camera' untuk ikon
+              boxColor={isUploaded ? "#F9F9F9" : "#49DBC8"}
+              iconsColor={isUploaded ? "#C2C2C2" : "#FFFFFF"}
+              cardColor={"#FFF"}
+              alertText="Pastikan keterbacaan foto dan hindari bayangan"
+              alertColor={isUploaded ? "#08B20F" : "#C2C2C2"}
+              alertIconName={isUploaded ? "checkmark-circle" : "alert-circle"} // Pastikan ini juga sesuai dengan AttachmentFilled
+              alertIconColor={isUploaded ? "#08B20F" : "#C2C2C2"}
+              onPress={handleUpload}
+            />
+          </TouchableOpacity>
+          <View className="mt-4 mb-4">
+            {!image ? null : (
+              <Image
+                source={{ uri: image?.uri }}
+                className="w-full h-64 rounded-lg"
+              />
+            )}
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
       {/* Button */}
       <View className="w-full px-4 py-4">
         <PrimaryButton

@@ -3,10 +3,13 @@ import {
   ScrollView,
   RefreshControl,
   ActivityIndicator,
+  Text,
+  Image,
+  TouchableOpacity,
+  SafeAreaView,
 } from "react-native";
 import { useRouter } from "expo-router";
 import PrimaryButton from "../../components/PrimaryButton";
-import SellerEmptyContent from "../../screens/seller/homeScreen";
 import { useState, useEffect } from "react";
 import NavigationBar from "../../components/NavigationBar";
 import { StatusBar } from "expo-status-bar";
@@ -16,6 +19,7 @@ import { getProfile } from "../../utils/api/auth";
 import { getAccessToken, removeAccessToken } from "../../store";
 import { showToast } from "../../utils";
 import Toast from "react-native-toast-message";
+import EmptyIllustration from "../../components/Ilustration";
 
 export default function Seller() {
   const router = useRouter();
@@ -40,16 +44,12 @@ export default function Seller() {
         setIsEmptyTransaction(true);
       }
       setTransactions(res.data);
-      // console.log("Berhasil get all transaction seller");
-      // console.log(res.data);
     } catch (err) {
       showToast(
-        "Error",
-        "Failed to fetch transactions. Please try again later.",
+        "Gagal",
+        "Gagal mengambil data transaksi. Silahkan coba lagi.",
         "error"
       );
-    } finally {
-      console.log("finally");
     }
   };
 
@@ -68,8 +68,8 @@ export default function Seller() {
       }
     } catch {
       showToast(
-        "Session Invalid",
-        "Your session has expired. Please log in again.",
+        "Sesi Berakhir",
+        "Sesi Anda telah berakhir. Silahkan login kembali.",
         "error"
       );
       handleLogout();
@@ -88,8 +88,9 @@ export default function Seller() {
     try {
       await removeAccessToken();
       router.replace("Onboarding");
+      showToast("Logout Berhasil", "Anda telah berhasil logout.", "success");
     } catch (err) {
-      console.error("Logout failed:", err);
+      showToast("Logout Gagal", "Gagal logout. Silahkan coba lagi.", "error");
     }
   };
 
@@ -159,5 +160,57 @@ export default function Seller() {
         {/* Modal */}
       </View>
     </>
+  );
+}
+
+function SellerEmptyContent({ isKYCCompleted }) {
+  const router = useRouter();
+
+  return (
+    <SafeAreaView className="flex-1 bg-white pt-4 justify-start">
+      {/* Warning Banner (jika belum KYC) */}
+      {!isKYCCompleted && (
+        <View className="mb-6">
+          <View className="bg-[#FFF4D9] rounded-xl py-3 px-4">
+            <View className="flex-row items-start">
+              <Image
+                source={require("../../assets/icon-warning.png")}
+                className="w-5 h-5 mt-[2px] mr-2"
+                resizeMode="contain"
+              />
+              <Text className="flex-1 text-sm text-black font-normal leading-5">
+                Biar bisa lanjut bikin Rekber, kamu perlu selesain KYC dulu, ya!
+              </Text>
+            </View>
+          </View>
+        </View>
+      )}
+
+      {/* Empty Illustration + Text */}
+      <View className="items-center mb-8">
+        <EmptyIllustration
+          text={`Kosong banget di sini...\nBikin Rekber pertama kamu, kuy!`}
+        />
+      </View>
+
+      {/* CTA Button */}
+      <View className="">
+        <TouchableOpacity
+          className="w-full py-4 rounded-xl bg-black items-center justify-center"
+          onPress={() => {
+            if (!isKYCCompleted) {
+              router.push("E-kyc/KYC_Intro");
+            } else {
+              router.push("CreateTransaksi/CreateRekening/ChooseRekening");
+            }
+          }}>
+          <Text className="text-white text-base font-semibold">
+            {isKYCCompleted
+              ? "Bikin Rekbr Baru"
+              : "Lengkapi KYC & Bikin Rekber"}
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </SafeAreaView>
   );
 }

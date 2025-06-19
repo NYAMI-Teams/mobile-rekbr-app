@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { useNavigation } from "@react-navigation/native";
 import { View, Text, Image, Pressable, TouchableOpacity } from "react-native";
 import * as Clipboard from "expo-clipboard";
-import Toast from "react-native-toast-message";
 import moment from "moment";
 import clsx from "clsx";
 import CountdownTimer from "../Countdown";
 import { useRouter } from "expo-router";
 import { buyerConfirmReceivedTransaction } from "../../utils/api/buyer";
 import BuyerKonfirmasi from "../BuyerKonfirmasi";
+import { showToast } from "../../utils";
 
 const BuyerCard = ({ data }) => {
   const [showPopup, setShowPopup] = useState(false);
@@ -24,7 +23,7 @@ const BuyerCard = ({ data }) => {
       const res = await buyerConfirmReceivedTransaction(data?.id);
       setShowPopup(false);
     } catch (error) {
-      console.log(error);
+      showToast("Gagal", "Gagal mengkonfirmasi pembayaran", "error");
     }
   };
 
@@ -33,21 +32,9 @@ const BuyerCard = ({ data }) => {
     if (!text) return;
     try {
       await Clipboard.setStringAsync(text);
-      Toast.show({
-        type: "success",
-        text1: "Berhasil",
-        text2: "Disalin ke clipboard",
-        position: "bottom",
-      });
-      console.log("Copied to clipboard:", text);
+      showToast("Berhasil", "Disalin ke clipboard", "success");
     } catch (error) {
-      Toast.show({
-        type: "error",
-        text1: "Gagal",
-        text2: "Tidak dapat menyalin",
-        position: "bottom",
-      });
-      console.log("Failed to copy to clipboard:", error);
+      showToast("Gagal", "Tidak dapat menyalin", "error");
     }
   };
 
@@ -162,7 +149,7 @@ const BuyerCard = ({ data }) => {
               {/* Replace this with actual countdown (e.g., 24 jam mundur dari requestAt) */}
               <CountdownTimer
                 deadline={data?.buyerConfirmDeadline || "-"}
-                fromTime={data?.fundReleaseRequest?.resolvedAt || "-"}
+                fromTime={data?.currentTimestamp || "-"}
               />
             </Text>
           </View>

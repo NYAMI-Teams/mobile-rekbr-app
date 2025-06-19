@@ -35,8 +35,7 @@ export default function HomeDispute() {
           {/* Tombol Back di kiri */}
           <TouchableOpacity
             onPress={() => navigation.goBack()}
-            className="absolute left-0"
-          >
+            className="absolute left-0">
             <ChevronLeft size={24} color="black" />
           </TouchableOpacity>
 
@@ -61,7 +60,7 @@ export default function HomeDispute() {
 
         {/* Info Email */}
         <Text className="text-lg font-medium text-black mb-3">
-          Diskusi dengan{" "}
+          Diskusi dengan
           <Text className="font-semibold">irgi168@gmail.com</Text>
         </Text>
         <Text className="text-base text-gray-500 mb-4">
@@ -104,7 +103,7 @@ export default function HomeDispute() {
       {/* Footer */}
       <View className="absolute bottom-0 left-0 right-0 items-center pb-6">
         <Text className="text-xs text-gray-400">
-          Terdapat kendala?{" "}
+          Terdapat kendala?
           <Text className="text-blue-500 font-medium">
             Silahkan Hubungi Kami
           </Text>
