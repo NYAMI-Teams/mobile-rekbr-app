@@ -57,9 +57,7 @@ export default function DetailKomplain() {
           isRejected={ditolak}
         />
 
-        <InfoBanner 
-            contentBefore="Tunggu approval bukti dari admin, ya! Kalau bukti kamu oke, permintaan konfirmasi bakal langsung dikirim ke seller!"
-        />
+        <InfoBanner contentBefore="Tunggu approval bukti dari admin, ya! Kalau bukti kamu oke, permintaan konfirmasi bakal langsung dikirim ke seller!" />
 
         {/* Status Komplain */}
         <StatusKomplain status="Menunggu Pengembalian Barang" />
@@ -83,7 +81,7 @@ export default function DetailKomplain() {
             },
             {
               imgTitle: "Bukti foto & video",
-              images: [require("../../assets/barangrusak.png")],
+              images: [require("../../../assets/barangrusak.png")],
             },
           ]}
         />
@@ -107,7 +105,7 @@ export default function DetailKomplain() {
             },
             {
               imgTitle: "Bukti foto & video",
-              images: [require("../../assets/barangrusak.png")],
+              images: [require("../../../assets/barangrusak.png")],
             },
           ]}
         />
@@ -125,7 +123,7 @@ export default function DetailKomplain() {
             },
             {
               imgTitle: "Bukti foto & video",
-              images: [require("../../assets/barangrusak.png")],
+              images: [require("../../../assets/barangrusak.png")],
             },
           ]}
         />
@@ -137,7 +135,10 @@ export default function DetailKomplain() {
         <CopyField title="No Resi" content="J X 3 4 7 4 1 2 4 0 1 3" />
         <TextView title="Ekspedisi" content="J&T Express Indonesia" />
         <CopyField title="ID Transaksi" content="1 2 3 4 5 6 7 8 9" />
-        <CopyField title="Virtual Account" content="8 0 8 0 1 2 3 4 5 6 7 8 9" />
+        <CopyField
+          title="Virtual Account"
+          content="8 0 8 0 1 2 3 4 5 6 7 8 9"
+        />
 
         {/* ✅ Tombol untuk mengaktifkan setDitolak(true) */}
         {/* <TouchableOpacity
