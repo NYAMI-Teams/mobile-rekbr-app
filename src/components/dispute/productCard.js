@@ -15,7 +15,10 @@ const ProductCard = ({
   sellerMail,
   noResi,
   expedisi,
-  nominal,
+  itemPrice = 0,
+  insuranceFee = 0,
+  platformFee = 0,
+  totalAmount = 0,
 }) => {
   return (
     <View>
@@ -46,19 +49,19 @@ const ProductCard = ({
         </View>
         <Tagihan
           caption="Nominal Rekber"
-          price={formatPrice(nominal)}
+          price={formatPrice(totalAmount)}
           details={[
             {
               status: "Nominal Barang",
-              price: formatPrice(nominal),
+              price: formatPrice(itemPrice),
             },
             {
               status: "Asuransi Pengiriman BNI Life (0.2%)",
-              price: formatPrice(nominal),
+              price: formatPrice(insuranceFee),
             },
             {
               status: `Biaya Jasa Aplikasi (8%)`,
-              price: formatPrice(nominal),
+              price: formatPrice(platformFee),
             },
           ]}
         />

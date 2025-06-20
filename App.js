@@ -5,6 +5,7 @@ import "./global.css";
 
 export default function App() {
   const params = useLocalSearchParams();
+  
 
   return (
     <View style={styles.container}>

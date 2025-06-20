@@ -1,5 +1,5 @@
 // DisputeDetail.js
-import React, { useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ChevronLeft, ClipboardPaste, ChevronDown } from "lucide-react-native";
-import { router, useNavigation } from "expo-router";
+import { router, useLocalSearchParams, useNavigation } from "expo-router";
 import PrimaryButton from "../../../components/PrimaryButton";
 
 import * as ImagePicker from "expo-image-picker";
@@ -25,14 +25,41 @@ import { UploadProve } from "../../../components/dispute/UploadProve";
 import { InfoBanner } from "../../../components/dispute/InfoBanner";
 import { TrackDispute } from "../../../components/dispute/TrackDispute";
 import { useRouter } from "expo-router";
+import { getDetailBuyerTransaction } from "../../../utils/api/buyer";
 
 export default function DisputeDetail() {
   const router = useRouter();
+  const params = useLocalSearchParams();
+  const data = params.data ? JSON.parse(params.data) : null;
+
   const [selectedSolution, setSelectedSolution] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [showTipsModal, setShowTipsModal] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [media, setMedia] = useState([]);
+  const [detailTransaction, setDetailTransaction] = useState({});
+
+  console.log("data:", data.id);
+  useEffect(() => {
+    const fetchTransactionDetails = async () => {
+      try {
+        const res = await getDetailBuyerTransaction(data.id);
+        setDetailTransaction(res.data);
+      } catch (err) {
+        showToast(
+          "Gagal",
+          "Gagal mengambil data transaksi. Silahkan coba lagi.",
+          "error"
+        );
+      }
+    };
+
+    fetchTransactionDetails();
+  }, [data.id]);
+
+  useEffect(() => {
+    console.log("updated detailTransaction:", detailTransaction);
+  }, [detailTransaction]);
 
   const solutionOptions = [
     {
@@ -126,9 +153,7 @@ export default function DisputeDetail() {
         {/* Header */}
         <View className="relative items-center justify-center mb-6">
           <TouchableOpacity
-            onPress={() =>
-              router.back()
-            }
+            onPress={() => router.back()}
             className="absolute left-0"
           >
             <ChevronLeft size={24} color="black" />
@@ -146,12 +171,15 @@ export default function DisputeDetail() {
 
         {/* Info Barang */}
         <ProductCard
-          productName="iPhone 13 Pro Max"
-          idx="RKB - 8080123456789"
-          sellerMail="irgi168@gmail.com"
-          noResi="JX3474124013"
-          expedisi="J&T Express Indonesia"
-          nominal="1000000"
+          productName={detailTransaction?.itemName}
+          idx={detailTransaction?.transactionCode}
+          sellerMail={detailTransaction?.sellerEmail}
+          noResi={detailTransaction?.shipment?.trackingNumber}
+          expedisi={detailTransaction?.shipment?.courier}
+          itemPrice={detailTransaction?.itemPrice}
+          insuranceFee={detailTransaction?.insuranceFee}
+          platformFee={detailTransaction?.platformFee}
+          totalAmount={detailTransaction?.totalAmount}
         />
 
         {/* Alasan */}

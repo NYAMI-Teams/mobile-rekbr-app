@@ -1,18 +1,21 @@
-import React from "react";
+import React, { use, useEffect } from "react";
 import { View, Text, TouchableOpacity, Image, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import PrimaryButton from "../../components/PrimaryButton";
 import { ChevronLeft } from "lucide-react-native";
 import { useRouter } from "expo-router";
-
-
+import { useLocalSearchParams } from "expo-router";
 
 export default function Dispute() {
-  const router = useRouter()
+  const params = useLocalSearchParams();
+  const data = params.data ? JSON.parse(params.data) : null;
+  
+
+  const router = useRouter();
   const complaints = [
     {
       label: "Barang belum sampai atau kesasar",
-      icon: require("../../assets/belumsampai.png"), 
+      icon: require("../../assets/belumsampai.png"),
       route: "",
     },
     {
@@ -23,12 +26,12 @@ export default function Dispute() {
     {
       label: "Tidak sesuai deskripsi",
       icon: require("../../assets/tidaksesuai.png"),
-      route: ""
+      route: "",
     },
     {
       label: "Masalah atau komplain lainnya",
       icon: require("../../assets/komplain.png"),
-      route: ""
+      route: "",
     },
   ];
 
@@ -63,7 +66,7 @@ export default function Dispute() {
         {/* Info Email */}
         <Text className="text-lg font-medium text-black mb-3">
           Diskusi dengan
-          <Text className="font-semibold">irgi168@gmail.com</Text>
+          <Text className="font-semibold"> {data?.sellerEmail}</Text>
         </Text>
         <Text className="text-base text-gray-500 mb-4">
           Cari resolusi yang lebih cepat, diskusikan dulu kendalamu dengan
@@ -87,7 +90,12 @@ export default function Dispute() {
             <TouchableOpacity
               key={index}
               className="w-[48%] h-40 bg-white border border-gray-300 rounded-xl px-4 py-10 items-center justify-between"
-              onPress={() => router.push(`/${item.route}`)}
+              onPress={() =>
+              router.push({
+                pathname: `/${item.route}`,
+                params: { data: JSON.stringify(data) },
+              })
+            }
             >
               <Image
                 source={item.icon}

@@ -328,7 +328,12 @@ export default function DetailTransaksiBuyer({ data }) {
         <View className="flex flex-row items-center gap-4">
           <PrimaryButton
             title="Komplain"
-            onPress={() => router.push("/dispute")}
+            onPress={() =>
+              router.push({
+                pathname: "/dispute",
+                params: { data: JSON.stringify(data) },
+              })
+            }
             height={50}
             width={"45%"}
             btnColor="#F9F9F9"
