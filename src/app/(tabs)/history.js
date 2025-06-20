@@ -1,4 +1,10 @@
-import { View, ActivityIndicator, Text, TouchableOpacity, ScrollView } from "react-native";
+import {
+  View,
+  ActivityIndicator,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+} from "react-native";
 import NavigationBar from "@/components/NavigationBar";
 import { StatusBar } from "expo-status-bar";
 import { useState, useEffect } from "react";
@@ -49,11 +55,7 @@ export default function Home() {
       await removeAccessToken();
       router.replace("Onboarding");
     } catch (err) {
-      showToast(
-        "Logout Gagal",
-        "Gagal logout. Silahkan coba lagi.",
-        "error"
-      );
+      showToast("Logout Gagal", "Gagal logout. Silahkan coba lagi.", "error");
     }
   };
 
@@ -84,6 +86,7 @@ export default function Home() {
       }
     } catch (error) {
       console.log("Error get history buyer:", error);
+      showToast("Gagal", "Gagal mendapatkan riwayat pembelian", "error");
     }
   };
 
@@ -154,25 +157,29 @@ export default function Home() {
             <View className="flex-row w-full mt-4">
               <TouchableOpacity
                 onPress={() => handleTabPress("pembelian")}
-                className={`flex-1 items-center justify-center h-8 ${selectedTab === "pembelian"
-                  ? "border-b-2 border-[#49DBC8]"
-                  : "border-b-2 border-gray-300"
-                  }`}>
+                className={`flex-1 items-center justify-center h-8 ${
+                  selectedTab === "pembelian"
+                    ? "border-b-2 border-[#49DBC8]"
+                    : "border-b-2 border-gray-300"
+                }`}>
                 <Text
-                  className={`text-xs font-semibold ${selectedTab === "pembelian" ? "text-black" : "text-gray-400"
-                    }`}>
+                  className={`text-xs font-semibold ${
+                    selectedTab === "pembelian" ? "text-black" : "text-gray-400"
+                  }`}>
                   Pembelian
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => handleTabPress("penjualan")}
-                className={`flex-1 items-center justify-center h-8 ${selectedTab === "penjualan"
-                  ? "border-b-2 border-[#49DBC8]"
-                  : "border-b-2 border-gray-300"
-                  }`}>
+                className={`flex-1 items-center justify-center h-8 ${
+                  selectedTab === "penjualan"
+                    ? "border-b-2 border-[#49DBC8]"
+                    : "border-b-2 border-gray-300"
+                }`}>
                 <Text
-                  className={`text-xs font-semibold ${selectedTab === "penjualan" ? "text-black" : "text-gray-400"
-                    }`}>
+                  className={`text-xs font-semibold ${
+                    selectedTab === "penjualan" ? "text-black" : "text-gray-400"
+                  }`}>
                   Penjualan
                 </Text>
               </TouchableOpacity>

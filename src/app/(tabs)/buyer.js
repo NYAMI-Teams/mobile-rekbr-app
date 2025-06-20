@@ -34,11 +34,7 @@ export default function Home() {
       }
       setTransactions(res.data);
     } catch (err) {
-      showToast(
-        "Gagal",
-        "Gagal mengambil data transaksi. Silahkan coba lagi.",
-        "error"
-      );
+      showToast("Gagal", err?.message, "error");
     }
   };
 
@@ -58,12 +54,8 @@ export default function Home() {
       }
       const res = await getProfile();
       setProfile(res.data);
-    } catch {
-      showToast(
-        "Sesi Berakhir",
-        "Sesi Anda telah berakhir. Silahkan login kembali.",
-        "error"
-      );
+    } catch (err) {
+      showToast("Sesi Berakhir", err?.message, "error");
       handleLogout();
     } finally {
       setIsLoading(false);
@@ -75,7 +67,7 @@ export default function Home() {
       await removeAccessToken();
       router.replace("Onboarding");
     } catch (err) {
-      showToast("Logout Gagal", "Gagal logout. Silahkan coba lagi.", "error");
+      showToast("Logout Gagal", err?.message, "error");
     }
   };
 
@@ -103,7 +95,9 @@ export default function Home() {
             }>
             {isEmptyTransaction ? (
               <View className="items-center mt-8">
-                <EmptyIllustration text={`Belum ada Rekber yang masuk.\nTunggu seller kirimkan Rekber untuk kamu`} />
+                <EmptyIllustration
+                  text={`Belum ada Rekber yang masuk.\nTunggu seller kirimkan Rekber untuk kamu`}
+                />
               </View>
             ) : (
               transactions.map((transaction) => (

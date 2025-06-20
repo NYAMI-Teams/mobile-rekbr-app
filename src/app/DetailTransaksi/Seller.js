@@ -19,6 +19,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { cancelTransaksiSeller } from "@/utils/api/seller";
 import { getDetailSellerTransaction } from "@/utils/api/seller";
 import BuyerKonfirmasi from "@/components/BuyerKonfirmasi";
+import { showToast } from "@/utils";
 
 export default function DetailTransaksiSeller() {
   const { id } = useLocalSearchParams();
@@ -27,7 +28,6 @@ export default function DetailTransaksiSeller() {
   const [data, setData] = useState(null);
   const [isExpanded, setIsExpanded] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
-
 
   useEffect(() => {
     const fetchTransactionDetails = async () => {
@@ -51,6 +51,8 @@ export default function DetailTransaksiSeller() {
     try {
       const res = await cancelTransaksiSeller(data?.id);
       if (res) {
+        console.log(res, "Batalkan Transaksi");
+        setShowPopup(false);
         showToast("Berhasil", "Transaksi berhasil dibatalkan", "success");
         router.replace("/");
       }
@@ -446,12 +448,13 @@ export default function DetailTransaksiSeller() {
                   {status == "pending_payment" ? "Virtual Account" : "No Resi"}
                 </Text>
                 <View
-                  className={`flex-row items-center ${status == "waiting_shipment" ||
-                      status == "shipped" ||
-                      status == "completed"
+                  className={`flex-row items-center ${
+                    status == "waiting_shipment" ||
+                    status == "shipped" ||
+                    status == "completed"
                       ? "mb-3"
                       : ""
-                    }`}>
+                  }`}>
                   <Text style={{ fontSize: 17, fontWeight: "500" }}>
                     {status == "pending_payment"
                       ? data?.virtualAccount || "-"
@@ -504,10 +507,10 @@ export default function DetailTransaksiSeller() {
                   {status == "completed"
                     ? "Komplain dianggap tidak ada dan bakal selesai otomatis kalau pembeli nggak respon."
                     : data?.fundReleaseRequest?.status == "pending"
-                      ? "Tunggu approval kami, ya! Kalau bukti kamu oke, permintaan konfirmasi bakal langsung dikirim ke buyer!"
-                      : data?.fundReleaseRequest?.status == "approved"
-                        ? "Konfirmasi udah dikirim ke buyer! Sekarang tinggal tunggu respon mereka dalam 1 x 24 jam"
-                        : "Permintaan konfirmasi ke buyer ditolak. Pastikan data atau bukti yang kamu kirim sudah lengkap dan sesuai"}
+                    ? "Tunggu approval kami, ya! Kalau bukti kamu oke, permintaan konfirmasi bakal langsung dikirim ke buyer!"
+                    : data?.fundReleaseRequest?.status == "approved"
+                    ? "Konfirmasi udah dikirim ke buyer! Sekarang tinggal tunggu respon mereka dalam 1 x 24 jam"
+                    : "Permintaan konfirmasi ke buyer ditolak. Pastikan data atau bukti yang kamu kirim sudah lengkap dan sesuai"}
                 </Text>
               </View>
             </>
@@ -515,7 +518,7 @@ export default function DetailTransaksiSeller() {
 
         {/* Status Rekbr (done)*/}
         {data?.fundReleaseRequest?.status == "pending" ||
-          data?.fundReleaseRequest?.status == "rejected" ? (
+        data?.fundReleaseRequest?.status == "rejected" ? (
           <View className="flex-col  gap-2 mx-3 p-3">
             <View className="flex-row justify-between">
               <Text className="text-[15px]">Status Rekbr:</Text>
