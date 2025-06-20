@@ -1,4 +1,4 @@
-import React, { Profiler, useState } from "react";
+import React, { Profiler, useEffect, useState } from "react";
 import {
   View,
   ScrollView,
@@ -16,7 +16,11 @@ import PrimaryButton from "../../components/PrimaryButton";
 import NavigationBar from "../../components/NavigationBar";
 import AccountBalance from "../../components/AccountBalance";
 import QuickActions from "../../components/QuickActions";
-import Dispute from "../Dispute";
+import Dispute from "../Dispute/Index";
+import { getDetailBuyerTransaction } from "@/utils/api/buyer";
+import { RefreshControl } from "react-native";
+import { getListComplainBuyer } from "@/utils/api/complaint";
+import { showToast } from "@/utils";
 
 export default function DisputeScreen() {
   const router = useRouter();
@@ -25,7 +29,44 @@ export default function DisputeScreen() {
   const [activeTab, setActiveTab] = useState("pembelian");
   const [isKYCCompleted, setIsKYCCompleted] = useState(true);
   const [isEmptyTransaction, setIsEmptyTransaction] = useState(false);
+  const [complainTransactions, setComplainTransactions] = useState([]);
+  const [refreshing, setRefreshing] = useState(false);
 
+  useEffect(() => {
+    fetchComplainData();
+  }, []);
+
+  const fetchComplainData = async () => {
+    try {
+      const res = await getListComplainBuyer();
+      setComplainTransactions(res.data);
+      setIsEmptyTransaction(res.data.length === 0);
+    } catch (err) {
+      showToast("Gagal", "Gagal mengambil data komplain", "error");
+    }
+  };
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    fetchComplainData().finally(() => setRefreshing(false));
+  };
+
+  // useEffect(() => {
+  //   const fetchTransactionDetails = async () => {
+  //     try {
+  //       const res = await getDetailBuyerTransaction(id);
+  //       setData(res.data);
+  //     } catch (err) {
+  //       showToast(
+  //         "Gagal",
+  //         "Gagal mengambil data transaksi. Silahkan coba lagi.",
+  //         "error"
+  //       );
+  //     }
+  //   };
+
+  //   fetchTransactionDetails();
+  // }, [id]);
   return (
     <SafeAreaView
       style={{ flex: 1, backgroundColor: "white", paddingTop: insets.top }}
@@ -80,15 +121,48 @@ export default function DisputeScreen() {
       </View>
 
       {/* Content */}
-      <ScrollView className="p-4">
-        <Pressable onPress={() => router.push("/Dispute/HilangDisputeDetail")}>
-          <OrderSummaryCard status="investigasi" />
-        </Pressable>
-        {/* Tambahkan lebih banyak OrderSummaryCard jika diperlukan */}
+      <ScrollView
+        className="p-4"
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
+        {complainTransactions.length > 0 ? (
+          complainTransactions.map((item) => (
+            <Pressable
+              key={item.id}
+              onPress={() =>
+                router.push({
+                  pathname: "/Dispute/HilangDisputeDetail",
+                  params: { id: item.id },
+                })
+              }
+            >
+              <OrderSummaryCard
+                productName={item.itemName}
+                sellerEmail={item.sellerEmail}
+                price={item.totalAmount}
+                resi={item.shipment?.trackingNumber || "-"}
+                ekspedisi={item.shipment?.courier || "-"}
+                status={item.complaint?.status || "unknown"}
+                issue={
+                  item.complaint?.type === "lost"
+                    ? "Barang belum sampai atau kesasar"
+                    : "Masalah lainnya"
+                }
+              />
+            </Pressable>
+          ))
+        ) : (
+          <Text className="text-gray-400 text-center mt-8">
+            Belum ada transaksi komplain.
+          </Text>
+        )}
+
         <PrimaryButton
           title="Ajukan Komplain"
           onPress={() => {
-            router.push("/Dispute/Index"); // Ganti dengan route yang kamu inginkan
+            router.push("/Dispute/Index");
           }}
           className="mt-4"
         />
