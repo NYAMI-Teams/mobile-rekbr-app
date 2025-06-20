@@ -2,27 +2,25 @@ import React, { useState } from "react";
 import { View, Text, TouchableOpacity, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ChevronLeft } from "lucide-react-native";
-import { useNavigation } from "expo-router";
-import { InputField } from "../../components/dispute/InputField";
-import AttachmentFilled from "../../components/AttachmentFilled";
-import PrimaryButton from "../../components/PrimaryButton";
+import { InputField } from "../../../components/dispute/InputField";
+import AttachmentFilled from "../../../components/AttachmentFilled";
+import PrimaryButton from "../../../components/PrimaryButton";
+import { useRouter } from "expo-router";
 
 export default function PengembalianForm() {
-  const navigation = useNavigation();
+  const router = useRouter();
 
   return (
     <SafeAreaView className="flex-1 bg-white">
       {/* Header */}
-      <View className="relative items-center justify-center mb-6">
+      <View className="flex-row items-center justify-between p-4">
         <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          className="absolute left-0"
+          onPress={() => router.back()}
         >
           <ChevronLeft size={24} color="black" />
         </TouchableOpacity>
-        <Text className="text-xl font-semibold text-center">
-          Form Pengembalian
-        </Text>
+        <Text className="text-base font-semibold">Form Pengembalian</Text>
+        <View style={{ width: 24 }} />
       </View>
 
       {/* Isi Form */}
@@ -53,7 +51,12 @@ export default function PengembalianForm() {
 
       {/* Button di bawah */}
       <View className="px-4 py-3 border-t border-gray-200">
-        <PrimaryButton title="Kirim" onPress={() => navigation.navigate("")} />
+        <PrimaryButton
+          title="Kirim"
+          onPress={() =>
+            router.replace("../../(tabs)/dispute")
+          }
+        />
         <View className="flex-row items-center justify-center mt-3">
           <Text className="text-sm text-gray-500">Terdapat kendala?</Text>
           <TouchableOpacity>

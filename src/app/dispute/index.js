@@ -3,26 +3,32 @@ import { View, Text, TouchableOpacity, Image, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import PrimaryButton from "../../components/PrimaryButton";
 import { ChevronLeft } from "lucide-react-native";
-import { useNavigation } from "expo-router";
+import { useRouter } from "expo-router";
+
+
 
 export default function Dispute() {
-  const navigation = useNavigation();
+  const router = useRouter()
   const complaints = [
     {
       label: "Barang belum sampai atau kesasar",
-      icon: require("../../assets/belumsampai.png"),
+      icon: require("../../assets/belumsampai.png"), 
+      route: "",
     },
     {
       label: "Barang rusak",
       icon: require("../../assets/barangrusak.png"),
+      route: "dispute/BarangRusak/rusakBarang",
     },
     {
       label: "Tidak sesuai deskripsi",
       icon: require("../../assets/tidaksesuai.png"),
+      route: ""
     },
     {
       label: "Masalah atau komplain lainnya",
       icon: require("../../assets/komplain.png"),
+      route: ""
     },
   ];
 
@@ -31,9 +37,7 @@ export default function Dispute() {
       <ScrollView className="px-4 pt-4">
         <View className="relative items-center justify-center mb-4">
           {/* Tombol Back di kiri */}
-          <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            className="absolute left-0">
+          <TouchableOpacity onPress={router.back} className="absolute left-0">
             <ChevronLeft size={24} color="black" />
           </TouchableOpacity>
 
@@ -82,7 +86,9 @@ export default function Dispute() {
           {complaints.map((item, index) => (
             <TouchableOpacity
               key={index}
-              className="w-[48%] h-40 bg-white border border-gray-300 rounded-xl px-4 py-10 items-center justify-between">
+              className="w-[48%] h-40 bg-white border border-gray-300 rounded-xl px-4 py-10 items-center justify-between"
+              onPress={() => router.push(`/${item.route}`)}
+            >
               <Image
                 source={item.icon}
                 className="w-10 h-10"

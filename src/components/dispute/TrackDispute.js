@@ -56,7 +56,7 @@ const TrackDetail = ({
               <Image
                 key={index}
                 source={imgSource}
-                className="w-[100px] h-[100px] rounded-lg"
+                className="w-[100px] h-[100px] rounded-lg mx-3"
                 resizeMode="cover"
               />
             ))}
@@ -85,9 +85,7 @@ const TrackDetail = ({
           )}
           {expedition && (
             <View className="flex-row justify-between items-center mt-2">
-              <Text className="text-[15px] text-black">
-                Ekspedisi:
-              </Text>
+              <Text className="text-[15px] text-black">Ekspedisi:</Text>
               <Text className="text-[15px] text-black">{expedition}</Text>
             </View>
           )}
@@ -98,15 +96,22 @@ const TrackDetail = ({
 };
 
 // Komponen utama TrackDispute
-export const TrackDispute = ({ title, dateTime, details = [] }) => {
+export const TrackDispute = ({
+  title,
+  dateTime,
+  details = [],
+  titleColor = "black",
+}) => {
   return (
     <View className="px-4 mt-6">
-      <Text className="text-[15px] font-semibold text-black">{title}</Text>
+      <Text className="text-[15px] font-semibold" style={{ color: titleColor }}>
+        {title}
+      </Text>
       {dateTime ? (
         <Text className="text-[10px] text-gray-500 mt-1">{dateTime}</Text>
       ) : null}
 
-      <View className="mt-2 bg-[#F9F9F9] rounded-xl">
+      <View className="mt-2 bg-[#F9F9F9] rounded-xl ">
         {details.map((item, index) => (
           <TrackDetail
             key={index}

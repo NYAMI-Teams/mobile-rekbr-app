@@ -8,40 +8,38 @@ import {
   TouchableWithoutFeedback,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import {
-  ClipboardPaste,
-  ChevronLeft,
-  ChevronDown,
-} from "lucide-react-native";
+import { ClipboardPaste, ChevronLeft, ChevronDown } from "lucide-react-native";
 
-import CopyField from "../../components/dispute/copyField";
-import TextView from "../../components/dispute/textView";
-import { InfoBanner } from "../../components/dispute/InfoBanner";
-import { StatusKomplain } from "../../components/dispute/statusKomplain";
-import StepProgressBar from "../../components/ProgressBar";
-import { TrackDispute } from "../../components/dispute/TrackDispute";
+import CopyField from "../../../components/dispute/copyField";
+import TextView from "../../../components/dispute/textView";
+import { InfoBanner } from "../../../components/dispute/InfoBanner";
+import { StatusKomplain } from "../../../components/dispute/statusKomplain";
+import StepProgressBar from "../../../components/ProgressBar";
+import { TrackDispute } from "../../../components/dispute/TrackDispute";
 
 export default function DetailKomplain() {
   const [showOptionModal, setShowOptionModal] = useState(false);
 
   return (
     <SafeAreaView className="flex-1 bg-white">
+      {/* Header */}
+      <View className="flex-row items-center justify-between p-4">
+        <TouchableOpacity
+          onPress={() => router.replace("../../(tabs)/dispute")}
+        >
+          <ChevronLeft size={24} color="black" />
+        </TouchableOpacity>
+        <Text className="text-base font-semibold">Detail Komplain</Text>
+        <View style={{ width: 24 }} />
+      </View>
+
+      {/* Stepper */}
+      <StepProgressBar
+        currentStep={2}
+        steps={["Menunggu", "Kembaliin", "Refund", "Selesai"]}
+      />
+
       <ScrollView className="px-4">
-        {/* Header */}
-        <View className="flex-row items-center justify-between py-4">
-          <TouchableOpacity>
-            <ChevronLeft size={24} color="black" />
-          </TouchableOpacity>
-          <Text className="text-base font-semibold">Detail Komplain</Text>
-          <View style={{ width: 24 }} />
-        </View>
-
-        {/* Stepper */}
-        <StepProgressBar
-          currentStep={2}
-          steps={["Menunggu", "Kembaliin", "Refund", "Selesai"]}
-        />
-
         {/* Alert Info */}
         {/* <InfoBanner
           contentBefore="Jika seller nggak respon sampai "
@@ -61,48 +59,47 @@ export default function DetailKomplain() {
           title="Admin meneruskan permintaan konfirmasi"
           dateTime="20 Juni 2025, 10:00 WIB"
         />
-         <TrackDispute
+        <TrackDispute
           title="Permintaan konfirmasi buyer"
           dateTime="21 Juni 2025, 10:00 WIB"
-        details={[
+          details={[
             {
-              content:
-                "Melalui resi harusnya barang sudah sampai di seller",
+              content: "Melalui resi harusnya barang sudah sampai di seller",
             },
             {
               imgTitle: "Bukti foto & video",
-                images: [require("../../assets/barangrusak.png")]
+              images: [require("../../../assets/barangrusak.png")],
             },
           ]}
-          />
+        />
         <TrackDispute
           title="Refund bayar oleh buyer"
           dateTime="20 Juni 2025, 10:00 WIB"
-        details={[
+          details={[
             {
               resiNumber: "J X 3 4 7 4 1 2 4 0 1 3",
-                expedition: "J&T Express Indonesia",
+              expedition: "J&T Express Indonesia",
             },
-        ]}
-            />
+          ]}
+        />
         <TrackDispute
           title="Persetujuan komplain seller"
           dateTime="19 Juni 2025, 10:00 WIB"
-        details={[
+          details={[
             {
               content:
                 "Seller setuju untuk Refund dana pada barang yang bermasalah.",
             },
             {
               imgTitle: "Bukti foto & video",
-                images: [require("../../assets/barangrusak.png")]
+              images: [require("../../../assets/barangrusak.png")],
             },
           ]}
-          />
-          <TrackDispute
+        />
+        <TrackDispute
           title="Pengajuan komplain buyer"
           dateTime="16 Juni 2025, 10:00 WIB"
-        details={[
+          details={[
             {
               content:
                 "Buyer mau ngembaliin barang yang bermasalah. Barang yg bermasalah bakalan diganti yang baru.",
@@ -113,10 +110,10 @@ export default function DetailKomplain() {
             },
             {
               imgTitle: "Bukti foto & video",
-                images: [require("../../assets/barangrusak.png")]
+              images: [require("../../../assets/barangrusak.png")],
             },
           ]}
-          />
+        />
 
         {/* Data Seller & Transaksi */}
         <TextView title="Seller" content="zhirazzi@gmail.com" />
@@ -125,10 +122,11 @@ export default function DetailKomplain() {
         <CopyField title="No Resi" content="J X 3 4 7 4 1 2 4 0 1 3" />
         <TextView title="Ekspedisi" content="J&T Express Indonesia" />
         <CopyField title="ID Transaksi" content="1 2 3 4 5 6 7 8 9" />
-        <CopyField title="Virtual Account" content="8 0 8 0 1 2 3 4 5 6 7 8 9" />
+        <CopyField
+          title="Virtual Account"
+          content="8 0 8 0 1 2 3 4 5 6 7 8 9"
+        />
       </ScrollView>
-
-     
     </SafeAreaView>
   );
 }

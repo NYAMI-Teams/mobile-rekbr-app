@@ -12,21 +12,22 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ChevronLeft, ClipboardPaste, ChevronDown } from "lucide-react-native";
-import { useNavigation } from "expo-router";
-import PrimaryButton from "../../components/PrimaryButton";
+import { router, useNavigation } from "expo-router";
+import PrimaryButton from "../../../components/PrimaryButton";
 
 import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system";
 import * as MediaLibrary from "expo-media-library";
-import ProblemDisplay from "../../components/dispute/problemDisplay";
-import ProductCard from "../../components/dispute/productCard";
-import { InputField } from "../../components/dispute/InputField";
-import { UploadProve } from "../../components/dispute/UploadProve";
-import { InfoBanner } from "../../components/dispute/InfoBanner";
-import { TrackDispute } from "../../components/dispute/TrackDispute";
+import ProblemDisplay from "../../../components/dispute/problemDisplay";
+import ProductCard from "../../../components/dispute/productCard";
+import { InputField } from "../../../components/dispute/InputField";
+import { UploadProve } from "../../../components/dispute/UploadProve";
+import { InfoBanner } from "../../../components/dispute/InfoBanner";
+import { TrackDispute } from "../../../components/dispute/TrackDispute";
+import { useRouter } from "expo-router";
 
 export default function DisputeDetail() {
-  const navigation = useNavigation();
+  const router = useRouter();
   const [selectedSolution, setSelectedSolution] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [showTipsModal, setShowTipsModal] = useState(false);
@@ -48,7 +49,7 @@ export default function DisputeDetail() {
 
   const handleConfirm = () => {
     setShowConfirmModal(false);
-    // navigation.navigate("DisputeSummary");
+    router.push("../../(tabs)/dispute");
   };
 
   const pickMedia = async () => {
@@ -125,7 +126,9 @@ export default function DisputeDetail() {
         {/* Header */}
         <View className="relative items-center justify-center mb-6">
           <TouchableOpacity
-            onPress={() => navigation.goBack()}
+            onPress={() =>
+              router.back()
+            }
             className="absolute left-0"
           >
             <ChevronLeft size={24} color="black" />
@@ -137,7 +140,7 @@ export default function DisputeDetail() {
 
         {/* Masalah */}
         <ProblemDisplay
-          image={require("../../assets/barangrusak.png")}
+          image={require("../../../assets/barangrusak.png")}
           problemType="Barang rusak"
         />
 
@@ -198,7 +201,7 @@ export default function DisputeDetail() {
           <View className="bg-white rounded-2xl w-full px-6 pt-5 pb-5">
             <View className="flex-row items-start space-x-3 mb-7">
               <Image
-                source={require("../../assets/icon-info-blue.png")}
+                source={require("../../../assets/icon-info-blue.png")}
                 className="w-5 h-5 mt-1"
                 resizeMode="contain"
               />
@@ -282,7 +285,7 @@ export default function DisputeDetail() {
             ].map((tip, index) => (
               <View key={index} className="flex-row items-start mb-3">
                 <Image
-                  source={require("../../assets/icon-check-green.png")}
+                  source={require("../../../assets/icon-check-green.png")}
                   className="w-5 h-5 mt-0.5 mr-2"
                   resizeMode="contain"
                 />

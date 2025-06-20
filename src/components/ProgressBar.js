@@ -1,14 +1,15 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons"; // ganti di sini
+import { MaterialIcons } from "@expo/vector-icons";
 
-const StepProgressBar = ({ currentStep, steps, isRejected }) => {
+const StepProgressBar = ({ currentStep, steps, rejectedSteps = [] }) => {
   return (
     <View style={styles.container}>
       {steps.map((label, index) => {
         const isCompleted = index < currentStep;
         const isActive = index === currentStep;
         const isFinalStep = isActive && currentStep === steps.length - 1;
+        const isRejectedStep = rejectedSteps.includes(index);
 
         return (
           <React.Fragment key={index}>
@@ -16,44 +17,46 @@ const StepProgressBar = ({ currentStep, steps, isRejected }) => {
               <View
                 style={[
                   styles.circle,
+                  isRejectedStep && styles.rejectedCircle,
                   isCompleted && styles.completedCircle,
                   isActive &&
                     !isFinalStep &&
-                    (isRejected ? styles.rejectedCircle : styles.activeCircle),
+                    !isRejectedStep &&
+                    styles.activeCircle,
                   isFinalStep && styles.finalCircle,
                 ]}
               >
-                {isCompleted || isFinalStep ? (
+                {isRejectedStep ? (
+                  <MaterialIcons name="close" size={16} color="#F44336" />
+                ) : isCompleted || isFinalStep ? (
                   <MaterialIcons
                     name="check"
                     size={16}
                     color={isFinalStep ? "#4CD964" : "#4CD7D0"}
                   />
                 ) : isActive ? (
-                  isRejected ? (
-                    <MaterialIcons name="close" size={16} color="#F44336" />
-                  ) : (
-                    <View
-                      style={[
-                        styles.dot,
-                        isFinalStep && { backgroundColor: "#4CD964" },
-                      ]}
-                    />
-                  )
+                  <View
+                    style={[
+                      styles.dot,
+                      isFinalStep && { backgroundColor: "#4CD964" },
+                    ]}
+                  />
                 ) : null}
               </View>
+
               <Text
                 style={[
                   styles.label,
                   isCompleted && styles.completedLabel,
-                  isActive &&
-                    (isRejected ? styles.rejectedLabel : styles.activeLabel),
+                  isActive && styles.activeLabel,
                   isFinalStep && styles.finalLabel,
+                  isRejectedStep && styles.rejectedLabel,
                 ]}
               >
                 {label}
               </Text>
             </View>
+
             {index !== steps.length - 1 && (
               <View
                 style={[
@@ -77,6 +80,7 @@ const styles = StyleSheet.create({
     marginVertical: 20,
     marginBottom: 16,
     marginHorizontal: 16,
+    justifyContent: "space-between",
   },
   stepContainer: {
     alignItems: "center",

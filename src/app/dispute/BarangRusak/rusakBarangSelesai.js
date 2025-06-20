@@ -3,59 +3,76 @@ import { View, Text, TouchableOpacity, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ChevronLeft } from "lucide-react-native";
 import { useNavigation } from "expo-router";
-import PrimaryButton from "../../components/PrimaryButton";
-import { InfoBanner } from "../../components/dispute/InfoBanner";
-import StepProgressBar from "../../components/ProgressBar";
-import { StatusKomplain } from "../../components/dispute/statusKomplain";
-import { TrackDispute } from "../../components/dispute/TrackDispute";
-import TextView from "../../components/dispute/textView";
-import Tagihan from "../../components/DetailRekber/Tagihan";
-import CopyField from "../../components/dispute/copyField";
+import PrimaryButton from "../../../components/PrimaryButton";
+import { InfoBanner } from "../../../components/dispute/InfoBanner";
+import StepProgressBar from "../../../components/ProgressBar";
+import { StatusKomplain } from "../../../components/dispute/statusKomplain";
+import { TrackDispute } from "../../../components/dispute/TrackDispute";
+import TextView from "../../../components/dispute/textView";
+import Tagihan from "../../../components/DetailRekber/Tagihan";
+import CopyField from "../../../components/dispute/copyField";
+import { useRouter } from "expo-router";
 
 export default function RusakBarangSelesai() {
-  const navigation = useNavigation();
+  const router = useRouter();
 
   return (
     <SafeAreaView className="flex-1 bg-white">
       {/* Header */}
-      <View className="relative items-center justify-center mb-6">
+      <View className="flex-row items-center justify-between p-4">
         <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          className="absolute left-0"
+          onPress={() => router.replace("../../(tabs)/dispute")}
         >
           <ChevronLeft size={24} color="black" />
         </TouchableOpacity>
-        <Text className="text-xl font-semibold text-center">
-          Detail Komplain
-        </Text>
+        <Text className="text-base font-semibold">Detail Komplain</Text>
+        <View style={{ width: 24 }} />
       </View>
 
       <StepProgressBar
         currentStep={3}
         steps={["Menunggu", "Kembaliin", "Refund", "Selesai"]}
       />
+      <StatusKomplain status="Transaksi Selesai" />
+
+      <View className="h-2 bg-[#f5f5f5] mt-3" />
 
       <ScrollView className="px-4 pt-4 pb-40">
-        <InfoBanner contentBefore="Pastikan barang dalam kondisi baik, kemasan terjaga, dan lampirkan bukti pengiriman!" />
-        <StatusKomplain status="Komplain Selesai" />
-
-        <View className="h-2 bg-[#f5f5f5] mt-3" />
-
         <TrackDispute
-          title="Dana telah diteruskan kepada buyer"
-          dateTime="16 Juni 2025, 10 : 00 WIB"
-        />
-        <View className="h-2 bg-[#f5f5f5] mt-3" />
-
-        <TrackDispute
-          title="Konfirmasi seller barang diterima"
+          title="Konfirmasi seller dan dana berhasil dikembalikan"
           dateTime="22 Juni 2025, 10 : 00 WIB"
         />
         <View className="h-2 bg-[#f5f5f5] mt-3" />
-
         <TrackDispute
           title="Admin meneruskan permintaan konfirmasi"
           dateTime="20 Juni 2025, 12 : 00 WIB"
+        />
+        <View className="h-2 bg-[#f5f5f5] mt-3" />
+
+        <TrackDispute
+          title="Permintaan konfirmasi buyer"
+          dateTime="Melalui resi harusnya barang sudah sampai di seller"
+          details={[
+            {
+              content: "Melalui resi harusnya barang sudah sampai di seller",
+            },
+            {
+              imgTitle: "Bukti foto & video",
+              images: [require("../../../assets/barangrusak.png")],
+            },
+          ]}
+        />
+        <View className="h-2 bg-[#f5f5f5] mt-3" />
+
+        <TrackDispute
+          title="Pengembalian barang oleh buyer"
+          dateTime="20 Juni 2025, 10 : 00 WIB"
+          details={[
+            {
+              resiNumber: "J X 3 4 7 4 1 2 4 0 1 3",
+              expedition: "J&T Express Indonesia",
+            },
+          ]}
         />
 
         <View className="h-2 bg-[#f5f5f5] mt-3" />
@@ -70,7 +87,7 @@ export default function RusakBarangSelesai() {
             },
             {
               imgTitle: "Bukti foto & video",
-              images: [require("../../assets/barangrusak.png")],
+              images: [require("../../../assets/barangrusak.png")],
             },
           ]}
         />

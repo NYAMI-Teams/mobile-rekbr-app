@@ -328,8 +328,7 @@ export default function DetailTransaksiBuyer({ data }) {
         <View className="flex flex-row items-center gap-4">
           <PrimaryButton
             title="Komplain"
-            onPress={() => Alert.alert("Komplain pressed")}
-            // disabled={!isFormValid}
+            onPress={() => router.push("/dispute")}
             height={50}
             width={"45%"}
             btnColor="#F9F9F9"
@@ -414,9 +413,11 @@ export default function DetailTransaksiBuyer({ data }) {
                   marginHorizontal: 12,
                   backgroundColor: "#EDFBFA",
                   borderRadius: 12,
-                }}>
+                }}
+              >
                 <Text
-                  style={{ fontSize: 15, marginBottom: 12, fontWeight: "500" }}>
+                  style={{ fontSize: 15, marginBottom: 12, fontWeight: "500" }}
+                >
                   {data?.status == "pending_payment"
                     ? "Virtual Account"
                     : "No Resi"}
@@ -428,7 +429,8 @@ export default function DetailTransaksiBuyer({ data }) {
                     data?.status == "completed"
                       ? "mb-3"
                       : ""
-                  }`}>
+                  }`}
+                >
                   <Text style={{ fontSize: 17, fontWeight: "500" }}>
                     {data?.status == "pending_payment"
                       ? data?.virtualAccount
@@ -441,7 +443,8 @@ export default function DetailTransaksiBuyer({ data }) {
                           ? data?.virtualAccount
                           : data?.shipment?.trackingNumber
                       )
-                    }>
+                    }
+                  >
                     <Image
                       source={require("../../assets/copy.png")}
                       style={{ marginLeft: 4, width: 17, height: 16 }}
@@ -457,7 +460,8 @@ export default function DetailTransaksiBuyer({ data }) {
                         // marginBottom: 12,
                         fontWeight: "400",
                         color: "#616161",
-                      }}>
+                      }}
+                    >
                       {data?.shipment?.courier || "-"}
                     </Text>
                   ))}
@@ -605,13 +609,16 @@ export default function DetailTransaksiBuyer({ data }) {
         animationType="slide"
         transparent={true}
         visible={modalVisible}
-        onRequestClose={closeModal}>
+        onRequestClose={closeModal}
+      >
         <Pressable
           className="flex-1 justify-end bg-black/30"
-          onPress={closeModal}>
+          onPress={closeModal}
+        >
           <Pressable
             className="bg-white px-5 pt-5 pb-8 rounded-t-3xl h-[55%]"
-            onPress={(event) => event.stopPropagation()}>
+            onPress={(event) => event.stopPropagation()}
+          >
             <Pressable onPress={closeModal}>
               <View className="flex-row items-center mb-6">
                 <ChevronLeftCircle size={24} color="#00C2C2" />
@@ -630,7 +637,8 @@ export default function DetailTransaksiBuyer({ data }) {
                   {data?.transactionCode || "-"}
                 </Text>
                 <TouchableOpacity
-                  onPress={() => handleCopy(data?.transactionCode)}>
+                  onPress={() => handleCopy(data?.transactionCode)}
+                >
                   <Image
                     source={require("../../assets/copy.png")}
                     style={{ marginLeft: 4, width: 17, height: 16 }}
@@ -665,7 +673,8 @@ export default function DetailTransaksiBuyer({ data }) {
 
                 <Pressable
                   className="bg-gray-100 py-3 rounded-xl flex-row justify-center items-center mb-5"
-                  onPress={updateTransaction}>
+                  onPress={updateTransaction}
+                >
                   <Play size={20} color="#000" />
                   <Text className="ml-2 font-semibold text-gray-800">
                     Simulate Payment
@@ -694,7 +703,8 @@ export default function DetailTransaksiBuyer({ data }) {
                           0600604502
                         </Text>
                         <TouchableOpacity
-                          onPress={() => handleCopy("0600604502")}>
+                          onPress={() => handleCopy("0600604502")}
+                        >
                           <Image
                             source={require("../../assets/copy.png")}
                             style={{ marginLeft: 4, width: 17, height: 16 }}

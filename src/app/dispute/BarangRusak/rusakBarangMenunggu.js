@@ -8,45 +8,53 @@ import {
   TouchableWithoutFeedback,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import {
-  ClipboardPaste,
-  ChevronLeft,
-  ChevronDown,
-} from "lucide-react-native";
+import { ClipboardPaste, ChevronLeft, ChevronDown } from "lucide-react-native";
 
-import CopyField from "../../components/dispute/copyField";
-import TextView from "../../components/dispute/textView";
-import { InfoBanner } from "../../components/dispute/InfoBanner";
-import { StatusKomplain } from "../../components/dispute/statusKomplain";
-import StepProgressBar from "../../components/ProgressBar";
-import { TrackDispute } from "../../components/dispute/TrackDispute";
+import CopyField from "../../../components/dispute/copyField";
+import TextView from "../../../components/dispute/textView";
+import { InfoBanner } from "../../../components/dispute/InfoBanner";
+import { StatusKomplain } from "../../../components/dispute/statusKomplain";
+import StepProgressBar from "../../../components/ProgressBar";
+import { TrackDispute } from "../../../components/dispute/TrackDispute";
+import { useRouter } from "expo-router";
 
 export default function DetailKomplain() {
+  const router = useRouter();
   const [showOptionModal, setShowOptionModal] = useState(false);
+  const [isNeedAdmin, setIsNeedAdmin] = useState(false);
+  const [ditolak, setDitolak] = useState(false);
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
-      <ScrollView className="px-4">
-        {/* Header */}
-        <View className="flex-row items-center justify-between py-4">
-          <TouchableOpacity>
-            <ChevronLeft size={24} color="black" />
-          </TouchableOpacity>
-          <Text className="text-base font-semibold">Detail Komplain</Text>
-          <View style={{ width: 24 }} />
-        </View>
+    <SafeAreaView className="flex-1 bg-white ">
+      {/* Header */}
+      <View className="flex-row items-center justify-between p-4">
+        <TouchableOpacity
+          onPress={() => router.replace("../../(tabs)/dispute")}
+        >
+          <ChevronLeft size={24} color="black" />
+        </TouchableOpacity>
+        <Text className="text-base font-semibold">Detail Komplain</Text>
+        <View style={{ width: 24 }} />
+      </View>
 
-        {/* Stepper */}
+      {/* Stepper */}
+      <View className="items-center w-full">
         <StepProgressBar
           currentStep={0}
-          steps={["Menunggu", "Kembaliin", "Refund", "Selesai"]}
+          steps={
+            isNeedAdmin
+              ? ["Menunggu", "Admin", "Kembaliin", "Refunded"]
+              : ["Seller", "Kembaliin", "Refunded"]
+          }
+          isRejected={ditolak}
         />
-
+      </View>
+      <ScrollView className="px-4">
         {/* Alert Info */}
         <InfoBanner
-          contentBefore="Jika seller nggak respon sampai "
+          contentBefore="Jika seller nggak respon sampai"
           dateTime="18 Juni 2025, 10 : 00 WIB"
-          contentAfter="pengajuanmu bakal otomatis disetujui ya!"
+          contentAfter=" pengajuanmu bakal otomatis disetujui ya!"
         />
 
         {/* Status Komplain */}
@@ -65,6 +73,13 @@ export default function DetailKomplain() {
               content:
                 "Layar barang pecah di bagian tengah dan ada goresan dalam di sisi kiri.",
             },
+            {
+              imgTitle: "Bukti foto & video",
+              images: [
+                require("../../../assets/barangrusak.png"),
+                require("../../../assets/barangrusak.png"),
+              ],
+            },
           ]}
         />
 
@@ -75,7 +90,10 @@ export default function DetailKomplain() {
         <CopyField title="No Resi" content="J X 3 4 7 4 1 2 4 0 1 3" />
         <TextView title="Ekspedisi" content="J&T Express Indonesia" />
         <CopyField title="ID Transaksi" content="1 2 3 4 5 6 7 8 9" />
-        <CopyField title="Virtual Account" content="8 0 8 0 1 2 3 4 5 6 7 8 9" />
+        <CopyField
+          title="Virtual Account"
+          content="8 0 8 0 1 2 3 4 5 6 7 8 9"
+        />
       </ScrollView>
 
       {/* Footer */}
@@ -89,7 +107,10 @@ export default function DetailKomplain() {
         </TouchableOpacity>
 
         {/* Tombol utama */}
-        <TouchableOpacity className="flex-1 ml-2 h-11 bg-black rounded-xl items-center justify-center">
+        <TouchableOpacity
+          className="flex-1 ml-2 h-11 bg-black rounded-xl items-center justify-center"
+          onPress={() => router.push("../../(tabs)/dispute")}
+        >
           <Text className="text-white font-semibold text-sm">
             Kirim Seller Email
           </Text>
@@ -115,15 +136,30 @@ export default function DetailKomplain() {
             Lainnya
           </Text>
 
-          <TouchableOpacity className="mb-4">
+          <TouchableOpacity
+            className="mb-4"
+            onPress={() => router.replace("/dispute/BarangRusak/rusakBarang")}
+          >
             <Text className="text-sm font-medium text-black">
               Ubah Detail Komplain
             </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => router.replace("../../(tabs)/dispute")}
+            className="mb-4"
+          >
             <Text className="text-sm font-medium text-black">
               Batalkan Komplain
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => console.log("Simulate pressed")}
+            className="mb-4"
+          >
+            <Text className="text-sm font-medium text-black">
+              Simulate reject
             </Text>
           </TouchableOpacity>
         </View>
