@@ -6,13 +6,15 @@ export const postBuyerComplaint = async (id, type, reason, evidence) => {
     formData.append("type", type);
     formData.append("reason", reason);
 
-    evidence.forEach((file) => {
-      formData.append("evidence", {
-        uri: file.uri,
-        name: file.fileName || file.uri.split("/").pop(),
-        type: file.type || "image/jpeg", // fallback default
+    if (evidence && evidence.length > 0) {
+      evidence.forEach((file) => {
+        formData.append("evidence", {
+          uri: file.uri,
+          name: file.fileName || file.uri.split("/").pop(),
+          type: file.type || "image/jpeg",
+        });
       });
-    });
+    }
 
     const res = await Api.post(
       `/buyer/transactions/${id}/complaint`,
@@ -64,7 +66,12 @@ export const postBuyerCancelComplaint = async (id) => {
   }
 };
 
-export const postBuyerReturn = async (id, courier_id, tracking_number, photo) => {
+export const postBuyerReturn = async (
+  id,
+  courier_id,
+  tracking_number,
+  photo
+) => {
   try {
     const file = {
       uri: photo.uri,
@@ -73,8 +80,8 @@ export const postBuyerReturn = async (id, courier_id, tracking_number, photo) =>
     };
     const formData = new FormData();
     formData.append("photo", file);
-    formData.append("courier_id", courier_id);
-    formData.append("tracking_number", tracking_number);
+    formData.append("courierId", courier_id);
+    formData.append("trackingNumber", tracking_number);
     const res = await Api.post(`/buyer/complaints/${id}/return`, formData);
     if (res) {
       return res;
