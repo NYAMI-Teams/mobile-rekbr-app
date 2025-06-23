@@ -1,7 +1,7 @@
 import Api from "../api";
 import QueryString from "qs";
 
-export const getListComplainBuyer = async () => {
+export const getBuyerComplaints = async () => {
   try {
     const res = await Api.get(`/buyer/transactions`, {
       params: {
@@ -17,4 +17,41 @@ export const getListComplainBuyer = async () => {
   } catch (error) {
     throw error;
   }
+};
+
+export const getBuyerComplaintDetail = async (id) => {
+  try {
+    const res = await Api.get(`/buyer/transactions/${id}`);
+    return res;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const cancelComplaintById = async (complaintId) => {
+  try {
+    const res = await Api.post(`/buyer/complaints/${complaintId}/cancel`);
+    return res;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const createComplaint = async (transactionId, type, reason, file) => {
+  const formData = new FormData();
+  formData.append("type", type);
+  formData.append("reason", reason);
+  if (file) formData.append("evidence", file);
+
+  const res = await Api.post(
+    `/buyer/transactions/${transactionId}/complaint`,
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
+
+  return res.data;
 };

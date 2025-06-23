@@ -18,7 +18,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 2,
     borderColor: "#e5e7eb", // gray-200
     paddingHorizontal: 12, // p-3
-    paddingVertical: 9,    // p-3
+    paddingVertical: 9, // p-3
     alignItems: "center",
   },
   tabBar: {
@@ -37,7 +37,6 @@ const styles = StyleSheet.create({
 
 export default function TabLayout() {
   return (
-
     <Tabs
       screenOptions={{
         headerShown: false,
@@ -49,12 +48,12 @@ export default function TabLayout() {
       }}
     >
       <Tabs.Screen
-        name="index"
+        name='index'
         options={{
           title: "As Seller",
           tabBarIcon: ({ color, focused, size }) => (
             <MaterialCommunityIcons
-              name="storefront"
+              name='storefront'
               size={24}
               color={color}
               style={{ opacity: focused ? 1 : 0.4 }}
@@ -63,12 +62,12 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="buyer"
+        name='buyer'
         options={{
           title: "As Buyer",
           tabBarIcon: ({ color, focused, size }) => (
             <MaterialCommunityIcons
-              name="wallet-outline"
+              name='wallet-outline'
               size={24}
               color={color}
               style={{ opacity: focused ? 1 : 0.4 }}
@@ -77,12 +76,12 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="dispute"
+        name='complaint'
         options={{
-          title: "Dispute",
+          title: "Complaint",
           tabBarIcon: ({ color, focused, size }) => (
             <MaterialCommunityIcons
-              name="chat-processing-outline"
+              name='chat-processing-outline'
               size={24}
               color={color}
               style={{ opacity: focused ? 1 : 0.4 }}
@@ -91,12 +90,12 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="history"
+        name='history'
         options={{
           title: "History",
           tabBarIcon: ({ color, focused, size }) => (
             <MaterialCommunityIcons
-              name="clock-time-three-outline"
+              name='clock-time-three-outline'
               size={24}
               color={color}
               style={{ opacity: focused ? 1 : 0.4 }}

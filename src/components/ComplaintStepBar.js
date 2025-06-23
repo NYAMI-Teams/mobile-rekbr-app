@@ -2,15 +2,13 @@ import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 
-const StepKomplainBar = ({ currentStep, status }) => {
-  const steps = ["Investigasi", status === "rejected" ? "Ditolak" : "Disetujui"];
-
+const ComplaintStepBar = ({ currentStep = 0, steps = [], status }) => {
   return (
     <View style={styles.container}>
       {steps.map((label, index) => {
         const isCompleted = index < currentStep;
         const isActive = index === currentStep;
-        const isFinalStep = isActive && currentStep === steps.length - 1;
+        const isFinalStep = isActive && index === steps.length - 1;
         const isRejected = isFinalStep && status === "rejected";
 
         return (
@@ -29,7 +27,7 @@ const StepKomplainBar = ({ currentStep, status }) => {
                   <MaterialIcons
                     name={isRejected ? "cancel" : "check"}
                     size={16}
-                    color={isRejected ? "#FF4D4F" : isFinalStep ? "#4CD964" : "#4CD7D0"}
+                    color={isRejected ? "#FF4D4F" : "#4CD964"}
                   />
                 ) : isActive ? (
                   <View
@@ -69,7 +67,6 @@ const StepKomplainBar = ({ currentStep, status }) => {
     </View>
   );
 };
-
 
 const styles = StyleSheet.create({
   container: {
@@ -150,4 +147,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default StepKomplainBar;
+export default ComplaintStepBar;
