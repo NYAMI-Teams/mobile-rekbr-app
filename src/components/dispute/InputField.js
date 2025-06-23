@@ -1,26 +1,22 @@
-import React, { useState } from "react";
+import React from "react";
 import { View, Text, TextInput } from "react-native";
 
-export const InputField = ({ title, placeholder }) => {
-  const [text, setText] = useState("");
+export const InputField = ({ title, placeholder, value = "", onChangeText = () => {} }) => {
+  // Hitung jumlah kata
+  const wordCount = value.trim().split(/\s+/).filter(Boolean).length;
 
   const handleChangeText = (inputText) => {
-    // Hitung jumlah kata
     const words = inputText.trim().split(/\s+/).filter(Boolean);
-
-    // Jika jumlah kata <= 200, simpan teksnya
     if (words.length <= 200) {
-      setText(inputText);
+      onChangeText(inputText);
     }
   };
-
-  const wordCount = text.trim().split(/\s+/).filter(Boolean).length;
 
   return (
     <View>
       <Text className="text-sm font-semibold text-black mb-2">{title}</Text>
       <TextInput
-        value={text}
+        value={value}
         onChangeText={handleChangeText}
         placeholder={placeholder}
         placeholderTextColor="#999"
