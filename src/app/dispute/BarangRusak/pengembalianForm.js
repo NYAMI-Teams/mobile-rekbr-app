@@ -30,6 +30,7 @@ export default function PengembalianForm() {
   const [courierList, setCourierList] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [image, setImage] = useState(null);
+  const [loading, isLoading] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -78,15 +79,16 @@ export default function PengembalianForm() {
   };
 
   const handleSubmit = async () => {
+    if (loading) return;
+    setLoading(true);
     try {
       await postBuyerReturn(complaintId, courierId, resi, image);
       router.replace("../../(tabs)/dispute");
     } catch (error) {
       showToast("Gagal", error?.message, "error");
     } finally {
-      setShowPopup(false);
+      setLoading(false);
     }
-    // console.log("ini pengembalian", complaintId, courierId, resi, photoUri);
   };
 
   return (
@@ -145,10 +147,14 @@ export default function PengembalianForm() {
       </ScrollView>
 
       <View className="px-4 py-3 border-t border-gray-200">
-        <PrimaryButton title="Kirim" onPress={handleSubmit} />
+        <PrimaryButton
+          title={loading ? "Mengirim..." : "Kirim"}
+          onPress={handleSubmit}
+          disabled={loading}
+        />
         <View className="flex-row items-center justify-center mt-3">
           <Text className="text-sm text-gray-500">Terdapat kendala?</Text>
-          <TouchableOpacity>
+          <TouchableOpacity disabled={loading}>
             <Text className="text-sm text-blue-600 ml-1 font-bold">
               Silahkan Hubungi Kami
             </Text>
@@ -162,7 +168,6 @@ export default function PengembalianForm() {
         transparent={true}
         visible={modalVisible}
         onRequestClose={() => {
-          // Alert.alert("Modal has been closed."); // Komentar atau hapus ini untuk UX yang lebih baik
           closeModal();
         }}
       >
@@ -171,13 +176,11 @@ export default function PengembalianForm() {
           onPress={closeModal}
         >
           <View className="bg-white rounded-t-lg h-[55%]">
-            {/* Close Button */}
             <View className="flex-row justify-start p-4 ">
               <TouchableOpacity
                 onPress={closeModal}
                 className="flex-row items-center mb-6"
               >
-                {/* Tambahkan onPress untuk menutup modal */}
                 <ChevronLeftCircle size={24} color="#00C2C2" />
                 <Text className="text-lg font-normal text-gray-800 ml-2">
                   Pilih Ekspedisi
@@ -187,9 +190,7 @@ export default function PengembalianForm() {
 
             {/* Modal Content */}
             <View className="justify-between flex-1">
-              {/* Ubah h-[70%] menjadi flex-1 agar menyesuaikan sisa ruang */}
               <ScrollView className="my-2" showsVerticalScrollIndicator={false}>
-                {/* Sembunyikan indikator scroll */}
                 <View className="flex-col gap-4 bg-slate-100/50 m-5 p-5 rounded-lg border border-gray-300">
                   {courierList.map((courier, index) => (
                     <TouchableOpacity

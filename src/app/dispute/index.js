@@ -16,7 +16,7 @@ export default function Dispute() {
     {
       label: "Barang belum sampai atau kesasar",
       icon: require("../../assets/belumsampai.png"),
-      route: "",
+      route: "dispute/BarangHilang/hilangBarang",
     },
     {
       label: "Barang rusak",
