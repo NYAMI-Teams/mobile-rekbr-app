@@ -4,7 +4,7 @@ import { ClipboardPaste } from "lucide-react-native";
 import PrimaryButton from "../PrimaryButton";
 
 const statusConfig = {
-  waitingSeller: {
+  waitingSellerApproval: {
     color: "#FBBF24",
     text: "Persetujuan Seller",
     note: "Jika seller nggak respon sampai",
@@ -13,16 +13,77 @@ const statusConfig = {
     status: "18 Juni 2025, 10 : 00 WIB",
     statusColor: "#FEF2D3",
   },
+  returnRequested: {
+    color: "#FBBF24",
+    text: "Menunggu Pengembalian",
+    note: "Kembalikan dengan baik, kemasan aman, dan berikan bukti pengiriman kembali!",
+    notebold: " Proses maksimal 1 x 24 jam.",
+    button: "Bukti Pengembalian",
+  },
+  Completed: {
+    color: "#06B217",
+    text: "Tranasksi Selesai",
+    note: "",
+    status: "22 Juni 2025, 10 : 00 WIB",
+  },
+  sellerRejected: {
+    color: "#CB3A31",
+    text: "Menunggu Persetujuan Admin",
+    note: "",
+    button: null,
+  },
+  returnInTransit: {
+    color: "#FBBF24",
+    text: "Menunggu Pengembalian",
+    note: "Cek no resi berkala, kalau seller nggak konfirmasi, minta konfirmasi seller lewat admin. ",
+    button: "Minta Konfirmasi",
+  },
+  awaitingAdminApproval: {
+    color: "#CB3A31",
+    text: "Menunggu Persetujuan Admin",
+    note: "",
+    button: null,
+  },
+  rejectedByAdmin: {
+    color: "#06B217",
+    text: "Transaksi Selesai",
+    note: "Setelah ditinjau, bukti belum cukup kuat. Dana diteruskan ke seller dan transaksi dianggap selesai.",
+    button: null,
+  },
+  awaitingSellerConfirmation: {},
+  approvedBySeller: {
+    color: "#FBBF24",
+    text: "Menunggu Pengembalian",
+    note: "Kembalikan dengan baik, kemasan aman, dan berikan bukti pengiriman kembali!",
+    notebold: " Proses maksimal 1 x 24 jam.",
+    button: "Bukti Pengembalian",
+  },
+  approvedByAdmin: {
+    color: "#FBBF24",
+    text: "Menunggu Pengembalian",
+    note: "Kembalikan dengan baik, kemasan aman, dan berikan bukti pengiriman kembali!",
+    notebold: " Proses maksimal 1 x 24 jam.",
+    button: "Bukti Pengembalian",
+  },
+
+  // Buyer Hilang Barang
+  underInvestigation: {
+    color: "#FBBF24",
+    text: "Investigasi Pengiriman",
+    note: "",
+    button: null,
+  },
+
   disputeCancel: {
     color: "#C2C2C2",
     text: "Komplain Dibatalkan",
-    note:""
+    note: "",
   },
   disputeProved: {
     color: "#FBBF24",
     text: "Menunggu Pengembalian Barang",
-    note:"Seller nggak kasih kabar, jadi sekarang giliran kamu buat lanjut prosesnya. Ayo upload bukti pengembalian barang!"
-  }, 
+    note: "Seller nggak kasih kabar, jadi sekarang giliran kamu buat lanjut prosesnya. Ayo upload bukti pengembalian barang!",
+  },
   waitingAdmin: {
     color: "#CB3A31",
     text: "Menunggu Persetujuan Admin",
@@ -35,13 +96,7 @@ const statusConfig = {
     note: "Setelah ditinjau, bukti belum cukup kuat. Dana diteruskan ke seller dan transaksi dianggap selesai.",
     button: null,
   },
-  adminApprove: {
-    color: "#FBBF24",
-    text: "Pengembalian Barang",
-    note: "Kembalikan dengan baik, kemasan aman, dan berikan bukti pengiriman kembali!",
-    notebold: " Proses maksimal 1 x 24 jam.",
-    button: "Bukti Pengembalian",
-  },
+
   buyerLate: {
     color: "#06B217",
     text: "Transaksi Selesai",
