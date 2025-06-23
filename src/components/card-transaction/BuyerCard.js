@@ -28,7 +28,6 @@ const BuyerCard = ({ data }) => {
   };
 
   const handleCopy = async (text) => {
-    // belum bisa jalan toastnya
     if (!text) return;
     try {
       await Clipboard.setStringAsync(text);

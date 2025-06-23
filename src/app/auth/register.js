@@ -76,11 +76,11 @@ export default function Register() {
         showToast("Registrasi Berhasil", res?.message, "success");
         router.push({
           pathname: "/auth/otp",
-          params: { email: email },
+          params: { email: email, isFromLogin: true },
         });
       })
       .catch((err) => {
-        showToast("Registrasi Gagal", "Silahkan coba lagi.", "error");
+        showToast("Registrasi Gagal", err?.message, "error");
       })
       .finally(() => {
         setIsLoading(false);
@@ -277,3 +277,5 @@ export default function Register() {
     </SafeAreaView>
   );
 }
+
+

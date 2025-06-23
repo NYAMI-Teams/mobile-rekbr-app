@@ -1,3 +1,4 @@
+import QueryString from "qs";
 import Api from "../api";
 
 // export const createTransaction = async (data) => {
@@ -16,7 +17,10 @@ export const getSellerTransactions = async () => {
   try {
     const res = await Api.get(`/seller/transactions`, {
       params: {
-        isHistory: false,
+        status: ["shipped", "pending_payment", "waiting_shipment"],
+      },
+      paramsSerializer: (params) => {
+        return QueryString.stringify(params, { arrayFormat: "repeat" });
       },
     });
     if (res) {
@@ -32,7 +36,10 @@ export const getHistorySeller = async () => {
   try {
     const res = await Api.get(`/seller/transactions`, {
       params: {
-        isHistory: true,
+        status: ["completed", "canceled"],
+      },
+      paramsSerializer: (params) => {
+        return QueryString.stringify(params, { arrayFormat: "repeat" });
       },
     });
     if (res) {
@@ -156,6 +163,30 @@ export const checkRekeningExist = async (account_number, bank_id) => {
         bank_id,
       },
     });
+    if (res) {
+      return res;
+    }
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Post Seller Response
+export const postSellerResponse = async (id, status, seller_response_reason, arrPhoto) => {
+  try {
+    const photoArr = arrPhoto.map((photo) => {
+      return {
+        uri: photo.uri,
+        name: photo.fileName || photo.uri.split("/").pop(),
+        type: photo.type || "image/jpeg", // default jika tidak ada type
+      };
+    });
+    const formData = new FormData();
+    formData.append("status", status);
+    formData.append("seller_response_reason", seller_response_reason);
+    formData.append("photo", photoArr);
+
+    const res = await Api.post(`/seller/complaints/${id}/respond`, formData);
     if (res) {
       return res;
     }
