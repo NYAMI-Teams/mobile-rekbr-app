@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -6,9 +6,10 @@ import {
   TouchableOpacity,
   Modal,
   TouchableWithoutFeedback,
+  Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { ClipboardPaste, ChevronLeft, ChevronDown } from "lucide-react-native";
+import { ChevronLeft } from "lucide-react-native";
 
 import CopyField from "../../../components/dispute/copyField";
 import TextView from "../../../components/dispute/textView";
@@ -16,21 +17,80 @@ import { InfoBanner } from "../../../components/dispute/InfoBanner";
 import { StatusKomplain } from "../../../components/dispute/statusKomplain";
 import StepProgressBar from "../../../components/ProgressBar";
 import { TrackDispute } from "../../../components/dispute/TrackDispute";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import {
+  getDetailBuyerComplaint,
+  postBuyerCancelComplaint,
+} from "../../../utils/api/complaint";
 
 export default function DetailKomplain() {
   const router = useRouter();
   const [showOptionModal, setShowOptionModal] = useState(false);
   const [isNeedAdmin, setIsNeedAdmin] = useState(false);
   const [ditolak, setDitolak] = useState(false);
+  const [detailComplaint, setDetailComplaint] = useState({});
+  const { complaintId } = useLocalSearchParams();
+
+  useEffect(() => {
+    if (complaintId) {
+      fetchComplaintDetails();
+    }
+  }, [complaintId]);
+
+  const fetchComplaintDetails = async () => {
+    try {
+      const res = await getDetailBuyerComplaint(complaintId);
+      setDetailComplaint(res.data);
+    } catch (err) {
+      showToast(
+        "Gagal",
+        "Gagal mengambil data transaksi. Silahkan coba lagi.",
+        "error"
+      );
+    }
+  };
+
+  useEffect(() => {
+    console.log("Complaints:", JSON.stringify(detailComplaint, null, 2));
+  }, [detailComplaint]);
+
+  const handleCancelComplaint = () => {
+    Alert.alert(
+      "Konfirmasi",
+      "Yakin ingin membatalkan komplain?",
+      [
+        {
+          text: "Tidak",
+          style: "cancel",
+        },
+        {
+          text: "Ya, Batalkan",
+          style: "destructive",
+          onPress: () => {
+            postBuyerCancelComplaint(complaintId)
+              .then(() => {
+                router.replace("../../(tabs)/dispute");
+              })
+              .catch((err) => {
+                showToast(
+                  "Gagal",
+                  "Gagal membatalkan komplain. Coba lagi.",
+                  "error"
+                );
+                console.log("Cancel error:", err);
+              });
+          },
+        },
+      ],
+      { cancelable: true }
+    );
+  };
 
   return (
-    <SafeAreaView className="flex-1 bg-white ">
+    <SafeAreaView className="flex-1 bg-white">
       {/* Header */}
       <View className="flex-row items-center justify-between p-4">
-        <TouchableOpacity
-          onPress={() => router.replace("../../(tabs)/dispute")}
-        >
+        <TouchableOpacity onPress={() => router.back()}>
           <ChevronLeft size={24} color="black" />
         </TouchableOpacity>
         <Text className="text-base font-semibold">Detail Komplain</Text>
@@ -49,56 +109,97 @@ export default function DetailKomplain() {
           isRejected={ditolak}
         />
       </View>
+
       <ScrollView className="px-4">
         {/* Alert Info */}
         <InfoBanner
           contentBefore="Jika seller nggak respon sampai"
-          dateTime="18 Juni 2025, 10 : 00 WIB"
+          dateTime={detailComplaint?.seller_confirm_deadline || "null"}
           contentAfter=" pengajuanmu bakal otomatis disetujui ya!"
         />
 
         {/* Status Komplain */}
-        <StatusKomplain status="Menunggu" />
+        <StatusKomplain status="Menunggu Persetujuan Seller" />
 
         {/* Pengajuan */}
-        <TrackDispute
-          title="Pengajuan komplain buyer"
-          dateTime="16 Juni 2025, 10:00 WIB"
-          details={[
-            {
-              content:
-                "Buyer mau ngembaliin barang yang bermasalah. Dana rekber bakal dikembalikan setelah komplain disetujui, ya!",
-            },
-            {
-              content:
-                "Layar barang pecah di bagian tengah dan ada goresan dalam di sisi kiri.",
-            },
-            {
-              imgTitle: "Bukti foto & video",
-              images: [
-                require("../../../assets/barangrusak.png"),
-                require("../../../assets/barangrusak.png"),
-              ],
-            },
-          ]}
-        />
+        {detailComplaint?.timeline
+          ?.slice()
+          .reverse()
+          .map((item, index) => (
+            <TrackDispute
+              key={index}
+              title={item.label}
+              dateTime={new Date(item.timestamp).toLocaleString("id-ID", {
+                day: "2-digit",
+                month: "long",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
+              details={[
+                {
+                  content:
+                    index === detailComplaint.timeline.length - 1
+                      ? detailComplaint?.buyer_reason
+                      : "Proses komplain sedang berjalan.",
+                },
+                ...(index === detailComplaint.timeline.length - 1 &&
+                detailComplaint?.buyer_evidence_urls?.length
+                  ? [
+                      {
+                        imgTitle: "Bukti foto & video",
+                        images: detailComplaint.buyer_evidence_urls.map(
+                          (url) => ({
+                            uri: url,
+                          })
+                        ),
+                      },
+                    ]
+                  : []),
+              ]}
+            />
+          ))}
 
         {/* Data Seller & Transaksi */}
-        <TextView title="Seller" content="zhirazzi@gmail.com" />
-        <TextView title="Nama Barang" content="iPhone 17 Pro" />
-        <TextView title="Tagihan Rekber" content="Rp 8.080.000,00" />
-        <CopyField title="No Resi" content="J X 3 4 7 4 1 2 4 0 1 3" />
-        <TextView title="Ekspedisi" content="J&T Express Indonesia" />
-        <CopyField title="ID Transaksi" content="1 2 3 4 5 6 7 8 9" />
+        <TextView
+          title="Seller"
+          content={detailComplaint?.transaction?.sellerEmail}
+        />
+        <TextView
+          title="Nama Barang"
+          content={detailComplaint?.transaction?.itemName}
+        />
+        <TextView
+          title="Tagihan Rekber"
+          content={detailComplaint?.transaction?.totalAmount}
+        />
+        <CopyField
+          title="No Resi"
+          content={
+            detailComplaint?.transaction?.trackingNumber?.split("").join(" ") ||
+            "-"
+          }
+        />
+        <TextView
+          title="Ekspedisi"
+          content={detailComplaint?.transaction?.courier?.name || "-"}
+        />
+        <CopyField
+          title="ID Transaksi"
+          content={detailComplaint?.transaction?.transactionCode
+            ?.split("")
+            .join(" ")}
+        />
         <CopyField
           title="Virtual Account"
-          content="8 0 8 0 1 2 3 4 5 6 7 8 9"
+          content={detailComplaint?.transaction?.virtualAccount
+            ?.split("")
+            .join(" ")}
         />
       </ScrollView>
 
       {/* Footer */}
       <View className="flex-row items-center px-4 py-3 border-t border-gray-100 bg-white">
-        {/* Tombol titik tiga horizontal */}
         <TouchableOpacity
           onPress={() => setShowOptionModal(true)}
           className="h-11 w-16 bg-white rounded-xl border border-black items-center justify-center"
@@ -106,7 +207,6 @@ export default function DetailKomplain() {
           <Text className="text-black text-[20px] font-semibold">⋯</Text>
         </TouchableOpacity>
 
-        {/* Tombol utama */}
         <TouchableOpacity
           className="flex-1 ml-2 h-11 bg-black rounded-xl items-center justify-center"
           onPress={() => router.push("../../(tabs)/dispute")}
@@ -129,7 +229,6 @@ export default function DetailKomplain() {
         </TouchableWithoutFeedback>
 
         <View className="bg-white rounded-t-3xl pt-3 pb-8 px-6">
-          {/* Drag handle */}
           <View className="w-10 h-1.5 bg-gray-300 rounded-full self-center mb-5" />
 
           <Text className="text-base font-semibold text-black mb-4">
@@ -145,10 +244,7 @@ export default function DetailKomplain() {
             </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity
-            onPress={() => router.replace("../../(tabs)/dispute")}
-            className="mb-4"
-          >
+          <TouchableOpacity onPress={handleCancelComplaint} className="mb-4">
             <Text className="text-sm font-medium text-black">
               Batalkan Komplain
             </Text>

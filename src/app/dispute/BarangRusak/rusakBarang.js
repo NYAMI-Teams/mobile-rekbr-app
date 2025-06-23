@@ -1,5 +1,5 @@
 // DisputeDetail.js
-import React, { use, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ChevronLeft, ClipboardPaste, ChevronDown } from "lucide-react-native";
-import { router, useLocalSearchParams, useNavigation } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import PrimaryButton from "../../../components/PrimaryButton";
 
 import * as ImagePicker from "expo-image-picker";
@@ -24,20 +24,24 @@ import { InputField } from "../../../components/dispute/InputField";
 import { UploadProve } from "../../../components/dispute/UploadProve";
 import { InfoBanner } from "../../../components/dispute/InfoBanner";
 import { TrackDispute } from "../../../components/dispute/TrackDispute";
-import { useRouter } from "expo-router";
 import { getDetailBuyerTransaction } from "../../../utils/api/buyer";
+import { postBuyerComplaint } from "../../../utils/api/complaint";
+import { showToast } from "../../../utils";
 
 export default function DisputeDetail() {
   const router = useRouter();
   const params = useLocalSearchParams();
   const data = params.data ? JSON.parse(params.data) : null;
 
+  const [problemType, setProblemType] = useState("damaged");
   const [selectedSolution, setSelectedSolution] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [showTipsModal, setShowTipsModal] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [media, setMedia] = useState([]);
   const [detailTransaction, setDetailTransaction] = useState({});
+  const [reason, setReason] = useState("");
+  const [isLoading, setLoading] = useState(false);
 
   console.log("data:", data.id);
   useEffect(() => {
@@ -57,10 +61,6 @@ export default function DisputeDetail() {
     fetchTransactionDetails();
   }, [data.id]);
 
-  useEffect(() => {
-    console.log("updated detailTransaction:", detailTransaction);
-  }, [detailTransaction]);
-
   const solutionOptions = [
     {
       title: "Pengembalian barang dan dana",
@@ -69,14 +69,34 @@ export default function DisputeDetail() {
     {
       title: "Refund Barang",
       desc: "Seller mengirimkan barang pengganti setelah buyer mengembalikan barang",
+      disabled: true,
     },
   ];
 
   const handleSubmit = () => setShowConfirmModal(true);
 
-  const handleConfirm = () => {
-    setShowConfirmModal(false);
-    router.push("../../(tabs)/dispute");
+  const handleConfirm = async () => {
+    setLoading(true);
+    try {
+      const problemType = "Barang rusak";
+
+      // console.log("==== Komplain Dikirim ====");
+      // console.log("ID Transaksi:", data.id);
+      // console.log("Problem Type:", problemType);
+      // console.log("Alasan:", reason);
+      // console.log("Media:", media);
+      // console.log("=========================");
+
+      // Nanti tinggal aktifkan ini kalau sudah
+      const res = await postBuyerComplaint(data.id, problemType, reason, media);
+      showToast("Sukses", "Komplain berhasil dikirim", "success");
+      setShowConfirmModal(false);
+      router.push("../../(tabs)/dispute");
+    } catch (error) {
+      showToast("Gagal", "Komplain gagal dikirim", "error");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const pickMedia = async () => {
@@ -186,6 +206,8 @@ export default function DisputeDetail() {
         <InputField
           title="Alasan kerusakan"
           placeholder="Jelaskan kerusakan barang dan lampirkan foto."
+          value={reason}
+          onChangeText={setReason}
         />
 
         {/* Bukti */}
@@ -240,18 +262,25 @@ export default function DisputeDetail() {
             <View className="flex-row justify-between">
               <TouchableOpacity
                 onPress={() => setShowConfirmModal(false)}
-                className="w-[48%] py-[14px] border border-gray-300 rounded-xl items-center"
+                disabled={isLoading}
+                className={`w-[48%] py-[14px] border border-gray-300 rounded-xl items-center ${
+                  isLoading ? "opacity-50" : ""
+                }`}
               >
                 <Text className="text-[16px] font-semibold text-black">
                   Kembali
                 </Text>
               </TouchableOpacity>
+
               <TouchableOpacity
                 onPress={handleConfirm}
-                className="w-[48%] py-[14px] bg-blue-600 rounded-xl items-center"
+                disabled={isLoading}
+                className={`w-[48%] py-[14px] rounded-xl items-center ${
+                  isLoading ? "bg-blue-400" : "bg-blue-600"
+                }`}
               >
                 <Text className="text-[16px] font-semibold text-white">
-                  Konfirmasi
+                  {isLoading ? "Mengirim..." : "Konfirmasi"}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -271,20 +300,28 @@ export default function DisputeDetail() {
             {solutionOptions.map((item, index) => (
               <TouchableOpacity
                 key={index}
+                disabled={item.disabled}
                 className={`mb-3 p-4 rounded-xl border ${
                   selectedSolution === item.title
                     ? "border-gray-800 bg-gray-50"
                     : "border-gray-200"
-                }`}
+                } ${item.disabled ? "opacity-50" : ""}`}
                 onPress={() => {
-                  setSelectedSolution(item.title);
-                  setShowModal(false);
+                  if (!item.disabled) {
+                    setSelectedSolution(item.title);
+                    setShowModal(false);
+                  }
                 }}
               >
                 <Text className="text-sm font-semibold text-black mb-1">
                   {item.title}
                 </Text>
                 <Text className="text-xs text-gray-600">{item.desc}</Text>
+                {item.disabled && (
+                  <Text className="text-[11px] text-red-500 mt-1 font-medium">
+                    Tidak tersedia
+                  </Text>
+                )}
               </TouchableOpacity>
             ))}
           </View>

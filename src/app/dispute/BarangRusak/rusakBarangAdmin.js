@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -17,12 +17,38 @@ import { StatusKomplain } from "../../../components/dispute/statusKomplain";
 import StepProgressBar from "../../../components/ProgressBar";
 import { TrackDispute } from "../../../components/dispute/TrackDispute";
 import { useRouter, useLocalSearchParams } from "expo-router";
+import { getDetailBuyerComplaint } from "../../../utils/api/complaint";
 
 export default function AdminPage() {
   const router = useRouter();
-  const { rejected } = useLocalSearchParams();
+  const { status, rejectedAdmin } = useLocalSearchParams();
   const [showOptionModal, setShowOptionModal] = useState(false);
-  const [ditolak, setDitolak] = useState(rejected === "true");
+  const [ditolak, setDitolak] = useState(rejectedAdmin === "true");
+  const [detailComplaint, setDetailComplaint] = useState({});
+  const { complaintId } = useLocalSearchParams();
+
+  useEffect(() => {
+    if (complaintId) {
+      fetchComplaintDetails();
+    }
+  }, [complaintId]);
+
+  const fetchComplaintDetails = async () => {
+    try {
+      const res = await getDetailBuyerComplaint(complaintId);
+      setDetailComplaint(res.data);
+    } catch (err) {
+      showToast(
+        "Gagal",
+        "Gagal mengambil data transaksi. Silahkan coba lagi.",
+        "error"
+      );
+    }
+  };
+
+  // useEffect(() => {
+  //   console.log("Complaints:", JSON.stringify(detailComplaint, null, 2));
+  // }, [detailComplaint]);
 
   return (
     <SafeAreaView className="flex-1 bg-white">
@@ -54,56 +80,137 @@ export default function AdminPage() {
           <InfoBanner contentBefore="Setelah ditinjau, bukti belum cukup kuat. Dana diteruskan ke seller dan transaksi dianggap selesai." />
         )}
 
-        {/* Pengajuan */}
-        <TrackDispute
-          title="Penolakan komplain seller"
-          dateTime="16 Juni 2025, 14 : 00 WIB"
-          details={[
-            {
-              content:
-                "Penolakan dikarenakan bukti buyer belum cukup kuat dan tidak ada alasan menerima hal seperti itu",
-            },
-            {
-              imgTitle: "Bukti foto & video",
-              images: [
-                require("../../../assets/barangrusak.png"),
-                require("../../../assets/barangrusak.png"),
-              ],
-            },
-          ]}
-        />
-        <TrackDispute
-          title="Pengajuan komplain buyer"
-          dateTime="16 Juni 2025, 10:00 WIB"
-          details={[
-            {
-              content:
-                "Buyer mau ngembaliin barang yang bermasalah. Dana rekber bakal dikembalikan setelah komplain disetujui, ya!",
-            },
-            {
-              content:
-                "Layar barang pecah di bagian tengah dan ada goresan dalam di sisi kiri.",
-            },
-            {
-              imgTitle: "Bukti foto & video",
-              images: [
-                require("../../../assets/barangrusak.png"),
-                require("../../../assets/barangrusak.png"),
-              ],
-            },
-          ]}
-        />
+        {rejectedAdmin === "false" && (
+          <>
+            <TrackDispute
+              title="Penolakan komplain seller"
+              dateTime="16 Juni 2025, 14 : 00 WIB"
+              details={[
+                {
+                  content:
+                    "Penolakan dikarenakan bukti buyer belum cukup kuat dan tidak ada alasan menerima hal seperti itu",
+                },
+                {
+                  imgTitle: "Bukti foto & video",
+                  images: [
+                    require("../../../assets/barangrusak.png"),
+                    require("../../../assets/barangrusak.png"),
+                  ],
+                },
+              ]}
+            />
+            <TrackDispute
+              title="Pengajuan komplain buyer"
+              dateTime="16 Juni 2025, 10:00 WIB"
+              details={[
+                {
+                  content:
+                    "Buyer mau ngembaliin barang yang bermasalah. Dana rekber bakal dikembalikan setelah komplain disetujui, ya!",
+                },
+                {
+                  content:
+                    "Layar barang pecah di bagian tengah dan ada goresan dalam di sisi kiri.",
+                },
+                {
+                  imgTitle: "Bukti foto & video",
+                  images: [
+                    require("../../../assets/barangrusak.png"),
+                    require("../../../assets/barangrusak.png"),
+                  ],
+                },
+              ]}
+            />
+          </>
+        )}
+
+        {rejectedAdmin === "true" && (
+          <>
+            <TrackDispute
+              title="Penolakan komplain admin"
+              dateTime="16 Juni 2025, 15 : 00 WIB"
+              details={[
+                {
+                  content:
+                    "Setelah bukti ditinjau, pengajuan tidak memenuhi syarat. Komplain dinyatakan tidak valid dan dana tetap diteruskan ke seller.",
+                },
+              ]}
+            />
+            <TrackDispute
+              title="Penolakan komplain seller"
+              dateTime="16 Juni 2025, 14 : 00 WIB"
+              details={[
+                {
+                  content:
+                    "Penolakan dikarenakan bukti buyer belum cukup kuat dan tidak ada alasan menerima hal seperti itu",
+                },
+                {
+                  imgTitle: "Bukti foto & video",
+                  images: [
+                    require("../../../assets/barangrusak.png"),
+                    require("../../../assets/barangrusak.png"),
+                  ],
+                },
+              ]}
+            />
+            <TrackDispute
+              title="Pengajuan komplain buyer"
+              dateTime="16 Juni 2025, 10:00 WIB"
+              details={[
+                {
+                  content:
+                    "Buyer mau ngembaliin barang yang bermasalah. Dana rekber bakal dikembalikan setelah komplain disetujui, ya!",
+                },
+                {
+                  content:
+                    "Layar barang pecah di bagian tengah dan ada goresan dalam di sisi kiri.",
+                },
+                {
+                  imgTitle: "Bukti foto & video",
+                  images: [
+                    require("../../../assets/barangrusak.png"),
+                    require("../../../assets/barangrusak.png"),
+                  ],
+                },
+              ]}
+            />
+          </>
+        )}
 
         {/* Data Seller & Transaksi */}
-        <TextView title="Seller" content="zhirazzi@gmail.com" />
-        <TextView title="Nama Barang" content="iPhone 17 Pro" />
-        <TextView title="Tagihan Rekber" content="Rp 8.080.000,00" />
-        <CopyField title="No Resi" content="J X 3 4 7 4 1 2 4 0 1 3" />
-        <TextView title="Ekspedisi" content="J&T Express Indonesia" />
-        <CopyField title="ID Transaksi" content="1 2 3 4 5 6 7 8 9" />
+        <TextView
+          title="Seller"
+          content={detailComplaint?.transaction?.sellerEmail}
+        />
+        <TextView
+          title="Nama Barang"
+          content={detailComplaint?.transaction?.itemName}
+        />
+        <TextView
+          title="Tagihan Rekber"
+          content={detailComplaint?.transaction?.totalAmount}
+        />
+        <CopyField
+          title="No Resi"
+          content={
+            detailComplaint?.transaction?.trackingNumber?.split("").join(" ") ||
+            "-"
+          }
+        />
+        <TextView
+          title="Ekspedisi"
+          content={detailComplaint?.transaction?.courier?.name || "-"}
+        />
+        <CopyField
+          title="ID Transaksi"
+          content={detailComplaint?.transaction?.transactionCode
+            ?.split("")
+            .join(" ")}
+        />
         <CopyField
           title="Virtual Account"
-          content="8 0 8 0 1 2 3 4 5 6 7 8 9"
+          content={detailComplaint?.transaction?.virtualAccount
+            ?.split("")
+            .join(" ")}
         />
       </ScrollView>
     </SafeAreaView>

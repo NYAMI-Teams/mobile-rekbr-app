@@ -1,115 +1,150 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, ScrollView, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 
 import RusakBarangCard from "../../../components/dispute/RusakBarangCard";
+import { getBuyerComplaints } from "../../../utils/api/complaint";
+import { showToast } from "../../../utils";
 
 export default function RusakBarangHome() {
   const router = useRouter();
 
-  // Function helper buat navigate ke rusakBarangKembaliin dengan params
-  const navigateToKembaliin = (params) => {
+  const [isEmptyComplaints, setIsEmptyComplaints] = useState(false);
+  const [Complaints, setComplaints] = useState([]);
+
+  useEffect(() => {
+    fetchComplaints();
+  }, []);
+
+  const fetchComplaints = async () => {
+    try {
+      const res = await getBuyerComplaints();
+      if (res.data.length > 0) {
+        setIsEmptyComplaints(false);
+      } else {
+        setIsEmptyComplaints(true);
+      }
+      setComplaints(res.data);
+    } catch (err) {
+      showToast(
+        "Gagal",
+        "Gagal mengambil data transaksi. Silahkan coba lagi.",
+        "error"
+      );
+    }
+  };
+
+  // useEffect(() => {
+  //   console.log("Complaints:", JSON.stringify(Complaints, null, 2));
+  // }, [Complaints]);
+
+  // Function navigate dengan status + optional extra param
+  const navigateToKembaliin = (status, extraParams = {}) => {
     router.push({
       pathname: "/dispute/BarangRusak/rusakBarangKembaliin",
-      params,
+      params: { status, ...extraParams },
     });
   };
 
-  // List komplain data
-  const komplainList = [
-    // {
-    //   status: "waitingSeller",
-    //   onPress: () => router.push("/dispute/BarangRusak/rusakBarangMenunggu"),
-    // },
-    // {
-    //   status: "disputeCancel",
-    //   onPress: () => router.push("/dispute/BarangRusak/komplainBatal"),
-    // },
-    // {
-    //   status: "disputeProved",
-    //   onPress: () => navigateToKembaliin({}),
-    // },
-    // {
-    //   status: "waitingAdmin",
-    //   onPress: () => router.push("/dispute/BarangRusak/rusakBarangAdmin"),
-    // },
-    // {
-    //   status: "adminReject",
-    //   onPress: () =>
-    //     router.push({
-    //       pathname: "/dispute/BarangRusak/rusakBarangAdmin",
-    //       params: { rejected: true },
-    //     }),
-    // },
-    {
-      status: "adminApprove",
-      onPress: () =>
-        navigateToKembaliin({ sellerRejected: true, ditolak: false }),
-      onPressButton: () => router.push("/dispute/BarangRusak/pengembalianForm"),
-    },
-    {
-      status: "adminApprove",
-      onPress: () =>
-        navigateToKembaliin({ sellerRejected: false, ditolak: false }),
-      onPressButton: () => router.push("/dispute/BarangRusak/pengembalianForm"),
-    },
-    {
-      status: "adminApprove",
-      onPress: () =>
-        navigateToKembaliin({ sellerRejected: false, ditolak: true }),
-      onPressButton: () => router.push("/dispute/BarangRusak/pengembalianForm"),
-    },
+  const complaintStatusMap = {
+    waiting_seller_approval: "waitingSellerApproval",
+    return_requested: "returnRequested",
+    rejected_by_seller: "sellerRejected",
+    return_in_transit: "returnInTransit",
+    awaiting_admin_approval: "awaitingAdminApproval",
+    approved_by_seller: "approvedBySeller",
+    approved_by_admin: "approvedByAdmin",
+    under_investigtion: "underInvestigation",
+  };
 
-    ////////
-    {
-      status: "buyerResi",
-      onPress: () =>
-        navigateToKembaliin({
-          sellerRejected: false,
-          ditolak: false,
-          resi: true,
-        }),
-      onPressButton: () =>
-        router.push("/dispute/BarangRusak/konfirmasiSellerForm"),
-    },
-    {
-      status: "requestSeller",
-      onPress: () =>
-        navigateToKembaliin({
-          sellerRejected: false,
-          ditolak: false,
-          resi: true,
-          mintaKonfirmasi: true,
-        }),
-    },
-    {
-      status: "waitSeller",
-      onPress: () =>
-        navigateToKembaliin({
-          sellerRejected: false,
-          ditolak: false,
-          resi: true,
-          mintaKonfirmasi: true,
-          AdminResponse: true,
-        }),
-    },
-    {
-      status: "requestRejected",
-      onPress: () =>
-        navigateToKembaliin({
-          sellerRejected: false,
-          ditolak: false,
-          resi: true,
-          mintaKonfirmasi: true,
-          AdminResponse: false,
-        }),
-    },
-    // {
-    //   status: "requestApprove",
-    //   onPress: () => router.push("/dispute/BarangRusak/rusakBarangSelesai"),
-    // },
+  const hiddenStatuses = [
+    "Completed",
+    "rejectedByAdmin",
+    "disputeCancel",
+    "awaitingSellerConfirmation",
   ];
+
+  // komplainList mapping by status
+  const handleComplaintPress = (item, mappedStatus) => {
+    const actions = {
+      waitingSellerApproval: () =>
+        router.push({
+          pathname: "/dispute/BarangRusak/rusakBarangMenunggu",
+          params: { complaintId: item?.id },
+        }),
+      returnRequested: () =>
+        router.push({
+          pathname: "/dispute/BarangRusak/rusakBarangKembaliin",
+          params: {
+            complaintId: item?.id,
+            status: "returnRequested",
+            sellerRejected: false,
+            buyerExpiredDate: false,
+          },
+        }),
+      Completed: () =>
+        router.push({
+          pathname: "/dispute/BarangRusak/rusakBarangSelesai",
+          params: { complaintId: item?.id },
+        }),
+      sellerRejected: () =>
+        router.push({
+          pathname: "/dispute/BarangRusak/rusakBarangAdmin",
+          params: { complaintId: item?.id, rejectedAdmin: false },
+        }),
+      returnInTransit: () =>
+        router.push({
+          pathname: "/dispute/BarangRusak/rusakBarangKembaliin",
+          params: {
+            complaintId: item?.id,
+            status: "returnInTransit",
+            sellerRejected: false,
+            buyerExpiredDate: false,
+          },
+        }),
+      disputeProved: () =>
+        router.push({
+          pathname: "/dispute/BarangRusak/rusakBarangKembaliin",
+          params: { status: "disputeProved" },
+        }),
+      awaitingAdminApproval: () =>
+        router.push({
+          pathname: "/dispute/BarangRusak/rusakBarangKembaliin",
+          params: { status: "awaitingAdminApproval" },
+        }),
+      rejectedByAdmin: () =>
+        router.push({
+          pathname: "/dispute/BarangRusak/rusakBarangAdmin",
+          params: { complaintId: item?.id, rejectedAdmin: true },
+        }),
+      awaitingSellerConfirmation: () =>
+        router.push({
+          pathname: "/dispute/BarangRusak/rusakBarangKembaliin",
+          params: { status: "awaitingSellerConfirmation" },
+        }),
+      approvedBySeller: () =>
+        router.push({
+          pathname: "/dispute/BarangRusak/rusakBarangKembaliin",
+          params: { status: "approvedBySeller" },
+        }),
+      approvedByAdmin: () =>
+        router.push({
+          pathname: "/dispute/BarangRusak/rusakBarangKembaliin",
+          params: { status: "approvedByAdmin" },
+        }),
+      underInvestigation: () =>
+        router.push({
+          pathname: "/dispute/BarangRusak/rusakBarangKembaliin",
+          params: { status: "under_investigation" },
+        }),
+    };
+
+    // jalankan action jika ada, kalau tidak ya kosong
+    if (actions[mappedStatus]) {
+      actions[mappedStatus]();
+    }
+  };
 
   return (
     <SafeAreaView className="flex-1 bg-white">
@@ -127,19 +162,46 @@ export default function RusakBarangHome() {
         </View>
 
         {/* Render Card List */}
-        {komplainList.map((item, index) => (
-          <RusakBarangCard
-            key={index}
-            namaBarang="Iphone 13 Pro Max"
-            harga="Rp 10.000.000"
-            seller="irgi168@gmail.com"
-            noResi="JX12345678"
-            expedisi="J&T"
-            status={item.status}
-            onPress={item.onPress}
-            onPressButton={item.onPressButton}
-          />
-        ))}
+        {Complaints.filter((item) => {
+          const mappedStatus =
+            complaintStatusMap[item.status] || "disputeCancel";
+          return !hiddenStatuses.includes(mappedStatus);
+        }).map((item) => {
+          const mappedStatus =
+            complaintStatusMap[item.status] || "disputeCancel";
+
+          return (
+            <RusakBarangCard
+              key={item?.id || ""}
+              namaBarang={item?.transaction?.itemName || ""}
+              harga={`Rp ${Number(
+                item?.transaction?.totalAmount || 0
+              ).toLocaleString("id-ID")}`}
+              seller={item?.transaction?.sellerEmail}
+              noResi={item?.transaction?.shipment?.trackingNumber
+                ?.split("")
+                .join(" ")}
+              expedisi={item?.transaction?.shipment?.courier}
+              status={mappedStatus}
+              onPress={() => handleComplaintPress(item, mappedStatus)}
+              onPressButton={
+                mappedStatus === "returnRequested"
+                  ? () =>
+                      router.push({
+                        pathname: "/dispute/BarangRusak/pengembalianForm",
+                        params: { complaintId: item?.id },
+                      })
+                  : mappedStatus === "returnInTransit"
+                  ? () =>
+                      router.push({
+                        pathname: "/dispute/BarangRusak/konfirmasiSellerForm",
+                        params: { complaintId: item?.id },
+                      })
+                  : null
+              }
+            />
+          );
+        })}
       </ScrollView>
     </SafeAreaView>
   );

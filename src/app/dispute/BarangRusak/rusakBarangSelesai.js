@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ChevronLeft } from "lucide-react-native";
-import { useNavigation } from "expo-router";
+import { useLocalSearchParams, useNavigation } from "expo-router";
 import PrimaryButton from "../../../components/PrimaryButton";
 import { InfoBanner } from "../../../components/dispute/InfoBanner";
 import StepProgressBar from "../../../components/ProgressBar";
@@ -12,9 +12,30 @@ import TextView from "../../../components/dispute/textView";
 import Tagihan from "../../../components/DetailRekber/Tagihan";
 import CopyField from "../../../components/dispute/copyField";
 import { useRouter } from "expo-router";
+import { getDetailBuyerComplaint } from "../../../utils/api/complaint";
 
 export default function RusakBarangSelesai() {
   const router = useRouter();
+  const [detailComplaint, setDetailComplaint] = useState({});
+  const { complaintId } = useLocalSearchParams();
+
+  useEffect(() => {
+    fetchComplaintDetails();
+  }, []);
+
+  const fetchComplaintDetails = async () => {
+    try {
+      const res = await getDetailBuyerComplaint(complaintId);
+      setDetailComplaint(res.data);
+    } catch (err) {
+      showToast(
+        "Gagal",
+        "Gagal mengambil data transaksi. Silahkan coba lagi.",
+        "error"
+      );
+    }
+  };
+
 
   return (
     <SafeAreaView className="flex-1 bg-white">
@@ -33,7 +54,7 @@ export default function RusakBarangSelesai() {
         currentStep={3}
         steps={["Menunggu", "Kembaliin", "Refund", "Selesai"]}
       />
-      <StatusKomplain status="Transaksi Selesai" />
+      <StatusKomplain status={detailComplaint.status_label} />
 
       <View className="h-2 bg-[#f5f5f5] mt-3" />
 
