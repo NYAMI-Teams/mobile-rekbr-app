@@ -148,6 +148,8 @@ const RusakBarangCard = ({
   seller,
   noResi,
   expedisi,
+  iconDespute,
+  typeDespute,
   status,
   time,
   onPress,

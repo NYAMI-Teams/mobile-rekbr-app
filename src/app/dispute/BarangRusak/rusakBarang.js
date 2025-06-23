@@ -43,7 +43,7 @@ export default function DisputeDetail() {
   const [reason, setReason] = useState("");
   const [isLoading, setLoading] = useState(false);
 
-  console.log("data:", data.id);
+  // console.log("data:", data.id);
   useEffect(() => {
     const fetchTransactionDetails = async () => {
       try {
@@ -169,20 +169,20 @@ export default function DisputeDetail() {
 
   return (
     <SafeAreaView className="flex-1 bg-white">
+      {/* Header */}
+      <View className="relative items-center justify-center mb-6">
+        <TouchableOpacity
+          onPress={() => router.back()}
+          className="absolute left-0"
+        >
+          <ChevronLeft size={24} color="black" />
+        </TouchableOpacity>
+        <Text className="text-xl font-semibold text-center">
+          Detail Masalah
+        </Text>
+      </View>
+      
       <ScrollView className="px-4 pt-4 pb-40">
-        {/* Header */}
-        <View className="relative items-center justify-center mb-6">
-          <TouchableOpacity
-            onPress={() => router.back()}
-            className="absolute left-0"
-          >
-            <ChevronLeft size={24} color="black" />
-          </TouchableOpacity>
-          <Text className="text-xl font-semibold text-center">
-            Detail Masalah
-          </Text>
-        </View>
-
         {/* Masalah */}
         <ProblemDisplay
           image={require("../../../assets/barangrusak.png")}

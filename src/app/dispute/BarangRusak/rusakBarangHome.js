@@ -182,6 +182,8 @@ export default function RusakBarangHome() {
                 ?.split("")
                 .join(" ")}
               expedisi={item?.transaction?.shipment?.courier}
+              // iconDespute={iconDespute}
+              // typeDespute={typeDespute}
               status={mappedStatus}
               onPress={() => handleComplaintPress(item, mappedStatus)}
               onPressButton={
