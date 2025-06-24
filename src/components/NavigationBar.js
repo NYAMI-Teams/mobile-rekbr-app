@@ -22,12 +22,12 @@ export default function NavigationBar({
   const handleEdit = () => modalizeRef.current?.open();
 
   const handleChangePassword = () => {
-    modalizeRef.current?.close();
+    // modalizeRef.current?.close();
     router.push("/Profile/ChangePassword");
   };
 
   const handleChangeEmail = () => {
-    modalizeRef.current?.close();
+    // modalizeRef.current?.close();
     router.push("/Profile/ChangeEmail");
   };
 
