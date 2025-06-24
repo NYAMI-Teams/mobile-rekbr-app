@@ -3,13 +3,19 @@ import { View, Text, StyleSheet } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 
 const ComplaintStepBar = ({ currentStep = 0, steps = [], status }) => {
+  const isRejectedStatus = [
+    "rejected",
+    "rejected_by_seller",
+    "rejected_by_admin",
+  ].includes(status);
+
   return (
     <View style={styles.container}>
       {steps.map((label, index) => {
         const isCompleted = index < currentStep;
         const isActive = index === currentStep;
         const isFinalStep = isActive && index === steps.length - 1;
-        const isRejected = isFinalStep && status === "rejected";
+        const isRejected = isFinalStep && isRejectedStatus;
 
         return (
           <React.Fragment key={index}>
@@ -33,10 +39,9 @@ const ComplaintStepBar = ({ currentStep = 0, steps = [], status }) => {
                   <View
                     style={[
                       styles.dot,
-                      isFinalStep &&
-                        (isRejected
-                          ? { backgroundColor: "#FF4D4F" }
-                          : { backgroundColor: "#4CD964" }),
+                      isFinalStep && {
+                        backgroundColor: isRejected ? "#FF4D4F" : "#4CD964",
+                      },
                     ]}
                   />
                 ) : null}
@@ -53,11 +58,17 @@ const ComplaintStepBar = ({ currentStep = 0, steps = [], status }) => {
                 {label}
               </Text>
             </View>
+
+            {/* Progress Line */}
             {index !== steps.length - 1 && (
               <View
                 style={[
                   styles.line,
-                  index < currentStep && styles.completedLine,
+                  index < currentStep &&
+                    (steps[index + 1]?.toLowerCase().includes("ditolak") &&
+                    isRejectedStatus
+                      ? styles.rejectedLine
+                      : styles.completedLine),
                 ]}
               />
             )}
@@ -123,6 +134,9 @@ const styles = StyleSheet.create({
   },
   completedLine: {
     backgroundColor: "#4CD7D0",
+  },
+  rejectedLine: {
+    backgroundColor: "#FF4D4F",
   },
   label: {
     marginTop: 6,

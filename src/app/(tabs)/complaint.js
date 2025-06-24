@@ -37,6 +37,7 @@ export default function ComplaintListScreen() {
   const fetchComplaints = async () => {
     try {
       const res = await getBuyerComplaints();
+      console.log("📋 Complaint list response:", res.data);
       setComplaints(res.data);
     } catch (err) {
       showToast("Gagal", "Gagal mengambil data komplain", "error");
@@ -71,7 +72,7 @@ export default function ComplaintListScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: "#fff" }}>
-      <StatusBar style='dark' />
+      <StatusBar style="dark" />
       <View style={{ flex: 1, padding: 16 }}>
         <NavigationBar
           name={profile?.email}
@@ -82,11 +83,11 @@ export default function ComplaintListScreen() {
         />
 
         {/* Tabs */}
-        <View className='flex-row border-b border-gray-200'>
+        <View className="flex-row border-b border-gray-200">
           {["pembelian", "penjualan"].map((tab) => (
             <TouchableOpacity
               key={tab}
-              className='flex-1 items-center pb-2'
+              className="flex-1 items-center pb-2"
               onPress={() => setActiveTab(tab)}
             >
               <Text
@@ -97,7 +98,7 @@ export default function ComplaintListScreen() {
                 {tab.charAt(0).toUpperCase() + tab.slice(1)}
               </Text>
               {activeTab === tab && (
-                <View className='h-1 w-full bg-[#3ED9D0] rounded-full mt-1' />
+                <View className="h-1 w-full bg-[#3ED9D0] rounded-full mt-1" />
               )}
             </TouchableOpacity>
           ))}
@@ -105,8 +106,8 @@ export default function ComplaintListScreen() {
 
         {/* Content */}
         {isLoading ? (
-          <View className='flex-1 justify-center items-center'>
-            <ActivityIndicator size='large' color='#000' />
+          <View className="flex-1 justify-center items-center">
+            <ActivityIndicator size="large" color="#000" />
           </View>
         ) : (
           <ScrollView
@@ -115,19 +116,25 @@ export default function ComplaintListScreen() {
             }
           >
             {complaints.length === 0 ? (
-              <View className='items-center mt-8'>
-                <EmptyIllustration text='Belum ada komplain yang kamu ajukan.' />
+              <View className="items-center mt-8">
+                <EmptyIllustration text="Belum ada komplain yang kamu ajukan." />
               </View>
             ) : (
               complaints.map((item) => (
                 <Pressable
                   key={item.id}
-                  onPress={() =>
+                  onPress={() => {
+                    console.log("🔗 Navigating to complaint detail:", {
+                      itemId: item.id,
+                      complaintId: item.complaint?.id,
+                      complaint: item.complaint,
+                      item: item,
+                    });
                     router.push({
                       pathname: "/Complaint/Detail",
-                      params: { id: item.id },
-                    })
-                  }
+                      params: { id: item.complaint?.id },
+                    });
+                  }}
                 >
                   <ComplaintCard
                     productName={item.itemName}

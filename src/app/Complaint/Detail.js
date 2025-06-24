@@ -7,13 +7,16 @@ import {
   TouchableOpacity,
   Alert,
   ActivityIndicator,
+  Image,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useRouter, useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { Copy } from "lucide-react-native";
 import * as Clipboard from "expo-clipboard";
 import { StatusBar } from "expo-status-bar";
+import dayjs from "dayjs";
+import "dayjs/locale/id";
 
 import ComplaintStepBar from "@/components/ComplaintStepBar";
 import {
@@ -23,44 +26,46 @@ import {
 import { showToast } from "@/utils";
 import Modal from "react-native-modal";
 
-export default function ComplaintDetailScreen() {
+dayjs.locale("id");
+
+export default function ComplaintDetailScreen({ label, timestamp }) {
   const { id } = useLocalSearchParams();
   const router = useRouter();
+  const dateText = timestamp
+    ? dayjs(timestamp).format("D MMMM YYYY, HH:mm [WIB]")
+    : null;
 
-  const [transactionDetail, setTransactionDetail] = useState(null);
+  const [complaintDetail, setComplaintDetail] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showActionModal, setShowActionModal] = useState(false);
 
   useEffect(() => {
-    if (id) fetchTransactionDetail();
+    if (id) fetchComplaintDetail();
   }, [id]);
 
-  const fetchTransactionDetail = async () => {
+  const fetchComplaintDetail = async () => {
     try {
       const res = await getBuyerComplaintDetail(id);
-      setTransactionDetail(res.data);
+      console.log(res.data, "============>");
+      setComplaintDetail(res.data);
     } catch (err) {
-      showToast("Gagal", "Gagal mengambil detail transaksi", "error");
+      showToast("Gagal", "Gagal mengambil detail komplain", "error");
     } finally {
       setLoading(false);
     }
   };
 
-  const complaint = transactionDetail?.Complaint?.slice()?.sort(
-    (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-  )?.[0];
-
-  const status = complaint?.status || "-";
-  const type = complaint?.type || "-";
+  const status = complaintDetail?.status || "-";
+  const type = complaintDetail?.type || "-";
 
   const handleCancelComplaint = async () => {
-    if (!complaint?.id) {
+    if (!complaintDetail?.id) {
       showToast("Gagal", "ID komplain tidak ditemukan", "error");
       return;
     }
 
     try {
-      await cancelComplaintById(complaint.id);
+      await cancelComplaintById(complaintDetail.id);
       showToast("Berhasil", "Komplain berhasil dibatalkan", "success");
       router.replace("/(tabs)/complaint");
     } catch (err) {
@@ -73,12 +78,32 @@ export default function ComplaintDetailScreen() {
   };
 
   const getStatusLabel = (status) => {
+    console.log("status", status);
     switch (status) {
       case "under_investigation":
         return "Dalam Investigasi";
       case "approved_by_admin":
-        return "Komplain Disetujui";
+        return "Tim Rekbr by BNI meminta maaf atas barang yang hilang , dan bukti kurir ekspedisi tidak memenuhi aturan SOP kami.";
+      case "rejected_by_admin":
+        return "Komplain Ditolak";
+      case "canceled":
+        return "Komplain Dibatalkan";
+      case "completed":
+        return "Selesai";
+      default:
+        return "-";
+    }
+  };
+
+  const getStatus = (status) => {
+    switch (status) {
+      case "under_investigation":
+        return "Dalam Investigasi";
+      case "approved_by_admin":
+        return "Komplain disetujui";
       case "rejected_by_seller":
+        return "Komplain Ditolak";
+      case "rejected_by_admin":
         return "Komplain Ditolak";
       case "canceled":
         return "Komplain Dibatalkan";
@@ -96,16 +121,6 @@ export default function ComplaintDetailScreen() {
         approved_by_admin: "Barang hilang telah disetujui oleh admin.",
         rejected_by_seller: null,
       },
-      damaged: {
-        under_investigation: "Barang kamu sedang kami cek kerusakannya.",
-        approved_by_admin: "Komplain disetujui karena barang rusak.",
-        rejected_by_seller: null,
-      },
-      not_as_described: {
-        under_investigation: "Barang tidak sesuai sedang dievaluasi.",
-        approved_by_admin: "Komplain disetujui karena tidak sesuai deskripsi.",
-        rejected_by_seller: null,
-      },
     };
 
     return (
@@ -117,7 +132,12 @@ export default function ComplaintDetailScreen() {
     if (status === "approved_by_admin") {
       return { steps: ["Investigasi", "Disetujui"], currentStep: 1 };
     } else if (
-      ["rejected_by_seller", "rejected", "canceled"].includes(status)
+      [
+        "rejected_by_seller",
+        "rejected",
+        "canceled",
+        "rejected_by_admin",
+      ].includes(status)
     ) {
       return { steps: ["Investigasi", "Ditolak"], currentStep: 1 };
     } else {
@@ -131,30 +151,30 @@ export default function ComplaintDetailScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView className='flex-1 justify-center items-center bg-white'>
-        <StatusBar style='dark' />
-        <ActivityIndicator size='large' color='#000' />
+      <SafeAreaView className="flex-1 justify-center items-center bg-white">
+        <StatusBar style="dark" />
+        <ActivityIndicator size="large" color="#000" />
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView className='flex-1 bg-white'>
-      <StatusBar style='dark' />
+    <SafeAreaView className="flex-1 bg-white">
+      <StatusBar style="dark" />
 
       {/* Header */}
-      <View className='flex-row items-center px-4 py-3'>
+      <View className="flex-row items-center px-4 py-3">
         <TouchableOpacity onPress={() => router.back()}>
-          <Ionicons name='chevron-back-outline' size={24} color='#000' />
+          <Ionicons name="chevron-back-outline" size={24} color="#000" />
         </TouchableOpacity>
-        <Text className='flex-1 text-center text-base font-semibold text-black'>
+        <Text className="flex-1 text-center text-base font-semibold text-black">
           Detail Komplain
         </Text>
         <View style={{ width: 24 }} />
       </View>
 
       {/* Step Bar */}
-      <View className='items-center px-4'>
+      <View className="items-center px-4">
         <ComplaintStepBar
           currentStep={currentStep}
           steps={steps}
@@ -163,72 +183,96 @@ export default function ComplaintDetailScreen() {
       </View>
 
       {/* Konten Scrollable */}
-      <View className='flex-1'>
+      <View className="flex-1">
         <ScrollView
-          className='px-4 pt-4'
+          className="px-4 pt-4"
           contentContainerStyle={{ paddingBottom: 80 }}
           showsVerticalScrollIndicator={false}
         >
           {/* Pesan Status */}
           {message && (
-            <View className='bg-white p-3 rounded-xl border border-gray-100 mb-4'>
-              <Text className='text-sm font-semibold mb-1'>
-                {getStatusLabel(status)}
-              </Text>
-              <Text className='text-gray-600 text-xs'>{message}</Text>
+            <View className="flex-row items-start bg-white p-4 rounded-xl mb-4 border border-gray-100 space-x-3">
+              {/* Tampilkan gambar dan title hanya jika status bukan rejected */}
+              {!status?.includes("rejected") && (
+                <Image
+                  source={require("../../assets/admin1.png")}
+                  className="w-10 h-10 rounded-full"
+                  resizeMode="contain"
+                />
+              )}
+
+              <View className="flex-1">
+                {!status?.includes("rejected") && (
+                  <Text className="text-sm font-semibold mb-1">
+                    {getStatusLabel(status)}
+                  </Text>
+                )}
+                <Text className="text-gray-600 text-xs">{message}</Text>
+              </View>
             </View>
           )}
 
           {/* Status Ringkas */}
-          <View className='p-4 border-b border-gray-200'>
-            <View className='flex-row justify-between items-center'>
-              <Text className='text-gray-600 text-sm'>Status Komplain :</Text>
-              <Text className='text-black font-semibold text-sm'>
-                {getStatusLabel(status)}
+          <View className="p-4 border-b border-gray-200">
+            <View className="flex-row justify-between items-center">
+              <Text className="text-gray-600 text-sm">Status Komplain :</Text>
+              <Text className="text-black font-semibold text-sm">
+                {getStatus(complaintDetail?.status)}
               </Text>
             </View>
           </View>
 
+          <ComplaintTimeline
+            timeline={complaintDetail?.timeline}
+            message={complaintDetail?.messsage}
+            status={complaintDetail?.status}
+          />
+
           {/* Info Transaksi */}
-          <View className='space-y-3 mt-4'>
-            <InfoBlock label='Seller' value={transactionDetail?.sellerEmail} />
+          <View className="space-y-3 mt-4">
             <InfoBlock
-              label='Nama Barang'
-              value={transactionDetail?.itemName}
+              label="Seller"
+              value={complaintDetail?.transaction?.sellerEmail}
             />
             <InfoBlock
-              label='Tagihan Rekber'
+              label="Nama Barang"
+              value={complaintDetail?.transaction?.itemName}
+            />
+            <InfoBlock
+              label="Tagihan Rekber"
               value={`Rp. ${Number(
-                transactionDetail?.totalAmount || 0
+                complaintDetail?.transaction?.totalAmount || 0
               ).toLocaleString("id-ID")},00`}
             />
             <InfoBlock
-              label='ID Transaksi'
-              value={transactionDetail?.transactionCode}
+              label="ID Transaksi"
+              value={complaintDetail?.transaction?.transactionCode}
               copyable
             />
             <InfoBlock
-              label='No Resi'
-              value={transactionDetail?.shipment?.trackingNumber}
+              label="No Resi"
+              value={complaintDetail?.transaction?.shipment?.trackingNumber}
               copyable
             />
             <InfoBlock
-              label='Ekspedisi'
-              value={transactionDetail?.shipment?.courier}
+              label="Ekspedisi"
+              value={complaintDetail?.transaction?.shipment?.courier}
             />
           </View>
 
+          {/* Timeline */}
+
           {/* Tombol Aksi */}
           {shouldShowActions && (
-            <View className='mt-8 pb-6'>
-              <Pressable className='flex-row items-center'>
+            <View className="mt-8 pb-6">
+              <Pressable className="flex-row items-center">
                 {/* Tombol More */}
-                <View className='justify-center items-center'>
+                <View className="justify-center items-center">
                   <TouchableOpacity
                     onPress={() => setShowActionModal(true)}
-                    className='w-11 h-11 border border-gray-300 rounded-xl justify-center items-center bg-white mr-3'
+                    className="w-11 h-11 border border-gray-300 rounded-xl justify-center items-center bg-white mr-3"
                   >
-                    <Text className='text-black text-xl'>•••</Text>
+                    <Text className="text-black text-xl">•••</Text>
                   </TouchableOpacity>
 
                   {/* Modal Aksi */}
@@ -236,15 +280,15 @@ export default function ComplaintDetailScreen() {
                     isVisible={showActionModal}
                     onBackdropPress={() => setShowActionModal(false)}
                     onBackButtonPress={() => setShowActionModal(false)}
-                    animationIn='slideInUp'
-                    animationOut='slideOutDown'
+                    animationIn="slideInUp"
+                    animationOut="slideOutDown"
                     style={{ margin: 0, justifyContent: "flex-end" }}
                   >
-                    <View className='bg-white rounded-t-2xl pt-2 pb-6 px-4'>
-                      <View className='items-center'>
-                        <View className='w-12 h-1.5 bg-gray-300 rounded-full mb-4' />
+                    <View className="bg-white rounded-t-2xl pt-2 pb-6 px-4">
+                      <View className="items-center">
+                        <View className="w-12 h-1.5 bg-gray-300 rounded-full mb-4" />
                       </View>
-                      <Text className='text-lg font-semibold mb-8'>
+                      <Text className="text-lg font-semibold mb-8">
                         Lainnya
                       </Text>
 
@@ -253,9 +297,9 @@ export default function ComplaintDetailScreen() {
                           setShowActionModal(false);
                           router.push("/Complaint/Edit?id=" + id);
                         }}
-                        className='mb-4'
+                        className="mb-4"
                       >
-                        <Text className='text-black text-base font-medium mb-6'>
+                        <Text className="text-black text-base font-medium mb-6">
                           Ubah Detail Komplain
                         </Text>
                       </TouchableOpacity>
@@ -266,7 +310,7 @@ export default function ComplaintDetailScreen() {
                           handleCancelComplaint();
                         }}
                       >
-                        <Text className='text-black text-base font-medium mb-10'>
+                        <Text className="text-black text-base font-medium mb-10">
                           Batalkan Komplain
                         </Text>
                       </TouchableOpacity>
@@ -277,9 +321,9 @@ export default function ComplaintDetailScreen() {
                 {/* Tombol Hubungi Seller */}
                 <Pressable
                   onPress={() => router.push("/Complaint")}
-                  className='flex-1 bg-black py-3 rounded-xl justify-center items-center'
+                  className="flex-1 bg-black py-3 rounded-xl justify-center items-center"
                 >
-                  <Text className='text-white font-semibold text-base'>
+                  <Text className="text-white font-semibold text-base">
                     Hubungi Seller
                   </Text>
                 </Pressable>
@@ -292,12 +336,13 @@ export default function ComplaintDetailScreen() {
   );
 }
 
+// Komponen InfoBlock
 function InfoBlock({ label, value, copyable = false }) {
   return (
-    <View className='mb-4'>
-      <Text className='text-gray-600 text-base mb-1'>{label}</Text>
-      <View className='flex-row items-center space-x-2'>
-        <Text className='text-black text-xl font-medium'>{value || "-"}</Text>
+    <View className="mb-4">
+      <Text className="text-gray-600 text-base mb-1">{label}</Text>
+      <View className="flex-row items-center space-x-2">
+        <Text className="text-black text-xl font-medium">{value || "-"}</Text>
         {copyable && value && (
           <Pressable
             onPress={() => {
@@ -305,10 +350,78 @@ function InfoBlock({ label, value, copyable = false }) {
               Alert.alert("Disalin", `${label} berhasil disalin.`);
             }}
           >
-            <Copy size={20} color='#999' />
+            <Copy size={20} color="#999" />
           </Pressable>
         )}
       </View>
+    </View>
+  );
+}
+
+// Komponen Timeline
+function ComplaintTimeline({ timeline, status, message }) {
+  const isRejected =
+    status === "rejected_by_seller" || status === "rejected_by_admin";
+
+  if (!timeline || timeline.length === 0) {
+    return (
+      <Text className="text-gray-400 text-sm mt-4">
+        Belum ada aktivitas dalam komplain ini.
+      </Text>
+    );
+  }
+
+  const filteredTimeline = timeline.filter(
+    (item) => item.label !== "Komplain Selesai"
+  );
+
+  return (
+    <View className="mt-6">
+      {timeline
+        .slice()
+        .reverse()
+        .map((item, index) => (
+          <TimelineItem
+            key={index}
+            label={item.label}
+            timestamp={item.timestamp}
+            message={item.message}
+            isRejected={isRejected && index === 0}
+          />
+        ))}
+    </View>
+  );
+}
+
+// Komponen TimelineItem
+function TimelineItem({ label, timestamp, isRejected, message }) {
+  const formattedDate = timestamp
+    ? dayjs(timestamp).format("D MMMM YYYY, HH:mm [WIB]")
+    : null;
+
+  return (
+    <View className="mb-5 border-b border-gray-200 pb-3">
+      <Text
+        className={`text-base font-semibold ${
+          isRejected ? "text-red-600" : "text-black"
+        }`}
+      >
+        {label}
+      </Text>
+      {message && (
+        <View className="bg-gray-100 p-3 rounded-xl mt-2">
+          <Text className="text-black text-sm">{message}</Text>
+        </View>
+      )}
+      {formattedDate && (
+        <Text className="text-gray-500 text-sm mt-1">{formattedDate}</Text>
+      )}
+
+      {isRejected && (
+        <Text className="text-red-500 text-sm mt-2">
+          Komplain kamu telah ditolak oleh pihak terkait.
+        </Text>
+      )}
     </View>
   );
 }

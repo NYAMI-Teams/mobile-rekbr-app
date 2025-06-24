@@ -21,7 +21,7 @@ export const getBuyerComplaints = async () => {
 
 export const getBuyerComplaintDetail = async (id) => {
   try {
-    const res = await Api.get(`/buyer/transactions/${id}`);
+    const res = await Api.get(`/buyer/complaints/${id}`);
     return res;
   } catch (error) {
     throw error;
@@ -54,4 +54,13 @@ export const createComplaint = async (transactionId, type, reason, file) => {
   );
 
   return res.data;
+};
+
+export const getLatestComplaint = async () => {
+  try {
+    const res = await Api.get(`/buyer/complaints/latest`);
+    return res;
+  } catch (error) {
+    throw error;
+  }
 };

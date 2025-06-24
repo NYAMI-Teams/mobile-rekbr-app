@@ -6,7 +6,7 @@ import * as Clipboard from "expo-clipboard";
 // Hanya menampilkan label status, bukan message
 const getStatusStyle = (status) => {
   switch (status) {
-    case "approved_by_admin":
+    case "approved_by_a":
       return {
         dotColor: "bg-green-500",
         textColor: "text-green-600",
@@ -18,7 +18,7 @@ const getStatusStyle = (status) => {
         textColor: "text-orange-500",
         label: "Investigasi Pengiriman",
       };
-    case "rejected_by_seller":
+    case "rejected_by_admin":
       return {
         dotColor: "bg-red-400",
         textColor: "text-red-500",
