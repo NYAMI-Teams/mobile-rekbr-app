@@ -7,9 +7,9 @@ const statusConfig = {
   waitingSellerApproval: {
     color: "#FBBF24",
     text: "Persetujuan Seller",
-    note: "Jika seller nggak respon sampai",
-    notebold: "  18 Juni 2025, 10 : 00 WIB,",
-    noteafter: " pengajuanmu bakal otomatis disetujui ya!",
+    note: "Jika kamu nggak respon sampai ",
+    notebold: "  18 Juni 2025, 10:00 WIB,",
+    noteafter: " pengajuan ini bakal otomatis disetujui, ya!",
     status: "18 Juni 2025, 10 : 00 WIB",
     statusColor: "#FEF2D3",
   },
@@ -60,10 +60,10 @@ const statusConfig = {
   },
   approvedByAdmin: {
     color: "#FBBF24",
-    text: "Menunggu Pengembalian",
-    note: "Kembalikan dengan baik, kemasan aman, dan berikan bukti pengiriman kembali!",
-    notebold: " Proses maksimal 1 x 24 jam.",
-    button: "Bukti Pengembalian",
+    text: "Pengembalian Barang",
+    note: "Halo! Barang sudah sampai. Konfirmasi dalam 24 jam, kalau nggak, dana otomatis dikembalikan ke buyer. ",
+    status: "23 : 59 : 59",
+    statusColor: "#FEF2D3",
   },
 
   // Buyer Hilang Barang
@@ -74,78 +74,19 @@ const statusConfig = {
     button: null,
   },
 
-  disputeCancel: {
-    color: "#C2C2C2",
-    text: "Komplain Dibatalkan",
-    note: "",
-  },
-  disputeProved: {
-    color: "#FBBF24",
-    text: "Menunggu Pengembalian Barang",
-    note: "Seller nggak kasih kabar, jadi sekarang giliran kamu buat lanjut prosesnya. Ayo upload bukti pengembalian barang!",
-  },
-  waitingAdmin: {
-    color: "#CB3A31",
-    text: "Menunggu Persetujuan Admin",
-    note: "",
-    button: null,
-  },
-  adminReject: {
-    color: "#06B217",
-    text: "Transaksi Selesai",
-    note: "Setelah ditinjau, bukti belum cukup kuat. Dana diteruskan ke seller dan transaksi dianggap selesai.",
-    button: null,
-  },
-
-  buyerLate: {
-    color: "#06B217",
-    text: "Transaksi Selesai",
-    note: "Karena pengembalian barang",
-    notebold: " sudah lewat 1 x 24 jam",
-    noteafter: ", komplain dianggap selesai dan tidak bisa diproses lagi.",
-    button: "Silakan Hubungi Kami",
-  },
-  buyerResi: {
+  // Seller
+  awaitingSellerConfirmation: {
     color: "#FBBF24",
     text: "Menunggu Pengembalian",
-    note: "Cek no resi berkala, kalau seller nggak konfirmasi, minta konfirmasi seller lewat admin. ",
-    button: "Minta Konfirmasi",
-  },
-  requestSeller: {
-    color: "#FBBF24",
-    text: "Menunggu Pengembalian",
-    note: "Tunggu approval kami, ya! Kalau bukti kamu oke, permintaan konfirmasi bakal langsung dikirim ke seller!",
-    button: "Permintaan Ditinjau",
-    btnColor: "#FEF2D3",
-    btnTextColor: "black",
-  },
-  waitSeller: {
-    color: "#FBBF24",
-    text: "Menunggu Pengembalian",
-    note: "Konfirmasi udah dikirim ke seller! Sekarang tinggal tunggu respon mereka dalam 1 x 24 jam.",
-    status: "23 : 59 : 59",
-    statusColor: "#FEF2D3",
-  },
-  requestRejected: {
-    color: "#FBBF24",
-    text: "Menunggu Pengembalian",
-    note: "Pengajuan ditolak karena bukti yang diajukan tidak valid. Silakan hubungi kami untuk klarifikasi lebih lanjut.",
-    button: "Permintaan Ditolak",
-    btnColor: "#F5D8D6",
-    btnTextColor: "black",
-  },
-  requestApprove: {
-    color: "#06B217",
-    text: "Tranasksi Selesai",
-    note: "",
-    status: "22 Juni 2025, 10 : 00 WIB",
+    note: "Buyer akan mengembalikan barang dalam 24 jam, konfirmasi bila barang telah sampai dan diterima.",
+    button: "Barang Diterima",
   },
 };
 
-const RusakBarangCard = ({
+const SellerDisputeListCard = ({
   namaBarang,
   harga,
-  seller,
+  buyer,
   noResi,
   expedisi,
   typeDespute,
@@ -169,8 +110,8 @@ const RusakBarangCard = ({
 
         {/* Seller */}
         <View className="flex-row justify-between mb-2">
-          <Text className="text-xs text-[#6B7280]">Seller</Text>
-          <Text className="text-xs text-[#1D1D1D]">{seller}</Text>
+          <Text className="text-xs text-[#6B7280]">Buyer</Text>
+          <Text className="text-xs text-[#1D1D1D]">{buyer}</Text>
         </View>
 
         {/* No Resi */}
@@ -255,4 +196,4 @@ const RusakBarangCard = ({
   );
 };
 
-export default RusakBarangCard;
+export default SellerDisputeListCard;

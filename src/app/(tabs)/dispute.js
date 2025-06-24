@@ -4,6 +4,7 @@ import AccountBalance from "../../components/AccountBalance";
 import QuickActions from "../../components/QuickActions";
 import RusakBarangHome from "../dispute/BarangRusak/rusakBarangHome";
 import RusakBarangKembaliinPage from "../dispute/BarangRusak/rusakBarangKembaliin";
+import PenjualanDisputeHome from "../dispute/SellerDispute/penjualanHome";
 
 export default function DisputeScreen() {
   return (
@@ -11,7 +12,7 @@ export default function DisputeScreen() {
       {/* <NavigationBar /> */}
       {/* <RusakBarangRefund /> */}
       {/* <RusakBarangKembaliinPage /> */}
-      <RusakBarangHome />
+      <PenjualanDisputeHome />
     </View>
   );
 }

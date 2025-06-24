@@ -99,6 +99,7 @@ export default function AdminPage() {
                 },
               ]}
             />
+            <View className="h-2 bg-[#f5f5f5] mt-3" />
             <TrackDispute
               title="Pengajuan komplain buyer"
               dateTime="16 Juni 2025, 10:00 WIB"
@@ -135,6 +136,7 @@ export default function AdminPage() {
                 },
               ]}
             />
+            <View className="h-2 bg-[#f5f5f5] mt-3" />
             <TrackDispute
               title="Penolakan komplain seller"
               dateTime="16 Juni 2025, 14 : 00 WIB"
@@ -152,6 +154,7 @@ export default function AdminPage() {
                 },
               ]}
             />
+            <View className="h-2 bg-[#f5f5f5] mt-3" />
             <TrackDispute
               title="Pengajuan komplain buyer"
               dateTime="16 Juni 2025, 10:00 WIB"

@@ -1,76 +1,33 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, TouchableOpacity, ScrollView, Image } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { ChevronLeft } from "lucide-react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
-
-import PrimaryButton from "../../../components/PrimaryButton";
-import { InfoBanner } from "../../../components/dispute/InfoBanner";
+import { Alert, SafeAreaView, TouchableOpacity, View } from "react-native";
+import { ChevronLeft } from "lucide-react-native";
+import { Text } from "react-native";
 import StepProgressBar from "../../../components/ProgressBar";
-import { StatusKomplain } from "../../../components/dispute/statusKomplain";
+import { ScrollView } from "react-native-gesture-handler";
 import { TrackDispute } from "../../../components/dispute/TrackDispute";
 import TextView from "../../../components/dispute/textView";
 import Tagihan from "../../../components/DetailRekber/Tagihan";
 import CopyField from "../../../components/dispute/copyField";
-import { getDetailBuyerComplaint } from "../../../utils/api/complaint";
+import { InfoBanner } from "../../../components/dispute/InfoBanner";
+import { StatusKomplain } from "../../../components/dispute/statusKomplain";
+import PrimaryButton from "../../../components/PrimaryButton";
 
-export default function RusakBarangKembaliinPage() {
+export default function KembaliinPage() {
   const router = useRouter();
-  const {
-    status,
-    sellerRejected: sellerRejectedParam,
-    buyerExpiredDate,
-    resi: resiParam,
-  } = useLocalSearchParams();
+  const { status, sellerRejected, buyerExpiredDate } = useLocalSearchParams();
 
-  const sellerRejected = sellerRejectedParam === "true";
-  const [ditolak, setDitolak] = useState(buyerExpiredDate === "true");
-
-  const [detailComplaint, setDetailComplaint] = useState({});
-  const { complaintId } = useLocalSearchParams();
-
-  useEffect(() => {
-    if (complaintId) {
-      fetchComplaintDetails();
-    }
-  }, [complaintId]);
-
-  const fetchComplaintDetails = async () => {
-    try {
-      const res = await getDetailBuyerComplaint(complaintId);
-      setDetailComplaint(res.data);
-    } catch (err) {
-      showToast(
-        "Gagal",
-        "Gagal mengambil data transaksi. Silahkan coba lagi.",
-        "error"
-      );
-    }
-  };
-
-  useEffect(() => {
-    console.log("Complaints:", JSON.stringify(detailComplaint, null, 2));
-  }, [detailComplaint]);
-
-  const handlePrimaryButton = () => {
-    if (status === "returnRequested") {
-      router.push({
-        pathname: "/dispute/BarangRusak/pengembalianForm",
-        params: { complaintId: complaintId },
-      });
-    } else if (status === "returnInTransit") {
-      router.push({
-        pathname: "/dispute/BarangRusak/konfirmasiSellerForm",
-        params: { complaintId: complaintId },
-      });
-    }
-  };
-
-  const getButtonTitle = () => {
-    if (status === "returnRequested") return "Kirim Barang Refund";
-    if (status === "returnInTransit") return "Minta Konfirmasi Seller";
-    if (status === "disputeProved") return "Kirim Bukti Pengembalian";
-    return null;
+  const detailComplaint = {
+    transaction: {
+      sellerEmail: "sellerku@mail.com",
+      itemName: "Smart TV 50 Inch UHD",
+      totalAmount: "Rp 7.500.000",
+      trackingNumber: "JNE123456789",
+      courier: {
+        name: "JNE",
+      },
+      transactionCode: "INV123456789",
+      virtualAccount: "1234567890123456",
+    },
   };
 
   const renderStatusSection = () => {
@@ -333,15 +290,147 @@ export default function RusakBarangKembaliinPage() {
           </>
         );
 
+      case "awaitingSellerConfirmation":
+        return (
+          <>
+            <InfoBanner contentBefore="Buyer akan mengembalikan barang dalam 24 jam, konfirmasi bila barang telah sampai dan diterima." />
+            <StatusKomplain status="Menunggu Pengembalian Barang" />
+            <View className="h-2 bg-[#f5f5f5] mt-3" />
+
+            <TrackDispute
+              title="Pengembalian barang oleh buyer"
+              dateTime="20 Juni 2025, 10:00 WIB"
+              details={[
+                {
+                  resiNumber: "J X 3 4 7 4 1 2 4 0 1 3",
+                  expedition: "J&T Express Indonesia",
+                },
+              ]}
+            />
+            <View className="h-2 bg-[#f5f5f5] mt-3" />
+            <TrackDispute
+              title="Persetujuan komplain seller"
+              dateTime="19 Juni 2025, 10:00 WIB"
+              details={[
+                {
+                  content:
+                    "Seller mau nerima barang kembaliin agar dapat ditukar, kirim bukti Refund.",
+                },
+              ]}
+            />
+
+            <View className="h-2 bg-[#f5f5f5] mt-3" />
+          </>
+        );
+
+      case "approvedByAdmin":
+        return (
+          <>
+            <InfoBanner contentBefore="Halo! Barang sudah sampai. Konfirmasi dalam 24 jam, kalau nggak, dana otomatis dikembalikan ke buyer." />
+            <StatusKomplain status="Menunggu Pengembalian Barang" />
+            <View className="flex-row justify-end px-4 mt-4">
+              <View className="p-2 rounded bg-[#FEF2D3]">
+                <Text className="font-bold text-black">23 : 59 : 59</Text>
+              </View>
+            </View>
+
+            <View className="h-2 bg-[#f5f5f5] mt-3" />
+
+            <TrackDispute
+              title="Admin meneruskan permintaan konfirmasi"
+              dateTime="21 Juni 2025, 12 : 00 WIB"
+              details={[
+                { content: "Melalui resi harusnya barang sudah sampai di seller" },
+                {
+                  imgTitle: "Bukti foto & video",
+                  images: [
+                    require("../../../assets/barangrusak.png"),
+                  ],
+                },
+              ]}
+            />
+
+            <View className="h-2 bg-[#f5f5f5] mt-3" />
+
+            <TrackDispute
+              title="Permintaan konfirmasi buyer"
+              dateTime="21 Juni 2025, 10 : 00 WIB"
+              details={[
+                { content: "Melalui resi harusnya barang sudah sampai di seller" },
+                {
+                  imgTitle: "Bukti foto & video",
+                  images: [
+                    require("../../../assets/barangrusak.png"),
+                  ],
+                },
+              ]}
+            />
+
+            <View className="h-2 bg-[#f5f5f5] mt-3" />
+            <TrackDispute
+              title="Pengembalian barang oleh buyer"
+              dateTime="20 Juni 2025, 10:00 WIB"
+              details={[
+                {
+                  resiNumber: "J X 3 4 7 4 1 2 4 0 1 3",
+                  expedition: "J&T Express Indonesia",
+                },
+              ]}
+            />
+            <View className="h-2 bg-[#f5f5f5] mt-3" />
+            <TrackDispute
+              title="Persetujuan komplain seller"
+              dateTime="19 Juni 2025, 10:00 WIB"
+              details={[
+                {
+                  content:
+                    "Seller mau nerima barang kembaliin agar dapat ditukar, kirim bukti Refund.",
+                },
+              ]}
+            />
+
+            <View className="h-2 bg-[#f5f5f5] mt-3" />
+          </>
+        );
       default:
         return null;
     }
   };
 
-  const renderPrimaryButton = () => {
-    const title = getButtonTitle();
-    if (!title) return null;
-    return <PrimaryButton title={title} onPress={handlePrimaryButton} />;
+  const handleSellerAccept = () => {
+    Alert.alert(
+      "Konfirmasi",
+      "Barang udah diterima dengan baik dan benar? Cek dulu ya, biar aman!",
+      [
+        {
+          text: "Kembali",
+          style: "cancel",
+        },
+        {
+          text: "Konfirmasi",
+          style: "destructive",
+          onPress: () => {
+            postBuyerCancelComplaint(complaintId) //nanti ganti dengan API yang sesuai
+              .then(() => {
+                router.replace("../../(tabs)/dispute");
+              })
+              .catch((err) => {
+                showToast(
+                  "Gagal",
+                  "Gagal membatalkan komplain. Coba lagi.",
+                  "error"
+                );
+                console.log("Cancel error:", err);
+              });
+          },
+        },
+      ],
+      { cancelable: true }
+    );
+  };
+
+  const handleSubmit = () => {
+    console.log("Submit komplain");
   };
 
   return (
@@ -359,7 +448,7 @@ export default function RusakBarangKembaliinPage() {
       <StepProgressBar
         currentStep={2}
         steps={["Seller", "Admin", "Kembaliin", "Refunded"]}
-        rejectedSteps={ditolak ? [2] : sellerRejected ? [0] : []}
+        rejectedSteps={buyerExpiredDate ? [2] : sellerRejected ? [0] : []}
       />
 
       <ScrollView className="px-4 pb-40">
@@ -429,7 +518,25 @@ export default function RusakBarangKembaliinPage() {
             .join(" ")}
         />
 
-        {renderPrimaryButton()}
+        {/* Bottom Action */}
+        <View
+          className="flex-row px-4 pb-4 pt-2 mt-5 bg-white"
+          style={{ position: "absolute", bottom: 0, left: 0, right: 0 }}
+        >
+          <PrimaryButton
+            title="Komplain"
+            onPress={handleSubmit}
+            width="48%"
+            btnColor="#F9F9F9"
+            textColor="#000000"
+            style={{ marginRight: 8 }}
+          />
+          <PrimaryButton
+            title="Barang diterima"
+            onPress={handleSellerAccept}
+            width="48%"
+          />
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
