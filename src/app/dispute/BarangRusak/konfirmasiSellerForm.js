@@ -1,0 +1,113 @@
+import React, { useState } from "react";
+import { View, Text, TouchableOpacity, ScrollView } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { ChevronLeft } from "lucide-react-native";
+import { useRouter } from "expo-router";
+import { InputField } from "../../../components/dispute/InputField";
+import AttachmentFilled from "../../../components/AttachmentFilled";
+import PrimaryButton from "../../../components/PrimaryButton";
+
+export default function konfirmasiSellerForm() {
+  const router = useRouter();
+  const { complaintId } = useLocalSearchParams();
+
+  const [reason, setReason] = useState("");
+  const [photoUri, setPhotoUri] = useState(null);
+  const [image, setImage] = useState(null);
+
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setPhotoUri(result.assets[0].uri);
+      setImage(result.assets[0]);
+    }
+  };
+
+  const handleSubmit = async () => {
+    try {
+      await postBuyerReturn(complaintId, reason, image);
+      router.replace("../../(tabs)/dispute");
+    } catch (error) {
+      showToast("Gagal", error?.message, "error");
+    } finally {
+      setShowPopup(false);
+    }
+    // console.log("ini pengembalian", complaintId, courierId, resi, photoUri);
+  };
+
+  return (
+    <SafeAreaView className="flex-1 bg-white">
+      {/* Header */}
+      <View className="flex-row items-center justify-between p-4">
+        <TouchableOpacity onPress={() => router.back()}>
+          <ChevronLeft size={24} color="black" />
+        </TouchableOpacity>
+        <Text className="text-base font-semibold">
+          Permintaan Konfirmasi Seller
+        </Text>
+        <View style={{ width: 24 }} />
+      </View>
+
+      {/* Isi Form */}
+      <ScrollView className="flex-1 px-4">
+        <InputField
+          title="Alasan Permintaan Konfirmasi"
+          placeholder="Contohnya, barang telah diterima Buyer sejak 2 hari kemarin"
+          value={reason}
+          onChangeText={setReason}
+        />
+
+        <AttachmentFilled
+          title="Unggah Bukti"
+          caption={
+            photoUri
+              ? "Foto berhasil diupload"
+              : "Berikan bukti berupa screenshot cek resi"
+          }
+          cardColor={photoUri ? "#E8F5E9" : "#FFF"}
+          captionColor={photoUri ? "#4CAF50" : "#9E9E9E"}
+          iconName={photoUri ? "checkmark" : "camera"}
+          boxColor={photoUri ? "#4CAF50" : "#49DBC8"}
+          alertText="Pastikan keterbacaan foto dan hindari bayangan"
+          alertColor="#C2C2C2"
+          alertIconName="alert-circle"
+          alertIconColor="#C2C2C2"
+          onPress={pickImage}
+          iconsColor="#FFF"
+        />
+
+        {photoUri && (
+          <View className="mt-4">
+            <Text className="text-sm font-medium mb-2">
+              Preview Foto Bukti:
+            </Text>
+            <Image
+              source={{ uri: photoUri }}
+              style={{ width: "100%", height: 200, borderRadius: 12 }}
+            />
+          </View>
+        )}
+      </ScrollView>
+
+      {/* Button di bawah */}
+      <View className="px-4 py-3 border-t border-gray-200">
+        <PrimaryButton
+          title="Kirim"
+          onPress={() => router.replace("../../(tabs)/dispute")}
+        />
+        <View className="flex-row items-center justify-center mt-3">
+          <Text className="text-sm text-gray-500">Terdapat kendala?</Text>
+          <TouchableOpacity>
+            <Text className="text-sm text-blue-600 ml-1 font-bold">
+              Silahkan Hubungi Kami
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </SafeAreaView>
+  );
+}
