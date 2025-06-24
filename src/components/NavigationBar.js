@@ -1,18 +1,14 @@
 // src/components/NavigationBar.js
-import React from "react";
+import React, { useRef, useState } from "react";
 import {
   View,
   Text,
-  SafeAreaView,
   Image,
   TouchableOpacity,
-  StyleSheet,
   Platform,
-  StatusBar,
+  StyleSheet,
 } from "react-native";
-import Modal from "react-native-modal";
-import { useState } from "react";
-import { Pressable } from "react-native";
+import { Modalize } from "react-native-modalize";
 import { useRouter } from "expo-router";
 
 export default function NavigationBar({
@@ -21,26 +17,23 @@ export default function NavigationBar({
   onLogoutPress,
 }) {
   const router = useRouter();
-  const [showPopup, setShowPopup] = useState(false);
+  const modalizeRef = useRef(null);
 
-  const handleEdit = () => {
-    setShowPopup(true);
-  };
+  const handleEdit = () => modalizeRef.current?.open();
 
   const handleChangePassword = () => {
-    setShowPopup(false);
+    // modalizeRef.current?.close();
     router.push("/Profile/ChangePassword");
   };
 
   const handleChangeEmail = () => {
-    setShowPopup(false);
+    // modalizeRef.current?.close();
     router.push("/Profile/ChangeEmail");
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <>
       <View style={styles.container}>
-        {/* Left → Logo + Hi + Name */}
         <View style={styles.leftSection}>
           <Image
             source={require("../assets/logo-rekbr.png")}
@@ -84,69 +77,66 @@ export default function NavigationBar({
         </View>
       </View>
 
-      {/* Modal */}
-      {showPopup && (
-        <Modal
-          visible={showPopup}
-          transparent
-          animationType="slide"
-          onRequestClose={() => setShowPopup(false)}
-          style={{ margin: 0, padding: 0 }}>
-          {/* <SafeAreaView className="flex-1"> */}
-          <Pressable
-            className="flex-1 bg-black/40 justify-end"
-            onPress={() => setShowPopup(false)}>
-            <Pressable
-              className="bg-white rounded-t-2xl px-5"
-              style={{
-                height: "30%",
-                width: "100%",
-                position: "absolute",
-                bottom: 0,
-                left: 0,
-                right: 0,
-              }}
-              onPress={() => {}}>
-              <View className="flex-col justify-center p-4">
-                <Text className="text-lg font-semibold mb-8">Atur Profile</Text>
-                <TouchableOpacity
-                  onPress={handleChangePassword}
-                  className="mb-4">
-                  <Text className="text-black text-base font-medium mb-6">
-                    Ubah Password
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={handleChangeEmail} className="mb-4">
-                  <Text className="text-black text-base font-medium mb-6">
-                    Ubah Email
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={onLogoutPress} className="mb-10">
-                  <Text className="text-red-500 text-base font-medium">
-                    Keluar
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            </Pressable>
-          </Pressable>
-          {/* </SafeAreaView> */}
-        </Modal>
-      )}
-    </SafeAreaView>
+      {/* Modalize Bottom Sheet */}
+      <Modalize
+        ref={modalizeRef}
+        adjustToContentHeight
+        handleStyle={{
+          backgroundColor: "#ccc",
+          width: 60,
+          alignSelf: "center",
+          top: 32,
+        }}
+        modalStyle={{
+          borderTopLeftRadius: 20,
+          borderTopRightRadius: 20,
+          paddingHorizontal: 24,
+          paddingTop: 32,
+          paddingBottom: 32,
+          backgroundColor: "#fff",
+        }}
+      >
+        <View>
+          <Text className="text-lg font-bold mb-6 text-center">
+            Atur Profile
+          </Text>
+          <TouchableOpacity onPress={handleChangePassword} className="mb-4 py-4">
+            <Text className="text-base text-black font-medium">
+              Ubah Password
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={handleChangeEmail} className="mb-4 py-4">
+            <Text className="text-base text-black font-medium">
+              Ubah Email
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              onLogoutPress();
+            }}
+            className="mb-8 py-4"
+          >
+            <Text className="text-base text-red-500 font-medium">
+              Keluar
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </Modalize>
+    </>
+
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    backgroundColor: "#fff",
-    marginVertical: 12,
-  },
   container: {
     flexDirection: "row",
     alignItems: "flex-start", // supaya "Hi, nama" bisa agak turun
     justifyContent: "space-between",
     backgroundColor: "#fff",
     width: "100%",
+    paddingHorizontal: 16,
+    paddingTop: Platform.OS === "ios" ? 0 : 20,
+    paddingBottom: 16,
   },
   leftSection: {
     flexDirection: "column",

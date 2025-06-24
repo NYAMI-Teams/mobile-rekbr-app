@@ -13,14 +13,14 @@ import { Ionicons } from "@expo/vector-icons";
 import PrimaryButton from "@/components/PrimaryButton";
 import { useRouter } from "expo-router";
 
-export default function Welcoming() {
+export default function KYCFirst() {
   const router = useRouter();
 
   const [isChecked, setIsChecked] = useState(false);
 
   return (
     <>
-      <SafeAreaView className="flex-1 bg-white">
+      <View className="flex-1 bg-white">
         <StatusBar style="dark" />
 
         {/* Header */}
@@ -33,7 +33,7 @@ export default function Welcoming() {
         </View>
 
         {/* Content scrollable */}
-        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        <View style={styles.content} >
           <Image
             source={require("../../assets/kyc-image.png")}
             style={styles.image}
@@ -50,7 +50,7 @@ export default function Welcoming() {
               barangnya beneran nyata.
             </Text>
           </View>
-        </ScrollView>
+        </View>
 
         {/* Bottom Section */}
         <View style={styles.bottomSection}>
@@ -70,6 +70,7 @@ export default function Welcoming() {
             title="Lanjut"
             onPress={() => router.push("/E-kyc/KYC_DataDiri")}
             disabled={!isChecked}
+            style={styles.button}
           />
 
           <View style={styles.footer}>
@@ -84,7 +85,7 @@ export default function Welcoming() {
             </Text>
           </View>
         </View>
-      </SafeAreaView>
+      </View>
     </>
   );
 }
@@ -138,7 +139,7 @@ const styles = StyleSheet.create({
   },
   bottomSection: {
     paddingHorizontal: 16,
-    paddingBottom: 16,
+    marginBottom: 32,
     backgroundColor: "#fff",
   },
   checkboxContainer: {

@@ -45,7 +45,7 @@ export default function LainnyaPage() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <StatusBar style="dark" />
 
       {/* Header */}
@@ -136,7 +136,7 @@ export default function LainnyaPage() {
           </Text>
         </View>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 

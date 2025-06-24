@@ -6,7 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 export default function BuyerDispute({ visible, onCancel, onComplain, onClose }) {
     return (
         <View className="absolute inset-0 z-50 justify-center items-center bg-black/30">
-            <SafeAreaView className="w-[90%] bg-white rounded-xl shadow-md p-4 border border-gray-200">
+            <View className="w-[90%] bg-white rounded-xl shadow-md p-4 border border-gray-200">
                 <Modal visible={visible} transparent animationType="fade">
                     <View className="flex-1 justify-center items-center bg-black/30">
                         <View className="bg-white rounded-2xl p-5 mx-6 shadow-lg w-full max-w-sm">
@@ -34,7 +34,7 @@ export default function BuyerDispute({ visible, onCancel, onComplain, onClose })
                         </View>
                     </View>
                 </Modal>
-            </SafeAreaView>
+            </View>
         </View >
     );
 }

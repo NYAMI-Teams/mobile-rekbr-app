@@ -25,7 +25,7 @@ export default function Lampiran() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <StatusBar style="dark" />
 
       {/* Header */}
@@ -130,7 +130,7 @@ export default function Lampiran() {
           </Text>
         </View>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 

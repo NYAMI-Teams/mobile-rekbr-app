@@ -1,5 +1,4 @@
 import { useRouter } from "expo-router";
-import { SafeAreaView } from "react-native-safe-area-context";
 import {
   Platform,
   ScrollView,
@@ -51,7 +50,7 @@ export default function MasukkanEmailScreen() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
+    <View className="bg-white flex-1">
       {/* Header */}
       <View className="flex-row justify-between items-center w-full px-4 pt-4">
         <TouchableOpacity onPress={handleBackBtn}>
@@ -66,72 +65,71 @@ export default function MasukkanEmailScreen() {
       {/* Content */}
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={{ flex: 1 }}>
+        style={{ flex: 1 }}
+      >
         <ScrollView
-          className="flex-1 w-full px-4 mt-5"
+          contentContainerStyle={{ flexGrow: 1 }}
+          className="px-4 pt-4"
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
-          hideKeyboardOnScroll={true}
-          keyboardDismissMode="on-drag">
-          <>
-            {/* Email Kamu */}
-            <View className="relative mb-4">
-              <InputField
-                title="Masukkan Email"
-                placeholder="Masukkan email kamu"
-                value={email}
-                onChangeText={(text) => {
-                  setEmail(text);
-                  setEmailFound(false);
-                }}
-                keyboardType="email-address"
-              />
-              {/* Alert Validasi Email*/}
-              <View className="flex-row items-center mt-2 mx-5">
-                <Feather
-                  name={
-                    isEmailValid()
-                      ? emailFound
-                        ? "check-circle"
-                        : "info"
-                      : "x-circle"
-                  }
-                  size={18}
-                  color={
-                    isEmailValid()
-                      ? emailFound
-                        ? "#4ade80"
-                        : "#fbbf24"
-                      : "#f87171"
-                  }
-                />
-                <Text
-                  className={`ml-2 text-sm ${
-                    isEmailValid()
-                      ? emailFound
-                        ? "text-green-600"
-                        : "text-yellow-600"
-                      : "text-red-400"
-                  }`}>
-                  {isEmailValid()
+        >
+          {/* Email Kamu */}
+          <View className="flex-1 mb-4">
+            <InputField
+              title="Masukkan Email"
+              placeholder="Masukkan email kamu"
+              value={email}
+              onChangeText={(text) => {
+                setEmail(text);
+                setEmailFound(false);
+              }}
+              keyboardType="email-address"
+            />
+            {/* Alert Validasi Email*/}
+            <View className="flex-row items-center mt-2 mx-5">
+              <Feather
+                name={
+                  isEmailValid()
                     ? emailFound
-                      ? "Email valid"
-                      : "Check Email"
-                    : "Email tidak valid"}
-                </Text>
-              </View>
+                      ? "check-circle"
+                      : "info"
+                    : "x-circle"
+                }
+                size={18}
+                color={
+                  isEmailValid()
+                    ? emailFound
+                      ? "#4ade80"
+                      : "#fbbf24"
+                    : "#f87171"
+                }
+              />
+              <Text
+                className={`ml-2 text-sm ${isEmailValid()
+                  ? emailFound
+                    ? "text-green-600"
+                    : "text-yellow-600"
+                  : "text-red-400"
+                  }`}>
+                {isEmailValid()
+                  ? emailFound
+                    ? "Email valid"
+                    : "Check Email"
+                  : "Email tidak valid"}
+              </Text>
             </View>
-          </>
+          </View>
+          {/* Button */}
+          <View className="w-full pb-16">
+            <PrimaryButton
+              title="Kirim"
+              onPress={handleBtnPress}
+              disabled={!isEmailValid()}
+            />
+          </View>
         </ScrollView>
       </KeyboardAvoidingView>
-      {/* Button */}
-      <View className="w-full px-4 py-4">
-        <PrimaryButton
-          title="Kirim"
-          onPress={handleBtnPress}
-          disabled={!isEmailValid()}
-        />
-      </View>
-    </SafeAreaView>
+
+    </View>
   );
 }

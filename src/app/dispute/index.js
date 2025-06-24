@@ -36,7 +36,7 @@ export default function Dispute() {
   ];
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <View className="flex-1 bg-white">
       <ScrollView className="px-4 pt-4">
         <View className="relative items-center justify-center mb-4">
           {/* Tombol Back di kiri */}
@@ -118,6 +118,6 @@ export default function Dispute() {
           </Text>
         </Text>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }

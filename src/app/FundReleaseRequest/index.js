@@ -21,6 +21,7 @@ import InputField from "../../components/InputField";
 import BuyerKonfirmasi from "../../components/BuyerKonfirmasi";
 import { useLocalSearchParams } from "expo-router";
 import { showToast } from "../../utils";
+import NavBackHeader from "@/components/NavBackHeader";
 
 export default function FundReleaseRequestScreen() {
   const router = useRouter();
@@ -144,81 +145,78 @@ export default function FundReleaseRequestScreen() {
       showToast("Berhasil", "Permintaan konfirmasi pengiriman berhasil dibuat", "success");
       router.replace("/");
     } catch (error) {
-      showToast("Gagal", "Gagal membuat permintaan konfirmasi pengiriman", "error");
+      showToast("Gagal", `Gagal membuat permintaan konfirmasi pengiriman, ${error?.message}`, "error");
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white justify-between">
+    <View className="flex-1 bg-white">
       {/* Header */}
-      <View className="flex-row justify-between items-center w-full px-4 pt-4">
-        <TouchableOpacity onPress={() => router.back()}>
-          <Ionicons name="chevron-back-outline" size={24} color="#000" />
-        </TouchableOpacity>
-        <Text className="text-[16px] font-semibold text-black">
-          Permintaan Konfirmasi
-        </Text>
-        <View style={{ width: 24 }} />
-      </View>
-
+      <NavBackHeader title={"Permintaan Konfirmasi"} />
       {/* Content */}
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={{ flex: 1 }}>
+        keyboardVerticalOffset={Platform.OS === 'ios' && 60}
+        style={{ flex: 1 }}
+      >
         <ScrollView
-          className="flex-1 w-full px-4 mt-5"
+          className="px-4 mt-3"
+          contentContainerStyle={{ flexGrow: 1 }}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
-          hideKeyboardOnScroll={true}
-          keyboardDismissMode="on-drag">
-          <View className="mt-4">
-            <InputField
-              title="Alasan Permintaan Konfirmasi"
-              placeholder="Contohnya, barang telah diterima pembeli sejak 2 hari kemarin"
-              value={alasanText}
-              onChangeText={setAlasanText}
-            />
-          </View>
-          <TouchableOpacity onPress={handleUpload} className="mt-4">
-            <AttachmentFilled
-              title="Unggah Bukti"
-              caption={
-                isUploaded
-                  ? image?.uri?.split("/").pop()
-                  : "Berikan bukti berupa screenshot cek resi"
-              }
-              captionColor={isUploaded ? "#08B20F" : "#9E9E9E"}
-              iconName={"camera"} // Pastikan AttachmentFilled Anda bisa menerima string 'camera' untuk ikon
-              boxColor={isUploaded ? "#F9F9F9" : "#49DBC8"}
-              iconsColor={isUploaded ? "#C2C2C2" : "#FFFFFF"}
-              cardColor={"#FFF"}
-              alertText="Pastikan keterbacaan foto dan hindari bayangan"
-              alertColor={isUploaded ? "#08B20F" : "#C2C2C2"}
-              alertIconName={isUploaded ? "checkmark-circle" : "alert-circle"} // Pastikan ini juga sesuai dengan AttachmentFilled
-              alertIconColor={isUploaded ? "#08B20F" : "#C2C2C2"}
-              onPress={handleUpload}
-            />
-          </TouchableOpacity>
-          <View className="mt-4 mb-4">
-            {!image && (
-              <Image
-                source={{ uri: image?.uri }}
-                className="w-full h-64 rounded-lg"
+        >
+          <View className="flex-1">
+
+            <View className="">
+              <InputField
+                title="Alasan Permintaan Konfirmasi"
+                placeholder="Contohnya, barang telah diterima pembeli sejak 2 hari kemarin"
+                value={alasanText}
+                onChangeText={setAlasanText}
               />
-            )}
+            </View>
+            <TouchableOpacity onPress={handleUpload} className="mt-4">
+              <AttachmentFilled
+                title="Unggah Bukti"
+                caption={
+                  isUploaded
+                    ? image?.uri?.split("/").pop()
+                    : "Berikan bukti berupa screenshot cek resi"
+                }
+                captionColor={isUploaded ? "#08B20F" : "#9E9E9E"}
+                iconName={"camera"} // Pastikan AttachmentFilled Anda bisa menerima string 'camera' untuk ikon
+                boxColor={isUploaded ? "#F9F9F9" : "#49DBC8"}
+                iconsColor={isUploaded ? "#C2C2C2" : "#FFFFFF"}
+                cardColor={"#FFF"}
+                alertText="Pastikan keterbacaan foto dan hindari bayangan"
+                alertColor={isUploaded ? "#08B20F" : "#C2C2C2"}
+                alertIconName={isUploaded ? "checkmark-circle" : "alert-circle"} // Pastikan ini juga sesuai dengan AttachmentFilled
+                alertIconColor={isUploaded ? "#08B20F" : "#C2C2C2"}
+                onPress={handleUpload}
+              />
+            </TouchableOpacity>
+            <View className="mt-4 mb-4">
+              {!image ? null : (
+                <Image
+                  source={{ uri: image?.uri }}
+                  className="w-full h-64 rounded-lg"
+                />
+              )}
+            </View>
           </View>
+          {/* Button */}
+          <View className="w-full py-4 mb-8">
+            <PrimaryButton
+              title="Kirim"
+              onPress={handleBtnPress}
+              disabled={isLoading}
+            />
+          </View>
+
         </ScrollView>
       </KeyboardAvoidingView>
-      {/* Button */}
-      <View className="w-full px-4 py-4">
-        <PrimaryButton
-          title="Kirim"
-          onPress={handleBtnPress}
-          disabled={isLoading}
-        />
-      </View>
 
       {showPopup && (
         <BuyerKonfirmasi
@@ -230,6 +228,6 @@ export default function FundReleaseRequestScreen() {
           btn2="Konfirmasi"
         />
       )}
-    </SafeAreaView>
+    </View >
   );
 }

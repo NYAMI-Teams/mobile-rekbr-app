@@ -68,8 +68,7 @@ export default function DataDiri() {
     village.trim() !== "";
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar style="dark" />
+    <View style={styles.container}>
 
       {/* Header */}
       <View style={styles.header}>
@@ -207,7 +206,7 @@ export default function DataDiri() {
             editable={false}
           />
         </View>
-        <View style={styles.content}>
+        <View style={styles.content} className="mb-4">
           <DropDownField
             title="Kelurahan / Desa"
             placeholder="Pilih kelurahan / desa anda"
@@ -238,7 +237,7 @@ export default function DataDiri() {
           </Text>
         </View>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 

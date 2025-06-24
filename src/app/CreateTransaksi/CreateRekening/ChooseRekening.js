@@ -29,6 +29,8 @@ import {
 } from "@/utils/api/seller";
 import { saveAccountBank } from "@/utils/api/bank";
 import { showToast } from "@/utils";
+import NavBackHeader from "@/components/NavBackHeader";
+import { Modalize } from "react-native-modalize";
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
 
@@ -63,6 +65,8 @@ export default function ChooseRekening() {
   const [isLoading, setIsLoading] = useState(false);
   const slideAnim = useRef(new Animated.Value(250)).current;
 
+  const modalizeRef = useRef(null);
+
   useEffect(() => {
     fetchBankAccount();
     fetchBankList();
@@ -71,14 +75,18 @@ export default function ChooseRekening() {
   const fetchBankAccount = async () => {
     try {
       const res = await getListBankAccount();
+      console.log(res);
       if (res) {
         setSaved(res.data);
         return res.data;
       }
     } catch (error) {
+      if (error?.message == "Tidak ada akun yang ditemukan") {
+        return
+      }
       showToast(
         "Gagal",
-        "Gagal mengambil data rekening. Silahkan coba lagi.",
+        error.message || "Gagal mengambil data rekening. Silahkan coba lagi.",
         "error"
       );
     }
@@ -118,8 +126,12 @@ export default function ChooseRekening() {
     }
   };
 
+  const openModal = () => {
+    modalizeRef.current?.open();
+  }
+
   const closeModal = () => {
-    setModalVisible(false);
+    modalizeRef.current?.close();
   };
 
   const handleKeyPress = (key) => {
@@ -196,19 +208,9 @@ export default function ChooseRekening() {
   const isSavedEmpty = saved.length === 0;
 
   return (
-    <SafeAreaProvider>
-      <SafeAreaView style={styles.safeArea}>
-        <View style={styles.appBar}>
-          <TouchableOpacity
-            style={styles.backButton}
-            onPress={() => router.back()}>
-            <Image
-              source={require("@/assets/icon-back.png")}
-              style={styles.backIcon}
-            />
-          </TouchableOpacity>
-          <Text style={styles.appBarTitle}>Pilih Rekening Kamu</Text>
-        </View>
+    <>
+      <View className="flex-1 w-full h-full bg-white">
+        <NavBackHeader title={"Pilih Rekening Kamu"} onBackPress={() => router.back()} />
 
         <View style={styles.topBackground}>
           <Image
@@ -289,198 +291,179 @@ export default function ChooseRekening() {
           <TouchableOpacity
             style={styles.addButton}
             onPress={() => {
-              setModalVisible(true);
+              openModal();
             }}>
             <Text style={styles.addButtonText}>+ Rekening</Text>
           </TouchableOpacity>
         </View>
+      </View>
 
-        <View className="flex-1 w-full h-full">
-          <Modal
-            animationType="slide"
-            transparent={true}
-            visible={modalVisible}
-            onRequestClose={() => {
-              closeModal();
-            }}>
-            <View className="bg-black/50 w-full h-full">
-              <Animated.View
-                style={{ transform: [{ translateY: slideAnim }] }}
-                className="bg-white px-5 pt-5 pb-8 rounded-t-3xl">
-                <Pressable
-                  onPress={
-                    isAlreadyCheckedRekening
-                      ? handleBackToInputRekening
-                      : isSelectBankDone
-                      ? handleBackToBankSelection
-                      : closeModal
-                  }>
-                  <View className="flex-row items-center mb-6">
-                    <ChevronLeftCircle size={24} color="#00C2C2" />
-                    <Text className="text-lg font-normal text-gray-800 ml-2">
-                      {!isSelectBankDone
-                        ? "Pilih Bank Kamu"
-                        : !isAlreadyCheckedRekening
-                        ? "Masukan No Rekening Kamu"
-                        : "Rekening Kamu Ditemukan"}
-                    </Text>
+      <Modalize
+        ref={modalizeRef}
+        adjustToContentHeight
+        scrollViewProps={{ nestedScrollEnabled: true }}
+        handleStyle={{
+          backgroundColor: "#ccc",
+          width: 60,
+          alignSelf: "center",
+          top: 32,
+        }}
+        modalStyle={{
+          borderTopLeftRadius: 20,
+          borderTopRightRadius: 20,
+          backgroundColor: "#fff",
+          paddingHorizontal: 24,
+          paddingVertical: 32,
+        }}
+      >
+        {/* Gunakan View pembungkus dengan margin/padding seperlunya */}
+        <View className="bg-white">
+          {/* Header dan tombol back */}
+          <Pressable onPress={isAlreadyCheckedRekening
+            ? handleBackToInputRekening
+            : isSelectBankDone
+              ? handleBackToBankSelection
+              : closeModal
+          }>
+            <View className="flex-row items-center mb-6">
+              <ChevronLeftCircle size={24} color="#00C2C2" />
+              <Text className="text-lg font-normal text-gray-800 ml-2">
+                {!isSelectBankDone
+                  ? "Pilih Bank Kamu"
+                  : !isAlreadyCheckedRekening
+                    ? "Masukan No Rekening Kamu"
+                    : "Rekening Kamu Ditemukan"}
+              </Text>
+            </View>
+          </Pressable>
+
+          {/* === State 1: Pilih Bank === */}
+          {!isSelectBankDone ? (
+            <BankSelector
+              banks={bankList}
+              onSelectBank={(bank) => {
+                setSelectedBank({
+                  logoUrl: bank.logoUrl,
+                  bankName: bank.bankName,
+                  bankId: bank.id,
+                });
+                setIsSelectBankDone(true);
+              }}
+            />
+          ) : !isAlreadyCheckedRekening ? (
+            <>
+              {/* === State 2: Masukkan No Rekening === */}
+              {selectedBank && (
+                <View className="flex-row items-center mt-2 mb-2 gap-4">
+                  <View className="w-20 h-10 rounded bg-[#EDFBFA] justify-center items-center py-2">
+                    <Image
+                      source={{ uri: selectedBank.logoUrl }}
+                      className="w-12 h-12 object-contain"
+                      resizeMode="contain"
+                    />
                   </View>
-                </Pressable>
+                  <Text className="text-base font-normal">
+                    {selectedBank.bankName}
+                  </Text>
+                </View>
+              )}
 
-                {!isSelectBankDone ? (
-                  // <View className="bg-red-300">
-                  <BankSelector
-                    banks={bankList}
-                    onSelectBank={(bank) => {
-                      setSelectedBank({
-                        logoUrl: bank.logoUrl,
-                        bankName: bank.bankName,
-                        bankId: bank.id,
-                      });
-                      setIsSelectBankDone(true);
+              <View className="mt-2">
+                <Text className="text-sm font-normal mb-1">
+                  Nomor Rekening
+                </Text>
+                <TextInput
+                  value={accountNumber}
+                  placeholder="Contoh : 00900604501"
+                  editable={false}
+                  className="border border-gray-300 rounded-lg px-4 py-3 text-base bg-gray-100 text-black"
+                />
+              </View>
+
+              {/* Keypad */}
+              <View className="w-full items-center justify-center">
+                <View className="flex-row flex-wrap justify-center items-center mt-8 px-6 w-[80%]">
+                  {keys.map((key, index) => {
+                    if (index < 9) {
+                      return (
+                        <View key={index} className="w-1/3 items-center justify-center mb-4">
+                          <TouchableOpacity
+                            onPress={() => handleKeyPress(key)}
+                            className="size-[62px] rounded-full bg-white border border-gray-300 justify-center items-center shadow-sm"
+                          >
+                            <Text className="text-2xl font-normal text-gray-800">
+                              {key}
+                            </Text>
+                          </TouchableOpacity>
+                        </View>
+                      );
+                    }
+                    if (index === 9) {
+                      return (
+                        <View key="last-row" className="flex-row w-full justify-around items-center mt-2">
+                          <View className="size-[62px] opacity-0" />
+                          <TouchableOpacity
+                            onPress={() => handleKeyPress("0")}
+                            className="size-[62px] rounded-full bg-white border border-gray-300 justify-center items-center shadow-sm"
+                          >
+                            <Text className="text-2xl font-normal text-gray-800">0</Text>
+                          </TouchableOpacity>
+                          <TouchableOpacity
+                            onPress={() => handleKeyPress("x")}
+                            className="size-[62px] rounded-full bg-white border border-gray-300 justify-center items-center shadow-sm"
+                          >
+                            <Text className="text-2xl font-normal text-gray-800">x</Text>
+                          </TouchableOpacity>
+                        </View>
+                      );
+                    }
+                    return null;
+                  })}
+                </View>
+              </View>
+
+              <TouchableOpacity
+                onPress={checkRekening}
+                className="bg-black rounded-lg py-4 mt-3 mb-6"
+              >
+                <Text className="text-white text-center font-semibold text-base">
+                  Cek Rekening
+                </Text>
+              </TouchableOpacity>
+            </>
+          ) : (
+            <>
+              {/* === State 3: Rekening ditemukan === */}
+              <View className="w-full bg-[#EAFBF8] rounded-2xl p-4 gap-2 mb-16">
+                <Text className="text-base font-medium">{accountName}</Text>
+                <View className="flex-row mt-2 gap-2 items-center">
+                  <Image
+                    source={{ uri: selectedBank.logoUrl }}
+                    style={{
+                      width: 60,
+                      height: 32,
+                      resizeMode: "contain",
                     }}
                   />
-                ) : // </View>
-                !isAlreadyCheckedRekening ? (
-                  <>
-                    {selectedBank && (
-                      <View className="flex-row items-center mt-2 mb-2 gap-4">
-                        <View className="w-20 h-10 rounded bg-[#EDFBFA] justify-center items-center py-2">
-                          <Image
-                            source={{ uri: selectedBank.logoUrl }}
-                            className="w-12 h-12 object-contain"
-                            resizeMode="contain"
-                          />
-                        </View>
-                        <Text className="text-base font-normal">
-                          {selectedBank.bankName}
-                        </Text>
-                      </View>
-                    )}
+                  <View className="flex-col justify-center p-2">
+                    <Text className="text-sm font-medium">{selectedBank.bankName}</Text>
+                    <Text className="text-sm font-normal">{formatAccountNumber(accountNumber)}</Text>
+                  </View>
+                </View>
+              </View>
 
-                    <View className="mt-2">
-                      <Text className="text-sm font-normal mb-1">
-                        Nomor Rekening
-                      </Text>
-                      <TextInput
-                        value={accountNumber}
-                        placeholder="Contoh : 00900604501"
-                        editable={false}
-                        className="border border-gray-300 rounded-lg px-4 py-3 text-base bg-gray-100 text-black"
-                      />
-                    </View>
-
-                    <View className="w-full items-center justify-center">
-                      <View className="flex-row flex-wrap justify-center items-center mt-8 px-6 w-[80%]">
-                        {keys.map((key, index) => {
-                          // Tombol 1-9
-                          if (index < 9) {
-                            return (
-                              <View
-                                key={index}
-                                className="w-1/3 items-center justify-center mb-4">
-                                <TouchableOpacity
-                                  onPress={() => handleKeyPress(key)}
-                                  className="size-[62px] aspect-square rounded-full bg-white border border-gray-300 justify-center items-center shadow-sm">
-                                  <Text className="text-2xl font-normal text-gray-800">
-                                    {key}
-                                  </Text>
-                                </TouchableOpacity>
-                              </View>
-                            );
-                          }
-
-                          // Tombol baris terakhir (0 dan x)
-                          if (index === 9) {
-                            return (
-                              <View
-                                key="last-row"
-                                className="flex-row w-full justify-around items-center mt-2">
-                                {/* Spacer kiri biar seimbang */}
-                                <View className="size-[62px] aspect-square opacity-0" />
-
-                                {/* Tombol 0 */}
-                                <TouchableOpacity
-                                  onPress={() => handleKeyPress("0")}
-                                  className="size-[62px] aspect-square rounded-full bg-white border border-gray-300 justify-center items-center shadow-sm">
-                                  <Text className="text-2xl font-normal text-gray-800">
-                                    0
-                                  </Text>
-                                </TouchableOpacity>
-
-                                {/* Tombol x */}
-                                <TouchableOpacity
-                                  onPress={() => handleKeyPress("x")}
-                                  className="size-[62px] aspect-square rounded-full bg-white border border-gray-300 justify-center items-center shadow-sm">
-                                  <Text className="text-2xl font-normal text-gray-800">
-                                    x
-                                  </Text>
-                                </TouchableOpacity>
-                              </View>
-                            );
-                          }
-
-                          return null;
-                        })}
-                      </View>
-                    </View>
-
-                    <TouchableOpacity
-                      onPress={checkRekening}
-                      className="bg-black rounded-lg py-4 mt-3">
-                      <Text className="text-white text-center font-semibold text-base">
-                        Cek Rekening
-                      </Text>
-                    </TouchableOpacity>
-                  </>
-                ) : (
-                  <Animated.View className="w-full h-[75%] items-start mb-4 justify-between ">
-                    <View className="w-full h-36 bg-[#EAFBF8] rounded-2xl p-4">
-                      <View
-                        style={{
-                          flexDirection: "row",
-                          alignItems: "flex-start",
-                          flex: 1,
-                          justifyContent: "flex-start",
-                        }}>
-                        <View className="flex-col gap-2 w-full">
-                          <Text className="text-base font-medium">
-                            {accountName}
-                          </Text>
-                          <View className="flex-row mt-2 justify-start items-center gap-2">
-                            <Image
-                              source={{ uri: selectedBank.logoUrl }}
-                              style={{
-                                width: 60,
-                                height: 32,
-                                resizeMode: "contain",
-                              }}
-                            />
-                            <View className="flex-col justify-center items-start p-2">
-                              <Text className="text-sm font-medium">
-                                {selectedBank.bankName}
-                              </Text>
-                              <Text className="text-sm font-normal">
-                                {formatAccountNumber(accountNumber)}
-                              </Text>
-                            </View>
-                          </View>
-                        </View>
-                      </View>
-                    </View>
-                    <PrimaryButton
-                      onPress={() => handleToCreateRekbr()}
-                      title="Simpan dan Gunakan Rekening"
-                      disabled={isLoading}
-                    />
-                  </Animated.View>
-                )}
-              </Animated.View>
-            </View>
-          </Modal>
+              <View className="mb-6">
+                <PrimaryButton
+                  onPress={handleToCreateRekbr}
+                  title="Simpan dan Gunakan Rekening"
+                  disabled={isLoading}
+                />
+              </View>
+            </>
+          )}
         </View>
-      </SafeAreaView>
-    </SafeAreaProvider>
+      </Modalize>
+    </>
   );
 }
 
@@ -559,13 +542,6 @@ const styles = StyleSheet.create({
   accountItemContainer: {
     marginBottom: 16,
     width: "100%",
-  },
-  safeArea: {
-    flex: 1,
-    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
-    backgroundColor: "#fff",
-    justifyContent: "center",
-    // alignItems: "center",
   },
   appBar: {
     flexDirection: "row",

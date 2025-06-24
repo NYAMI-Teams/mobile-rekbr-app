@@ -65,7 +65,7 @@ const StepProgressBar = ({ currentStep, steps }) => {
 const styles = StyleSheet.create({
     container: {
         flexDirection: "row",
-        alignItems: "center",
+        alignItems: "start",
         paddingHorizontal: 10,
         marginVertical: 20,
         marginBottom: 16,
@@ -83,6 +83,7 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         backgroundColor: "white",
+        zIndex: 1,
     },
     completedCircle: {
         backgroundColor: "#EDFBFA",
@@ -106,11 +107,13 @@ const styles = StyleSheet.create({
         elevation: 4,
     },
     line: {
-        width: 200,
+        width: "100%",
         height: 2,
         backgroundColor: "#ccc",
         marginHorizontal: 5,
-        marginBottom: 10,
+        marginTop: 12,
+        marginHorizontal: -20,
+        zIndex: 0
     },
     completedLine: {
         backgroundColor: "#4CD7D0",
