@@ -7,7 +7,7 @@ import {
     TextInput,
     TouchableOpacity,
     Image,
-    FlatList,
+    ScrollView,
 } from 'react-native';
 import { Search } from 'lucide-react-native';
 
@@ -19,7 +19,7 @@ const BankSelector = ({ banks, onSelectBank }) => {
     );
 
     return (
-        <>
+        <View>
             <View className="flex-row items-center border border-gray-300 rounded-xl px-4 py-2 mb-5">
                 <TextInput
                     placeholder="Cari Bank"
@@ -35,12 +35,10 @@ const BankSelector = ({ banks, onSelectBank }) => {
                 Bank Terpopuler
             </Text>
 
-            <FlatList
-                data={filteredBanks}
-                keyExtractor={(item) => item.id}
-                className="mb-5 h-[50%]"
-                renderItem={({ item }) => (
+            <ScrollView className="mb-5" showsVerticalScrollIndicator={false}>
+                {filteredBanks?.map((item) => (
                     <TouchableOpacity
+                        key={item.id}
                         onPress={() => onSelectBank(item)}
                         className="flex-row items-center space-x-3 mb-5"
                     >
@@ -51,9 +49,9 @@ const BankSelector = ({ banks, onSelectBank }) => {
                         />
                         <Text className="text-xl text-gray-800 ml-3">{item.bankName}</Text>
                     </TouchableOpacity>
-                )}
-            />
-        </>
+                ))}
+            </ScrollView>
+        </View>
     );
 };
 

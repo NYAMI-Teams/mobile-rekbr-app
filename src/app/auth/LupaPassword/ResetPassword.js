@@ -80,7 +80,7 @@ export default function ChangePasswordScreen() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
+    <View style={{ flex: 1, backgroundColor: "#fff" }}>
       {/* Header */}
       <View className="flex-row justify-between items-center w-full px-4 pt-4">
         <TouchableOpacity onPress={handleBackBtn}>
@@ -97,14 +97,15 @@ export default function ChangePasswordScreen() {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}>
         <ScrollView
+          contentContainerStyle={{ flexGrow: 1 }}
           className="flex-1 w-full px-4 mt-5"
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
           hideKeyboardOnScroll={true}
           keyboardDismissMode="on-drag">
-          <View className="mt-4">
+          <View className="mt-4 gap-4 flex-1">
             {/* Password */}
-            <View className="relative mb-4">
+            <View className="relative">
               <InputField
                 title="Kata Sandi Baru Rekbr"
                 placeholder="Masukkan kata sandi baru kamu"
@@ -130,7 +131,7 @@ export default function ChangePasswordScreen() {
             </View>
 
             {/* Confirm Password */}
-            <View className="relative mb-4">
+            <View className="relative">
               <InputField
                 title="Konfirmasi Kata Sandi Baru Rekbr"
                 placeholder="Pastikan sama, ya!"
@@ -172,11 +173,10 @@ export default function ChangePasswordScreen() {
                     }
                   />
                   <Text
-                    className={`ml-2 text-sm ${
-                      konfirmasiKataSandiBaru === kataSandiBaru
-                        ? "text-green-600"
-                        : "text-red-400"
-                    }`}>
+                    className={`ml-2 text-sm ${konfirmasiKataSandiBaru === kataSandiBaru
+                      ? "text-green-600"
+                      : "text-red-400"
+                      }`}>
                     {konfirmasiKataSandiBaru === kataSandiBaru
                       ? "Kata sandi sesuai"
                       : "Kata sandi tidak sesuai"}
@@ -185,16 +185,17 @@ export default function ChangePasswordScreen() {
               )}
             </View>
           </View>
+          {/* Button */}
+          <View className="w-full pb-16">
+            <PrimaryButton
+              title="Kirim"
+              onPress={handleBtnPress}
+              disabled={isLoading ? false : !isPasswordValid()}
+            />
+          </View>
         </ScrollView>
       </KeyboardAvoidingView>
-      {/* Button */}
-      <View className="w-full px-4 py-4">
-        <PrimaryButton
-          title="Kirim"
-          onPress={handleBtnPress}
-          disabled={isLoading ? false : !isPasswordValid()}
-        />
-      </View>
+
 
       {showPopup && (
         <BuyerKonfirmasi
@@ -206,6 +207,6 @@ export default function ChangePasswordScreen() {
           btn2="Kirim"
         />
       )}
-    </SafeAreaView>
+    </View>
   );
 }

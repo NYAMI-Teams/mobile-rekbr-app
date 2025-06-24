@@ -91,7 +91,7 @@ export default function ChangePasswordScreen() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
+    <View style={{ flex: 1, backgroundColor: "#fff" }}>
       {/* Header */}
       <View className="flex-row justify-between items-center w-full px-4 pt-4">
         <TouchableOpacity onPress={handleBackBtn}>
@@ -106,14 +106,16 @@ export default function ChangePasswordScreen() {
       {/* Content */}
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={{ flex: 1 }}>
+        keyboardVerticalOffset={Platform.OS === 'ios' && 60}
+        style={{ flex: 1 }}
+      >
         <ScrollView
-          className="flex-1 w-full px-4 mt-5"
+          className="px-4 mt-5"
+          contentContainerStyle={{ flexGrow: 1 }}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
-          hideKeyboardOnScroll={true}
-          keyboardDismissMode="on-drag">
-          <View className="mt-4">
+        >
+          <View className="mt-4 flex-1">
             <View className="relative mb-4">
               <InputField
                 title="Kata Sandi Rekbr Saat Ini"
@@ -207,11 +209,10 @@ export default function ChangePasswordScreen() {
                     }
                   />
                   <Text
-                    className={`ml-2 text-sm ${
-                      konfirmasiKataSandiBaru === kataSandiBaru
-                        ? "text-green-600"
-                        : "text-red-400"
-                    }`}>
+                    className={`ml-2 text-sm ${konfirmasiKataSandiBaru === kataSandiBaru
+                      ? "text-green-600"
+                      : "text-red-400"
+                      }`}>
                     {konfirmasiKataSandiBaru === kataSandiBaru
                       ? "Kata sandi sesuai"
                       : "Kata sandi tidak sesuai"}
@@ -220,16 +221,17 @@ export default function ChangePasswordScreen() {
               )}
             </View>
           </View>
+          {/* Button */}
+          <View className="w-full py-4 mb-16">
+            <PrimaryButton
+              title="Kirim"
+              onPress={handleBtnPress}
+              disabled={isLoading ? false : !isPasswordValid()}
+            />
+          </View>
         </ScrollView>
       </KeyboardAvoidingView>
-      {/* Button */}
-      <View className="w-full px-4 py-4">
-        <PrimaryButton
-          title="Kirim"
-          onPress={handleBtnPress}
-          disabled={isLoading ? false : !isPasswordValid()}
-        />
-      </View>
+
 
       {showPopup && (
         <BuyerKonfirmasi
@@ -241,6 +243,6 @@ export default function ChangePasswordScreen() {
           btn2="Konfirmasi"
         />
       )}
-    </SafeAreaView>
+    </View>
   );
 }

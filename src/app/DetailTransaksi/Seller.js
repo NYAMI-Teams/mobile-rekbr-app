@@ -20,6 +20,7 @@ import { cancelTransaksiSeller } from "@/utils/api/seller";
 import { getDetailSellerTransaction } from "@/utils/api/seller";
 import BuyerKonfirmasi from "@/components/BuyerKonfirmasi";
 import { showToast } from "@/utils";
+import NavBackHeader from "@/components/NavBackHeader";
 
 export default function DetailTransaksiSeller() {
   const { id } = useLocalSearchParams();
@@ -294,7 +295,7 @@ export default function DetailTransaksiSeller() {
             btnColor="#FEF0E9"
             textColor="#000"
           />
-          <View className="flex-row w-9/12 items-center justify-between px-3">
+          <View className="flex-row items-center px-3 gap-3">
             <Text className="text-sm items-start justify-start text-[#616161]">
               Terdapat kendala?
             </Text>
@@ -333,7 +334,7 @@ export default function DetailTransaksiSeller() {
               width={"45%"}
             />
           </View>
-          <View className="flex-row w-9/12 items-center justify-between px-3">
+          <View className="flex-row items-center px-3 gap-3">
             <Text className="text-sm items-start justify-start text-[#616161]">
               Terdapat kendala?
             </Text>
@@ -398,15 +399,9 @@ export default function DetailTransaksiSeller() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()}>
-          <Ionicons name="chevron-back-outline" size={24} color="#000" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Detail Transaksi</Text>
-        <View style={{ width: 24 }} />
-      </View>
+      <NavBackHeader title={"Detail Rekber Seller"} />
       {(() => {
         const steps = ["Transfer", "Dikemas", "Dikirim", "Diterima"];
         let currentStep = 0;
@@ -448,13 +443,12 @@ export default function DetailTransaksiSeller() {
                   {status == "pending_payment" ? "Virtual Account" : "No Resi"}
                 </Text>
                 <View
-                  className={`flex-row items-center ${
-                    status == "waiting_shipment" ||
-                    status == "shipped" ||
-                    status == "completed"
+                  className={`flex-row items-center ${status == "waiting_shipment" ||
+                      status == "shipped" ||
+                      status == "completed"
                       ? "mb-3"
                       : ""
-                  }`}>
+                    }`}>
                   <Text style={{ fontSize: 17, fontWeight: "500" }}>
                     {status == "pending_payment"
                       ? data?.virtualAccount || "-"
@@ -507,10 +501,10 @@ export default function DetailTransaksiSeller() {
                   {status == "completed"
                     ? "Komplain dianggap tidak ada dan bakal selesai otomatis kalau pembeli nggak respon."
                     : data?.fundReleaseRequest?.status == "pending"
-                    ? "Tunggu approval kami, ya! Kalau bukti kamu oke, permintaan konfirmasi bakal langsung dikirim ke buyer!"
-                    : data?.fundReleaseRequest?.status == "approved"
-                    ? "Konfirmasi udah dikirim ke buyer! Sekarang tinggal tunggu respon mereka dalam 1 x 24 jam"
-                    : "Permintaan konfirmasi ke buyer ditolak. Pastikan data atau bukti yang kamu kirim sudah lengkap dan sesuai"}
+                      ? "Tunggu approval kami, ya! Kalau bukti kamu oke, permintaan konfirmasi bakal langsung dikirim ke buyer!"
+                      : data?.fundReleaseRequest?.status == "approved"
+                        ? "Konfirmasi udah dikirim ke buyer! Sekarang tinggal tunggu respon mereka dalam 1 x 24 jam"
+                        : "Permintaan konfirmasi ke buyer ditolak. Pastikan data atau bukti yang kamu kirim sudah lengkap dan sesuai"}
                 </Text>
               </View>
             </>
@@ -518,7 +512,7 @@ export default function DetailTransaksiSeller() {
 
         {/* Status Rekbr (done)*/}
         {data?.fundReleaseRequest?.status == "pending" ||
-        data?.fundReleaseRequest?.status == "rejected" ? (
+          data?.fundReleaseRequest?.status == "rejected" ? (
           <View className="flex-col  gap-2 mx-3 p-3">
             <View className="flex-row justify-between">
               <Text className="text-[15px]">Status Rekbr:</Text>
@@ -687,7 +681,7 @@ export default function DetailTransaksiSeller() {
         </View>
       </ScrollView>
       {/* Footer (done)*/}
-      <View className="p-3 border-t-2 rounded-t-3xl border-x-2 border-gray-200 drop-shadow-xl items-center">
+      <View className="p-3 border-t-2 rounded-t-3xl border-x-2 border-gray-200 drop-shadow-xl items-center mb-6">
         {setupFooter()}
       </View>
 
@@ -704,7 +698,7 @@ export default function DetailTransaksiSeller() {
             isBatalkan={true}
           />
         )}
-    </SafeAreaView>
+    </View>
   );
 }
 

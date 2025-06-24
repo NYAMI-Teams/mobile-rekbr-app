@@ -1,17 +1,17 @@
-import React from "react";
+import React, { Fragment } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons"; // ganti di sini
 
 const StepProgressBar = ({ currentStep, steps }) => {
   return (
-    <View style={styles.container}>
+    <View className="flex-row items-start justify-center px-4 my-5 mb-4 mx-4">
       {steps.map((label, index) => {
         const isCompleted = index < currentStep;
         const isActive = index === currentStep;
         const isFinalStep = isActive && currentStep === steps.length - 1;
 
         return (
-          <React.Fragment key={index}>
+          <Fragment key={index}>
             <View style={styles.stepContainer}>
               <View
                 style={[
@@ -48,14 +48,9 @@ const StepProgressBar = ({ currentStep, steps }) => {
               </Text>
             </View>
             {index !== steps.length - 1 && (
-              <View
-                style={[
-                  styles.line,
-                  index < currentStep && styles.completedLine,
-                ]}
-              />
+              <View style={[styles.line, index < currentStep && styles.completedLine]} />
             )}
-          </React.Fragment>
+          </Fragment>
         );
       })}
     </View>
@@ -83,6 +78,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "white",
+    zIndex: 1,
   },
   completedCircle: {
     backgroundColor: "#EDFBFA",
@@ -106,11 +102,12 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   line: {
-    width: 40,
+    width: 80,
     height: 2,
     backgroundColor: "#ccc",
-    marginHorizontal: 5,
-    marginBottom: 10,
+    marginHorizontal: -13,
+    marginTop: 12,
+    zIndex: 0,
   },
   completedLine: {
     backgroundColor: "#4CD7D0",

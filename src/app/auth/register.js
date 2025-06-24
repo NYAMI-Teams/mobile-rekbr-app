@@ -30,13 +30,13 @@ export default function Register() {
   const [isChecked, setIsChecked] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  // useEffect(() => {
-  //   //dev (DELETE)
-  //   setEmail("bayuseptyan43@gmail.com");
-  //   setPassword("Mobilmerah123#");
-  //   setConfirmPassword("Mobilmerah123#");
-  //   setIsChecked(true);
-  // }, []);
+  useEffect(() => {
+    //development (DELETE)
+    // setEmail("danilardi13@gmail.com");
+    // setPassword("Mobilmerah123#");
+    // setConfirmPassword("Mobilmerah123#");
+    // setIsChecked(true);
+  }, []);
 
   const togglePasswordVisibility = () => {
     setIsPasswordVisible(!isPasswordVisible);
@@ -88,16 +88,16 @@ export default function Register() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <View className="flex-1 bg-white">
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={Platform.OS === 'ios' && 60}
         style={{ flex: 1 }}>
         <ScrollView
           contentContainerStyle={{ flexGrow: 1 }}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
-          hideKeyboardOnScroll={true}
-          keyboardDismissMode="on-drag">
+          >
           <View className="bg-white items-center mb-2">
             <Image
               source={require("../../assets/header.png")}
@@ -260,7 +260,7 @@ export default function Register() {
               </View>
             </View>
 
-            <View className="flex-row items-center space-x-1 mt-4">
+            <View className="flex-row items-center space-x-1 mt-4 pb-5">
               <Text className="text-xs text-gray-600">Powered by</Text>
               <Image
                 source={require("../../assets/326.png")}
@@ -274,6 +274,6 @@ export default function Register() {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </View>
   );
 }

@@ -7,7 +7,7 @@ import CountdownTimer from "../Countdown";
 const TimestampDetail = ({ status, date }) => {
   const formatDateWIB = (dateTime) => {
     if (!dateTime) return "Invalid date";
-    return moment(dateTime).utcOffset(0).format("DD MMMM YYYY, HH:mm [WIB]");
+    return moment(dateTime).utcOffset(7).format("DD MMMM YYYY, HH:mm [WIB]");
   };
 
   return (
@@ -41,7 +41,7 @@ const TimestampDetail = ({ status, date }) => {
 const Timestamp = ({ data, caption, date, details = [] }) => {
   const formatDateWIB = (dateTime) => {
     if (!dateTime) return "Invalid date";
-    return moment(dateTime).utcOffset(0).format("DD MMMM YYYY, HH:mm [WIB]");
+    return moment(dateTime).utcOffset(7).format("DD MMMM YYYY, HH:mm [WIB]");
   };
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -101,11 +101,11 @@ const Timestamp = ({ data, caption, date, details = [] }) => {
         {/* Countdown */}
         {(data?.status == "shipped" &&
           data?.fundReleaseRequest?.status != "approved") ||
-        (data?.status == "completed" &&
-          (data?.fundReleaseRequest?.status == "approved" ||
-            data?.fundReleaseRequest?.status == null)) ||
-        data?.status == "canceled" ||
-        data?.status == "refunded" ? null : (
+          (data?.status == "completed" &&
+            (data?.fundReleaseRequest?.status == "approved" ||
+              data?.fundReleaseRequest?.status == null)) ||
+          data?.status == "canceled" ||
+          data?.status == "refunded" ? null : (
           <View
             style={{
               flexDirection: "row",
@@ -146,26 +146,26 @@ const Timestamp = ({ data, caption, date, details = [] }) => {
           padding:
             (data?.status == "shipped" &&
               data?.fundReleaseRequest?.status != "approved") ||
-            (data?.status == "completed" &&
-              (data?.fundReleaseRequest?.status == "approved" ||
-                data?.fundReleaseRequest?.status == null))
+              (data?.status == "completed" &&
+                (data?.fundReleaseRequest?.status == "approved" ||
+                  data?.fundReleaseRequest?.status == null))
               ? 0
               : 16,
           backgroundColor:
             (data?.status == "shipped" &&
               data?.fundReleaseRequest?.status != "approved") ||
-            (data?.status == "completed" &&
-              (data?.fundReleaseRequest?.status == "approved" ||
-                data?.fundReleaseRequest?.status == null))
+              (data?.status == "completed" &&
+                (data?.fundReleaseRequest?.status == "approved" ||
+                  data?.fundReleaseRequest?.status == null))
               ? "#fff"
               : "#FEF2D3",
           alignItems: "center",
         }}>
         {(data?.status == "shipped" &&
           data?.fundReleaseRequest?.status != "approved") ||
-        (data?.status == "completed" &&
-          (data?.fundReleaseRequest?.status == "approved" ||
-            data?.fundReleaseRequest?.status == null)) ? null : (
+          (data?.status == "completed" &&
+            (data?.fundReleaseRequest?.status == "approved" ||
+              data?.fundReleaseRequest?.status == null)) ? null : (
           <Image
             source={require("../../assets/timer.png")}
             style={{ width: 24, height: 24 }}
@@ -176,9 +176,9 @@ const Timestamp = ({ data, caption, date, details = [] }) => {
             marginLeft:
               (data?.status == "shipped" &&
                 data?.fundReleaseRequest?.status != "approved") ||
-              (data?.status == "completed" &&
-                (data?.fundReleaseRequest?.status == "approved" ||
-                  data?.fundReleaseRequest?.status == null))
+                (data?.status == "completed" &&
+                  (data?.fundReleaseRequest?.status == "approved" ||
+                    data?.fundReleaseRequest?.status == null))
                 ? 0
                 : 10,
             fontSize: 17,

@@ -8,11 +8,6 @@
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "scheme": "mobile-rekbr-app",
-    "splash": {
-      "image": "./src/assets/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
     "ios": {
       "supportsTablet": true
     },

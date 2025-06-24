@@ -73,7 +73,7 @@ export default function ChangeEmailScreen() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
+    <View style={{ flex: 1, backgroundColor: "#fff" }}>
       {/* Header */}
       <View className="flex-row justify-between items-center w-full px-4 pt-4">
         <TouchableOpacity onPress={handleBackBtn}>
@@ -88,14 +88,16 @@ export default function ChangeEmailScreen() {
       {/* Content */}
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={{ flex: 1 }}>
+        keyboardVerticalOffset={Platform.OS === 'ios' && 60}
+        style={{ flex: 1 }}
+      >
         <ScrollView
-          className="flex-1 w-full px-4 mt-5"
+          className="px-4 mt-5"
+          contentContainerStyle={{ flexGrow: 1 }}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
-          hideKeyboardOnScroll={true}
-          keyboardDismissMode="on-drag">
-          <>
+        >
+          <View className="flex-1">
             {/* Email Saat Ini */}
             <View className="relative mb-4">
               <InputField
@@ -126,13 +128,12 @@ export default function ChangeEmailScreen() {
                   }
                 />
                 <Text
-                  className={`ml-2 text-sm ${
-                    isEmailValid(emailSaatIni)
-                      ? emailSaatIniValid
-                        ? "text-green-600"
-                        : "text-yellow-600"
-                      : "text-red-400"
-                  }`}>
+                  className={`ml-2 text-sm ${isEmailValid(emailSaatIni)
+                    ? emailSaatIniValid
+                      ? "text-green-600"
+                      : "text-yellow-600"
+                    : "text-red-400"
+                    }`}>
                   {isEmailValid(emailSaatIni)
                     ? emailSaatIniValid
                       ? "Email Ditemukan"
@@ -159,11 +160,10 @@ export default function ChangeEmailScreen() {
                     color={isEmailValid(emailBaru) ? "#4ade80" : "#f87171"}
                   />
                   <Text
-                    className={`ml-2 text-sm ${
-                      isEmailValid(emailBaru)
-                        ? "text-green-600"
-                        : "text-red-400"
-                    }`}>
+                    className={`ml-2 text-sm ${isEmailValid(emailBaru)
+                      ? "text-green-600"
+                      : "text-red-400"
+                      }`}>
                     {isEmailValid(emailBaru)
                       ? "Email valid"
                       : "Email tidak valid"}
@@ -171,18 +171,18 @@ export default function ChangeEmailScreen() {
                 </View>
               </View>
             )}
-          </>
+          </View>
+          {/* Button */}
+          <View className="w-full py-4 mb-8">
+            <PrimaryButton
+              title={`${checkEmailSaatIniBtn ? "Email Baru" : "Check Email Saat Ini"
+                }`}
+              onPress={handleBtnPress}
+            />
+          </View>
         </ScrollView>
       </KeyboardAvoidingView>
-      {/* Button */}
-      <View className="w-full px-4 py-4">
-        <PrimaryButton
-          title={`${
-            checkEmailSaatIniBtn ? "Email Baru" : "Check Email Saat Ini"
-          }`}
-          onPress={handleBtnPress}
-        />
-      </View>
-    </SafeAreaView>
+
+    </View>
   );
 }

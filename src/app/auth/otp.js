@@ -3,16 +3,13 @@ import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
-  TextInput,
   TouchableOpacity,
-  StyleSheet,
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Icon from "react-native-vector-icons/Ionicons";
 import { PinInput } from "@pakenfit/react-native-pin-input";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
   verifyEmail,
@@ -83,8 +80,6 @@ export default function OTP() {
           setIsLoading(false);
         });
     } else if (isFromResetPassword) {
-      console.log("hitted from reset password", otpValue);
-
       resetPasswordOTP(email, otpValue)
         .then((res) => {
           showToast("Berhasil", res?.message, "success");
@@ -94,8 +89,6 @@ export default function OTP() {
           });
         })
         .catch((error) => {
-          console.log(error, "error from reset password otp");
-
           setIsError(true);
           setErrorMessage("Kode OTP yang Anda masukkan salah.");
           showToast("Gagal", error?.message, "error");
@@ -126,34 +119,36 @@ export default function OTP() {
   };
 
   return (
-    <SafeAreaView className="bg-white flex-1 p-4">
+    <View className="flex-1 bg-white p-4">
       <GestureHandlerRootView>
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : undefined}
-          style={styles.container}>
+          className="flex-1 items-center">
           {/* Header */}
-          <View style={styles.header}>
+          <View className="flex-row items-center justify-between w-full mb-4">
             <TouchableOpacity onPress={() => router.back()}>
               <Icon name="chevron-back" size={24} color="#000" />
             </TouchableOpacity>
-            <Text style={styles.title}>Verifikasi Email Kamu</Text>
+            <Text className="text-lg font-semibold text-center flex-1">
+              Verifikasi Email Kamu
+            </Text>
             <View style={{ width: 24 }} />
           </View>
 
           {/* OTP Card */}
-          <View style={styles.card}>
-            <Text style={styles.subtitle}>
+          <View className="w-full bg-white rounded-2xl p-5 items-center">
+            <Text className="w-full text-[18px] text-[#333] text-left font-medium pb-1">
               Masukkan kode yang kami kirimkan
             </Text>
-            <View className="flex-col items-center">
-              <Text style={styles.emailInfo}>
+            <View className="flex-col items-center w-full">
+              <Text className="w-full text-sm text-[#616161] text-left">
                 Sudah dikirim ke email kamu
-                <Text style={styles.email}> {email}</Text>
+                <Text className="font-medium text-[#111] text-base"> {email}</Text>
               </Text>
             </View>
 
             {/* OTP Input */}
-            <View style={styles.otpContainer}>
+            <View className="flex-col justify-center items-center py-6">
               <PinInput
                 length={6}
                 onFillEnded={(otp) => submitOtp(otp)}
@@ -164,141 +159,49 @@ export default function OTP() {
                   borderColor: isValid
                     ? "#009688"
                     : isError
-                    ? "#FF3B30"
-                    : "#ccc",
+                      ? "#FF3B30"
+                      : "#ccc",
                   borderRadius: 8,
                   textAlign: "center",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  fontSize: 16,
+                  fontSize: 16, // lebih besar
                 }}
+                
               />
               <Text
-                style={[
-                  styles.timer,
-                  { color: timeLeft > 0 ? "#000" : "#FF3B30" },
-                ]}>
+                className={`text-sm font-medium mt-4 mb-4 ${timeLeft > 0 ? "text-black" : "text-red-500"
+                  }`}
+              >
                 {formatTime(timeLeft)}
               </Text>
             </View>
 
             {isError && (
-              <Text style={{ color: "#FF3B30", fontSize: 12, marginTop: 4 }}>
-                {errorMessage}
-              </Text>
+              <Text className="text-red-500 text-sm mt-1">{errorMessage}</Text>
             )}
 
-            <View style={styles.resendContainer}>
-              <Text style={styles.resendText}>Tidak menerima kode?</Text>
+            <View className="flex-row items-center mt-4">
+              <Text className="text-sm text-black">Tidak menerima kode?</Text>
               <TouchableOpacity
                 onPress={handleResendCode}
-                disabled={timeLeft > 0}>
+                disabled={timeLeft > 0}
+              >
                 <Text
-                  style={[
-                    styles.resendLink,
-                    { color: timeLeft > 0 ? "#aaa" : "#007AFF" },
-                  ]}>
+                  className={`text-sm underline ml-1 ${timeLeft > 0 ? "text-gray-400" : "text-blue-500"
+                    }`}
+                >
                   Klik untuk kirim ulang
                 </Text>
               </TouchableOpacity>
             </View>
 
             <TouchableOpacity onPress={() => router.back()}>
-              <Text style={styles.errorLink}>Salah alamat email?</Text>
+              <Text className="text-sm text-blue-500 mt-2 underline">
+                Salah alamat email?
+              </Text>
             </TouchableOpacity>
           </View>
         </KeyboardAvoidingView>
       </GestureHandlerRootView>
-    </SafeAreaView>
+    </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "start",
-    alignItems: "center",
-    backgroundColor: "#fff",
-  },
-  card: {
-    width: "100%",
-    height: "auto",
-    backgroundColor: "#fff",
-    borderRadius: 16,
-    padding: 20,
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    width: "100%",
-  },
-  title: {
-    fontSize: 16,
-    fontWeight: "600",
-    textAlign: "center",
-    flex: 1,
-  },
-  subtitle: {
-    width: "100%",
-    fontSize: 17,
-    color: "#333",
-    textAlign: "left",
-    fontWeight: "500",
-    paddingBottom: 4,
-  },
-  emailInfo: {
-    width: "100%",
-    fontSize: 12,
-    color: "#616161",
-    textAlign: "left",
-  },
-  email: {
-    fontWeight: "500",
-    color: "#111",
-  },
-  otpContainer: {
-    flexDirection: "col",
-    justifyContent: "center",
-    alignItems: "center",
-    width: 320,
-    paddingVertical: 24,
-  },
-  otpInput: {
-    width: 46,
-    height: 46,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 8,
-    textAlign: "center",
-    fontSize: 16,
-  },
-  timer: {
-    fontSize: 12,
-    marginTop: 16,
-    marginBottom: 16,
-    fontWeight: "500",
-  },
-  resendContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginTop: 16,
-  },
-  resendText: {
-    fontSize: 12,
-    color: "#000",
-  },
-  resendLink: {
-    fontSize: 12,
-    marginLeft: 4,
-    textDecorationLine: "underline",
-  },
-  errorLink: {
-    fontSize: 12,
-    color: "#007AFF",
-    marginTop: 8,
-    textDecorationLine: "underline",
-  },
-});

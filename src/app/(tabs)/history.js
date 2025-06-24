@@ -19,45 +19,10 @@ import EmptyIllustration from "@/components/Ilustration";
 import { getHistoryBuyer } from "@/utils/api/buyer";
 import { getHistorySeller } from "@/utils/api/seller";
 
-export default function Home() {
+export default function History() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [profile, setProfile] = useState(null);
-
-  useEffect(() => {
-    checkAuth();
-  }, []);
-
-  const checkAuth = async () => {
-    setIsLoading(true);
-    try {
-      const token = await getAccessToken();
-      if (!token) {
-        handleLogout();
-        return;
-      }
-      const res = await getProfile();
-      setProfile(res.data);
-    } catch {
-      showToast(
-        "Sesi Berakhir",
-        "Sesi Anda telah berakhir. Silahkan login kembali.",
-        "error"
-      );
-      handleLogout();
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleLogout = async () => {
-    try {
-      await removeAccessToken();
-      router.replace("Onboarding");
-    } catch (err) {
-      showToast("Logout Gagal", "Gagal logout. Silahkan coba lagi.", "error");
-    }
-  };
 
   const [selectedTab, setSelectedTab] = useState("pembelian");
 
@@ -137,59 +102,46 @@ export default function Home() {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#fff" }}>
-      <StatusBar style="dark" />
-      <View style={{ flex: 1, padding: 16 }}>
-        <NavigationBar
-          name={profile?.email}
-          onNotificationPress={() =>
-            showToast("Notification pressed", "Notification pressed", "success")
-          }
-          onLogoutPress={() => handleLogout()}
-        />
-
-        {isLoading ? (
-          <View className="flex-1 justify-center items-center">
-            <ActivityIndicator size="large" color="#000" />
+    <View className="flex-1 bg-white">
+      {isLoading ? (
+        <View className="flex-1 justify-center items-center">
+          <ActivityIndicator size="large" color="#000" />
+        </View>
+      ) : (
+        <View className="bg-white items-center w-full gap-2">
+          <View className="flex-row w-full px-4 h-10">
+            <TouchableOpacity
+              onPress={() => handleTabPress("pembelian")}
+              className={`flex-1 items-center justify-center h-full ${selectedTab === "pembelian"
+                  ? "border-b-2 border-[#49DBC8]"
+                  : "border-b-2 border-gray-300"
+                }`}>
+              <Text
+                className={`text-xs font-semibold ${selectedTab === "pembelian" ? "text-black" : "text-gray-400"
+                  }`}>
+                Pembelian
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => handleTabPress("penjualan")}
+              className={`flex-1 items-center justify-center h-full ${selectedTab === "penjualan"
+                  ? "border-b-2 border-[#49DBC8]"
+                  : "border-b-2 border-gray-300"
+                }`}>
+              <Text
+                className={`text-xs font-semibold ${selectedTab === "penjualan" ? "text-black" : "text-gray-400"
+                  }`}>
+                Penjualan
+              </Text>
+            </TouchableOpacity>
           </View>
-        ) : (
-          <View className="bg-white items-center w-full h-[80%] gap-2">
-            <View className="flex-row w-full mt-4">
-              <TouchableOpacity
-                onPress={() => handleTabPress("pembelian")}
-                className={`flex-1 items-center justify-center h-8 ${
-                  selectedTab === "pembelian"
-                    ? "border-b-2 border-[#49DBC8]"
-                    : "border-b-2 border-gray-300"
-                }`}>
-                <Text
-                  className={`text-xs font-semibold ${
-                    selectedTab === "pembelian" ? "text-black" : "text-gray-400"
-                  }`}>
-                  Pembelian
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => handleTabPress("penjualan")}
-                className={`flex-1 items-center justify-center h-8 ${
-                  selectedTab === "penjualan"
-                    ? "border-b-2 border-[#49DBC8]"
-                    : "border-b-2 border-gray-300"
-                }`}>
-                <Text
-                  className={`text-xs font-semibold ${
-                    selectedTab === "penjualan" ? "text-black" : "text-gray-400"
-                  }`}>
-                  Penjualan
-                </Text>
-              </TouchableOpacity>
-            </View>
-            <ScrollView className="w-full" showsVerticalScrollIndicator={false}>
+          <ScrollView className="w-full px-4" showsVerticalScrollIndicator={false}>
+            <View className="mb-16">
               {renderContent()}
-            </ScrollView>
-          </View>
-        )}
-      </View>
+            </View>
+          </ScrollView>
+        </View>
+      )}
     </View>
   );
 }

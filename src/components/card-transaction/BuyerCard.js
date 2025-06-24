@@ -13,7 +13,7 @@ const BuyerCard = ({ data }) => {
   const [showPopup, setShowPopup] = useState(false);
   const formatDateWIB = (dateTime) => {
     if (!dateTime) return "Invalid date";
-    return moment(dateTime).utcOffset(0).format("DD MMMM YYYY, HH:mm [WIB]");
+    return moment(dateTime).utcOffset(7).format("DD MMMM YYYY, HH:mm [WIB]");
   };
   const router = useRouter();
   const status = data?.status;
@@ -268,8 +268,8 @@ const BuyerCard = ({ data }) => {
                   status === "completed"
                     ? "bg-green-400"
                     : status === "canceled"
-                    ? "bg-red-400"
-                    : "bg-yellow-400"
+                      ? "bg-red-400"
+                      : "bg-yellow-400"
                 )}
               />
               <Text className="font-poppins text-xs text-gray-800">
