@@ -7,31 +7,48 @@ import TextView from "../../../components/dispute/textView";
 import CopyField from "../../../components/dispute/copyField";
 import { StatusKomplain } from "../../../components/dispute/statusKomplain";
 import { TrackDispute } from "../../../components/dispute/TrackDispute";
+import { getDetailSellerComplaint } from "../../../utils/api/complaint";
+import { useEffect, useState } from "react";
+import { showToast, formatCurrency } from "../../../utils";
+import moment from "moment";
+
+const formatDateWIB = (dateTime) => {
+  if (!dateTime) return "Invalid date";
+  return moment(dateTime).utcOffset(7).format("DD MMMM YYYY, HH:mm [WIB]");
+};
 
 export default function AdminPage() {
   const router = useRouter();
-  const { status, rejectedAdmin } = useLocalSearchParams();
+  const { id, status, rejectedAdmin } = useLocalSearchParams();
+  const [detailComplaint, setDetailComplaint] = useState({});
 
-  const detailComplaint = {
-    transaction: {
-      sellerEmail: "sellerku@mail.com",
-      itemName: "Smart TV 50 Inch UHD",
-      totalAmount: "Rp 7.500.000",
-      trackingNumber: "JNE123456789",
-      courier: {
-        name: "JNE",
-      },
-      transactionCode: "INV123456789",
-      virtualAccount: "1234567890123456",
-    },
+  useEffect(() => {
+    if (id) {
+      fetchComplaintDetails();
+    }
+  }, [id]);
+
+  const fetchComplaintDetails = async () => {
+    try {
+      const res = await getDetailSellerComplaint(id);
+      setDetailComplaint(res.data);
+      console.log(
+        "ini detail complaint as seller",
+        JSON.stringify(res.data, null, 2)
+      );
+    } catch (err) {
+      showToast(
+        "Gagal",
+        "Gagal mengambil data transaksi. Silahkan coba lagi.",
+        "error"
+      );
+    }
   };
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <View className="flex-1 bg-white">
       {/* Header */}
       <View className="flex-row items-center justify-between py-4 px-4">
-        <TouchableOpacity
-          onPress={() => router.replace("../../(tabs)/dispute")}
-        >
+        <TouchableOpacity onPress={() => router.back()}>
           <ChevronLeft size={24} color="black" />
         </TouchableOpacity>
         <Text className="text-base font-semibold">Detail Komplain</Text>
@@ -49,50 +66,40 @@ export default function AdminPage() {
         <StatusKomplain status="Menunggu Persetujuan Admin" />
         <View className="h-2 bg-[#f5f5f5] mt-3" />
 
-        <TrackDispute
-          title="Penolakan komplain seller"
-          dateTime="16 Juni 2025, 14 : 00 WIB"
-          details={[
-            {
-              content:
-                "Penolakan dikarenakan bukti buyer belum cukup kuat dan tidak ada alasan menerima hal seperti itu",
-            },
-            {
-              imgTitle: "Bukti foto & video",
-              images: [
-                require("../../../assets/barangrusak.png"),
-                require("../../../assets/barangrusak.png"),
-              ],
-            },
-          ]}
-        />
-        <View className="h-2 bg-[#f5f5f5] mt-3" />
-        <TrackDispute
-          title="Pengajuan komplain buyer"
-          dateTime="16 Juni 2025, 10:00 WIB"
-          details={[
-            {
-              content:
-                "Buyer mau ngembaliin barang yang bermasalah. Dana rekber bakal dikembalikan setelah komplain disetujui, ya!",
-            },
-            {
-              content:
-                "Layar barang pecah di bagian tengah dan ada goresan dalam di sisi kiri.",
-            },
-            {
-              imgTitle: "Bukti foto & video",
-              images: [
-                require("../../../assets/barangrusak.png"),
-                require("../../../assets/barangrusak.png"),
-              ],
-            },
-          ]}
-        />
-        <View className="h-2 bg-[#f5f5f5] mt-3" />
+        {/* Pengajuan */}
+        {detailComplaint?.timeline
+          ?.slice()
+          .reverse()
+          .map((item, index) => (
+            <>
+              <TrackDispute
+                key={index}
+                title={item.label}
+                dateTime={formatDateWIB(item.timestamp) || "null"}
+                details={[
+                  {
+                    content: item?.reason,
+                  },
+                  ...(item?.evidence?.length
+                    ? [
+                        {
+                          imgTitle: "Bukti foto & video",
+                          images: item.evidence.map((url) => ({
+                            uri: url,
+                          })),
+                        },
+                      ]
+                    : []),
+                ]}
+              />
+              <View className="h-2 bg-[#f5f5f5] mt-3" />
+            </>
+          ))}
+
         {/* Data Seller & Transaksi */}
         <TextView
           title="Buyer"
-          content={detailComplaint?.transaction?.sellerEmail}
+          content={detailComplaint?.transaction?.buyerEmail}
         />
         <TextView
           title="Nama Barang"
@@ -100,14 +107,11 @@ export default function AdminPage() {
         />
         <TextView
           title="Tagihan Rekber"
-          content={detailComplaint?.transaction?.totalAmount}
+          content={formatCurrency(detailComplaint?.transaction?.totalAmount)}
         />
         <CopyField
           title="No Resi"
-          content={
-            detailComplaint?.transaction?.trackingNumber?.split("").join(" ") ||
-            "-"
-          }
+          content={detailComplaint?.transaction?.trackingNumber || "-"}
         />
         <TextView
           title="Ekspedisi"
@@ -115,17 +119,13 @@ export default function AdminPage() {
         />
         <CopyField
           title="ID Transaksi"
-          content={detailComplaint?.transaction?.transactionCode
-            ?.split("")
-            .join(" ")}
+          content={detailComplaint?.transaction?.transactionCode || "-"}
         />
         <CopyField
           title="Virtual Account"
-          content={detailComplaint?.transaction?.virtualAccount
-            ?.split("")
-            .join(" ")}
+          content={detailComplaint?.transaction?.virtualAccount || "-"}
         />
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }

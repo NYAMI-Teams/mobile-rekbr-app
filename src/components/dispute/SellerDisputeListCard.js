@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, Image } from "react-native";
 import { ClipboardPaste } from "lucide-react-native";
 import PrimaryButton from "../PrimaryButton";
 
-const statusConfig = {
+const statusconfig = {
   waitingSellerApproval: {
     color: "#FBBF24",
     text: "Persetujuan Seller",
@@ -92,10 +92,10 @@ const SellerDisputeListCard = ({
   typeDespute,
   status,
   time,
-  onPress,
-  onPressButton,
+  onPress = () => {},
+  onPressButton = () => {},
 }) => {
-  const config = statusConfig[status];
+  const config = statusconfig[status];
 
   return (
     <TouchableOpacity onPress={onPress} activeOpacity={0.8}>
@@ -143,18 +143,16 @@ const SellerDisputeListCard = ({
           </View>
 
           {/* Catatan Admin */}
-          {config.note !== "" && (
+          {config?.note !== "" && (
             <View className="flex-row my-2 items-start">
               <Image
                 source={require("../../assets/admin1.png")}
                 className="w-5 h-5 mr-4"
               />
               <Text className="flex-1 text-xs text-gray-700 leading-5">
-                <Text className="text-xs text-black">{config.note}</Text>
-                <Text className="text-xs text-black font-semibold">
-                  {config.notebold}
-                </Text>
-                <Text className="text-xs text-black">{config.noteafter}</Text>
+                <Text className="text-xs text-black">{config?.note}</Text>
+                <Text className="text-xs text-black font-semibold">{time}</Text>
+                <Text className="text-xs text-black">{config?.noteafter}</Text>
               </Text>
             </View>
           )}
@@ -163,30 +161,29 @@ const SellerDisputeListCard = ({
             <View className="flex-row items-center space-x-1">
               <View
                 className="w-2 h-2 rounded-full"
-                style={{ backgroundColor: config.color }}
+                style={{ backgroundColor: config?.color }}
               />
-              <Text className="text-xs text-black ml-2">{config.text}</Text>
+              <Text className="text-xs text-black ml-2">{config?.text}</Text>
             </View>
 
             {/* Optional Button */}
-            {config.button && (
+            {config?.button && (
               <PrimaryButton
-                title={config.button}
+                title={config?.button}
                 height={30}
                 width="50%"
                 fontSize={10}
-                btnColor={config.btnColor}
-                textColor={config.btnTextColor}
+                btnColor={config?.btnColor}
+                textColor={config?.btnTextColor}
                 onPress={onPressButton}
               />
             )}
 
-            {config.status && (
+            {config?.status && (
               <View
                 className="flex-row items-center space-x-1 p-2 rounded-lg"
-                style={{ backgroundColor: config.statusColor }}
-              >
-                <Text className="text-xs text-black ml-2">{config.status}</Text>
+                style={{ backgroundColor: config?.statusColor }}>
+                <Text className="text-xs text-black ml-2">{time}</Text>
               </View>
             )}
           </View>

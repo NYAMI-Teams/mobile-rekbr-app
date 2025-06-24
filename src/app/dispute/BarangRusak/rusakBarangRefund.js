@@ -22,7 +22,7 @@ export default function DetailKomplain() {
   const [ditolak, setDitolak] = useState(false); // ✅ perbaikan useState
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <View className="flex-1 bg-white">
       {/* Header */}
       <View className="flex-row items-center justify-between p-4">
         <TouchableOpacity onPress={() => router.back()}>
@@ -148,6 +148,6 @@ export default function DetailKomplain() {
           </Text>
         </TouchableOpacity> */}
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }

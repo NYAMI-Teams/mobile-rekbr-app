@@ -18,16 +18,17 @@ import * as ImageManipulator from "expo-image-manipulator";
 import { Feather } from "lucide-react-native";
 import { postSellerResponse } from "../../utils/api/complaint";
 import PrimaryButton from "../PrimaryButton";
+import { showToast } from "../../utils";
+import { useRouter } from "expo-router";
 
-
-export default function ModalSeller({ showPopup, setShowPopup }) {
+export default function ModalSeller({ showPopup, setShowPopup, id }) {
+  const router = useRouter();
   const [tanggapanSeller, setTanggapanSeller] = useState("");
   const [isInputValid, setIsInputValid] = useState(false);
   const [arrPhoto, setArrPhoto] = useState([]);
   const [isUploaded, setIsUploaded] = useState(false);
   const [hasCameraPermission, setHasCameraPermission] = useState(null);
-  const mockID = 10;
-  const status = "accept";
+  const status = "approved";
 
   useEffect(() => {
     (async () => {
@@ -144,14 +145,16 @@ export default function ModalSeller({ showPopup, setShowPopup }) {
     // hitted API
     try {
       const res = await postSellerResponse(
-        mockID,
+        id,
         status,
         tanggapanSeller,
         arrPhoto
       );
       showToast("Berhasil", res?.message, "success");
+      console.log("ini res", res);
+      router.replace("../../(tabs)/dispute");
     } catch (err) {
-      console.log("Gagal cok ===> ", err);
+      console.log("Gagal cok ===> ", err.message);
       showToast("Gagal", err?.message, "error");
     }
   };
@@ -162,12 +165,10 @@ export default function ModalSeller({ showPopup, setShowPopup }) {
       transparent
       animationType="slide"
       onRequestClose={() => setShowPopup(false)}
-      style={{ margin: 0, padding: 0 }}
-    >
+      style={{ margin: 0, padding: 0 }}>
       <Pressable
         className="flex-1 bg-black/40 justify-end"
-        onPress={() => setShowPopup(false)}
-      >
+        onPress={() => setShowPopup(false)}>
         <Pressable
           className="bg-white rounded-t-2xl px-2"
           style={{
@@ -178,8 +179,7 @@ export default function ModalSeller({ showPopup, setShowPopup }) {
             left: 0,
             right: 0,
           }}
-          onPress={() => {}}
-        >
+          onPress={() => {}}>
           <View className="flex-col justify-center p-4">
             <Text className="text-lg font-semibold mb-4">
               Form Konfirmasi Seller
@@ -190,12 +190,10 @@ export default function ModalSeller({ showPopup, setShowPopup }) {
               keyboardShouldPersistTaps="handled"
               showsVerticalScrollIndicator={false}
               hideKeyboardOnScroll={true}
-              keyboardDismissMode="on-drag"
-            >
+              keyboardDismissMode="on-drag">
               <KeyboardAvoidingView
                 behavior={Platform.OS === "ios" ? "padding" : "height"}
-                style={{ flex: 1 }}
-              >
+                style={{ flex: 1 }}>
                 <View className="mb-4">
                   <Text className="text-black text-base font-medium mb-2">
                     Tanggapan Seller (Min. 25 karakter)
@@ -235,8 +233,7 @@ export default function ModalSeller({ showPopup, setShowPopup }) {
                       fontSize: 12,
                       fontWeight: "300",
                       marginBottom: 8,
-                    }}
-                  >
+                    }}>
                     Unggah maksimal
                     <Text style={{ fontWeight: "500" }}> 5 foto</Text> atau
                     <Text style={{ fontWeight: "500" }}> 4 foto + 1 video</Text>
@@ -268,8 +265,7 @@ export default function ModalSeller({ showPopup, setShowPopup }) {
                                 newPhotos.splice(index, 1);
                                 setArrPhoto(newPhotos);
                               }}
-                              className="absolute -top-2 -right-2 bg-red-500 rounded-full p-1"
-                            >
+                              className="absolute -top-2 -right-2 bg-red-500 rounded-full p-1">
                               <Feather name="x" size={16} color="white" />
                             </TouchableOpacity>
                           </View>

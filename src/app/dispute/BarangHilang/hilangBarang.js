@@ -88,7 +88,7 @@ export default function HilangBarang() {
   console.log("data:", data.id);
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <View className="flex-1 bg-white">
       {/* Header */}
       <View className="relative items-center justify-center mb-4">
         <TouchableOpacity
@@ -281,6 +281,6 @@ export default function HilangBarang() {
           </View>
         </Modal>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }

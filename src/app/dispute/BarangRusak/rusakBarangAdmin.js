@@ -58,7 +58,7 @@ export default function AdminPage() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <View className="flex-1 bg-white">
       {/* Header */}
       <View className="flex-row items-center justify-between py-4 px-4">
         <TouchableOpacity onPress={() => router.back()}>
@@ -171,6 +171,6 @@ export default function AdminPage() {
           content={detailComplaint?.transaction?.virtualAccount || "-"}
         />
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }

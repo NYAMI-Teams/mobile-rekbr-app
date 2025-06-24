@@ -11,23 +11,35 @@ import CopyField from "../../../components/dispute/copyField";
 import { InfoBanner } from "../../../components/dispute/InfoBanner";
 import { StatusKomplain } from "../../../components/dispute/statusKomplain";
 import PrimaryButton from "../../../components/PrimaryButton";
+import { getDetailSellerComplaint } from "@/utils/api/complaint";
+import { useEffect, useState } from "react";
+import { showToast, formatCurrency } from "@/utils";
+import moment from "moment";
+
+const formatDateWIB = (dateTime) => {
+  if (!dateTime) return "Invalid date";
+  return moment(dateTime).utcOffset(7).format("DD MMMM YYYY, HH:mm [WIB]");
+};
 
 export default function KembaliinPage() {
   const router = useRouter();
-  const { status, sellerRejected, buyerExpiredDate } = useLocalSearchParams();
+  const { id, status, sellerRejected, buyerExpiredDate } =
+    useLocalSearchParams();
+  const [detailComplaint, setDetailComplaint] = useState({});
 
-  const detailComplaint = {
-    transaction: {
-      sellerEmail: "sellerku@mail.com",
-      itemName: "Smart TV 50 Inch UHD",
-      totalAmount: "Rp 7.500.000",
-      trackingNumber: "JNE123456789",
-      courier: {
-        name: "JNE",
-      },
-      transactionCode: "INV123456789",
-      virtualAccount: "1234567890123456",
-    },
+  useEffect(() => {
+    fetchDetailComplaint();
+  }, []);
+
+  const fetchDetailComplaint = async () => {
+    try {
+      const res = await getDetailSellerComplaint(id);
+      setDetailComplaint(res.data);
+      console.log("Detail Complaint:", JSON.stringify(res.data, null, 2));
+    } catch (error) {
+      console.error("Gagal mengambil data detail komplain:", error);
+      showToast("Gagal", error?.message, "error");
+    }
   };
 
   const renderStatusSection = () => {
@@ -217,8 +229,7 @@ export default function KembaliinPage() {
             {ditolak === true ? (
               <>
                 <TouchableOpacity
-                  onPress={() => console.log("Hubungi kami di klik!")}
-                >
+                  onPress={() => console.log("Hubungi kami di klik!")}>
                   <View className="items-end px-4 mt-4">
                     <Text className="text-[#3267E3] font-bold">
                       Silahkan Hubungi Kami
@@ -337,58 +348,15 @@ export default function KembaliinPage() {
             <View className="h-2 bg-[#f5f5f5] mt-3" />
 
             <TrackDispute
-              title="Admin meneruskan permintaan konfirmasi"
-              dateTime="21 Juni 2025, 12 : 00 WIB"
-              details={[
-                { content: "Melalui resi harusnya barang sudah sampai di seller" },
-                {
-                  imgTitle: "Bukti foto & video",
-                  images: [
-                    require("../../../assets/barangrusak.png"),
-                  ],
-                },
-              ]}
-            />
-
-            <View className="h-2 bg-[#f5f5f5] mt-3" />
-
-            <TrackDispute
-              title="Permintaan konfirmasi buyer"
-              dateTime="21 Juni 2025, 10 : 00 WIB"
-              details={[
-                { content: "Melalui resi harusnya barang sudah sampai di seller" },
-                {
-                  imgTitle: "Bukti foto & video",
-                  images: [
-                    require("../../../assets/barangrusak.png"),
-                  ],
-                },
-              ]}
-            />
-
-            <View className="h-2 bg-[#f5f5f5] mt-3" />
-            <TrackDispute
               title="Pengembalian barang oleh buyer"
               dateTime="20 Juni 2025, 10:00 WIB"
               details={[
                 {
-                  resiNumber: "J X 3 4 7 4 1 2 4 0 1 3",
-                  expedition: "J&T Express Indonesia",
+                  resiNumber: "Hardcoded",
+                  expedition: "Hardcoded",
                 },
               ]}
             />
-            <View className="h-2 bg-[#f5f5f5] mt-3" />
-            <TrackDispute
-              title="Persetujuan komplain seller"
-              dateTime="19 Juni 2025, 10:00 WIB"
-              details={[
-                {
-                  content:
-                    "Seller mau nerima barang kembaliin agar dapat ditukar, kirim bukti Refund.",
-                },
-              ]}
-            />
-
             <View className="h-2 bg-[#f5f5f5] mt-3" />
           </>
         );
@@ -434,11 +402,9 @@ export default function KembaliinPage() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <View className="flex-1 bg-white">
       <View className="flex-row items-center justify-between p-4">
-        <TouchableOpacity
-          onPress={() => router.replace("../../(tabs)/dispute")}
-        >
+        <TouchableOpacity onPress={() => router.back()}>
           <ChevronLeft size={24} color="black" />
         </TouchableOpacity>
         <Text className="text-base font-semibold">Detail Komplain</Text>
@@ -454,31 +420,40 @@ export default function KembaliinPage() {
       <ScrollView className="px-4 pb-40">
         {renderStatusSection()}
 
-        {/* Timeline Komplain */}
-        <TrackDispute
-          title="Pengajuan komplain buyer"
-          dateTime="16 Juni 2025, 10:00 WIB"
-          details={[
-            {
-              content:
-                "Buyer ingin mengembalikan barang. Dana rekber akan dikembalikan setelah komplain disetujui.",
-            },
-            { content: "Layar barang pecah di tengah, goresan di sisi kiri." },
-            {
-              imgTitle: "Bukti foto & video",
-              images: [
-                require("../../../assets/barangrusak.png"),
-                require("../../../assets/barangrusak.png"),
-              ],
-            },
-          ]}
-        />
-        <View className="h-2 bg-[#f5f5f5] mt-3" />
+        {/* Pengajuan */}
+        {detailComplaint?.timeline
+          ?.slice()
+          .reverse()
+          .map((item, index) => (
+            <>
+              <TrackDispute
+                key={index}
+                title={item.label}
+                dateTime={formatDateWIB(item.timestamp) || "null"}
+                details={[
+                  {
+                    content: item?.reason,
+                  },
+                  ...(item?.evidence?.length
+                    ? [
+                        {
+                          imgTitle: "Bukti foto & video",
+                          images: item.evidence.map((url) => ({
+                            uri: url,
+                          })),
+                        },
+                      ]
+                    : []),
+                ]}
+              />
+              <View className="h-2 bg-[#f5f5f5] mt-3" />
+            </>
+          ))}
 
         {/* Data Transaksi */}
         <TextView
           title="Seller"
-          content={detailComplaint?.transaction?.sellerEmail}
+          content={detailComplaint?.transaction?.buyerEmail}
         />
         <TextView
           title="Nama Barang"
@@ -487,19 +462,26 @@ export default function KembaliinPage() {
         <View className="p-3">
           <Tagihan
             caption="Tagihan Rekber"
-            price="Rp 1.000.000"
+            price={formatCurrency(detailComplaint?.transaction?.totalAmount)}
             details={[
-              { status: "Kembaliin", price: "Rp 1.000.000" },
-              { status: "Refund", price: "Rp 1.000.000" },
+              {
+                status: "Kembaliin",
+                price: formatCurrency(
+                  detailComplaint?.transaction?.totalAmount
+                ),
+              },
+              {
+                status: "Refund",
+                price: formatCurrency(
+                  detailComplaint?.transaction?.totalAmount
+                ),
+              },
             ]}
           />
         </View>
         <CopyField
           title="No Resi"
-          content={
-            detailComplaint?.transaction?.trackingNumber?.split("").join(" ") ||
-            "-"
-          }
+          content={detailComplaint?.transaction?.trackingNumber || "-"}
         />
         <TextView
           title="Ekspedisi"
@@ -507,22 +489,17 @@ export default function KembaliinPage() {
         />
         <CopyField
           title="ID Transaksi"
-          content={detailComplaint?.transaction?.transactionCode
-            ?.split("")
-            .join(" ")}
+          content={detailComplaint?.transaction?.transactionCode}
         />
         <CopyField
           title="Virtual Account"
-          content={detailComplaint?.transaction?.virtualAccount
-            ?.split("")
-            .join(" ")}
+          content={detailComplaint?.transaction?.virtualAccount}
         />
 
         {/* Bottom Action */}
         <View
           className="flex-row px-4 pb-4 pt-2 mt-5 bg-white"
-          style={{ position: "absolute", bottom: 0, left: 0, right: 0 }}
-        >
+          style={{ position: "absolute", bottom: 0, left: 0, right: 0 }}>
           <PrimaryButton
             title="Komplain"
             onPress={handleSubmit}
@@ -538,6 +515,6 @@ export default function KembaliinPage() {
           />
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }

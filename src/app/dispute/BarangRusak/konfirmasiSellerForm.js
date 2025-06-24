@@ -5,8 +5,8 @@ import {
   TouchableOpacity,
   ScrollView,
   Alert,
-  Image,
 } from "react-native";
+import { Image } from "expo-image";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ChevronLeft } from "lucide-react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
@@ -138,7 +138,7 @@ export default function konfirmasiSellerForm() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <View className="flex-1 bg-white">
       {/* Header */}
       <View className="flex-row items-center justify-between p-4">
         <TouchableOpacity onPress={() => router.back()}>
@@ -203,6 +203,6 @@ export default function konfirmasiSellerForm() {
           </TouchableOpacity>
         </View>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }

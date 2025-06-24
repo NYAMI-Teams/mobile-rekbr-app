@@ -37,7 +37,7 @@ export default function RusakBarangSelesai() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <View className="flex-1 bg-white">
       {/* Header */}
       <View className="flex-row items-center justify-between p-4">
         <TouchableOpacity onPress={() => router.back()}>
@@ -133,6 +133,6 @@ export default function RusakBarangSelesai() {
           content="8 0 8 0 1 2 3 4 5 6 7 8 9"
         />
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }

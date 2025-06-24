@@ -99,7 +99,6 @@ export const postBuyerReturn = async (
   }
 };
 
-
 // Seller
 
 export const getSellerComplaints = async () => {
@@ -113,22 +112,43 @@ export const getSellerComplaints = async () => {
   }
 };
 
-// Post Seller Response
-export const postSellerResponse = async (id, status, seller_response_reason, arrPhoto) => {
+export const getDetailSellerComplaint = async (id) => {
   try {
-    const photoArr = arrPhoto.map((photo) => {
-      return {
-        uri: photo.uri,
-        name: photo.fileName || photo.uri.split("/").pop(),
-        type: photo.type || "image/jpeg", // default jika tidak ada type
-      };
-    });
+    const res = await Api.get(`/seller/complaints/${id}`);
+    if (res) {
+      return res;
+    }
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Post Seller Response
+export const postSellerResponse = async (
+  id,
+  status,
+  seller_response_reason,
+  arrPhoto
+) => {
+  try {
+    let photoArr = [];
+    if (arrPhoto && arrPhoto.length > 0) {
+      photoArr = arrPhoto.map((photo) => {
+        return {
+          uri: photo.uri,
+          name: photo.fileName || photo.uri.split("/").pop(),
+          type: photo.type || "image/jpeg", // default jika tidak ada type
+        };
+      });
+    }
     const formData = new FormData();
     formData.append("status", status);
     formData.append("seller_response_reason", seller_response_reason);
     formData.append("photo", photoArr);
+    console.log("ini status", status);
+    console.log("ini seller_response_reason", seller_response_reason);
 
-    const res = await Api.post(`/seller/complaints/${id}/respond`, formData);
+    const res = await Api.patch(`/seller/complaints/${id}/respond`, formData);
     if (res) {
       return res;
     }

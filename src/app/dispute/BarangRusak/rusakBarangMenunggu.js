@@ -47,6 +47,10 @@ export default function DetailKomplain() {
     try {
       const res = await getDetailBuyerComplaint(complaintId);
       setDetailComplaint(res.data);
+      console.log(
+        "ini detail complaint as buyer",
+        JSON.stringify(res.data, null, 2)
+      );
     } catch (err) {
       showToast(
         "Gagal",
@@ -55,10 +59,6 @@ export default function DetailKomplain() {
       );
     }
   };
-
-  useEffect(() => {
-    console.log("Complaints:", JSON.stringify(detailComplaint, null, 2));
-  }, [detailComplaint]);
 
   const handleCancelComplaint = () => {
     Alert.alert(
@@ -93,7 +93,7 @@ export default function DetailKomplain() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <View className="flex-1 bg-white">
       {/* Header */}
       <View className="flex-row items-center justify-between p-4">
         <TouchableOpacity onPress={() => router.back()}>
@@ -184,9 +184,7 @@ export default function DetailKomplain() {
         <CopyField
           title="No Resi"
           content={
-            detailComplaint?.transaction?.shipment.trackingNumber
-              ?.split("")
-              .join(" ") || "-"
+            detailComplaint?.transaction?.shipment?.trackingNumber || "-"
           }
         />
         <TextView
@@ -243,7 +241,9 @@ export default function DetailKomplain() {
 
           <TouchableOpacity
             className="mb-4"
-            onPress={() => router.replace("/dispute/BarangRusak/rusakBarang")}>
+            onPress={() =>
+              router.replace("/dispute/BarangRusak/pilihKomplain")
+            }>
             <Text className="text-sm font-medium text-black">
               Ubah Detail Komplain
             </Text>
@@ -264,6 +264,6 @@ export default function DetailKomplain() {
           </TouchableOpacity>
         </View>
       </Modal>
-    </SafeAreaView>
+    </View>
   );
 }

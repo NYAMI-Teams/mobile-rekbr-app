@@ -376,7 +376,7 @@ export default function DetailTransaksiBuyer({ data }) {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()}>
@@ -734,7 +734,7 @@ export default function DetailTransaksiBuyer({ data }) {
           btn2="Konfirmasi"
         />
       )}
-    </SafeAreaView>
+    </View>
   );
 }
 

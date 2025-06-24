@@ -293,7 +293,7 @@ export default function RusakBarangKembaliinPage() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <View className="flex-1 bg-white">
       <View className="flex-row items-center justify-between p-4">
         <TouchableOpacity onPress={() => router.back()}>
           <ChevronLeft size={24} color="black" />
@@ -367,6 +367,6 @@ export default function RusakBarangKembaliinPage() {
         />
       </ScrollView>
       <View className="p-4">{renderPrimaryButton()}</View>
-    </SafeAreaView>
+    </View>
   );
 }

@@ -30,9 +30,7 @@ import { showToast } from "../../../utils";
 
 export default function DisputeDetail() {
   const router = useRouter();
-  const params = useLocalSearchParams();
-  const data = params.data ? JSON.parse(params.data) : null;
-
+  const { id } = useLocalSearchParams();
   const [problemType, setProblemType] = useState("damaged");
   const [selectedSolution, setSelectedSolution] = useState(null);
   const [showModal, setShowModal] = useState(false);
@@ -47,7 +45,7 @@ export default function DisputeDetail() {
   useEffect(() => {
     const fetchTransactionDetails = async () => {
       try {
-        const res = await getDetailBuyerTransaction(data.id);
+        const res = await getDetailBuyerTransaction(id);
         setDetailTransaction(res.data);
       } catch (err) {
         showToast(
@@ -59,7 +57,7 @@ export default function DisputeDetail() {
     };
 
     fetchTransactionDetails();
-  }, [data.id]);
+  }, [id]);
 
   const solutionOptions = [
     {
@@ -80,15 +78,15 @@ export default function DisputeDetail() {
     try {
       const problemType = "Barang rusak";
 
-      // console.log("==== Komplain Dikirim ====");
-      // console.log("ID Transaksi:", data.id);
-      // console.log("Problem Type:", problemType);
-      // console.log("Alasan:", reason);
-      // console.log("Media:", media);
-      // console.log("=========================");
+      console.log("==== Komplain Dikirim ====");
+      console.log("ID Transaksi:", id);
+      console.log("Problem Type:", problemType);
+      console.log("Alasan:", reason);
+      console.log("Media:", media);
+      console.log("=========================");
 
       // Nanti tinggal aktifkan ini kalau sudah
-      const res = await postBuyerComplaint(data.id, problemType, reason, media);
+      const res = await postBuyerComplaint(id, problemType, reason, media);
       showToast("Sukses", "Komplain berhasil dikirim", "success");
       setShowConfirmModal(false);
       router.push("../../(tabs)/complaint");
@@ -168,7 +166,7 @@ export default function DisputeDetail() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <View className="flex-1 bg-white">
       {/* Header */}
       <View className="relative items-center justify-center mb-6">
         <TouchableOpacity
@@ -181,11 +179,12 @@ export default function DisputeDetail() {
         </Text>
       </View>
 
-      <ScrollView className="px-4 pt-4 pb-40">
+      <ScrollView className="px-4 pb-10">
         {/* Masalah */}
         <ProblemDisplay
           image={require("../../../assets/barangrusak.png")}
           problemType="Barang rusak"
+          action={() => router.back()}
         />
 
         {/* Info Barang */}
@@ -238,7 +237,7 @@ export default function DisputeDetail() {
       </ScrollView>
 
       {/* Tombol Kirim */}
-      <View className="absolute bottom-4 left-4 right-4">
+      <View className="mx-4 mb-8 ">
         <PrimaryButton title="Kirim" onPress={handleSubmit} />
       </View>
 
@@ -388,6 +387,6 @@ export default function DisputeDetail() {
           </View>
         </View>
       </Modal>
-    </SafeAreaView>
+    </View>
   );
 }

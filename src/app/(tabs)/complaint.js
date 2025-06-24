@@ -5,39 +5,79 @@ import {
   ScrollView,
   ActivityIndicator,
   RefreshControl,
+  TouchableOpacity,
 } from "react-native";
 import { useRouter } from "expo-router";
 
-import RusakBarangCard from "../../components/dispute/RusakBarangCard";
-import { getBuyerComplaints } from "../../utils/api/complaint";
-import { showToast } from "../../utils";
+import RusakBarangCard from "@/components/dispute/RusakBarangCard";
+import { getBuyerComplaints, getSellerComplaints } from "@/utils/api/complaint";
+import { showToast } from "@/utils";
 import { SafeAreaView } from "react-native-safe-area-context";
+import EmptyIllustration from "@/components/Ilustration";
+import SellerDisputeListCard from "@/components/dispute/SellerDisputeListCard";
+import moment from "moment";
+
+const formatDateWIB = (dateTime) => {
+  if (!dateTime) return "Invalid date";
+  return moment(dateTime).utcOffset(7).format("DD MMMM YYYY, HH:mm [WIB]");
+};
 
 export default function DisputeScreen() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
   const router = useRouter();
-
-  const [isEmptyComplaints, setIsEmptyComplaints] = useState(false);
-  const [Complaints, setComplaints] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [selectedTab, setSelectedTab] = useState("pembelian");
+  const [BuyerComplaints, setBuyerComplaints] = useState([]);
+  const [SellerComplaints, setSellerComplaints] = useState([]);
+  const [isEmptyBuyerComplaints, setIsEmptyBuyerComplaints] = useState(false);
+  const [isEmptySellerComplaints, setIsEmptySellerComplaints] = useState(false);
 
   useEffect(() => {
-    fetchComplaints();
+    fetchBuyerComplaints();
+    fetchSellerComplaints();
   }, []);
 
-  const fetchComplaints = async () => {
+  const handleTabPress = (tab) => {
+    setSelectedTab(tab);
+  };
+
+  const fetchBuyerComplaints = async () => {
     setIsLoading(true);
     try {
       const res = await getBuyerComplaints();
       if (res.data.length > 0) {
-        setIsEmptyComplaints(false);
+        setIsEmptyBuyerComplaints(false);
       } else {
-        setIsEmptyComplaints(true);
+        setIsEmptyBuyerComplaints(true);
       }
       // console.log("ini complaints", res.data);r
 
-      setComplaints(res.data);
-      console.log("Complaints:", JSON.stringify(res.data, null, 2));
+      setBuyerComplaints(res.data);
+      console.log("Complaints as Buyer:", JSON.stringify(res.data, null, 2));
+    } catch (err) {
+      showToast(
+        "Gagal",
+        "Gagal mengambil data transaksi. Silahkan coba lagi.",
+        "error"
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const fetchSellerComplaints = async () => {
+    setIsLoading(true);
+    try {
+      const res = await getSellerComplaints();
+      if (res.data.length > 0) {
+        setIsEmptySellerComplaints(false);
+      } else {
+        setIsEmptySellerComplaints(true);
+      }
+      // console.log("ini complaints", res.data);r
+
+      setSellerComplaints(res.data);
+      console.log("Complaints as Seller:", JSON.stringify(res.data, null, 2));
     } catch (err) {
       showToast(
         "Gagal",
@@ -51,8 +91,144 @@ export default function DisputeScreen() {
 
   const onRefresh = async () => {
     setRefreshing(true);
-    await fetchComplaints();
+    if (selectedTab === "pembelian") {
+      await fetchBuyerComplaints();
+    } else {
+      await fetchSellerComplaints();
+    }
     setRefreshing(false);
+  };
+
+  const renderContent = () => {
+    if (selectedTab === "pembelian") {
+      if (isEmptyBuyerComplaints) {
+        return (
+          <View className="justify-center items-center">
+            <EmptyIllustration
+              text={
+                "Belum ada dispute, semua transaksi rekber kamu aman, mulus, dan lancar jaya!"
+              }
+            />
+          </View>
+        );
+      }
+      return BuyerComplaints.filter((item) => {
+        const mappedStatus =
+          complaintStatusMapBuyer[item.status] || "disputeCancel";
+        return !hiddenStatusesBuyer.includes(mappedStatus);
+      }).map((item) => {
+        const mappedStatus =
+          complaintStatusMapBuyer[item.status] || "disputeCancel";
+        return (
+          <RusakBarangCard
+            key={item?.id || ""}
+            namaBarang={item?.transaction?.itemName || ""}
+            harga={`Rp ${Number(
+              item?.transaction?.totalAmount || 0
+            ).toLocaleString("id-ID")}`}
+            seller={item?.transaction?.sellerEmail}
+            noResi={
+              item?.status === "return_in_transit" ||
+              item?.status === "approved_by_admin"
+                ? item?.returnShipment?.trackingNumber || "-"
+                : "-"
+            }
+            expedisi={
+              item?.status === "return_in_transit" ||
+              item?.status === "approved_by_admin"
+                ? item?.returnShipment?.courierName || "-"
+                : "-"
+            }
+            time={item?.sellerConfirmDeadline} // ini perlu dibuat function base on status, karena timenya beda beda
+            status={mappedStatus}
+            onPress={() => handleBuyerComplaintPress(item, mappedStatus)}
+            onPressButton={
+              mappedStatus === "returnRequested"
+                ? () =>
+                    router.push({
+                      pathname: "/dispute/BarangRusak/pengembalianForm",
+                      params: { complaintId: item?.id },
+                    })
+                : mappedStatus === "returnInTransit"
+                ? () =>
+                    router.push({
+                      pathname: "/dispute/BarangRusak/konfirmasiSellerForm",
+                      params: { complaintId: item?.id },
+                    })
+                : () => {}
+            }
+          />
+        );
+      });
+    } else {
+      if (isEmptySellerComplaints) {
+        console.log("Masuk seller");
+
+        return (
+          <View className="justify-center items-center">
+            <EmptyIllustration
+              text={
+                "Belum ada dispute. Semua transaksi rekber kamu aman, mulus, dan lancar jaya!"
+              }
+            />
+          </View>
+        );
+      }
+      return SellerComplaints.filter((item) => {
+        const mappedStatus =
+          complaintStatusMapSeller[item.status] || "disputeCancel";
+        return !hiddenStatusesSeller.includes(mappedStatus);
+      }).map((item) => {
+        const mappedStatus =
+          complaintStatusMapSeller[item.status] || "disputeCancel";
+        return (
+          <SellerDisputeListCard
+            key={item?.id || ""}
+            namaBarang={item?.transaction?.itemName || ""}
+            harga={`Rp ${Number(
+              item?.transaction?.totalAmount || 0
+            ).toLocaleString("id-ID")}`}
+            buyer={item?.transaction?.buyerEmail || ""}
+            noResi={
+              item?.status === "return_in_transit" ||
+              item?.status === "approved_by_admin"
+                ? item?.returnShipment?.trackingNumber || "-"
+                : "-"
+            }
+            expedisi={
+              item?.status === "return_in_transit" ||
+              item?.status === "approved_by_admin"
+                ? item?.returnShipment?.courierName || "-"
+                : "-"
+            }
+            typeDespute={disputeTypeLabel(item?.type)}
+            time={formatDateWIB(item?.sellerConfirmDeadline)}
+            status={mappedStatus}
+            onPress={() => handleSellerComplaintPress(item, mappedStatus)}
+            onPressButton={
+              mappedStatus === "returnRequested"
+                ? () => {
+                    console.log("ini status dari seller", mappedStatus);
+                    router.push({
+                      pathname: "/dispute/BarangRusak/pengembalianForm",
+                      params: { complaintId: item?.id },
+                    });
+                  }
+                : mappedStatus === "returnInTransit"
+                ? () => {
+                    router.push({
+                      pathname: "/dispute/BarangRusak/konfirmasiSellerForm",
+                      params: { complaintId: item?.id },
+                    });
+                  }
+                : () => {
+                    console.log("Null", mappedStatus);
+                  } // Default empty function
+            }
+          />
+        );
+      });
+    }
   };
 
   // Function navigate dengan status + optional extra param
@@ -63,7 +239,7 @@ export default function DisputeScreen() {
     });
   };
 
-  const complaintStatusMap = {
+  const complaintStatusMapBuyer = {
     waiting_seller_approval: "waitingSellerApproval", //done
     return_requested: "returnRequested", //done
     rejected_by_seller: "sellerRejected", //return requested kalau udah di seller rejected gausah di test
@@ -74,15 +250,36 @@ export default function DisputeScreen() {
     under_investigation: "underInvestigation", //done
   };
 
-  const hiddenStatuses = [
-    "Completed",
+  const complaintStatusMapSeller = {
+    waiting_seller_approval: "waitingSellerApproval",
+    return_requested: "returnRequested",
+    rejected_by_seller: "sellerRejected",
+    return_in_transit: "returnInTransit",
+    awaiting_admin_approval: "awaitingAdminApproval",
+    approved_by_seller: "approvedBySeller",
+    approved_by_admin: "approvedByAdmin",
+    under_investigtion: "underInvestigation",
+    awaiting_seller_confirmation: "awaitingSellerConfirmation",
+    completed: "Completed",
+  };
+
+  const hiddenStatusesBuyer = [
+    "Completed", //kalo seller masuk ke status map
     "rejectedByAdmin",
     "disputeCancel",
-    "awaitingSellerConfirmation",
+    "awaitingSellerConfirmation", // kalo seller masuk ke status map
   ];
 
+  const hiddenStatusesSeller = ["rejectedByAdmin", "disputeCancel"];
+
+  const disputeTypeLabel = (type) => {
+    if (type === "Barang rusak") return "Barang Rusak";
+    if (type === "lost") return "Barang Hilang";
+    return "-";
+  };
+
   // komplainList mapping by status
-  const handleComplaintPress = (item, mappedStatus) => {
+  const handleBuyerComplaintPress = (item, mappedStatus) => {
     const actions = {
       waitingSellerApproval: () =>
         router.push({
@@ -180,88 +377,145 @@ export default function DisputeScreen() {
     }
   };
 
-  return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
-      {/* <NavigationBar /> */}
-      {/* <RusakBarangRefund /> */}
-      {/* <RusakBarangKembaliinPage /> */}
+  const handleSellerComplaintPress = (item, mappedStatus) => {
+    const actions = {
+      waitingSellerApproval: () =>
+        router.push({
+          pathname: "/dispute/SellerDispute/SellerPage",
+          params: { id: item?.id },
+        }),
+      awaitingAdminApproval: () =>
+        router.push({
+          pathname: "/dispute/SellerDispute/AdminPage",
+          params: {
+            id: item?.id,
+            rejectedAdmin: false,
+            status: "awaitingAdminApproval",
+          },
+        }),
+      returnRequested: () => {
+        router.push({
+          pathname: "/dispute/SellerDispute/KembaliinPage",
+          params: {
+            complaintId: item?.id,
+            status: "returnRequested",
+          },
+        });
+      },
+      Completed: () =>
+        router.push({
+          pathname: "/dispute/SellerDispute/SelesaiPage",
+          params: { complaintId: item?.id },
+        }),
+      sellerRejected: () => {},
+      returnInTransit: () =>
+        router.push({
+          pathname: "/dispute/SellerDispute/KembaliinPage",
+          params: {
+            complaintId: item?.id,
+            status: "returnInTransit",
+          },
+        }),
+      disputeProved: () =>
+        router.push({
+          pathname: "/dispute/SellerDispute/KembaliinPage",
+          params: {
+            complaintId: item?.id,
+            status: "disputeProved",
+          },
+        }),
+      rejectedByAdmin: () =>
+        router.push({
+          pathname: "/dispute/SellerDispute/SellerPage",
+          params: { complaintId: item?.id, rejectedAdmin: true },
+        }),
+      awaitingSellerConfirmation: () =>
+        //marking
+        router.push({
+          pathname: "/dispute/SellerDispute/KembaliinPage",
+          params: {
+            complaintId: item?.id,
+            status: "awaitingSellerConfirmation",
+          },
+        }),
+      approvedBySeller: () =>
+        //marking
+        router.push({
+          pathname: "/dispute/SellerDispute/KembaliinPage",
+          params: { complaintId: item?.id, status: "approvedBySeller" },
+        }),
+      approvedByAdmin: () => {
+        router.push({
+          pathname: "/dispute/SellerDispute/KembaliinPage",
+          params: {
+            id: item?.id,
+            status: "approvedByAdmin",
+          },
+        });
+      },
+      underInvestigation: () =>
+        //marking
+        router.push({
+          pathname: "/Complaint/Detail",
+          params: { id: item?.id },
+        }),
+    };
 
-      <View className="flex-1 bg-white">
-        <View className="flex-row justify-between items-center border-b border-gray-200 mb-10">
-          <View className="flex-1 items-center pb-2 border-b-2 border-[#00B7A0]">
-            <Text className="text-sm font-semibold text-[#1D1D1D]">
-              Pembelian
-            </Text>
-          </View>
-          <View className="flex-1 items-center pb-2">
-            <Text className="text-sm text-gray-400">Penjualan</Text>
-          </View>
+    // jalankan action jika ada, kalau tidak ya kosong
+    if (actions[mappedStatus]) {
+      actions[mappedStatus]();
+    }
+  };
+
+  return (
+    <View style={{ flex: 1, backgroundColor: "#fff" }}>
+      {/* <View className="flex-1 bg-white"> */}
+      <View className="flex-row w-full px-4 h-10">
+        <TouchableOpacity
+          onPress={() => handleTabPress("pembelian")}
+          className={`flex-1 items-center justify-center h-full ${
+            selectedTab === "pembelian"
+              ? "border-b-2 border-[#49DBC8]"
+              : "border-b-2 border-gray-300"
+          }`}>
+          <Text
+            className={`text-xs font-semibold ${
+              selectedTab === "pembelian" ? "text-black" : "text-gray-400"
+            }`}>
+            Pembelian
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => handleTabPress("penjualan")}
+          className={`flex-1 items-center justify-center h-full ${
+            selectedTab === "penjualan"
+              ? "border-b-2 border-[#49DBC8]"
+              : "border-b-2 border-gray-300"
+          }`}>
+          <Text
+            className={`text-xs font-semibold ${
+              selectedTab === "penjualan" ? "text-black" : "text-gray-400"
+            }`}>
+            Penjualan
+          </Text>
+        </TouchableOpacity>
+      </View>
+      {isLoading ? (
+        <View className="flex-1 items-center mt-5">
+          <ActivityIndicator size="large" color="#000" />
         </View>
-        {isLoading ? (
-          <View className="flex-1 justify-center items-center">
-            <ActivityIndicator size="large" color="#000" />
-          </View>
-        ) : (
+      ) : (
+        <View className="bg-white">
           <ScrollView
-            className="px-4 pt-6"
+            className="px-4 my-3"
+            showsVerticalScrollIndicator={false}
             refreshControl={
               <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
             }>
-            {/* Render Card List */}
-            {Complaints.filter((item) => {
-              const mappedStatus =
-                complaintStatusMap[item.status] || "disputeCancel";
-              return !hiddenStatuses.includes(mappedStatus);
-            }).map((item) => {
-              const mappedStatus =
-                complaintStatusMap[item.status] || "disputeCancel";
-
-              return (
-                <RusakBarangCard
-                  key={item?.id || ""}
-                  namaBarang={item?.transaction?.itemName || ""}
-                  harga={`Rp ${Number(
-                    item?.transaction?.totalAmount || 0
-                  ).toLocaleString("id-ID")}`}
-                  seller={item?.transaction?.sellerEmail}
-                  noResi={
-                    item?.status === "return_in_transit" ||
-                    item?.status === "approved_by_admin"
-                      ? item?.returnShipment?.trackingNumber || "-"
-                      : "-"
-                  }
-                  expedisi={
-                    item?.status === "return_in_transit" ||
-                    item?.status === "approved_by_admin"
-                      ? item?.returnShipment?.courierName || "-"
-                      : "-"
-                  }
-                  time={item?.buyerDeadlineInputShipment} //ini sellerConfirmDeadline untuk seller, kalau buyer
-                  status={mappedStatus}
-                  onPress={() => handleComplaintPress(item, mappedStatus)}
-                  onPressButton={
-                    mappedStatus === "returnRequested"
-                      ? () =>
-                          router.push({
-                            pathname: "/dispute/BarangRusak/pengembalianForm",
-                            params: { complaintId: item?.id },
-                          })
-                      : mappedStatus === "returnInTransit"
-                      ? () =>
-                          router.push({
-                            pathname:
-                              "/dispute/BarangRusak/konfirmasiSellerForm",
-                            params: { complaintId: item?.id },
-                          })
-                      : null
-                  }
-                />
-              );
-            })}
+            {renderContent()}
           </ScrollView>
-        )}
-      </View>
-      {/* )} */}
-    </SafeAreaView>
+        </View>
+      )}
+    </View>
   );
 }

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -10,19 +10,109 @@ import {
 } from "react-native";
 import { ChevronLeft } from "lucide-react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { router, useNavigation } from "expo-router";
+import { useRouter, useLocalSearchParams } from "expo-router";
 import { TextInput } from "react-native-gesture-handler";
 import * as ImagePicker from "expo-image-picker";
 import PrimaryButton from "../../components/PrimaryButton";
+import {
+  getDetailBuyerComplaint,
+  postBuyerComplaint,
+  postBuyerCancelComplaint,
+} from "@/utils/api/complaint";
+import { showToast, formatCurrency } from "@/utils";
 
 export default function DetailMasalahScreen() {
   const [description, setDescription] = useState("");
-  const navigation = useNavigation();
+  const router = useRouter();
+  const { id } = useLocalSearchParams();
   const placeholderText =
     "Layar barang pecah di bagian tengah dan ada goresan dalam di sisi kiri.";
 
   const [media, setMedia] = useState([]);
   const [showTipsModal, setShowTipsModal] = useState(false);
+
+  const [complaintDetail, setComplaintDetail] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (id) fetchComplaintDetail();
+  }, [id]);
+
+  const fetchComplaintDetail = async () => {
+    setLoading(true);
+    try {
+      const res = await getDetailBuyerComplaint(id);
+      setComplaintDetail(res.data);
+      console.log(
+        JSON.stringify(complaintDetail, null, 2),
+        " complaintDetail Hilang ============>"
+      );
+    } catch (err) {
+      showToast("Gagal", err?.message, "error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const cancelComplaint = async () => {
+    setLoading(true);
+    try {
+      await postBuyerCancelComplaint(id);
+      showToast("Berhasil", "Komplain berhasil dibatalkan", "success");
+      router.replace("/(tabs)/complaint");
+    } catch (err) {
+      showToast("Gagal", err?.message, "error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmitComplaint = async () => {
+    if (isSubmitting) return;
+
+    try {
+      setIsSubmitting(true);
+
+      const type = "lost";
+
+      console.log("🧾 Payload:", {
+        id,
+        type,
+        description,
+        media,
+      });
+
+      const complaint = await postBuyerComplaint(id, type, description, media);
+
+      if (!complaint?.id) throw new Error("Complaint tidak valid");
+
+      showToast("Berhasil", "Komplain Berhasil dibuat", "success");
+      router.replace("/(tabs)/complaint");
+    } catch (err) {
+      console.log(
+        "❌ Error saat createComplaint:",
+        err?.response?.data || err.message || err
+      );
+      Alert.alert("Gagal", err?.response?.data?.message || "Terjadi kesalahan");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleSubmit = () => {
+    if (!description) {
+      showToast("Gagal", "Harap isi alasan kerusakan", "error");
+      return;
+    }
+
+    if (media.length === 0) {
+      showToast("Gagal", "Harap pilih minimal 1 bukti", "error");
+      return;
+    }
+    cancelComplaint();
+    handleSubmitComplaint();
+  };
 
   const handlePickMedia = async () => {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -58,12 +148,12 @@ export default function DetailMasalahScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <View className="flex-1 bg-white">
       <ScrollView className="flex-1 px-4 pt-4">
         {/* Header */}
         <View className="relative items-center justify-center mb-4">
           <TouchableOpacity
-            onPress={() => navigation.goBack()}
+            onPress={() => router.back()}
             className="absolute left-0">
             <ChevronLeft size={24} color="black" />
           </TouchableOpacity>
@@ -102,29 +192,37 @@ export default function DetailMasalahScreen() {
         {/* Barang */}
         <View className="bg-[#EAF7F9] rounded-xl p-4 mb-3">
           <Text className="font-semibold text-black text-lg mb-2">
-            iPhone 13 Pro Max
+            {complaintDetail?.transaction?.itemName || "-"}
           </Text>
-          <Text className="text-sm text-black mb-3">REK - 8080123456789</Text>
+          <Text className="text-sm text-black mb-3">
+            {complaintDetail?.transaction?.transactionCode || "-"}
+          </Text>
 
-          <View className="mb-1 flex-row justify-between mb-2">
+          <View className="flex-row justify-between mb-2">
             <Text className="text-base text-black">Seller</Text>
-            <Text className="text-base text-black">irgi85@gmail.com</Text>
+            <Text className="text-base text-black">
+              {complaintDetail?.transaction?.sellerEmail || "-"}
+            </Text>
           </View>
 
-          <View className="mb-1 flex-row justify-between mb-2">
+          <View className="flex-row justify-between mb-2">
             <Text className="text-base text-black">No Resi</Text>
-            <Text className="text-base text-blue-500">JX347124013</Text>
+            <Text className="text-base text-blue-500">
+              {complaintDetail?.transaction?.shipment?.trackingNumber || "-"}
+            </Text>
           </View>
 
-          <View className="mb-1 flex-row justify-between mb-2">
+          <View className="flex-row justify-between mb-2">
             <Text className="text-base text-black">Ekspedisi</Text>
-            <Text className="text-sm text-black">J&T Express Indonesia</Text>
+            <Text className="text-sm text-black">
+              {complaintDetail?.transaction?.shipment?.courier || "-"}
+            </Text>
           </View>
 
           <View className="mb-1">
             <Text className="text-base text-black mb-1">Nominal Rekber</Text>
             <Text className="text-lg font-semibold text-black">
-              Rp. 8.080.000,00
+              {formatCurrency(complaintDetail?.transaction?.totalAmount || 0)}
             </Text>
           </View>
         </View>
@@ -273,14 +371,15 @@ export default function DetailMasalahScreen() {
             </Text>
           </View>
         </View>
-
+      </ScrollView>
+      <View className="px-4">
         {/* Button */}
         <PrimaryButton
           title="Ajukan Komplain Kembali"
-          onPress={() => router.push("../(tabs)/complaint")}
+          onPress={handleSubmit}
           style={{ marginBottom: 24 }} // ganti className dengan style inline
         />
-      </ScrollView>
-    </SafeAreaView>
+      </View>
+    </View>
   );
 }

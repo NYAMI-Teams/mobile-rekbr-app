@@ -9,7 +9,8 @@
     "newArchEnabled": true,
     "scheme": "mobile-rekbr-app",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.nyamiteams.rekbrapp"
     },
     "android": {
       "adaptiveIcon": {

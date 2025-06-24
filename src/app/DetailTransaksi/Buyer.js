@@ -43,7 +43,6 @@ export default function DetailTransaksiBuyer() {
   const [showPopup, setShowPopup] = useState(false);
   const modalizeRef = useRef(null);
 
-
   useEffect(() => {
     const fetchTransactionDetails = async () => {
       try {
@@ -316,7 +315,7 @@ export default function DetailTransaksiBuyer() {
           <PrimaryButton
             title="Cek Status Transaksi"
             onPress={handleSimulatePayment}
-          // disabled={!isFormValid}
+            // disabled={!isFormValid}
           />
           <View className="flex-row items-center px-3 gap-3">
             <Text className="text-sm items-start justify-start text-[#616161]">
@@ -338,8 +337,7 @@ export default function DetailTransaksiBuyer() {
           <Text className="text-sm items-start justify-start text-[#616161]">
             Terdapat kendala?
           </Text>
-          <TouchableOpacity
-            onPress={() => console.log("Hubungi Kami pressed")}>
+          <TouchableOpacity onPress={() => console.log("Hubungi Kami pressed")}>
             <Text className="text-sm items-end justify-end text-[#3267E3]">
               Silahkan Hubungi Kami
             </Text>
@@ -355,7 +353,10 @@ export default function DetailTransaksiBuyer() {
             onPress={() =>
               router.push({
                 pathname: "/Complaint/Index",
-                params: { transactionId: data?.id },
+                params: {
+                  transactionId: data?.id,
+                  sellerEmail: data?.sellerEmail,
+                },
               })
             }
             height={50}
@@ -446,12 +447,13 @@ export default function DetailTransaksiBuyer() {
                     : "No Resi"}
                 </Text>
                 <View
-                  className={`flex-row items-center ${data?.status == "waiting_shipment" ||
+                  className={`flex-row items-center ${
+                    data?.status == "waiting_shipment" ||
                     data?.status == "shipped" ||
                     data?.status == "completed"
-                    ? "mb-3"
-                    : ""
-                    }`}>
+                      ? "mb-3"
+                      : ""
+                  }`}>
                   <Text style={{ fontSize: 17, fontWeight: "500" }}>
                     {data?.status == "pending_payment"
                       ? data?.virtualAccount
@@ -640,11 +642,9 @@ export default function DetailTransaksiBuyer() {
           paddingTop: 32,
           paddingBottom: 32,
           backgroundColor: "#fff",
-        }}
-      >
-        <View
-          className="bg-white pb-8">
-          <Pressable onPress={closeModal} >
+        }}>
+        <View className="bg-white pb-8">
+          <Pressable onPress={closeModal}>
             <View className="flex-row items-center mb-6">
               <ChevronLeftCircle size={24} color="#00C2C2" />
               <Text className="text-lg font-semibold text-gray-800 ml-2">
@@ -740,9 +740,7 @@ export default function DetailTransaksiBuyer() {
           )}
 
           <View className="flex-row justify-center items-center gap-5">
-            <Text className="text-center text-gray-500">
-              Terdapat kendala?
-            </Text>
+            <Text className="text-center text-gray-500">Terdapat kendala?</Text>
             <Text className="text-blue-500 font-medium">
               Silahkan Hubungi Kami
             </Text>
@@ -759,7 +757,6 @@ export default function DetailTransaksiBuyer() {
         btn1="Kembali"
         btn2="Konfirmasi"
       />
-
     </View>
   );
 }

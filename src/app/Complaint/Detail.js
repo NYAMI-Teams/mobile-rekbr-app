@@ -9,31 +9,29 @@ import {
   ActivityIndicator,
   Image,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { Copy } from "lucide-react-native";
 import * as Clipboard from "expo-clipboard";
 import { StatusBar } from "expo-status-bar";
-import dayjs from "dayjs";
-import "dayjs/locale/id";
+import moment from "moment";
 
 import ComplaintStepBar from "@/components/ComplaintStepBar";
 import {
-  getBuyerComplaintDetail,
-  cancelComplaintById,
+  getDetailBuyerComplaint,
+  postBuyerCancelComplaint,
 } from "@/utils/api/complaint";
 import { showToast } from "@/utils";
 import Modal from "react-native-modal";
 
-dayjs.locale("id");
+const formatDateWIB = (dateTime) => {
+  if (!dateTime) return "Invalid date";
+  return moment(dateTime).utcOffset(7).format("DD MMMM YYYY, HH:mm [WIB]");
+};
 
 export default function ComplaintDetailScreen({ label, timestamp }) {
   const { id } = useLocalSearchParams();
   const router = useRouter();
-  const dateText = timestamp
-    ? dayjs(timestamp).format("D MMMM YYYY, HH:mm [WIB]")
-    : null;
 
   const [complaintDetail, setComplaintDetail] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -45,8 +43,8 @@ export default function ComplaintDetailScreen({ label, timestamp }) {
 
   const fetchComplaintDetail = async () => {
     try {
-      const res = await getBuyerComplaintDetail(id);
-      console.log(res.data, "============>");
+      const res = await getDetailBuyerComplaint(id);
+      console.log(JSON.stringify(res.data, null, 2), "============>");
       setComplaintDetail(res.data);
     } catch (err) {
       showToast("Gagal", "Gagal mengambil detail komplain", "error");
@@ -65,7 +63,7 @@ export default function ComplaintDetailScreen({ label, timestamp }) {
     }
 
     try {
-      await cancelComplaintById(complaintDetail.id);
+      await postBuyerCancelComplaint(complaintDetail.id);
       showToast("Berhasil", "Komplain berhasil dibatalkan", "success");
       router.replace("/(tabs)/complaint");
     } catch (err) {
@@ -75,6 +73,18 @@ export default function ComplaintDetailScreen({ label, timestamp }) {
         "error"
       );
     }
+  };
+
+  const handleUpdateComplaint = async () => {
+    if (!complaintDetail?.id) {
+      showToast("Gagal", "ID komplain tidak ditemukan", "error");
+      return;
+    }
+
+    router.push({
+      pathname: "/Complaint/HilangKomplain",
+      params: { id },
+    });
   };
 
   const getStatusLabel = (status) => {
@@ -151,15 +161,15 @@ export default function ComplaintDetailScreen({ label, timestamp }) {
 
   if (loading) {
     return (
-      <SafeAreaView className="flex-1 justify-center items-center bg-white">
+      <View className="flex-1 justify-center items-center bg-white">
         <StatusBar style="dark" />
         <ActivityIndicator size="large" color="#000" />
-      </SafeAreaView>
+      </View>
     );
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <View className="flex-1 bg-white">
       <StatusBar style="dark" />
 
       {/* Header */}
@@ -260,73 +270,70 @@ export default function ComplaintDetailScreen({ label, timestamp }) {
           </View>
 
           {/* Timeline */}
-
-          {/* Tombol Aksi */}
-          {shouldShowActions && (
-            <View className="mt-8 pb-6">
-              <Pressable className="flex-row items-center">
-                {/* Tombol More */}
-                <View className="justify-center items-center">
-                  <TouchableOpacity
-                    onPress={() => setShowActionModal(true)}
-                    className="w-11 h-11 border border-gray-300 rounded-xl justify-center items-center bg-white mr-3">
-                    <Text className="text-black text-xl">•••</Text>
-                  </TouchableOpacity>
-
-                  {/* Modal Aksi */}
-                  <Modal
-                    isVisible={showActionModal}
-                    onBackdropPress={() => setShowActionModal(false)}
-                    onBackButtonPress={() => setShowActionModal(false)}
-                    animationIn="slideInUp"
-                    animationOut="slideOutDown"
-                    style={{ margin: 0, justifyContent: "flex-end" }}>
-                    <View className="bg-white rounded-t-2xl pt-2 pb-6 px-4">
-                      <View className="items-center">
-                        <View className="w-12 h-1.5 bg-gray-300 rounded-full mb-4" />
-                      </View>
-                      <Text className="text-lg font-semibold mb-8">
-                        Lainnya
-                      </Text>
-
-                      <TouchableOpacity
-                        onPress={() => {
-                          setShowActionModal(false);
-                          router.push("/Complaint/Edit?id=" + id);
-                        }}
-                        className="mb-4">
-                        <Text className="text-black text-base font-medium mb-6">
-                          Ubah Detail Komplain
-                        </Text>
-                      </TouchableOpacity>
-
-                      <TouchableOpacity
-                        onPress={() => {
-                          setShowActionModal(false);
-                          handleCancelComplaint();
-                        }}>
-                        <Text className="text-black text-base font-medium mb-10">
-                          Batalkan Komplain
-                        </Text>
-                      </TouchableOpacity>
-                    </View>
-                  </Modal>
-                </View>
-
-                {/* Tombol Hubungi Seller */}
-                <Pressable
-                  onPress={() => router.push("/Complaint")}
-                  className="flex-1 bg-black py-3 rounded-xl justify-center items-center">
-                  <Text className="text-white font-semibold text-base">
-                    Hubungi Seller
-                  </Text>
-                </Pressable>
-              </Pressable>
-            </View>
-          )}
         </ScrollView>
+        {/* Tombol Aksi */}
+        {shouldShowActions && (
+          <View className="pb-6 m-5">
+            <Pressable className="flex-row items-center">
+              {/* Tombol More */}
+              <View className="justify-center items-center">
+                <TouchableOpacity
+                  onPress={() => setShowActionModal(true)}
+                  className="w-11 h-11 border border-gray-300 rounded-xl justify-center items-center bg-white mr-3">
+                  <Text className="text-black text-xl">•••</Text>
+                </TouchableOpacity>
+
+                {/* Modal Aksi */}
+                <Modal
+                  isVisible={showActionModal}
+                  onBackdropPress={() => setShowActionModal(false)}
+                  onBackButtonPress={() => setShowActionModal(false)}
+                  animationIn="slideInUp"
+                  animationOut="slideOutDown"
+                  style={{ margin: 0, justifyContent: "flex-end" }}>
+                  <View className="bg-white rounded-t-2xl pt-2 pb-6 px-4">
+                    <View className="items-center">
+                      <View className="w-12 h-1.5 bg-gray-300 rounded-full mb-4" />
+                    </View>
+                    <Text className="text-lg font-semibold mb-8">Lainnya</Text>
+
+                    <TouchableOpacity
+                      onPress={() => {
+                        setShowActionModal(false);
+                        handleUpdateComplaint();
+                      }}
+                      className="mb-4">
+                      <Text className="text-black text-base font-medium mb-6">
+                        Ubah Detail Komplain
+                      </Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                      onPress={() => {
+                        setShowActionModal(false);
+                        handleCancelComplaint();
+                      }}>
+                      <Text className="text-black text-base font-medium mb-10">
+                        Batalkan Komplain
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                </Modal>
+              </View>
+
+              {/* Tombol Hubungi Seller */}
+              <Pressable
+                onPress={() => router.push("/Complaint")}
+                className="flex-1 bg-black py-3 rounded-xl justify-center items-center">
+                <Text className="text-white font-semibold text-base">
+                  Hubungi Seller
+                </Text>
+              </Pressable>
+            </Pressable>
+          </View>
+        )}
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -388,10 +395,6 @@ function ComplaintTimeline({ timeline, status, message }) {
 
 // Komponen TimelineItem
 function TimelineItem({ label, timestamp, isRejected, message }) {
-  const formattedDate = timestamp
-    ? dayjs(timestamp).format("D MMMM YYYY, HH:mm [WIB]")
-    : null;
-
   return (
     <View className="mb-5 border-b border-gray-200 pb-3">
       <Text
@@ -405,8 +408,10 @@ function TimelineItem({ label, timestamp, isRejected, message }) {
           <Text className="text-black text-sm">{message}</Text>
         </View>
       )}
-      {formattedDate && (
-        <Text className="text-gray-500 text-sm mt-1">{formattedDate}</Text>
+      {timestamp && (
+        <Text className="text-gray-500 text-sm mt-1">
+          {formatDateWIB(timestamp)}
+        </Text>
       )}
 
       {isRejected && (

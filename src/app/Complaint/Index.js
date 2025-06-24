@@ -3,14 +3,13 @@ import { View, Text, TouchableOpacity, Image, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import PrimaryButton from "../../components/PrimaryButton";
 import { ChevronLeft } from "lucide-react-native";
-import { useNavigation } from "expo-router";
-import { router } from "expo-router";
+import { useRouter } from "expo-router";
 import { useLocalSearchParams } from "expo-router";
 
 export default function HomeDispute() {
   const [selectedComplaint, setSelectedComplaint] = useState(null);
-  const navigation = useNavigation();
-  const { transactionId } = useLocalSearchParams();
+  const router = useRouter();
+  const { transactionId, sellerEmail } = useLocalSearchParams();
   const complaints = [
     {
       label: "Barang belum sampai atau kesasar",
@@ -32,18 +31,18 @@ export default function HomeDispute() {
 
   const routeMap = {
     "Barang belum sampai atau kesasar": "/Complaint/Create",
-    "Barang rusak": "/Dispute/BarangRusak",
-    "Tidak sesuai deskripsi": "/Dispute/TidakSesuai",
-    "Masalah atau komplain lainnya": "/Dispute/KomplainLainnya",
+    "Barang rusak": "/dispute/BarangRusak/pilihKomplain",
+    "Tidak sesuai deskripsi": "/dispute/TidakSesuai", //PR
+    "Masalah atau komplain lainnya": "/dispute/KomplainLainnya",
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <View className="flex-1 bg-white">
       <ScrollView className="px-4 pt-4">
         <View className="relative items-center justify-center mb-4">
           {/* Tombol Back di kiri */}
           <TouchableOpacity
-            onPress={() => navigation.goBack()}
+            onPress={() => router.back()}
             className="absolute left-0">
             <ChevronLeft size={24} color="black" />
           </TouchableOpacity>
@@ -70,7 +69,7 @@ export default function HomeDispute() {
         {/* Info Email */}
         <Text className="text-lg font-medium text-black mb-3">
           Diskusi dengan
-          <Text className="font-semibold">irgi168@gmail.com</Text>
+          <Text className="font-semibold"> {sellerEmail}</Text>
         </Text>
         <Text className="text-base text-gray-500 mb-4">
           Cari resolusi yang lebih cepat, diskusikan dulu kendalamu dengan
@@ -100,7 +99,7 @@ export default function HomeDispute() {
                 if (route) {
                   router.push({
                     pathname: route,
-                    params: { transactionId },
+                    params: { id: transactionId },
                   });
                 }
               }}>
@@ -125,6 +124,6 @@ export default function HomeDispute() {
           </Text>
         </Text>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
