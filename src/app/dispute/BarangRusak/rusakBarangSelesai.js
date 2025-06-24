@@ -36,7 +36,6 @@ export default function RusakBarangSelesai() {
     }
   };
 
-
   return (
     <SafeAreaView className="flex-1 bg-white">
       {/* Header */}
@@ -52,7 +51,7 @@ export default function RusakBarangSelesai() {
 
       <StepProgressBar
         currentStep={3}
-        steps={["Menunggu", "Kembaliin", "Refund", "Selesai"]}
+        steps={["Seller", "Admin", "Kembaliin", "Refund"]}
       />
       <StatusKomplain status={detailComplaint.status_label} />
 

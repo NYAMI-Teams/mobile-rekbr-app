@@ -100,3 +100,41 @@ export const postBuyerReturn = async (
     throw error;
   }
 };
+
+
+// Seller
+
+export const getSellerComplaints = async () => {
+  try {
+    const res = await Api.get(`/seller/complaints`);
+    if (res) {
+      return res;
+    }
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Post Seller Response
+export const postSellerResponse = async (id, status, seller_response_reason, arrPhoto) => {
+  try {
+    const photoArr = arrPhoto.map((photo) => {
+      return {
+        uri: photo.uri,
+        name: photo.fileName || photo.uri.split("/").pop(),
+        type: photo.type || "image/jpeg", // default jika tidak ada type
+      };
+    });
+    const formData = new FormData();
+    formData.append("status", status);
+    formData.append("seller_response_reason", seller_response_reason);
+    formData.append("photo", photoArr);
+
+    const res = await Api.post(`/seller/complaints/${id}/respond`, formData);
+    if (res) {
+      return res;
+    }
+  } catch (error) {
+    throw error;
+  }
+};
