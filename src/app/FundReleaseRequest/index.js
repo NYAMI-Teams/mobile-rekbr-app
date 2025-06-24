@@ -202,7 +202,7 @@ export default function FundReleaseRequestScreen() {
             />
           </TouchableOpacity>
           <View className="mt-4 mb-4">
-            {!image ? null : (
+            {!image && (
               <Image
                 source={{ uri: image?.uri }}
                 className="w-full h-64 rounded-lg"

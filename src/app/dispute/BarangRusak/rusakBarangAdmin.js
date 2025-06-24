@@ -18,6 +18,7 @@ import StepProgressBar from "../../../components/ProgressBar";
 import { TrackDispute } from "../../../components/dispute/TrackDispute";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { getDetailBuyerComplaint } from "../../../utils/api/complaint";
+import moment from "moment";
 
 export default function AdminPage() {
   const router = useRouter();
@@ -34,9 +35,14 @@ export default function AdminPage() {
   }, [complaintId]);
 
   const fetchComplaintDetails = async () => {
+    console.log("ini complaint id", complaintId);
     try {
       const res = await getDetailBuyerComplaint(complaintId);
       setDetailComplaint(res.data);
+      console.log(
+        "ini detail complaint rusak barang admin",
+        JSON.stringify(res.data, null, 2)
+      );
     } catch (err) {
       showToast(
         "Gagal",
@@ -46,17 +52,16 @@ export default function AdminPage() {
     }
   };
 
-  // useEffect(() => {
-  //   console.log("Complaints:", JSON.stringify(detailComplaint, null, 2));
-  // }, [detailComplaint]);
+  const formatDateWIB = (dateTime) => {
+    if (!dateTime) return "Invalid date";
+    return moment(dateTime).utcOffset(7).format("DD MMMM YYYY, HH:mm [WIB]");
+  };
 
   return (
     <SafeAreaView className="flex-1 bg-white">
       {/* Header */}
       <View className="flex-row items-center justify-between py-4 px-4">
-        <TouchableOpacity
-          onPress={() => router.replace("../../(tabs)/dispute")}
-        >
+        <TouchableOpacity onPress={() => router.back()}>
           <ChevronLeft size={24} color="black" />
         </TouchableOpacity>
         <Text className="text-base font-semibold">Detail Komplain</Text>
@@ -67,7 +72,13 @@ export default function AdminPage() {
       <StepProgressBar
         currentStep={1}
         steps={["Seller", "Admin", "Kembaliin", "Refunded"]}
-        rejectedSteps={ditolak ? [0, 1] : [0]}
+        rejectedSteps={
+          detailComplaint?.seller_decision === "approved"
+            ? []
+            : ditolak
+            ? [0, 1]
+            : [0]
+        }
       />
 
       <ScrollView className="px-4">
@@ -82,97 +93,49 @@ export default function AdminPage() {
 
         {rejectedAdmin === "false" && (
           <>
-            <TrackDispute
-              title="Penolakan komplain seller"
-              dateTime="16 Juni 2025, 14 : 00 WIB"
-              details={[
-                {
-                  content:
-                    "Penolakan dikarenakan bukti buyer belum cukup kuat dan tidak ada alasan menerima hal seperti itu",
-                },
-                {
-                  imgTitle: "Bukti foto & video",
-                  images: [
-                    require("../../../assets/barangrusak.png"),
-                    require("../../../assets/barangrusak.png"),
-                  ],
-                },
-              ]}
-            />
-            <TrackDispute
-              title="Pengajuan komplain buyer"
-              dateTime="16 Juni 2025, 10:00 WIB"
-              details={[
-                {
-                  content:
-                    "Buyer mau ngembaliin barang yang bermasalah. Dana rekber bakal dikembalikan setelah komplain disetujui, ya!",
-                },
-                {
-                  content:
-                    "Layar barang pecah di bagian tengah dan ada goresan dalam di sisi kiri.",
-                },
-                {
-                  imgTitle: "Bukti foto & video",
-                  images: [
-                    require("../../../assets/barangrusak.png"),
-                    require("../../../assets/barangrusak.png"),
-                  ],
-                },
-              ]}
-            />
+            {detailComplaint?.timeline?.map((item, index) => (
+              <TrackDispute
+                key={index}
+                title={item?.label}
+                dateTime={formatDateWIB(item?.timestamp)}
+                details={[
+                  {
+                    content: item?.message,
+                  },
+                  {
+                    content: item?.reason || "-",
+                  },
+                  {
+                    imgTitle: "Bukti foto & video",
+                    images: item?.evidence?.map((url) => ({ uri: url })) || [],
+                  },
+                ]}
+              />
+            ))}
           </>
         )}
 
         {rejectedAdmin === "true" && (
           <>
-            <TrackDispute
-              title="Penolakan komplain admin"
-              dateTime="16 Juni 2025, 15 : 00 WIB"
-              details={[
-                {
-                  content:
-                    "Setelah bukti ditinjau, pengajuan tidak memenuhi syarat. Komplain dinyatakan tidak valid dan dana tetap diteruskan ke seller.",
-                },
-              ]}
-            />
-            <TrackDispute
-              title="Penolakan komplain seller"
-              dateTime="16 Juni 2025, 14 : 00 WIB"
-              details={[
-                {
-                  content:
-                    "Penolakan dikarenakan bukti buyer belum cukup kuat dan tidak ada alasan menerima hal seperti itu",
-                },
-                {
-                  imgTitle: "Bukti foto & video",
-                  images: [
-                    require("../../../assets/barangrusak.png"),
-                    require("../../../assets/barangrusak.png"),
-                  ],
-                },
-              ]}
-            />
-            <TrackDispute
-              title="Pengajuan komplain buyer"
-              dateTime="16 Juni 2025, 10:00 WIB"
-              details={[
-                {
-                  content:
-                    "Buyer mau ngembaliin barang yang bermasalah. Dana rekber bakal dikembalikan setelah komplain disetujui, ya!",
-                },
-                {
-                  content:
-                    "Layar barang pecah di bagian tengah dan ada goresan dalam di sisi kiri.",
-                },
-                {
-                  imgTitle: "Bukti foto & video",
-                  images: [
-                    require("../../../assets/barangrusak.png"),
-                    require("../../../assets/barangrusak.png"),
-                  ],
-                },
-              ]}
-            />
+            {detailComplaint?.timeline?.map((item, index) => (
+              <TrackDispute
+                key={index}
+                title={item?.label}
+                dateTime={formatDateWIB(item?.timestamp)}
+                details={[
+                  {
+                    content: item?.message,
+                  },
+                  {
+                    content: item?.reason || "-",
+                  },
+                  {
+                    imgTitle: "Bukti foto & video",
+                    images: item?.evidence?.map((url) => ({ uri: url })) || [],
+                  },
+                ]}
+              />
+            ))}
           </>
         )}
 
@@ -192,25 +155,20 @@ export default function AdminPage() {
         <CopyField
           title="No Resi"
           content={
-            detailComplaint?.transaction?.trackingNumber?.split("").join(" ") ||
-            "-"
+            detailComplaint?.transaction?.shipment?.trackingNumber || "-"
           }
         />
         <TextView
           title="Ekspedisi"
-          content={detailComplaint?.transaction?.courier?.name || "-"}
+          content={detailComplaint?.transaction?.shipment?.courier || "-"}
         />
         <CopyField
           title="ID Transaksi"
-          content={detailComplaint?.transaction?.transactionCode
-            ?.split("")
-            .join(" ")}
+          content={detailComplaint?.transaction?.transactionCode || "-"}
         />
         <CopyField
           title="Virtual Account"
-          content={detailComplaint?.transaction?.virtualAccount
-            ?.split("")
-            .join(" ")}
+          content={detailComplaint?.transaction?.virtualAccount || "-"}
         />
       </ScrollView>
     </SafeAreaView>

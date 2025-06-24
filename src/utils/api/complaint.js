@@ -1,4 +1,5 @@
 import Api from "../api";
+import QueryString from "qs";
 
 export const postBuyerComplaint = async (id, type, reason, evidence) => {
   try {
@@ -33,18 +34,15 @@ export const postBuyerComplaint = async (id, type, reason, evidence) => {
   }
 };
 
-
-import QueryString from "qs";
-
 export const getBuyerComplaints = async () => {
   try {
-    const res = await Api.get(`/buyer/transactions`, {
-      params: {
-        status: ["complain"],
-      },
-      paramsSerializer: (params) => {
-        return QueryString.stringify(params, { arrayFormat: "repeat" });
-      },
+    const res = await Api.get(`/buyer/complaints`, {
+      // params: {
+      //   status: ["complain"],
+      // },
+      // paramsSerializer: (params) => {
+      //   return QueryString.stringify(params, { arrayFormat: "repeat" });
+      // },
     });
     if (res) {
       return res;

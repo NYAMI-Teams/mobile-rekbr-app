@@ -17,7 +17,7 @@ import { StatusBar } from "expo-status-bar";
 
 import ComplaintStepBar from "@/components/ComplaintStepBar";
 import {
-  getBuyerComplaintDetail,
+  getDetailBuyerComplaint,
   cancelComplaintById,
 } from "@/utils/api/complaint";
 import { showToast } from "@/utils";
@@ -37,8 +37,9 @@ export default function ComplaintDetailScreen() {
 
   const fetchTransactionDetail = async () => {
     try {
-      const res = await getBuyerComplaintDetail(id);
+      const res = await getDetailBuyerComplaint(id);
       setTransactionDetail(res.data);
+      console.log("ini transaction detail", JSON.stringify(res.data, null, 2));
     } catch (err) {
       showToast("Gagal", "Gagal mengambil detail transaksi", "error");
     } finally {
@@ -49,6 +50,7 @@ export default function ComplaintDetailScreen() {
   const complaint = transactionDetail?.Complaint?.slice()?.sort(
     (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
   )?.[0];
+
 
   const status = complaint?.status || "-";
   const type = complaint?.type || "-";
@@ -131,30 +133,30 @@ export default function ComplaintDetailScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView className='flex-1 justify-center items-center bg-white'>
-        <StatusBar style='dark' />
-        <ActivityIndicator size='large' color='#000' />
+      <SafeAreaView className="flex-1 justify-center items-center bg-white">
+        <StatusBar style="dark" />
+        <ActivityIndicator size="large" color="#000" />
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView className='flex-1 bg-white'>
-      <StatusBar style='dark' />
+    <SafeAreaView className="flex-1 bg-white">
+      <StatusBar style="dark" />
 
       {/* Header */}
-      <View className='flex-row items-center px-4 py-3'>
+      <View className="flex-row items-center px-4 py-3">
         <TouchableOpacity onPress={() => router.back()}>
-          <Ionicons name='chevron-back-outline' size={24} color='#000' />
+          <Ionicons name="chevron-back-outline" size={24} color="#000" />
         </TouchableOpacity>
-        <Text className='flex-1 text-center text-base font-semibold text-black'>
+        <Text className="flex-1 text-center text-base font-semibold text-black">
           Detail Komplain
         </Text>
         <View style={{ width: 24 }} />
       </View>
 
       {/* Step Bar */}
-      <View className='items-center px-4'>
+      <View className="items-center px-4">
         <ComplaintStepBar
           currentStep={currentStep}
           steps={steps}
@@ -163,72 +165,70 @@ export default function ComplaintDetailScreen() {
       </View>
 
       {/* Konten Scrollable */}
-      <View className='flex-1'>
+      <View className="flex-1">
         <ScrollView
-          className='px-4 pt-4'
+          className="px-4 pt-4"
           contentContainerStyle={{ paddingBottom: 80 }}
-          showsVerticalScrollIndicator={false}
-        >
+          showsVerticalScrollIndicator={false}>
           {/* Pesan Status */}
           {message && (
-            <View className='bg-white p-3 rounded-xl border border-gray-100 mb-4'>
-              <Text className='text-sm font-semibold mb-1'>
+            <View className="bg-white p-3 rounded-xl border border-gray-100 mb-4">
+              <Text className="text-sm font-semibold mb-1">
                 {getStatusLabel(status)}
               </Text>
-              <Text className='text-gray-600 text-xs'>{message}</Text>
+              <Text className="text-gray-600 text-xs">{message}</Text>
             </View>
           )}
 
           {/* Status Ringkas */}
-          <View className='p-4 border-b border-gray-200'>
-            <View className='flex-row justify-between items-center'>
-              <Text className='text-gray-600 text-sm'>Status Komplain :</Text>
-              <Text className='text-black font-semibold text-sm'>
+          <View className="p-4 border-b border-gray-200">
+            <View className="flex-row justify-between items-center">
+              <Text className="text-gray-600 text-sm">Status Komplain :</Text>
+              <Text className="text-black font-semibold text-sm">
                 {getStatusLabel(status)}
               </Text>
             </View>
           </View>
 
           {/* Info Transaksi */}
-          <View className='space-y-3 mt-4'>
-            <InfoBlock label='Seller' value={transactionDetail?.sellerEmail} />
+          <View className="space-y-3 mt-4">
+            <InfoBlock label="Seller" value={transactionDetail?.sellerEmail} />
             <InfoBlock
-              label='Nama Barang'
+              label="Nama Barang"
               value={transactionDetail?.itemName}
             />
             <InfoBlock
-              label='Tagihan Rekber'
+              label="Tagihan Rekber"
               value={`Rp. ${Number(
                 transactionDetail?.totalAmount || 0
               ).toLocaleString("id-ID")},00`}
             />
             <InfoBlock
-              label='ID Transaksi'
+              label="ID Transaksi"
               value={transactionDetail?.transactionCode}
               copyable
             />
             <InfoBlock
-              label='No Resi'
+              label="No Resi"
               value={transactionDetail?.shipment?.trackingNumber}
               copyable
             />
             <InfoBlock
-              label='Ekspedisi'
+              label="Ekspedisi"
               value={transactionDetail?.shipment?.courier}
             />
           </View>
 
           {/* Tombol Aksi */}
           {shouldShowActions && (
-            <View className='mt-8 pb-6'>
-              <Pressable className='flex-row items-center'>
+            <View className="mt-8 pb-6">
+              <Pressable className="flex-row items-center">
                 {/* Tombol More */}
-                <View className='justify-center items-center'>
+                <View className="justify-center items-center">
                   <TouchableOpacity
                     onPress={() => setShowActionModal(true)}
-                    className='w-11 h-11 border border-gray-300 rounded-xl justify-center items-center bg-white mr-3'
-                  >
-                    <Text className='text-black text-xl'>•••</Text>
+                    className="w-11 h-11 border border-gray-300 rounded-xl justify-center items-center bg-white mr-3">
+                    <Text className="text-black text-xl">•••</Text>
                   </TouchableOpacity>
 
                   {/* Modal Aksi */}
@@ -236,15 +236,14 @@ export default function ComplaintDetailScreen() {
                     isVisible={showActionModal}
                     onBackdropPress={() => setShowActionModal(false)}
                     onBackButtonPress={() => setShowActionModal(false)}
-                    animationIn='slideInUp'
-                    animationOut='slideOutDown'
-                    style={{ margin: 0, justifyContent: "flex-end" }}
-                  >
-                    <View className='bg-white rounded-t-2xl pt-2 pb-6 px-4'>
-                      <View className='items-center'>
-                        <View className='w-12 h-1.5 bg-gray-300 rounded-full mb-4' />
+                    animationIn="slideInUp"
+                    animationOut="slideOutDown"
+                    style={{ margin: 0, justifyContent: "flex-end" }}>
+                    <View className="bg-white rounded-t-2xl pt-2 pb-6 px-4">
+                      <View className="items-center">
+                        <View className="w-12 h-1.5 bg-gray-300 rounded-full mb-4" />
                       </View>
-                      <Text className='text-lg font-semibold mb-8'>
+                      <Text className="text-lg font-semibold mb-8">
                         Lainnya
                       </Text>
 
@@ -253,9 +252,8 @@ export default function ComplaintDetailScreen() {
                           setShowActionModal(false);
                           router.push("/Complaint/Edit?id=" + id);
                         }}
-                        className='mb-4'
-                      >
-                        <Text className='text-black text-base font-medium mb-6'>
+                        className="mb-4">
+                        <Text className="text-black text-base font-medium mb-6">
                           Ubah Detail Komplain
                         </Text>
                       </TouchableOpacity>
@@ -264,9 +262,8 @@ export default function ComplaintDetailScreen() {
                         onPress={() => {
                           setShowActionModal(false);
                           handleCancelComplaint();
-                        }}
-                      >
-                        <Text className='text-black text-base font-medium mb-10'>
+                        }}>
+                        <Text className="text-black text-base font-medium mb-10">
                           Batalkan Komplain
                         </Text>
                       </TouchableOpacity>
@@ -277,9 +274,8 @@ export default function ComplaintDetailScreen() {
                 {/* Tombol Hubungi Seller */}
                 <Pressable
                   onPress={() => router.push("/Complaint")}
-                  className='flex-1 bg-black py-3 rounded-xl justify-center items-center'
-                >
-                  <Text className='text-white font-semibold text-base'>
+                  className="flex-1 bg-black py-3 rounded-xl justify-center items-center">
+                  <Text className="text-white font-semibold text-base">
                     Hubungi Seller
                   </Text>
                 </Pressable>
@@ -294,18 +290,17 @@ export default function ComplaintDetailScreen() {
 
 function InfoBlock({ label, value, copyable = false }) {
   return (
-    <View className='mb-4'>
-      <Text className='text-gray-600 text-base mb-1'>{label}</Text>
-      <View className='flex-row items-center space-x-2'>
-        <Text className='text-black text-xl font-medium'>{value || "-"}</Text>
+    <View className="mb-4">
+      <Text className="text-gray-600 text-base mb-1">{label}</Text>
+      <View className="flex-row items-center space-x-2">
+        <Text className="text-black text-xl font-medium">{value || "-"}</Text>
         {copyable && value && (
           <Pressable
             onPress={() => {
               Clipboard.setStringAsync(value);
               Alert.alert("Disalin", `${label} berhasil disalin.`);
-            }}
-          >
-            <Copy size={20} color='#999' />
+            }}>
+            <Copy size={20} color="#999" />
           </Pressable>
         )}
       </View>

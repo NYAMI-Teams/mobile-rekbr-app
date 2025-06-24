@@ -22,6 +22,7 @@ import {
   getDetailBuyerComplaint,
   postBuyerCancelComplaint,
 } from "../../../utils/api/complaint";
+import moment from "moment";
 
 export default function DetailKomplain() {
   const router = useRouter();
@@ -36,6 +37,11 @@ export default function DetailKomplain() {
       fetchComplaintDetails();
     }
   }, [complaintId]);
+
+  const formatDateWIB = (dateTime) => {
+    if (!dateTime) return "Invalid date";
+    return moment(dateTime).utcOffset(7).format("DD MMMM YYYY, HH:mm [WIB]");
+  };
 
   const fetchComplaintDetails = async () => {
     try {
@@ -69,7 +75,7 @@ export default function DetailKomplain() {
           onPress: () => {
             postBuyerCancelComplaint(complaintId)
               .then(() => {
-                router.replace("../../(tabs)/dispute");
+                router.replace("../../(tabs)/complaint");
               })
               .catch((err) => {
                 showToast(
@@ -114,7 +120,9 @@ export default function DetailKomplain() {
         {/* Alert Info */}
         <InfoBanner
           contentBefore="Jika seller nggak respon sampai"
-          dateTime={detailComplaint?.seller_confirm_deadline || "null"}
+          dateTime={
+            formatDateWIB(detailComplaint?.seller_confirm_deadline) || "null"
+          }
           contentAfter=" pengajuanmu bakal otomatis disetujui ya!"
         />
 
@@ -176,13 +184,14 @@ export default function DetailKomplain() {
         <CopyField
           title="No Resi"
           content={
-            detailComplaint?.transaction?.trackingNumber?.split("").join(" ") ||
-            "-"
+            detailComplaint?.transaction?.shipment.trackingNumber
+              ?.split("")
+              .join(" ") || "-"
           }
         />
         <TextView
           title="Ekspedisi"
-          content={detailComplaint?.transaction?.courier?.name || "-"}
+          content={detailComplaint?.transaction?.shipment?.courier || "-"}
         />
         <CopyField
           title="ID Transaksi"
@@ -202,15 +211,13 @@ export default function DetailKomplain() {
       <View className="flex-row items-center px-4 py-3 border-t border-gray-100 bg-white">
         <TouchableOpacity
           onPress={() => setShowOptionModal(true)}
-          className="h-11 w-16 bg-white rounded-xl border border-black items-center justify-center"
-        >
+          className="h-11 w-16 bg-white rounded-xl border border-black items-center justify-center">
           <Text className="text-black text-[20px] font-semibold">⋯</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           className="flex-1 ml-2 h-11 bg-black rounded-xl items-center justify-center"
-          onPress={() => router.push("../../(tabs)/dispute")}
-        >
+          onPress={() => router.push("../../(tabs)/complaint")}>
           <Text className="text-white font-semibold text-sm">
             Kirim Seller Email
           </Text>
@@ -222,8 +229,7 @@ export default function DetailKomplain() {
         visible={showOptionModal}
         transparent
         animationType="slide"
-        onRequestClose={() => setShowOptionModal(false)}
-      >
+        onRequestClose={() => setShowOptionModal(false)}>
         <TouchableWithoutFeedback onPress={() => setShowOptionModal(false)}>
           <View className="flex-1 bg-black/40" />
         </TouchableWithoutFeedback>
@@ -237,8 +243,7 @@ export default function DetailKomplain() {
 
           <TouchableOpacity
             className="mb-4"
-            onPress={() => router.replace("/dispute/BarangRusak/rusakBarang")}
-          >
+            onPress={() => router.replace("/dispute/BarangRusak/rusakBarang")}>
             <Text className="text-sm font-medium text-black">
               Ubah Detail Komplain
             </Text>
@@ -252,8 +257,7 @@ export default function DetailKomplain() {
 
           <TouchableOpacity
             onPress={() => console.log("Simulate pressed")}
-            className="mb-4"
-          >
+            className="mb-4">
             <Text className="text-sm font-medium text-black">
               Simulate reject
             </Text>

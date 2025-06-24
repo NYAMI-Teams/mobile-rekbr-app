@@ -381,9 +381,11 @@ export default function DetailTransaksiSeller() {
     if (itemPrice >= 10000 && itemPrice <= 499999.99) {
       return 5000;
     } else if (itemPrice >= 500000 && itemPrice <= 4999999.99) {
-      return 100 * 0.01; // 1%
+      const platformFee = itemPrice * 0.01;
+      return `${platformFee} %`;
     } else if (itemPrice >= 5000000 && itemPrice <= 10000000) {
-      return 100 * 0.008; // 0.8%
+      const platformFee = itemPrice * 0.008;
+      return `${platformFee} %`;
     }
     return 0;
   };
@@ -637,7 +639,7 @@ export default function DetailTransaksiSeller() {
               {
                 status: `Biaya Jasa Aplikasi (${calculatePlatformFee(
                   data?.itemPrice
-                )}%)`,
+                )})`,
                 price: formatPrice(data?.platformFee || "-"),
               },
             ]}

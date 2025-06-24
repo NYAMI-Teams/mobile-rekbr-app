@@ -25,9 +25,7 @@ export default function DetailKomplain() {
     <SafeAreaView className="flex-1 bg-white">
       {/* Header */}
       <View className="flex-row items-center justify-between p-4">
-        <TouchableOpacity
-          onPress={() => router.replace("../../(tabs)/dispute")}
-        >
+        <TouchableOpacity onPress={() => router.back()}>
           <ChevronLeft size={24} color="black" />
         </TouchableOpacity>
         <Text className="text-base font-semibold">Detail Komplain</Text>

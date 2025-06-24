@@ -1,11 +1,22 @@
-import React, { useState } from "react";
-import { View, Text, TouchableOpacity, ScrollView } from "react-native";
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  Alert,
+  Image,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ChevronLeft } from "lucide-react-native";
-import { useRouter } from "expo-router";
+import { useRouter, useLocalSearchParams } from "expo-router";
 import { InputField } from "../../../components/dispute/InputField";
 import AttachmentFilled from "../../../components/AttachmentFilled";
 import PrimaryButton from "../../../components/PrimaryButton";
+import * as ImagePicker from "expo-image-picker";
+import * as ImageManipulator from "expo-image-manipulator";
+import { postBuyerReturn } from "@/utils/api/complaint";
+import { showToast } from "@/utils";
 
 export default function konfirmasiSellerForm() {
   const router = useRouter();
@@ -14,23 +25,110 @@ export default function konfirmasiSellerForm() {
   const [reason, setReason] = useState("");
   const [photoUri, setPhotoUri] = useState(null);
   const [image, setImage] = useState(null);
+  const [hasCameraPermission, setHasCameraPermission] = useState(null);
 
-  const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      quality: 1,
-    });
+  useEffect(() => {
+    (async () => {
+      const cameraStatus = await ImagePicker.requestCameraPermissionsAsync();
+      setHasCameraPermission(cameraStatus.status === "granted");
+    })();
+  }, []);
 
-    if (!result.canceled) {
-      setPhotoUri(result.assets[0].uri);
-      setImage(result.assets[0]);
+  const handleUpload = async () => {
+    if (hasCameraPermission === false) {
+      Alert.alert(
+        "Izin Kamera Diperlukan",
+        "Aplikasi memerlukan akses kamera untuk mengambil foto. Mohon berikan izin di pengaturan perangkat Anda."
+      );
+      return;
+    }
+
+    if (hasCameraPermission === null) {
+      Alert.alert(
+        "Meminta Izin",
+        "Aplikasi sedang meminta izin kamera. Mohon tunggu sebentar."
+      );
+      return;
+    }
+
+    Alert.alert(
+      "Pilih Sumber Gambar",
+      "Ambil foto baru atau pilih dari galeri?",
+      [
+        {
+          text: "Kamera",
+          onPress: async () => {
+            await pickImage("camera");
+          },
+        },
+        {
+          text: "Galeri",
+          onPress: async () => {
+            await pickImage("gallery");
+          },
+        },
+        { text: "Batal", style: "cancel" },
+      ]
+    );
+  };
+
+  const pickImage = async (source) => {
+    let result;
+    if (source === "camera") {
+      result = await ImagePicker.launchCameraAsync({
+        mediaTypes: "Images",
+        allowsEditing: true,
+        quality: 1,
+      });
+    } else {
+      result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: "Images",
+        allowsEditing: true,
+        quality: 1,
+      });
+    }
+
+    if (!result.canceled && result.assets && result.assets.length > 0) {
+      let imageAsset = result.assets[0];
+      let quality = 0.7;
+      let compressed = await ImageManipulator.manipulateAsync(
+        imageAsset.uri,
+        [],
+        { compress: quality, format: ImageManipulator.SaveFormat.JPEG }
+      );
+
+      // Loop kompresi hingga < 1MB atau quality terlalu kecil
+      let blob, size;
+      do {
+        const response = await fetch(compressed.uri);
+        blob = await response.blob();
+        size = blob.size;
+        if (size > 1024 * 1024) {
+          quality -= 0.2;
+          if (quality < 0.2) break;
+          compressed = await ImageManipulator.manipulateAsync(
+            imageAsset.uri,
+            [],
+            { compress: quality, format: ImageManipulator.SaveFormat.JPEG }
+          );
+        }
+      } while (size > 1024 * 1024 && quality >= 0.2);
+
+      setImage({
+        ...imageAsset,
+        uri: compressed.uri,
+      });
+      setPhotoUri(true);
+    } else {
+      setImage(null);
+      setPhotoUri(false);
     }
   };
 
   const handleSubmit = async () => {
     try {
       await postBuyerReturn(complaintId, reason, image);
-      router.replace("../../(tabs)/dispute");
+      router.replace("../../(tabs)/complaint");
     } catch (error) {
       showToast("Gagal", error?.message, "error");
     } finally {
@@ -65,7 +163,7 @@ export default function konfirmasiSellerForm() {
           title="Unggah Bukti"
           caption={
             photoUri
-              ? "Foto berhasil diupload"
+              ? image?.uri?.split("/").pop()
               : "Berikan bukti berupa screenshot cek resi"
           }
           cardColor={photoUri ? "#E8F5E9" : "#FFF"}
@@ -76,7 +174,7 @@ export default function konfirmasiSellerForm() {
           alertColor="#C2C2C2"
           alertIconName="alert-circle"
           alertIconColor="#C2C2C2"
-          onPress={pickImage}
+          onPress={handleUpload}
           iconsColor="#FFF"
         />
 
@@ -86,7 +184,7 @@ export default function konfirmasiSellerForm() {
               Preview Foto Bukti:
             </Text>
             <Image
-              source={{ uri: photoUri }}
+              source={{ uri: image?.uri }}
               style={{ width: "100%", height: 200, borderRadius: 12 }}
             />
           </View>
@@ -95,10 +193,7 @@ export default function konfirmasiSellerForm() {
 
       {/* Button di bawah */}
       <View className="px-4 py-3 border-t border-gray-200">
-        <PrimaryButton
-          title="Kirim"
-          onPress={() => router.replace("../../(tabs)/dispute")}
-        />
+        <PrimaryButton title="Kirim" onPress={handleSubmit} />
         <View className="flex-row items-center justify-center mt-3">
           <Text className="text-sm text-gray-500">Terdapat kendala?</Text>
           <TouchableOpacity>

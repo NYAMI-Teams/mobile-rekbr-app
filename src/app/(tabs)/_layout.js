@@ -45,15 +45,14 @@ export default function TabLayout() {
         tabBarInactiveTintColor: "#666",
         tabBarLabelStyle: styles.tabLabel,
         tabStyle: styles.tabStyle,
-      }}
-    >
+      }}>
       <Tabs.Screen
-        name='index'
+        name="index"
         options={{
           title: "As Seller",
           tabBarIcon: ({ color, focused, size }) => (
             <MaterialCommunityIcons
-              name='storefront'
+              name="storefront"
               size={24}
               color={color}
               style={{ opacity: focused ? 1 : 0.4 }}
@@ -62,12 +61,12 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name='buyer'
+        name="buyer"
         options={{
           title: "As Buyer",
           tabBarIcon: ({ color, focused, size }) => (
             <MaterialCommunityIcons
-              name='wallet-outline'
+              name="wallet-outline"
               size={24}
               color={color}
               style={{ opacity: focused ? 1 : 0.4 }}
@@ -76,12 +75,12 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name='complaint'
+        name="complaint"
         options={{
           title: "Complaint",
           tabBarIcon: ({ color, focused, size }) => (
             <MaterialCommunityIcons
-              name='chat-processing-outline'
+              name="chat-processing-outline"
               size={24}
               color={color}
               style={{ opacity: focused ? 1 : 0.4 }}
@@ -90,12 +89,12 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name='history'
+        name="history"
         options={{
           title: "History",
           tabBarIcon: ({ color, focused, size }) => (
             <MaterialCommunityIcons
-              name='clock-time-three-outline'
+              name="clock-time-three-outline"
               size={24}
               color={color}
               style={{ opacity: focused ? 1 : 0.4 }}

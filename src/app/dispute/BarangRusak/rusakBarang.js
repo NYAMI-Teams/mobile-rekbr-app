@@ -91,7 +91,7 @@ export default function DisputeDetail() {
       const res = await postBuyerComplaint(data.id, problemType, reason, media);
       showToast("Sukses", "Komplain berhasil dikirim", "success");
       setShowConfirmModal(false);
-      router.push("../../(tabs)/dispute");
+      router.push("../../(tabs)/complaint");
     } catch (error) {
       showToast("Gagal", "Komplain gagal dikirim", "error");
     } finally {
@@ -173,15 +173,14 @@ export default function DisputeDetail() {
       <View className="relative items-center justify-center mb-6">
         <TouchableOpacity
           onPress={() => router.back()}
-          className="absolute left-0"
-        >
+          className="absolute left-0">
           <ChevronLeft size={24} color="black" />
         </TouchableOpacity>
         <Text className="text-xl font-semibold text-center">
           Detail Masalah
         </Text>
       </View>
-      
+
       <ScrollView className="px-4 pt-4 pb-40">
         {/* Masalah */}
         <ProblemDisplay
@@ -227,13 +226,11 @@ export default function DisputeDetail() {
         </Text>
         <TouchableOpacity
           className="flex-row justify-between items-center bg-white border border-gray-300 rounded-xl px-4 py-4"
-          onPress={() => setShowModal(true)}
-        >
+          onPress={() => setShowModal(true)}>
           <Text
             className={`text-sm ${
               selectedSolution ? "text-black" : "text-gray-400"
-            }`}
-          >
+            }`}>
             {selectedSolution || "Pilih solusi kamu"}
           </Text>
           <ChevronDown size={16} color="#999" />
@@ -265,8 +262,7 @@ export default function DisputeDetail() {
                 disabled={isLoading}
                 className={`w-[48%] py-[14px] border border-gray-300 rounded-xl items-center ${
                   isLoading ? "opacity-50" : ""
-                }`}
-              >
+                }`}>
                 <Text className="text-[16px] font-semibold text-black">
                   Kembali
                 </Text>
@@ -277,8 +273,7 @@ export default function DisputeDetail() {
                 disabled={isLoading}
                 className={`w-[48%] py-[14px] rounded-xl items-center ${
                   isLoading ? "bg-blue-400" : "bg-blue-600"
-                }`}
-              >
+                }`}>
                 <Text className="text-[16px] font-semibold text-white">
                   {isLoading ? "Mengirim..." : "Konfirmasi"}
                 </Text>
@@ -311,8 +306,7 @@ export default function DisputeDetail() {
                     setSelectedSolution(item.title);
                     setShowModal(false);
                   }
-                }}
-              >
+                }}>
                 <Text className="text-sm font-semibold text-black mb-1">
                   {item.title}
                 </Text>
@@ -336,8 +330,7 @@ export default function DisputeDetail() {
           </TouchableWithoutFeedback>
           <View
             className="bg-white rounded-t-3xl pt-4 px-6 pb-6"
-            style={{ maxHeight: "85%" }}
-          >
+            style={{ maxHeight: "85%" }}>
             <View className="w-12 h-1.5 bg-gray-300 rounded-full self-center mb-6" />
             <Text className="text-lg font-semibold mb-4">
               Tips Upload Bukti
@@ -362,8 +355,7 @@ export default function DisputeDetail() {
 
             <View
               style={{ backgroundColor: "#F3F4F6" }}
-              className="p-4 rounded-xl mt-4"
-            >
+              className="p-4 rounded-xl mt-4">
               <Text className="text-sm font-semibold text-black mb-2">
                 Format yang didukung:
               </Text>

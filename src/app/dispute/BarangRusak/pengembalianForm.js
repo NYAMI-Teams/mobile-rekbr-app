@@ -80,14 +80,14 @@ export default function PengembalianForm() {
 
   const handleSubmit = async () => {
     if (loading) return;
-    setLoading(true);
+    isLoading(true);
     try {
       await postBuyerReturn(complaintId, courierId, resi, image);
-      router.replace("../../(tabs)/dispute");
+      router.replace("../../(tabs)/complaint");
     } catch (error) {
       showToast("Gagal", error?.message, "error");
     } finally {
-      setLoading(false);
+      isLoading(false);
     }
   };
 
@@ -148,13 +148,13 @@ export default function PengembalianForm() {
 
       <View className="px-4 py-3 border-t border-gray-200">
         <PrimaryButton
-          title={loading ? "Mengirim..." : "Kirim"}
+          title={isLoading ? "Mengirim..." : "Kirim"}
           onPress={handleSubmit}
-          disabled={loading}
+          disabled={isLoading}
         />
         <View className="flex-row items-center justify-center mt-3">
           <Text className="text-sm text-gray-500">Terdapat kendala?</Text>
-          <TouchableOpacity disabled={loading}>
+          <TouchableOpacity disabled={isLoading}>
             <Text className="text-sm text-blue-600 ml-1 font-bold">
               Silahkan Hubungi Kami
             </Text>
@@ -169,18 +169,15 @@ export default function PengembalianForm() {
         visible={modalVisible}
         onRequestClose={() => {
           closeModal();
-        }}
-      >
+        }}>
         <TouchableOpacity
           className="flex-1 bg-black/50 justify-end"
-          onPress={closeModal}
-        >
+          onPress={closeModal}>
           <View className="bg-white rounded-t-lg h-[55%]">
             <View className="flex-row justify-start p-4 ">
               <TouchableOpacity
                 onPress={closeModal}
-                className="flex-row items-center mb-6"
-              >
+                className="flex-row items-center mb-6">
                 <ChevronLeftCircle size={24} color="#00C2C2" />
                 <Text className="text-lg font-normal text-gray-800 ml-2">
                   Pilih Ekspedisi
@@ -196,8 +193,7 @@ export default function PengembalianForm() {
                     <TouchableOpacity
                       key={index}
                       className="p-5 border-b-2 border-gray-300/50 mb-4"
-                      onPress={() => handleSelectCourier(courier)}
-                    >
+                      onPress={() => handleSelectCourier(courier)}>
                       <Text className="text-[15px] font-semibold">
                         {courier.name}
                       </Text>

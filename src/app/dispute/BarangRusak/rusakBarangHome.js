@@ -26,6 +26,7 @@ export default function RusakBarangHome() {
         setIsEmptyComplaints(true);
       }
       setComplaints(res.data);
+      // console.log("Complaints:", JSON.stringify(Complaints, null, 2));
     } catch (err) {
       showToast(
         "Gagal",
@@ -34,10 +35,6 @@ export default function RusakBarangHome() {
       );
     }
   };
-
-  // useEffect(() => {
-  //   console.log("Complaints:", JSON.stringify(Complaints, null, 2));
-  // }, [Complaints]);
 
   // Function navigate dengan status + optional extra param
   const navigateToKembaliin = (status, extraParams = {}) => {
@@ -67,13 +64,16 @@ export default function RusakBarangHome() {
 
   // komplainList mapping by status
   const handleComplaintPress = (item, mappedStatus) => {
+    console.log("Masuk SIni");
+    console.log(mappedStatus);
+
     const actions = {
       waitingSellerApproval: () =>
         router.push({
           pathname: "/dispute/BarangRusak/rusakBarangMenunggu",
           params: { complaintId: item?.id },
         }),
-      returnRequested: () =>
+      returnRequested: () => {
         router.push({
           pathname: "/dispute/BarangRusak/rusakBarangKembaliin",
           params: {
@@ -82,7 +82,8 @@ export default function RusakBarangHome() {
             sellerRejected: false,
             buyerExpiredDate: false,
           },
-        }),
+        });
+      },
       Completed: () =>
         router.push({
           pathname: "/dispute/BarangRusak/rusakBarangSelesai",
@@ -91,7 +92,11 @@ export default function RusakBarangHome() {
       sellerRejected: () =>
         router.push({
           pathname: "/dispute/BarangRusak/rusakBarangAdmin",
-          params: { complaintId: item?.id, rejectedAdmin: false },
+          params: {
+            complaintId: item?.id,
+            status: "sellerRejected",
+            rejectedAdmin: false,
+          },
         }),
       returnInTransit: () =>
         router.push({
@@ -106,37 +111,54 @@ export default function RusakBarangHome() {
       disputeProved: () =>
         router.push({
           pathname: "/dispute/BarangRusak/rusakBarangKembaliin",
-          params: { status: "disputeProved" },
+          params: {
+            complaintId: item?.id,
+            status: "disputeProved",
+            sellerRejected: false,
+            buyerExpiredDate: false,
+          },
         }),
-      awaitingAdminApproval: () =>
+      awaitingAdminApproval: () => 
         router.push({
-          pathname: "/dispute/BarangRusak/rusakBarangKembaliin",
-          params: { status: "awaitingAdminApproval" },
+          pathname: "/dispute/BarangRusak/rusakBarangAdmin",
+          params: {
+            complaintId: item?.id,
+            rejectedAdmin: false,
+          },
         }),
       rejectedByAdmin: () =>
         router.push({
           pathname: "/dispute/BarangRusak/rusakBarangAdmin",
           params: { complaintId: item?.id, rejectedAdmin: true },
         }),
-      awaitingSellerConfirmation: () =>
+      awaitingSellerConfirmation: () => //marking
         router.push({
           pathname: "/dispute/BarangRusak/rusakBarangKembaliin",
-          params: { status: "awaitingSellerConfirmation" },
+          params: {
+            complaintId: item?.id,
+            status: "awaitingSellerConfirmation",
+          },
         }),
-      approvedBySeller: () =>
+      approvedBySeller: () => //marking
         router.push({
           pathname: "/dispute/BarangRusak/rusakBarangKembaliin",
-          params: { status: "approvedBySeller" },
+          params: { complaintId: item?.id, status: "approvedBySeller" },
         }),
-      approvedByAdmin: () =>
+      r: () => {
         router.push({
           pathname: "/dispute/BarangRusak/rusakBarangKembaliin",
-          params: { status: "approvedByAdmin" },
-        }),
-      underInvestigation: () =>
+          params: {
+            complaintId: item?.id,
+            status: "approvedByAdmin",
+            sellerRejected: true,
+            buyerExpiredDate: false,
+          },
+        });
+      },
+      underInvestigation: () => //marking
         router.push({
           pathname: "/dispute/BarangRusak/rusakBarangKembaliin",
-          params: { status: "under_investigation" },
+          params: { complaintId: item?.id, status: "under_investigation" },
         }),
     };
 

@@ -61,7 +61,7 @@ export default function HilangBarang() {
       if (!complaint?.id) throw new Error("Complaint tidak valid");
 
       showToast("Berhasil", "Komplain Berhasil dibuat", "success");
-      router.push("../../(tabs)/dispute");
+      router.push("../../(tabs)/complaint");
     } catch (err) {
       console.log(
         "❌ Error saat postBuyerComplaint:",
@@ -93,8 +93,7 @@ export default function HilangBarang() {
       <View className="relative items-center justify-center mb-4">
         <TouchableOpacity
           onPress={() => router.back()}
-          className="absolute left-0"
-        >
+          className="absolute left-0">
           <ChevronLeft size={24} color="black" />
         </TouchableOpacity>
         <Text className="text-lg font-semibold text-center">
@@ -163,8 +162,7 @@ export default function HilangBarang() {
               <Text className="text-base text-black">No Resi</Text>
               <Pressable
                 onPress={handleCopy}
-                className="flex-row items-center space-x-1"
-              >
+                className="flex-row items-center space-x-1">
                 <Copy size={16} color="#999" />
                 <Text className="text-base text-blue-500 font-semibold">
                   {transaction.shipment?.trackingNumber || "-"}
@@ -182,8 +180,7 @@ export default function HilangBarang() {
             {/* Nominal Rekber */}
             <Pressable
               onPress={() => setShowBreakdown(!showBreakdown)}
-              className="pt-2 border-t border-gray-200"
-            >
+              className="pt-2 border-t border-gray-200">
               <View className="flex-row justify-between items-center mb-1">
                 <Text className="text-sm font-semibold text-black">
                   Nominal Rekber
@@ -251,8 +248,7 @@ export default function HilangBarang() {
           transparent
           visible={modalVisible}
           animationType="fade"
-          onRequestClose={() => setModalVisible(false)}
-        >
+          onRequestClose={() => setModalVisible(false)}>
           <View className="absolute inset-0 z-50 justify-center items-center bg-black/30">
             <View className="w-[90%] bg-white rounded-xl shadow-md p-5 border border-gray-200">
               <View className="flex-row items-start space-x-3 mb-6">
@@ -267,8 +263,7 @@ export default function HilangBarang() {
               <View className="flex-row justify-between">
                 <Pressable
                   onPress={() => setModalVisible(false)}
-                  className="flex-1 py-3 rounded-lg bg-gray-100 mr-2"
-                >
+                  className="flex-1 py-3 rounded-lg bg-gray-100 mr-2">
                   <Text className="text-center text-black font-semibold text-base">
                     Kembali
                   </Text>
@@ -276,8 +271,7 @@ export default function HilangBarang() {
 
                 <Pressable
                   onPress={handleSubmitComplaint}
-                  className="flex-1 py-3 rounded-lg bg-blue-100 ml-2"
-                >
+                  className="flex-1 py-3 rounded-lg bg-blue-100 ml-2">
                   <Text className="text-center text-black font-semibold text-base">
                     {isSubmitting ? "Mengirim..." : "Konfirmasi"}
                   </Text>

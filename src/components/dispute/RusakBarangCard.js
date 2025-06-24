@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text, TouchableOpacity, Image } from "react-native";
 import { ClipboardPaste } from "lucide-react-native";
 import PrimaryButton from "../PrimaryButton";
+import moment from "moment";
 
 const statusConfig = {
   waitingSellerApproval: {
@@ -35,7 +36,7 @@ const statusConfig = {
   returnInTransit: {
     color: "#FBBF24",
     text: "Menunggu Pengembalian",
-    note: "Cek no resi berkala, kalau seller nggak konfirmasi, minta konfirmasi seller lewat admin. ",
+    note: "Cek no resi berkala, kalau seller nggak konfirmasi, minta konfirmasi seller lewat admin.",
     button: "Minta Konfirmasi",
   },
   awaitingAdminApproval: {
@@ -157,6 +158,11 @@ const RusakBarangCard = ({
 }) => {
   const config = statusConfig[status];
 
+  const formatDateWIB = (dateTime) => {
+    if (!dateTime) return "Invalid date";
+    return moment(dateTime).utcOffset(7).format("DD MMMM YYYY, HH:mm [WIB]");
+  };
+
   return (
     <TouchableOpacity onPress={onPress} activeOpacity={0.8}>
       <View className="bg-white border border-[#E5E7EB] rounded-2xl px-4 pt-4 pb-3 shadow-sm mb-8">
@@ -211,9 +217,12 @@ const RusakBarangCard = ({
               />
               <Text className="flex-1 text-xs text-gray-700 leading-5">
                 <Text className="text-xs text-black">{config.note}</Text>
-                <Text className="text-xs text-black font-semibold">
-                  {config.notebold}
-                </Text>
+                {status !== "returnInTransit" && (
+                  <Text className="text-xs text-black font-semibold">
+                    {" "}
+                    {formatDateWIB(time) || "-"}
+                  </Text>
+                )}
                 <Text className="text-xs text-black">{config.noteafter}</Text>
               </Text>
             </View>
@@ -244,9 +253,11 @@ const RusakBarangCard = ({
             {config.status && (
               <View
                 className="flex-row items-center space-x-1 p-2 rounded-lg"
-                style={{ backgroundColor: config.statusColor }}
-              >
-                <Text className="text-xs text-black ml-2">{config.status}</Text>
+                style={{ backgroundColor: config.statusColor }}>
+                <Text className="text-xs text-black ml-2">
+                  {" "}
+                  {formatDateWIB(time) || "-"}
+                </Text>
               </View>
             )}
           </View>

@@ -49,7 +49,7 @@ export default function KomplainBatal() {
 
   const handleConfirm = () => {
     setShowConfirmModal(false);
-    router.push("../../(tabs)/dispute");
+    router.push("../../(tabs)/complaint");
   };
 
   const pickMedia = async () => {
@@ -183,13 +183,11 @@ export default function KomplainBatal() {
         </Text>
         <TouchableOpacity
           className="flex-row justify-between items-center bg-white border border-gray-300 rounded-xl px-4 py-4"
-          onPress={() => setShowModal(true)}
-        >
+          onPress={() => setShowModal(true)}>
           <Text
             className={`text-sm ${
               selectedSolution ? "text-black" : "text-gray-400"
-            }`}
-          >
+            }`}>
             {selectedSolution || "Pilih solusi kamu"}
           </Text>
           <ChevronDown size={16} color="#999" />
@@ -218,16 +216,14 @@ export default function KomplainBatal() {
             <View className="flex-row justify-between">
               <TouchableOpacity
                 onPress={() => setShowConfirmModal(false)}
-                className="w-[48%] py-[14px] border border-gray-300 rounded-xl items-center"
-              >
+                className="w-[48%] py-[14px] border border-gray-300 rounded-xl items-center">
                 <Text className="text-[16px] font-semibold text-black">
                   Kembali
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={handleConfirm}
-                className="w-[48%] py-[14px] bg-blue-600 rounded-xl items-center"
-              >
+                className="w-[48%] py-[14px] bg-blue-600 rounded-xl items-center">
                 <Text className="text-[16px] font-semibold text-white">
                   Konfirmasi
                 </Text>
@@ -257,8 +253,7 @@ export default function KomplainBatal() {
                 onPress={() => {
                   setSelectedSolution(item.title);
                   setShowModal(false);
-                }}
-              >
+                }}>
                 <Text className="text-sm font-semibold text-black mb-1">
                   {item.title}
                 </Text>
@@ -277,8 +272,7 @@ export default function KomplainBatal() {
           </TouchableWithoutFeedback>
           <View
             className="bg-white rounded-t-3xl pt-4 px-6 pb-6"
-            style={{ maxHeight: "85%" }}
-          >
+            style={{ maxHeight: "85%" }}>
             <View className="w-12 h-1.5 bg-gray-300 rounded-full self-center mb-6" />
             <Text className="text-lg font-semibold mb-4">
               Tips Upload Bukti
@@ -303,8 +297,7 @@ export default function KomplainBatal() {
 
             <View
               style={{ backgroundColor: "#F3F4F6" }}
-              className="p-4 rounded-xl mt-4"
-            >
+              className="p-4 rounded-xl mt-4">
               <Text className="text-sm font-semibold text-black mb-2">
                 Format yang didukung:
               </Text>

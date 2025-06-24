@@ -64,8 +64,7 @@ export default function DetailMasalahScreen() {
         <View className="relative items-center justify-center mb-4">
           <TouchableOpacity
             onPress={() => navigation.goBack()}
-            className="absolute left-0"
-          >
+            className="absolute left-0">
             <ChevronLeft size={24} color="black" />
           </TouchableOpacity>
           <Text className="text-lg font-semibold text-center">
@@ -176,8 +175,7 @@ export default function DetailMasalahScreen() {
             {media.length < 5 && (
               <TouchableOpacity
                 onPress={handlePickMedia}
-                className="w-16 h-16 border border-gray-300 rounded-md items-center justify-center bg-white"
-              >
+                className="w-16 h-16 border border-gray-300 rounded-md items-center justify-center bg-white">
                 <Text className="text-black text-2xl">+</Text>
               </TouchableOpacity>
             )}
@@ -191,8 +189,7 @@ export default function DetailMasalahScreen() {
               </TouchableWithoutFeedback>
               <View
                 className="bg-white rounded-t-3xl pt-4 px-6 pb-6"
-                style={{ maxHeight: "85%" }}
-              >
+                style={{ maxHeight: "85%" }}>
                 <View className="w-12 h-1.5 bg-gray-300 rounded-full self-center mb-6" />
                 <Text className="text-lg font-semibold mb-4">
                   Tips Upload Bukti
@@ -217,8 +214,7 @@ export default function DetailMasalahScreen() {
 
                 <View
                   style={{ backgroundColor: "#F3F4F6" }}
-                  className="p-4 rounded-xl mt-4"
-                >
+                  className="p-4 rounded-xl mt-4">
                   <Text className="text-sm font-semibold text-black mb-2">
                     Format yang didukung:
                   </Text>
@@ -281,7 +277,7 @@ export default function DetailMasalahScreen() {
         {/* Button */}
         <PrimaryButton
           title="Ajukan Komplain Kembali"
-          onPress={() => router.push("../(tabs)/dispute")}
+          onPress={() => router.push("../(tabs)/complaint")}
           style={{ marginBottom: 24 }} // ganti className dengan style inline
         />
       </ScrollView>
