@@ -11,7 +11,7 @@ import { showToast } from "../../utils";
 import { getProfile } from "../../utils/api/auth";
 import EmptyIllustration from "@/components/Ilustration";
 
-export default function Home() {
+export default function Buyer() {
   const router = useRouter();
   const [isEmptyTransaction, setIsEmptyTransaction] = useState(false);
   const [transactions, setTransactions] = useState([]);
@@ -20,7 +20,6 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    checkAuth();
     fetchTransactions();
   }, []);
 
@@ -44,69 +43,33 @@ export default function Home() {
     setRefreshing(false);
   };
 
-  const checkAuth = async () => {
-    setIsLoading(true);
-    try {
-      const token = await getAccessToken();
-      if (!token) {
-        handleLogout();
-        return;
-      }
-      const res = await getProfile();
-      setProfile(res.data);
-    } catch (err) {
-      showToast("Sesi Berakhir", err?.message, "error");
-      handleLogout();
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleLogout = async () => {
-    try {
-      await removeAccessToken();
-      router.replace("Onboarding");
-    } catch (err) {
-      showToast("Logout Gagal", err?.message, "error");
-    }
-  };
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#fff" }}>
-      <StatusBar style="dark" />
-      <View style={{ flex: 1, padding: 16 }}>
-        <NavigationBar
-          name={profile?.email}
-          onNotificationPress={() =>
-            showToast("Notification", "Notification pressed", "success")
-          }
-          onLogoutPress={() => handleLogout()}
-        />
-        {isLoading ? (
-          <View className="flex-1 justify-center items-center">
-            <ActivityIndicator size="large" color="#000" />
-          </View>
-        ) : (
-          <ScrollView
-            className="flex flex-col gap-6"
-            showsVerticalScrollIndicator={false}
-            refreshControl={
-              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-            }>
-            {isEmptyTransaction ? (
-              <View className="items-center mt-8">
-                <EmptyIllustration
-                  text={`Belum ada Rekber yang masuk.\nTunggu seller kirimkan Rekber untuk kamu`}
-                />
-              </View>
-            ) : (
-              transactions.map((transaction) => (
-                <BuyerCard key={transaction.id} data={transaction} />
-              ))
-            )}
-          </ScrollView>
-        )}
-      </View>
+    <View className="flex-1 bg-white">
+      {isLoading ? (
+        <View className="flex-1 justify-center items-center">
+          <ActivityIndicator size="large" color="#000" />
+        </View>
+      ) : (
+        <ScrollView
+          className="flex flex-col px-4 bg-white"
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }>
+          {isEmptyTransaction ? (
+            <View className="items-center mt-8">
+              <EmptyIllustration
+                text={`Belum ada Rekber yang masuk.\nTunggu seller kirimkan Rekber untuk kamu`}
+              />
+            </View>
+          ) : (
+            transactions.map((transaction) => (
+              <BuyerCard key={transaction.id} data={transaction} />
+            ))
+          )}
+        </ScrollView>
+      )}
     </View>
   );
 }

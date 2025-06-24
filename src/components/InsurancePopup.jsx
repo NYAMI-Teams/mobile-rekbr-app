@@ -6,7 +6,7 @@ import { Info } from 'lucide-react-native';
 export default function InsurancePopup({ onClose }) {
   return (
     <View className="absolute inset-0 z-50 justify-center items-center bg-black/30">
-      <SafeAreaView className="w-[90%] bg-white rounded-xl shadow-md p-4 border border-gray-200">
+      <View className="w-[90%] bg-white rounded-xl shadow-md p-4 border border-gray-200">
         <View className="flex-row items-start">
           <Info size={20} color="#3B82F6" className="mt-1 mr-2" />
           <View className="flex-1">
@@ -21,7 +21,7 @@ export default function InsurancePopup({ onClose }) {
             <Text className="text-gray-400 text-xl ml-2">×</Text>
           </TouchableOpacity>
         </View>
-      </SafeAreaView>
+      </View>
     </View>
   );
 }

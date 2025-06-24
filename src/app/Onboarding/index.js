@@ -37,7 +37,7 @@ export default function Landing() {
 
   return (
     <>
-      <SafeAreaView style={styles.container}>
+      <View style={styles.container}>
         <View style={styles.logoContainer}>
           <Image
             source={require("../../assets/logo-rekbr.png")}
@@ -130,7 +130,7 @@ export default function Landing() {
             />
           </View>
         </View>
-      </SafeAreaView>
+      </View>
     </>
   );
 }
@@ -139,7 +139,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-    paddingHorizontal: 16,
   },
   logoContainer: {
     flexDirection: "row",

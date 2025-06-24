@@ -13,7 +13,7 @@ const SellerCard = ({ data }) => {
 
   const formatDateWIB = (dateTime) => {
     if (!dateTime) return "Invalid date";
-    return moment(dateTime).utcOffset(0).format("DD MMMM YYYY, HH:mm [WIB]");
+    return moment(dateTime).utcOffset(7).format("DD MMMM YYYY, HH:mm [WIB]");
   };
 
   const handleCopy = async (text) => {
@@ -255,12 +255,12 @@ const SellerCard = ({ data }) => {
                 {data?.fundReleaseRequest?.status === null
                   ? "Cek no resi berkala, kalau pembeli nggak konfirmasi, minta konfirmasi pembeli lewat admin."
                   : data?.fundReleaseRequest?.status === "pending"
-                  ? "Tunggu approval kami, ya! Kalau bukti kamu oke, permintaan konfirmasi bakal langsung dikirim ke pembeli!"
-                  : data?.fundReleaseRequest?.status === "rejected"
-                  ? "Permintaan konfirmasi ke pembeli ditolak. Pastikan data atau bukti yang kamu kirim sudah lengkap dan sesuai."
-                  : data?.fundReleaseRequest?.status === "approved"
-                  ? "Konfirmasi udah dikirim ke pembeli! Sekarang tinggal tunggu respon mereka dalam 1 x 24 jam."
-                  : "-"}
+                    ? "Tunggu approval kami, ya! Kalau bukti kamu oke, permintaan konfirmasi bakal langsung dikirim ke pembeli!"
+                    : data?.fundReleaseRequest?.status === "rejected"
+                      ? "Permintaan konfirmasi ke pembeli ditolak. Pastikan data atau bukti yang kamu kirim sudah lengkap dan sesuai."
+                      : data?.fundReleaseRequest?.status === "approved"
+                        ? "Konfirmasi udah dikirim ke pembeli! Sekarang tinggal tunggu respon mereka dalam 1 x 24 jam."
+                        : "-"}
               </Text>
             </View>
           )}
@@ -274,8 +274,8 @@ const SellerCard = ({ data }) => {
                   status === "completed"
                     ? "bg-green-400"
                     : status === "canceled"
-                    ? "bg-red-400"
-                    : "bg-yellow-400"
+                      ? "bg-red-400"
+                      : "bg-yellow-400"
                 )}
               />
               <Text className="font-poppins text-xs text-gray-800">

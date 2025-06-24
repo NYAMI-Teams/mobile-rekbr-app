@@ -1,14 +1,13 @@
-import { View, StatusBar } from "react-native";
-import NavigationBar from "../../components/NavigationBar";
-import AccountBalance from "../../components/AccountBalance";
-import QuickActions from "../../components/QuickActions";
-import Dispute from "../Dispute";
+import {
+  View
+} from "react-native";
 
-export default function Home() {
+export default function Dispute() {
+
+
   return (
-    <View style={{ flex: 1, backgroundColor: "#000000" }}>
-      <NavigationBar />
-      <Dispute />
+    <View style={{ flex: 1, backgroundColor: "#fff" }}>
+     
     </View>
   );
 }

@@ -27,6 +27,13 @@ export default function Login() {
   const [errorMsg, setErrorMsg] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
+  useEffect(() => {
+    // development (DELETE)
+    // setEmail("danilardi8@gmail.com");
+    // setPassword("Mobilmerah123#");
+    // setIsPasswordVisible(true);
+  }, []);
+
   const togglePasswordVisibility = () => {
     setIsPasswordVisible(!isPasswordVisible);
   };
@@ -49,8 +56,8 @@ export default function Login() {
       getUserProfile();
     } catch (err) {
       setError(true);
-      setErrorMsg("Login Gagal. Silahkan coba lagi.");
-      showToast("Login Gagal", "Silahkan coba lagi.", "error");
+      setErrorMsg("Email atau kata sandi salah");
+      showToast("Login Gagal", "Silahkan coba lagi", "error");
       setIsLoading(false);
     }
   };
@@ -72,17 +79,18 @@ export default function Login() {
   };
 
   return (
-    <SafeAreaView className="bg-white flex-1">
+    <View className="bg-white flex-1">
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={{ flex: 1 }}>
+        keyboardVerticalOffset={Platform.OS === 'ios' && 60}
+        style={{ flex: 1 }}
+      >
         <ScrollView
           contentContainerStyle={{ flexGrow: 1 }}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
-          hideKeyboardOnScroll={true}
-          keyboardDismissMode="on-drag">
-          <View className="flex-1 justify-between">
+        >
+          <View className="flex-1">
             {/* Header */}
             <View className="bg-white items-center">
               <Image
@@ -93,9 +101,9 @@ export default function Login() {
             </View>
 
             {/* Form */}
-            <View className="py-5 mx-5 justify-between">
+            <View className="mx-5 gap-4 mt-6 flex-1">
               {/* Email */}
-              <View className="mb-4 mt-5">
+              <View className="">
                 <InputField
                   title="Email Kamu, Yuk!"
                   placeholder="email@kamu.com"
@@ -106,7 +114,7 @@ export default function Login() {
               </View>
 
               {/* Password */}
-              <View className=" mb-4 mt-5">
+              <View className="">
                 {/* <Text className="mb-2 text-base text-black">Kata Sandi Rekbr</Text> */}
                 <View className="relative mb-4">
                   <InputField
@@ -121,7 +129,8 @@ export default function Login() {
 
                   <TouchableOpacity
                     className="absolute top-11 right-10"
-                    onPress={togglePasswordVisibility}>
+                    onPress={togglePasswordVisibility}
+                  >
                     <MaterialIcons
                       name={isPasswordVisible ? "visibility" : "visibility-off"}
                       size={22}
@@ -131,8 +140,9 @@ export default function Login() {
                 </View>
 
                 <TouchableOpacity
-                  className="self-end mt-2 mb-2 px-5"
-                  onPress={() => router.push("/auth/LupaPassword")}>
+                  className="self-end mt-2 px-5"
+                  onPress={() => router.push("/auth/LupaPassword")}
+                >
                   <Text className="text-blue-600 text-sm">
                     Lupa Kata Sandi?
                   </Text>
@@ -144,63 +154,64 @@ export default function Login() {
                   </Text>
                 )}
               </View>
+            </View>
+            {/* Button & Links */}
+            <View className="items-center">
+              <View className="absolute bottom-0 left-0 right-0 h-52 rounded-b-3xl overflow-hidden z-[-1]">
+                <Image
+                  source={require("../../assets/gradasi.png")}
+                  className="w-full h-full absolute"
+                  resizeMode="cover"
+                />
+              </View>
+              <View className="px-5 py-5 w-full">
+                <PrimaryButton
+                  title="Masuk"
+                  onPress={handleLogin}
+                  disabled={isLoading || !email || !password}
+                />
+              </View>
 
-              {/* Button & Links */}
-              <View className="items-center mt-10 space-y-4">
-                <View className="absolute bottom-0 left-0 right-0 h-52 rounded-b-3xl overflow-hidden z-[-1]">
-                  <Image
-                    source={require("../../assets/gradasi.png")}
-                    className="w-full h-full absolute"
-                    resizeMode="cover"
-                  />
+              {/* Registrasi / Hubungi Kami */}
+              <View className="items-center mt-3">
+                <View className="flex-row items-center justify-between mb-4">
+                  <Text className="text-sm px-3">Belum punya akun?</Text>
+                  <TouchableOpacity
+                    onPress={() => router.replace("/auth/register")}
+                  >
+                    <Text className="text-sm text-blue-600 font-medium">
+                      Silakan Registrasi
+                    </Text>
+                  </TouchableOpacity>
                 </View>
-                <View className="px-5 py-5 w-full">
-                  <PrimaryButton
-                    title="Masuk"
-                    onPress={handleLogin}
-                    disabled={isLoading || !email || !password}
-                  />
+                <View className="flex-row items-center justify-between mb-4">
+                  <Text className="text-sm px-3">Terdapat kendala?</Text>
+                  <TouchableOpacity
+                    onPress={() => Alert.alert("Berhasil terhubung")}
+                  >
+                    <Text className="text-sm text-blue-600 font-medium">
+                      Silakan Hubungi Kami
+                    </Text>
+                  </TouchableOpacity>
                 </View>
+              </View>
 
-                {/* Registrasi / Hubungi Kami */}
-                <View className="items-center mt-3">
-                  <View className="flex-row items-center justify-between mb-4">
-                    <Text className="text-sm px-3">Belum punya akun?</Text>
-                    <TouchableOpacity
-                      onPress={() => router.replace("/auth/register")}>
-                      <Text className="text-sm text-blue-600 font-medium">
-                        Silakan Registrasi
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                  <View className="flex-row items-center justify-between mb-4">
-                    <Text className="text-sm px-3">Terdapat kendala?</Text>
-                    <TouchableOpacity
-                      onPress={() => Alert.alert("Berhasil terhubung")}>
-                      <Text className="text-sm text-blue-600 font-medium">
-                        Silakan Hubungi Kami
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-
-                {/* Powered by */}
-                <View className="flex-row items-center space-x-1 mt-4">
-                  <Text className="text-xs text-gray-600">Powered by</Text>
-                  <Image
-                    source={require("../../assets/326.png")}
-                    className="w-4 h-4"
-                    resizeMode="contain"
-                  />
-                  <Text className="text-xs font-semibold text-orange-500">
-                    ADHIKSHA TRIBIXA
-                  </Text>
-                </View>
+              {/* Powered by */}
+              <View className="flex-row items-center space-x-1 mt-4 mb-5">
+                <Text className="text-xs text-gray-600">Powered by</Text>
+                <Image
+                  source={require("../../assets/326.png")}
+                  className="w-4 h-4"
+                  resizeMode="contain"
+                />
+                <Text className="text-xs font-semibold text-orange-500">
+                  ADHIKSHA TRIBIXA
+                </Text>
               </View>
             </View>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </View>
   );
 }

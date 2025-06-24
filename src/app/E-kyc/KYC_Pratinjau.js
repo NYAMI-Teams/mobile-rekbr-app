@@ -28,14 +28,14 @@ export default function Pratinjau() {
       await verifyKyc();
       router.replace("/E-kyc/KYC_Success");
     } catch (error) {
-      showToast("KYC Submission Gagal", "Silahkan coba lagi.", "error");
+      showToast("KYC Submission Gagal", error.message, "error");
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <StatusBar style="dark" />
 
       {/* Header */}
@@ -135,7 +135,7 @@ export default function Pratinjau() {
           </Text>
         </View>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 

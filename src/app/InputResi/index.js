@@ -26,6 +26,7 @@ import Toast from "react-native-toast-message";
 import * as ImagePicker from "expo-image-picker";
 import * as ImageManipulator from "expo-image-manipulator";
 import { showToast } from "@/utils";
+import NavBackHeader from "@/components/NavBackHeader";
 
 export default function InputResi() {
   const router = useRouter();
@@ -176,7 +177,7 @@ export default function InputResi() {
       await postResi(id, courierId, resiNumber, image);
       router.replace("/");
     } catch (error) {
-      showToast("Gagal", "Gagal mengunggah resi", "error");
+      showToast("Gagal", `Gagal mengunggah resi, ${error?.message}`, "error");
     } finally {
       setShowPopup(false);
     }
@@ -195,92 +196,87 @@ export default function InputResi() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white justify-between">
+    <View className="flex-1 bg-white justify-between">
       {/* Header */}
-      <View className="flex-row justify-between items-center w-full px-4 pt-4">
-        {/* Tambahkan padding horizontal */}
-        <TouchableOpacity onPress={() => router.back()}>
-          <Ionicons name="chevron-back-outline" size={24} color="#000" />
-        </TouchableOpacity>
-        <Text className="text-[16px] font-semibold text-black">
-          {/* Hapus items-center, karena sudah di flex-row justify-between */}
-          Form Pengiriman
-        </Text>
-        <View style={{ width: 24 }} />
-      </View>
+      <NavBackHeader title={"Form Pengiriman"} />
 
       {/* Content */}
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={{ flex: 1 }}>
+        keyboardVerticalOffset={Platform.OS === 'ios' && 60}
+        style={{ flex: 1 }}
+      >
         <ScrollView
-          className="flex-1 w-full px-4 mt-5"
+          contentContainerStyle={{ flexGrow: 1 }}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
-          hideKeyboardOnScroll={true}
-          keyboardDismissMode="on-drag">
+          className="px-4"
+        >
           {/* Wrap content dengan ScrollView */}
-          <View className="mt-4">
-            <InputField
-              title="Masukkan Nomor Resi"
-              placeholder="Masukkan Nomor Resi dengan benar"
-              value={resiNumber}
-              onChangeText={handleResiNumberChange}
-              errorText={resiNumberError}
-              keyboardType="default"
-              autoCapitalize="characters"
-            />
-          </View>
-          <TouchableOpacity className="mt-4" onPress={handleModal}>
-            <DropDownField
-              title="Pilih Ekspedisi"
-              placeholder="Pilih Ekspedisi pengiriman kamu"
-              value={courier}
-              onChangeText={setCourier}
-              editable={false}
-            />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={handleUpload} className="mt-4">
-            <AttachmentFilled
-              title="Unggah Bukti"
-              caption={
-                isUploaded
-                  ? image?.uri?.split("/").pop()
-                  : "Berikan bukti berupa screenshot cek resi"
-              }
-              captionColor={isUploaded ? "#08B20F" : "#9E9E9E"}
-              iconName={"camera"} // Pastikan AttachmentFilled Anda bisa menerima string 'camera' untuk ikon
-              boxColor={isUploaded ? "#F9F9F9" : "#49DBC8"}
-              iconsColor={isUploaded ? "#C2C2C2" : "#FFFFFF"}
-              cardColor={"#FFF"}
-              alertText="Pastikan keterbacaan foto dan hindari bayangan"
-              alertColor={isUploaded ? "#08B20F" : "#C2C2C2"}
-              alertIconName={isUploaded ? "checkmark-circle" : "alert-circle"} // Pastikan ini juga sesuai dengan AttachmentFilled
-              alertIconColor={isUploaded ? "#08B20F" : "#C2C2C2"}
-              onPress={handleUpload}
-            />
-          </TouchableOpacity>
-          <View className="mt-4 mb-4">
-            {/* Tambahkan margin vertikal */}
-            {/* Image Preview */}
-            {!image ? null : (
-              <Image
-                source={{ uri: image.uri }}
-                className="w-full h-64 rounded-lg"
+          <View className="flex-1 mt-4">
+            <View className="">
+              <InputField
+                title="Masukkan Nomor Resi"
+                placeholder="Masukkan Nomor Resi dengan benar"
+                value={resiNumber}
+                onChangeText={handleResiNumberChange}
+                errorText={resiNumberError}
+                keyboardType="default"
+                autoCapitalize="characters"
               />
-            )}
+            </View>
+            <TouchableOpacity className="mt-4" onPress={handleModal}>
+              <DropDownField
+                title="Pilih Ekspedisi"
+                placeholder="Pilih Ekspedisi pengiriman kamu"
+                value={courier}
+                onChangeText={setCourier}
+                editable={false}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={handleUpload} className="mt-4">
+              <AttachmentFilled
+                title="Unggah Bukti"
+                caption={
+                  isUploaded
+                    ? image?.uri?.split("/").pop()
+                    : "Berikan bukti berupa screenshot cek resi"
+                }
+                captionColor={isUploaded ? "#08B20F" : "#9E9E9E"}
+                iconName={"camera"} // Pastikan AttachmentFilled Anda bisa menerima string 'camera' untuk ikon
+                boxColor={isUploaded ? "#F9F9F9" : "#49DBC8"}
+                iconsColor={isUploaded ? "#C2C2C2" : "#FFFFFF"}
+                cardColor={"#FFF"}
+                alertText="Pastikan keterbacaan foto dan hindari bayangan"
+                alertColor={isUploaded ? "#08B20F" : "#C2C2C2"}
+                alertIconName={isUploaded ? "checkmark-circle" : "alert-circle"} // Pastikan ini juga sesuai dengan AttachmentFilled
+                alertIconColor={isUploaded ? "#08B20F" : "#C2C2C2"}
+                onPress={handleUpload}
+              />
+            </TouchableOpacity>
+            <View className="mt-4 mb-4">
+              {/* Tambahkan margin vertikal */}
+              {/* Image Preview */}
+              {!image ? null : (
+                <Image
+                  source={{ uri: image.uri }}
+                  className="w-full h-64 rounded-lg"
+                />
+              )}
+            </View>
+          </View>
+          {/* Button */}
+          <View className="w-full px-4 py-4 mb-8">
+            {/* Tambahkan padding horizontal dan vertikal */}
+            <PrimaryButton
+              title="Kirim"
+              onPress={handleBtnPress}
+            // disabled={courier == "" || resiNumber == "" || image == null}
+            />
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
-      {/* Button */}
-      <View className="w-full px-4 py-4">
-        {/* Tambahkan padding horizontal dan vertikal */}
-        <PrimaryButton
-          title="Kirim"
-          onPress={handleBtnPress}
-          // disabled={courier == "" || resiNumber == "" || image == null}
-        />
-      </View>
+
 
       {showPopup && (
         <BuyerKonfirmasi
@@ -346,7 +342,7 @@ export default function InputResi() {
           </View>
         </TouchableOpacity>
       </Modal>
-    </SafeAreaView>
+    </View>
   );
 }
 

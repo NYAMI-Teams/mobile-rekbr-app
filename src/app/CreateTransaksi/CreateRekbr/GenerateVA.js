@@ -7,6 +7,7 @@ import RekeningKamu from "../../../components/RekeningKamu";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { sellerCreateTransaction } from "../../../utils/api/transaction";
 import { formatCurrency, showToast } from "../../../utils";
+import NavBackHeader from "@/components/NavBackHeader";
 
 export default function TransactionSummary() {
   const router = useRouter();
@@ -46,18 +47,9 @@ export default function TransactionSummary() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white relative">
+    <View className="flex-1 bg-white relative">
       {/* Header */}
-      <View className="flex-row items-center justify-center mb-6 relative">
-        <TouchableOpacity
-          className="absolute left-0"
-          onPress={() => router.back()}>
-          <ChevronLeft size={24} color="#000" />
-        </TouchableOpacity>
-        <Text className="text-lg font-semibold text-center">
-          Ringkasan Transaksi Rekber
-        </Text>
-      </View>
+      <NavBackHeader title={"Ringkasan Transaksi Rekber"}/>
       <ScrollView
         contentContainerStyle={{ paddingBottom: 160 }}
         className="px-4 pt-6">
@@ -111,7 +103,7 @@ export default function TransactionSummary() {
       </ScrollView>
 
       {/* Footer */}
-      <View className="p-3 border-t-2 rounded-t-3xl border-x-2 border-gray-200 drop-shadow-xl items-center justify-between">
+      <View className="p-3 border-t-2 rounded-t-3xl border-x-2 border-gray-200 drop-shadow-xl items-center justify-between mb-8">
         <View className="flex-row justify-between items-center mb-4 w-full px-2">
           <Text className="text-base text-gray-700 font-medium">
             Total Tagihan Buyer
@@ -126,7 +118,7 @@ export default function TransactionSummary() {
           disabled={isLoading}
         />
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 

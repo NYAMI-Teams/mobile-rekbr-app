@@ -7,7 +7,6 @@ import {
   Text,
   Image,
   TouchableOpacity,
-  SafeAreaView,
 } from "react-native";
 import { useRouter } from "expo-router";
 
@@ -16,7 +15,7 @@ import { useRouter } from "expo-router";
 export default function RegisterSuccess({ title, subTitle, fromRegister }) {
   const router = useRouter();
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <StatusBar style="dark" />
 
       {/* Logo Rekbr + by BNI */}
@@ -69,7 +68,7 @@ export default function RegisterSuccess({ title, subTitle, fromRegister }) {
           </TouchableOpacity>
         )}
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -77,7 +76,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-    paddingHorizontal: 16,
   },
   logoContainer: {
     flexDirection: "row",
@@ -133,7 +131,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   bottomSection: {
-    paddingBottom: 16,
+    paddingBottom: 32,
   },
   buttonLight: {
     width: "90%",
