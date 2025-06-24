@@ -1,7 +1,6 @@
 import { Stack } from "expo-router";
 import "../../global.css";
 import { useEffect, useState } from "react";
-import Toast from "react-native-toast-message";
 import { getProfile } from "../utils/api/auth";
 import { showToast } from "../utils";
 import { getAccessToken, setProfileStore } from "../store";
@@ -65,6 +64,7 @@ export default function RootLayout() {
           <Stack.Screen name="Onboarding/index" />
         )}
       </Stack>
+      </GestureHandlerRootView>
       <Toast />
     </GestureHandlerRootView>
     </>

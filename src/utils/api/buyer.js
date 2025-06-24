@@ -1,10 +1,15 @@
 import Api from "../api";
+import QueryString from "qs";
 
 export const getBuyerTransactions = async () => {
+  const params = ["pending_payment", "waiting_shipment", "shipped"];
   try {
     const res = await Api.get(`/buyer/transactions`, {
       params: {
-        isHistory: false,
+        status: ["shipped", "pending_payment", "waiting_shipment"],
+      },
+      paramsSerializer: (params) => {
+        return QueryString.stringify(params, { arrayFormat: "repeat" });
       },
     });
     if (res) {
@@ -20,7 +25,10 @@ export const getHistoryBuyer = async () => {
   try {
     const res = await Api.get(`/buyer/transactions`, {
       params: {
-        isHistory: true,
+        status: ["completed", "canceled"],
+      },
+      paramsSerializer: (params) => {
+        return QueryString.stringify(params, { arrayFormat: "repeat" });
       },
     });
     if (res) {
