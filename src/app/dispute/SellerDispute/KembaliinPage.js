@@ -11,7 +11,10 @@ import CopyField from "../../../components/dispute/copyField";
 import { InfoBanner } from "../../../components/dispute/InfoBanner";
 import { StatusKomplain } from "../../../components/dispute/statusKomplain";
 import PrimaryButton from "../../../components/PrimaryButton";
-import { getDetailSellerComplaint } from "@/utils/api/complaint";
+import {
+  getDetailSellerComplaint,
+  postSellerConfirmReturn,
+} from "@/utils/api/complaint";
 import { useEffect, useState } from "react";
 import { showToast, formatCurrency } from "@/utils";
 import moment from "moment";
@@ -23,9 +26,10 @@ const formatDateWIB = (dateTime) => {
 
 export default function KembaliinPage() {
   const router = useRouter();
-  const { id, status, sellerRejected, buyerExpiredDate } =
-    useLocalSearchParams();
+  const { id, status } = useLocalSearchParams();
   const [detailComplaint, setDetailComplaint] = useState({});
+  const [sellerRejected, setSellerRejected] = useState(false);
+  const [buyerExpiredDate, setBuyerExpiredDate] = useState(false);
 
   useEffect(() => {
     fetchDetailComplaint();
@@ -35,6 +39,8 @@ export default function KembaliinPage() {
     try {
       const res = await getDetailSellerComplaint(id);
       setDetailComplaint(res.data);
+      setSellerRejected(res.data.seller_decision === "rejected" ? true : false);
+      setBuyerExpiredDate(res.data.updated_at); // ini kurang response di DB untuk dapetin buyerExpiredDate
       console.log("Detail Complaint:", JSON.stringify(res.data, null, 2));
     } catch (error) {
       console.error("Gagal mengambil data detail komplain:", error);
@@ -373,21 +379,21 @@ export default function KembaliinPage() {
         {
           text: "Kembali",
           style: "cancel",
+          onPress: () => {
+            router.back();
+          },
         },
         {
           text: "Konfirmasi",
           style: "destructive",
           onPress: () => {
-            postBuyerCancelComplaint(complaintId) //nanti ganti dengan API yang sesuai
+            console.log("Finishing Id ===> ", id);
+            postSellerConfirmReturn(id)
               .then(() => {
-                router.replace("../../(tabs)/dispute");
+                router.replace("../../(tabs)/complaint");
               })
               .catch((err) => {
-                showToast(
-                  "Gagal",
-                  "Gagal membatalkan komplain. Coba lagi.",
-                  "error"
-                );
+                showToast("Gagal", err?.message, "error");
                 console.log("Cancel error:", err);
               });
           },

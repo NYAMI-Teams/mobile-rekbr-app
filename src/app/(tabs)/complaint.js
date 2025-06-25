@@ -113,12 +113,10 @@ export default function DisputeScreen() {
         );
       }
       return BuyerComplaints.filter((item) => {
-        const mappedStatus =
-          complaintStatusMapBuyer[item.status] || "disputeCancel";
-        return !hiddenStatusesBuyer.includes(mappedStatus);
+        const mappedStatus = complaintStatusMapBuyer[item.status];
+        return mappedStatus;
       }).map((item) => {
-        const mappedStatus =
-          complaintStatusMapBuyer[item.status] || "disputeCancel";
+        const mappedStatus = complaintStatusMapBuyer[item.status];
         return (
           <RusakBarangCard
             key={item?.id || ""}
@@ -175,12 +173,10 @@ export default function DisputeScreen() {
         );
       }
       return SellerComplaints.filter((item) => {
-        const mappedStatus =
-          complaintStatusMapSeller[item.status] || "disputeCancel";
-        return !hiddenStatusesSeller.includes(mappedStatus);
+        const mappedStatus = complaintStatusMapSeller[item.status];
+        return mappedStatus;
       }).map((item) => {
-        const mappedStatus =
-          complaintStatusMapSeller[item.status] || "disputeCancel";
+        const mappedStatus = complaintStatusMapSeller[item.status];
         return (
           <SellerDisputeListCard
             key={item?.id || ""}
@@ -248,6 +244,10 @@ export default function DisputeScreen() {
     approved_by_seller: "approvedBySeller", //return requested kalau udah di approved by seller gausah di test
     approved_by_admin: "approvedByAdmin", //gaada karena langsung ke (return_requested)
     under_investigation: "underInvestigation", //done
+    completed: "Completed",
+    rejected_by_admin: "rejectedByAdmin",
+    canceled_by_buyer: "canceledByBuyer",
+    awaiting_seller_confirmation: "awaitingSellerConfirmation",
   };
 
   const complaintStatusMapSeller = {
@@ -261,16 +261,18 @@ export default function DisputeScreen() {
     under_investigtion: "underInvestigation",
     awaiting_seller_confirmation: "awaitingSellerConfirmation",
     completed: "Completed",
+    rejected_by_admin: "rejectedByAdmin",
+    canceled_by_buyer: "canceledByBuyer",
   };
 
   const hiddenStatusesBuyer = [
-    "Completed", //kalo seller masuk ke status map
-    "rejectedByAdmin",
-    "disputeCancel",
-    "awaitingSellerConfirmation", // kalo seller masuk ke status map
+    "completed", //kalo seller masuk ke status map
+    "rejected_by_admin",
+    "canceled_by_buyer",
+    "awaiting_seller_confirmation", // kalo seller masuk ke status map
   ];
 
-  const hiddenStatusesSeller = ["rejectedByAdmin", "disputeCancel"];
+  const hiddenStatusesSeller = ["rejected_by_admin", "canceled_by_buyer"];
 
   const disputeTypeLabel = (type) => {
     if (type === "Barang rusak") return "Barang Rusak";

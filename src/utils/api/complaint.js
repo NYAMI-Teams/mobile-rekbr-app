@@ -123,6 +123,22 @@ export const getDetailSellerComplaint = async (id) => {
   }
 };
 
+export const postSellerConfirmReturn = async (id) => {
+  try {
+    const res = await Api.patch(`/seller/complaints/${id}/confirm-return`, {
+      params: {
+        status: "completed",
+      },
+    });
+
+    if (res) {
+      return res;
+    }
+  } catch (error) {
+    throw error;
+  }
+};
+
 // Post Seller Response
 export const postSellerResponse = async (
   id,
