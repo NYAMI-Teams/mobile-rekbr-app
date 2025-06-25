@@ -1,9 +1,4 @@
-import {
-  View,
-  FlatList,
-  RefreshControl,
-  ActivityIndicator,
-} from "react-native";
+import { View, FlatList, RefreshControl, StyleSheet } from "react-native";
 import { useState, useEffect, useRef } from "react";
 import { StatusBar } from "expo-status-bar";
 import { getBuyerTransactions } from "../../utils/api/buyer";
@@ -79,7 +74,7 @@ export default function Buyer() {
     }
 
     return (
-      <View className='items-center mt-8'>
+      <View style={styles.emptyContainer}>
         <EmptyIllustration
           text={`Belum ada Rekber yang masuk.\nTunggu seller kirimkan Rekber untuk kamu`}
         />
@@ -90,7 +85,7 @@ export default function Buyer() {
   const ListFooter = () => {
     if (isFetching && offset > 0) {
       return (
-        <View className='my-4 px-4'>
+        <View style={styles.footerContainer}>
           {[...Array(2)].map((_, i) => (
             <TransactionSkeleton key={i} />
           ))}
@@ -101,12 +96,11 @@ export default function Buyer() {
   };
 
   return (
-    <View className='flex-1 bg-white'>
+    <View style={styles.container}>
       <StatusBar style='dark' />
-
       <FlatList
         ref={listRef}
-        className='w-full px-4'
+        style={styles.flatList}
         data={transactions}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
@@ -122,3 +116,22 @@ export default function Buyer() {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#ffffff",
+  },
+  flatList: {
+    width: "100%",
+    paddingHorizontal: 16,
+  },
+  emptyContainer: {
+    alignItems: "center",
+    marginTop: 32,
+  },
+  footerContainer: {
+    marginVertical: 16,
+    paddingHorizontal: 16,
+  },
+});

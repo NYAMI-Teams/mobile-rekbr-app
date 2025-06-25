@@ -2,10 +2,10 @@ import {
   View,
   FlatList,
   RefreshControl,
-  ActivityIndicator,
   Text,
   Image,
   TouchableOpacity,
+  StyleSheet,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { useState, useEffect } from "react";
@@ -102,7 +102,7 @@ export default function Seller() {
 
   const renderFooter = () =>
     isFetching && offset > 0 ? (
-      <View className='my-4 px-4'>
+      <View style={styles.footerContainer}>
         {[...Array(2)].map((_, i) => (
           <TransactionSkeleton key={i} />
         ))}
@@ -110,9 +110,9 @@ export default function Seller() {
     ) : null;
 
   return (
-    <View className='flex-1 bg-white'>
+    <View style={styles.container}>
       <FlatList
-        className='flex px-4 bg-white'
+        style={styles.flatList}
         data={transactions}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
@@ -135,20 +135,7 @@ export default function Seller() {
           textColor='#fff'
           width='50%'
           height={50}
-          style={{
-            position: "absolute",
-            bottom: 30,
-            right: 16,
-            borderRadius: 16,
-            alignItems: "center",
-            justifyContent: "center",
-            shadowColor: "#000",
-            shadowOffset: { width: 0, height: 4 },
-            shadowOpacity: 0.3,
-            shadowRadius: 5,
-            elevation: 8,
-            zIndex: 10,
-          }}
+          style={styles.floatingButton}
         />
       )}
     </View>
@@ -161,28 +148,28 @@ function SellerEmptyContent({ isKYCCompleted }) {
   return (
     <View>
       {!isKYCCompleted && (
-        <View className='bg-[#FFF4D9] rounded-xl py-3 px-4 mb-4'>
-          <View className='flex-row items-start'>
+        <View style={styles.warningBox}>
+          <View style={styles.warningContent}>
             <Image
               source={require("../../assets/icon-warning.png")}
-              className='w-5 h-5 mt-[2px] mr-2'
+              style={styles.warningIcon}
               resizeMode='contain'
             />
-            <Text className='flex-1 text-sm text-black font-normal leading-5'>
+            <Text style={styles.warningText}>
               Biar bisa lanjut bikin Rekber, kamu perlu selesain KYC dulu, ya!
             </Text>
           </View>
         </View>
       )}
 
-      <View className='items-center mb-8'>
+      <View style={styles.emptyIllustration}>
         <EmptyIllustration
           text={`Kosong banget di sini...\nBikin Rekber pertama kamu, kuy!`}
         />
       </View>
 
       <TouchableOpacity
-        className='w-full py-4 rounded-xl bg-black items-center justify-center'
+        style={styles.ctaButton}
         onPress={() => {
           if (!isKYCCompleted) {
             router.push("E-kyc/KYC_Intro");
@@ -191,10 +178,80 @@ function SellerEmptyContent({ isKYCCompleted }) {
           }
         }}
       >
-        <Text className='text-white text-base font-semibold'>
+        <Text style={styles.ctaButtonText}>
           {isKYCCompleted ? "Bikin Rekber Baru" : "Lengkapi KYC & Bikin Rekber"}
         </Text>
       </TouchableOpacity>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
+  flatList: {
+    flex: 1,
+    paddingHorizontal: 16,
+    backgroundColor: "#fff",
+  },
+  footerContainer: {
+    marginVertical: 16,
+    paddingHorizontal: 16,
+  },
+  warningBox: {
+    backgroundColor: "#FFF4D9",
+    borderRadius: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    marginBottom: 16,
+  },
+  warningContent: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+  },
+  warningIcon: {
+    width: 20,
+    height: 20,
+    marginTop: 2,
+    marginRight: 8,
+  },
+  warningText: {
+    flex: 1,
+    fontSize: 14,
+    color: "#000",
+    lineHeight: 20,
+  },
+  emptyIllustration: {
+    alignItems: "center",
+    marginBottom: 32,
+  },
+  ctaButton: {
+    width: "100%",
+    paddingVertical: 16,
+    borderRadius: 12,
+    backgroundColor: "#000",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  ctaButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  floatingButton: {
+    position: "absolute",
+    bottom: 30,
+    right: 16,
+    borderRadius: 16,
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 8,
+    zIndex: 10,
+  },
+});

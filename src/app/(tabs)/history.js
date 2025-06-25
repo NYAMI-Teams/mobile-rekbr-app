@@ -4,6 +4,7 @@ import {
   TouchableOpacity,
   FlatList,
   RefreshControl,
+  StyleSheet,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { useState, useEffect, useRef } from "react";
@@ -24,7 +25,6 @@ export default function History() {
   const [isFetching, setIsFetching] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
-
   const flatListRef = useRef();
 
   const fetchData = async (reset = false) => {
@@ -96,7 +96,7 @@ export default function History() {
     }
 
     return (
-      <View className='mt-8 items-center justify-center'>
+      <View style={styles.emptyContainer}>
         <EmptyIllustration
           text={
             selectedTab === "pembelian"
@@ -109,37 +109,41 @@ export default function History() {
   };
 
   return (
-    <View className='flex-1 bg-white'>
+    <View style={styles.container}>
       <StatusBar style='dark' />
-      <View className='flex-row w-full px-4 h-10'>
+      <View style={styles.tabContainer}>
         <TouchableOpacity
           onPress={() => setSelectedTab("pembelian")}
-          className={`flex-1 items-center justify-center h-full ${
-            selectedTab === "pembelian"
-              ? "border-b-2 border-[#49DBC8]"
-              : "border-b-2 border-gray-300"
-          }`}
+          style={[
+            styles.tabButton,
+            selectedTab === "pembelian" ? styles.tabActive : styles.tabInactive,
+          ]}
         >
           <Text
-            className={`text-xs font-semibold ${
-              selectedTab === "pembelian" ? "text-black" : "text-gray-400"
-            }`}
+            style={[
+              styles.tabText,
+              selectedTab === "pembelian"
+                ? styles.tabTextActive
+                : styles.tabTextInactive,
+            ]}
           >
             Pembelian
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => setSelectedTab("penjualan")}
-          className={`flex-1 items-center justify-center h-full ${
-            selectedTab === "penjualan"
-              ? "border-b-2 border-[#49DBC8]"
-              : "border-b-2 border-gray-300"
-          }`}
+          style={[
+            styles.tabButton,
+            selectedTab === "penjualan" ? styles.tabActive : styles.tabInactive,
+          ]}
         >
           <Text
-            className={`text-xs font-semibold ${
-              selectedTab === "penjualan" ? "text-black" : "text-gray-400"
-            }`}
+            style={[
+              styles.tabText,
+              selectedTab === "penjualan"
+                ? styles.tabTextActive
+                : styles.tabTextInactive,
+            ]}
           >
             Penjualan
           </Text>
@@ -148,7 +152,7 @@ export default function History() {
 
       <FlatList
         ref={flatListRef}
-        className='w-full px-4'
+        style={styles.flatList}
         data={data}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
@@ -172,3 +176,48 @@ export default function History() {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#ffffff",
+  },
+  tabContainer: {
+    flexDirection: "row",
+    width: "100%",
+    paddingHorizontal: 16,
+    height: 40,
+  },
+  tabButton: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    height: "100%",
+    borderBottomWidth: 2,
+  },
+  tabActive: {
+    borderBottomColor: "#49DBC8",
+  },
+  tabInactive: {
+    borderBottomColor: "#D1D5DB", // gray-300
+  },
+  tabText: {
+    fontSize: 12,
+    fontWeight: "600",
+  },
+  tabTextActive: {
+    color: "#000000",
+  },
+  tabTextInactive: {
+    color: "#9CA3AF", // gray-400
+  },
+  flatList: {
+    width: "100%",
+    paddingHorizontal: 16,
+  },
+  emptyContainer: {
+    marginTop: 32,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+});
