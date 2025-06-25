@@ -13,11 +13,13 @@ import Api from "../api";
 // };
 
 // Get All Seller Trx
-export const getSellerTransactions = async () => {
+export const getSellerTransactions = async (offset, limit) => {
   try {
     const res = await Api.get(`/seller/transactions`, {
       params: {
         status: ["shipped", "pending_payment", "waiting_shipment"],
+        offset,
+        limit,
       },
       paramsSerializer: (params) => {
         return QueryString.stringify(params, { arrayFormat: "repeat" });
@@ -32,11 +34,13 @@ export const getSellerTransactions = async () => {
 };
 
 // Get History Seller Trx
-export const getHistorySeller = async () => {
+export const getHistorySeller = async (offset, limit) => {
   try {
     const res = await Api.get(`/seller/transactions`, {
       params: {
         status: ["completed", "canceled"],
+        offset,
+        limit,
       },
       paramsSerializer: (params) => {
         return QueryString.stringify(params, { arrayFormat: "repeat" });
