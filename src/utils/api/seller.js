@@ -36,7 +36,7 @@ export const getHistorySeller = async () => {
   try {
     const res = await Api.get(`/seller/transactions`, {
       params: {
-        status: ["completed", "canceled"],
+        status: ["completed", "canceled", "refunded"],
       },
       paramsSerializer: (params) => {
         return QueryString.stringify(params, { arrayFormat: "repeat" });

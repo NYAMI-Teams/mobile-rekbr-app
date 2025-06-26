@@ -1,28 +1,35 @@
-import React from "react";
+import React, { useState } from "react";
 import { View, Text, TouchableOpacity, Image, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import PrimaryButton from "../../components/PrimaryButton";
 import { ChevronLeft } from "lucide-react-native";
-import { useNavigation } from "expo-router";
+import { useRouter } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
 
-export default function Dispute() {
-  const navigation = useNavigation();
+export default function HomeDispute() {
+  const [selectedComplaint, setSelectedComplaint] = useState(null);
+  const router = useRouter();
+  const { transactionId, sellerEmail } = useLocalSearchParams();
   const complaints = [
     {
       label: "Barang belum sampai atau kesasar",
       icon: require("../../assets/belumsampai.png"),
+      route: "/Complaint/Create",
     },
     {
       label: "Barang rusak",
       icon: require("../../assets/barangrusak.png"),
+      route: "/dispute/BarangRusak/pilihKomplain",
     },
     {
       label: "Tidak sesuai deskripsi",
       icon: require("../../assets/tidaksesuai.png"),
+      route: "/dispute/TidakSesuai",
     },
     {
       label: "Masalah atau komplain lainnya",
       icon: require("../../assets/komplain.png"),
+      route: "/dispute/KomplainLainnya",
     },
   ];
 
@@ -32,7 +39,7 @@ export default function Dispute() {
         <View className="relative items-center justify-center mb-4">
           {/* Tombol Back di kiri */}
           <TouchableOpacity
-            onPress={() => navigation.goBack()}
+            onPress={() => router.back()}
             className="absolute left-0">
             <ChevronLeft size={24} color="black" />
           </TouchableOpacity>
@@ -59,7 +66,7 @@ export default function Dispute() {
         {/* Info Email */}
         <Text className="text-lg font-medium text-black mb-3">
           Diskusi dengan
-          <Text className="font-semibold">irgi168@gmail.com</Text>
+          <Text className="font-semibold"> {sellerEmail}</Text>
         </Text>
         <Text className="text-base text-gray-500 mb-4">
           Cari resolusi yang lebih cepat, diskusikan dulu kendalamu dengan
@@ -69,6 +76,7 @@ export default function Dispute() {
         {/* Button Email */}
         <View className="mb-6">
           <PrimaryButton
+            onPress={() => router.push("../(tabs)/complaint")}
             title="Diskusi via email dengan penjual"
             className="mb-6"
           />
@@ -82,7 +90,17 @@ export default function Dispute() {
           {complaints.map((item, index) => (
             <TouchableOpacity
               key={index}
-              className="w-[48%] h-40 bg-white border border-gray-300 rounded-xl px-4 py-10 items-center justify-between">
+              className="w-[48%] h-40 bg-white border border-gray-300 rounded-xl px-4 py-10 items-center justify-between"
+              onPress={() => {
+                console.log("route", `${item.route}`);
+                console.log("transactionId", transactionId);
+                if (item.route) {
+                  router.push({
+                    pathname: `${item.route}`,
+                    params: { id: transactionId },
+                  });
+                }
+              }}>
               <Image
                 source={item.icon}
                 className="w-10 h-10"
@@ -96,7 +114,7 @@ export default function Dispute() {
         </View>
       </ScrollView>
       {/* Footer */}
-      <View className="absolute bottom-16 left-0 right-0 items-center">
+      <View className="absolute bottom-0 left-0 right-0 items-center pb-6">
         <Text className="text-xs text-gray-400">
           Terdapat kendala?
           <Text className="text-blue-500 font-medium">

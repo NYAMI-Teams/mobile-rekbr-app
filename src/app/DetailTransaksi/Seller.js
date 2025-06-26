@@ -215,6 +215,28 @@ export default function DetailTransaksiSeller() {
         ];
       }
     }
+    if (status == "refunded") {
+      if (data?.paidAt == null) {
+        return [
+          {
+            status: "Waktu bikin Rekbr",
+            date: data?.createdAt || "-",
+          },
+        ];
+      }
+      if (data?.paidAt != null) {
+        return [
+          {
+            status: "Waktu bikin Rekbr",
+            date: data?.createdAt || "-",
+          },
+          {
+            status: "Waktu pembeli Bayar",
+            date: data?.paidAt || "-",
+          },
+        ];
+      }
+    }
   };
 
   const setupCaptionTimeStamp = () => {
@@ -268,6 +290,14 @@ export default function DetailTransaksiSeller() {
       return data?.buyerConfirmedAt || "-";
     }
     if (status == "canceled") {
+      if (data?.paidAt == null) {
+        return data?.createdAt || "-";
+      }
+      if (data?.paidAt != null) {
+        return data?.paidAt || "-";
+      }
+    }
+    if (status == "refunded") {
       if (data?.paidAt == null) {
         return data?.createdAt || "-";
       }
@@ -382,9 +412,11 @@ export default function DetailTransaksiSeller() {
     if (itemPrice >= 10000 && itemPrice <= 499999.99) {
       return 5000;
     } else if (itemPrice >= 500000 && itemPrice <= 4999999.99) {
-      return 100 * 0.01; // 1%
+      const platformFee = itemPrice * 0.01;
+      return `${platformFee} %`;
     } else if (itemPrice >= 5000000 && itemPrice <= 10000000) {
-      return 100 * 0.008; // 0.8%
+      const platformFee = itemPrice * 0.008;
+      return `${platformFee} %`;
     }
     return 0;
   };
@@ -417,6 +449,7 @@ export default function DetailTransaksiSeller() {
             currentStep = 2;
             break;
           case "completed":
+          case "refunded":
             currentStep = 3;
             break;
         }
@@ -443,12 +476,13 @@ export default function DetailTransaksiSeller() {
                   {status == "pending_payment" ? "Virtual Account" : "No Resi"}
                 </Text>
                 <View
-                  className={`flex-row items-center ${status == "waiting_shipment" ||
-                      status == "shipped" ||
-                      status == "completed"
+                  className={`flex-row items-center ${
+                    status == "waiting_shipment" ||
+                    status == "shipped" ||
+                    status == "completed"
                       ? "mb-3"
                       : ""
-                    }`}>
+                  }`}>
                   <Text style={{ fontSize: 17, fontWeight: "500" }}>
                     {status == "pending_payment"
                       ? data?.virtualAccount || "-"
@@ -501,10 +535,10 @@ export default function DetailTransaksiSeller() {
                   {status == "completed"
                     ? "Komplain dianggap tidak ada dan bakal selesai otomatis kalau pembeli nggak respon."
                     : data?.fundReleaseRequest?.status == "pending"
-                      ? "Tunggu approval kami, ya! Kalau bukti kamu oke, permintaan konfirmasi bakal langsung dikirim ke buyer!"
-                      : data?.fundReleaseRequest?.status == "approved"
-                        ? "Konfirmasi udah dikirim ke buyer! Sekarang tinggal tunggu respon mereka dalam 1 x 24 jam"
-                        : "Permintaan konfirmasi ke buyer ditolak. Pastikan data atau bukti yang kamu kirim sudah lengkap dan sesuai"}
+                    ? "Tunggu approval kami, ya! Kalau bukti kamu oke, permintaan konfirmasi bakal langsung dikirim ke buyer!"
+                    : data?.fundReleaseRequest?.status == "approved"
+                    ? "Konfirmasi udah dikirim ke buyer! Sekarang tinggal tunggu respon mereka dalam 1 x 24 jam"
+                    : "Permintaan konfirmasi ke buyer ditolak. Pastikan data atau bukti yang kamu kirim sudah lengkap dan sesuai"}
                 </Text>
               </View>
             </>
@@ -512,7 +546,7 @@ export default function DetailTransaksiSeller() {
 
         {/* Status Rekbr (done)*/}
         {data?.fundReleaseRequest?.status == "pending" ||
-          data?.fundReleaseRequest?.status == "rejected" ? (
+        data?.fundReleaseRequest?.status == "rejected" ? (
           <View className="flex-col  gap-2 mx-3 p-3">
             <View className="flex-row justify-between">
               <Text className="text-[15px]">Status Rekbr:</Text>
@@ -631,7 +665,7 @@ export default function DetailTransaksiSeller() {
               {
                 status: `Biaya Jasa Aplikasi (${calculatePlatformFee(
                   data?.itemPrice
-                )}%)`,
+                )})`,
                 price: formatPrice(data?.platformFee || "-"),
               },
             ]}

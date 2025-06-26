@@ -1,66 +1,76 @@
-import React, { Fragment } from "react";
+import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 
-const StepProgressBar = ({ currentStep, steps, rejectedSteps = [] }) => {
+const ComplaintStepBar = ({ currentStep = 0, steps = [], status }) => {
+  const isRejectedStatus = [
+    "rejected",
+    "rejected_by_seller",
+    "rejected_by_admin",
+  ].includes(status);
+
   return (
-    <View className="flex-row items-start justify-center px-4 my-5 mb-4 mx-4">
+    <View style={styles.container}>
       {steps.map((label, index) => {
         const isCompleted = index < currentStep;
         const isActive = index === currentStep;
-        const isFinalStep = isActive && currentStep === steps.length - 1;
-        const isRejectedStep = rejectedSteps.includes(index);
+        const isFinalStep = isActive && index === steps.length - 1;
+        const isRejected = isFinalStep && isRejectedStatus;
 
         return (
-          <Fragment key={index}>
+          <React.Fragment key={index}>
             <View style={styles.stepContainer}>
               <View
                 style={[
                   styles.circle,
-                  isRejectedStep && styles.rejectedCircle,
                   isCompleted && styles.completedCircle,
-                  isActive &&
-                    !isFinalStep &&
-                    !isRejectedStep &&
-                    styles.activeCircle,
-                  isFinalStep && styles.finalCircle,
-                ]}
-              >
-                {isRejectedStep ? (
-                  <MaterialIcons name="close" size={16} color="#F44336" />
-                ) : isCompleted || isFinalStep ? (
+                  isActive && !isFinalStep && styles.activeCircle,
+                  isFinalStep &&
+                    (isRejected ? styles.rejectedCircle : styles.finalCircle),
+                ]}>
+                {isCompleted || isFinalStep ? (
                   <MaterialIcons
-                    name="check"
+                    name={isRejected ? "cancel" : "check"}
                     size={16}
-                    color={isFinalStep ? "#4CD964" : "#4CD7D0"}
+                    color={isRejected ? "#FF4D4F" : "#4CD964"}
                   />
                 ) : isActive ? (
                   <View
                     style={[
                       styles.dot,
-                      isFinalStep && { backgroundColor: "#4CD964" },
+                      isFinalStep && {
+                        backgroundColor: isRejected ? "#FF4D4F" : "#4CD964",
+                      },
                     ]}
                   />
                 ) : null}
               </View>
-
               <Text
                 style={[
                   styles.label,
                   isCompleted && styles.completedLabel,
-                  isActive && styles.activeLabel,
-                  isFinalStep && styles.finalLabel,
-                  isRejectedStep && styles.rejectedLabel,
-                ]}
-              >
+                  isActive && !isFinalStep && styles.activeLabel,
+                  isFinalStep &&
+                    (isRejected ? styles.rejectedLabel : styles.finalLabel),
+                ]}>
                 {label}
               </Text>
             </View>
 
+            {/* Progress Line */}
             {index !== steps.length - 1 && (
-              <View style={[styles.line, index < currentStep && styles.completedLine]} />
+              <View
+                style={[
+                  styles.line,
+                  index < currentStep &&
+                    (steps[index + 1]?.toLowerCase().includes("ditolak") &&
+                    isRejectedStatus
+                      ? styles.rejectedLine
+                      : styles.completedLine),
+                ]}
+              />
             )}
-          </Fragment>
+          </React.Fragment>
         );
       })}
     </View>
@@ -75,7 +85,6 @@ const styles = StyleSheet.create({
     marginVertical: 20,
     marginBottom: 16,
     marginHorizontal: 16,
-    justifyContent: "space-between",
   },
   stepContainer: {
     alignItems: "center",
@@ -89,7 +98,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "white",
-    zIndex: 1,
   },
   completedCircle: {
     backgroundColor: "#EDFBFA",
@@ -100,6 +108,10 @@ const styles = StyleSheet.create({
   finalCircle: {
     backgroundColor: "#E6FFE6",
     borderColor: "#4CD964",
+  },
+  rejectedCircle: {
+    backgroundColor: "#FFF0F0",
+    borderColor: "#FF4D4F",
   },
   dot: {
     width: 8,
@@ -113,15 +125,16 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   line: {
-    width: 80,
+    flex: 1,
     height: 2,
     backgroundColor: "#ccc",
-    marginHorizontal: -13,
-    marginTop: 12,
-    zIndex: 0,
+    marginHorizontal: 8,
   },
   completedLine: {
     backgroundColor: "#4CD7D0",
+  },
+  rejectedLine: {
+    backgroundColor: "#FF4D4F",
   },
   label: {
     marginTop: 6,
@@ -140,14 +153,10 @@ const styles = StyleSheet.create({
     color: "#4CD964",
     fontWeight: "600",
   },
-  rejectedCircle: {
-    backgroundColor: "#FFEBEE",
-    borderColor: "#F44336",
-  },
   rejectedLabel: {
-    color: "#F44336",
+    color: "#FF4D4F",
     fontWeight: "600",
   },
 });
 
-export default StepProgressBar;
+export default ComplaintStepBar;

@@ -93,26 +93,23 @@ export default function CreateRekber() {
 
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        keyboardVerticalOffset={Platform.OS === 'ios' && 60}
-        style={{ flex: 1 }}
-      >
+        keyboardVerticalOffset={Platform.OS === "ios" && 60}
+        style={{ flex: 1 }}>
         <ScrollView
           contentContainerStyle={{ flexGrow: 1 }}
           keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
-        >
+          showsVerticalScrollIndicator={false}>
           <View className="flex-1 items-start gap-2 w-full">
             <View className="flex flex-col items-center gap-4 px-4 py-0 relative self-stretch w-full">
-              {bankData?.bankId !==
-                "484f56b2-4f2e-49e6-aec3-6050f1b8e091" && (
-                  <View className="flex-row items-center gap-2 bg-[#FEF2D3] p-2 rounded-lg mx-4">
-                    <Icon name="info" size={16} color="#FBBF24" />
-                    <Text className="text-neutral-950 text-sm font-normal">
-                      Pilih bank selain BNI? Biaya admin akan kami potong
-                      otomatis dari pembayaran kamu, ya!
-                    </Text>
-                  </View>
-                )}
+              {bankData?.bankId !== "484f56b2-4f2e-49e6-aec3-6050f1b8e091" && (
+                <View className="flex-row items-center gap-2 bg-[#FEF2D3] p-2 rounded-lg mx-4">
+                  <Icon name="info" size={16} color="#FBBF24" />
+                  <Text className="text-neutral-950 text-sm font-normal">
+                    Pilih bank selain BNI? Biaya admin akan kami potong otomatis
+                    dari pembayaran kamu, ya!
+                  </Text>
+                </View>
+              )}
               {/* Bank Account Section */}
               <RekeningKamu bankData={bankData} />
 
@@ -151,12 +148,13 @@ export default function CreateRekber() {
                         }
                       />
                       <Text
-                        className={`ml-2 text-sm ${isEmailValid()
-                          ? isUserFound
-                            ? "text-green-600"
-                            : "text-yellow-600"
-                          : "text-red-400"
-                          }`}>
+                        className={`ml-2 text-sm ${
+                          isEmailValid()
+                            ? isUserFound
+                              ? "text-green-600"
+                              : "text-yellow-600"
+                            : "text-red-400"
+                        }`}>
                         {isEmailValid()
                           ? isUserFound
                             ? "Pengguna ditemukan"
@@ -168,8 +166,9 @@ export default function CreateRekber() {
                   <View className="flex flex-row items-center gap-2 w-full">
                     <TouchableOpacity
                       onPress={handleCheckUser}
-                      className={`flex-row h-[34px] w-20 rounded-lg items-center justify-center text-white gap-2 ${!isEmailValid() ? "bg-gray-400" : "bg-black"
-                        }`}
+                      className={`flex-row h-[34px] w-20 rounded-lg items-center justify-center text-white gap-2 ${
+                        !isEmailValid() ? "bg-gray-400" : "bg-black"
+                      }`}
                       disabled={!isEmailValid()}>
                       <Icon name="search" size={16} color="white" />
                       <Text className="text-white text-xs font-medium">
@@ -192,7 +191,7 @@ export default function CreateRekber() {
                 {/* Amount Input */}
 
                 <InputField
-                  title="Nominal Barang"
+                  title="Nominal Barang (min Rp10.000)"
                   placeholder="Tuliskan harga barang yang kamu jual (Rupiah)"
                   value={amount}
                   renderValue={(amount) => {
@@ -206,8 +205,14 @@ export default function CreateRekber() {
                   }}
                   onChangeText={(text) => {
                     const cleanedText = text.replace(/[^0-9]/g, "");
-                    if (cleanedText > 10000000) {
-                      setErrorText("Maksimum nominal adalah Rp10.000.000");
+                    if (!cleanedText) {
+                      setErrorText("");
+                      setAmount("");
+                      return;
+                    }
+                    const value = parseInt(cleanedText);
+                    if (value > 10_000_000) {
+                      setErrorText("Nominal maksimum adalah Rp10.000.000");
                       return;
                     }
                     setErrorText("");
@@ -223,10 +228,11 @@ export default function CreateRekber() {
                 <View className="flex-row gap-2 w-full items-center">
                   <TouchableOpacity
                     onPress={handleCheckboxPress}
-                    className={`w-6 h-6 rounded border ${isChecked
-                      ? "bg-[#3ED6C5] border-[#3ED6C5]"
-                      : "border-gray-400"
-                      } items-center justify-center`}>
+                    className={`w-6 h-6 rounded border ${
+                      isChecked
+                        ? "bg-[#3ED6C5] border-[#3ED6C5]"
+                        : "border-gray-400"
+                    } items-center justify-center`}>
                     {isChecked && <Text className="text-white text-sm">✓</Text>}
                   </TouchableOpacity>
                   <Text className="text-[14px] text-black font-normal items-center justify-center">
@@ -248,7 +254,13 @@ export default function CreateRekber() {
               title="Lanjut"
               onPress={handleToConfirmPage}
               disabled={
-                !isUserFound || isLoading || !itemName || !amount || !email
+                !isUserFound ||
+                isLoading ||
+                !itemName ||
+                !amount ||
+                !email ||
+                amount < 10_000 ||
+                amount > 10_000_000
               }
             />
           </View>

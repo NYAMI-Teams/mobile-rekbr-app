@@ -9,67 +9,42 @@ import {
   Text,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import ProgressBar from "../ProgressBar";
+import Timestamp from "./Timestamp";
 import * as Clipboard from "expo-clipboard";
 import Toast from "react-native-toast-message";
-import { useRouter, useLocalSearchParams } from "expo-router";
+import PrimaryButton from "../PrimaryButton";
+import Tagihan from "./Tagihan";
+import { useRouter } from "expo-router";
 import React, { useState, useRef, useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ChevronLeftCircle, Play } from "lucide-react-native";
-import Tagihan from "@/components/DetailRekber/Tagihan";
-import Timestamp from "@/components/DetailRekber/Timestamp";
-import ProgressBar from "@/components/ProgressBar";
-import StepSuccesBar from "@/components/SuccesBar";
-import CountdownTimer from "@/components/Countdown";
-import PrimaryButton from "@/components/PrimaryButton";
-import { getDetailBuyerTransaction } from "@/utils/api/buyer";
+import StepSuccesBar from "../../components/SuccesBar";
+import CountdownTimer from "../Countdown";
 import moment from "moment";
 import {
   updateBuyerTransaction,
   buyerConfirmReceivedTransaction,
-} from "@/utils/api/buyer";
+} from "../../utils/api/buyer";
 import { Alert } from "react-native";
-import BuyerKonfirmasi from "@/components/BuyerKonfirmasi";
-import { showToast } from "@/utils";
-import NavBackHeader from "@/components/NavBackHeader";
-import { Modalize } from "react-native-modalize";
+import BuyerKonfirmasi from "../BuyerKonfirmasi";
+import { showToast } from "../../utils";
 
-export default function DetailTransaksiBuyer() {
+export default function DetailTransaksiBuyer({ data }) {
   const router = useRouter();
-  const { id } = useLocalSearchParams();
-  const [data, setData] = useState();
   const [modalVisible, setModalVisible] = useState(false);
   const [isPaymentDone, setIsPaymentDone] = useState(false);
   const [paymentDone, setPaymentDone] = useState({});
   const [showPopup, setShowPopup] = useState(false);
-  const modalizeRef = useRef(null);
 
-  useEffect(() => {
-    const fetchTransactionDetails = async () => {
-      try {
-        const res = await getDetailBuyerTransaction(id);
-        setData(res.data);
-        console.log(
-          "Ini Detail Buyer Transaction",
-          JSON.stringify(res.data, null, 2)
-        );
-      } catch (err) {
-        showToast(
-          "Gagal",
-          "Gagal mengambil data transaksi. Silahkan coba lagi.",
-          "error"
-        );
-      }
-    };
-
-    fetchTransactionDetails();
-  }, [id]);
+  useEffect(() => {}, []);
 
   const updateTransaction = async () => {
     try {
       const res = await updateBuyerTransaction(data?.id);
       setPaymentDone(res.data);
       setIsPaymentDone(res.success);
-      modalizeRef.current?.close();
+      router.replace("/buyer");
     } catch (error) {
       showToast("Gagal", "Gagal memperbarui transaksi", "error");
     }
@@ -79,7 +54,6 @@ export default function DetailTransaksiBuyer() {
     try {
       const res = await buyerConfirmReceivedTransaction(data?.id);
       setShowPopup(false);
-      modalizeRef.current?.close();
       router.replace("/buyer");
     } catch (error) {
       showToast("Gagal", "Gagal memperbarui transaksi", "error");
@@ -87,17 +61,18 @@ export default function DetailTransaksiBuyer() {
   };
 
   const handleSimulatePayment = () => {
-    // setModalVisible(true);
-    modalizeRef.current?.open();
+    console.log("Masuk Sini");
+    setModalVisible(true);
   };
 
   const closeModal = () => {
-    router.back();
+    setModalVisible(false);
+    router.replace("/buyer");
   };
 
   const formatDateWIB = (dateTime) => {
     if (!dateTime) return "Invalid date";
-    return moment(dateTime).utcOffset(7).format("DD MMMM YYYY, HH:mm [WIB]");
+    return moment(dateTime).utcOffset(0).format("DD MMMM YYYY, HH:mm [WIB]");
   };
 
   const handleCopy = async (text) => {
@@ -253,28 +228,6 @@ export default function DetailTransaksiBuyer() {
         ];
       }
     }
-    if (data?.status == "refunded") {
-      if (data?.paidAt == null) {
-        return [
-          {
-            status: "Waktu bikin Rekbr",
-            date: data?.createdAt || "-",
-          },
-        ];
-      }
-      if (data?.paidAt != null) {
-        return [
-          {
-            status: "Waktu bikin Rekbr",
-            date: data?.createdAt || "-",
-          },
-          {
-            status: "Waktu pembeli Bayar",
-            date: data?.paidAt || "-",
-          },
-        ];
-      }
-    }
   };
 
   const setupCaptionTimeStamp = () => {
@@ -327,14 +280,6 @@ export default function DetailTransaksiBuyer() {
         return data?.paidAt || "-";
       }
     }
-    if (data?.status == "refunded") {
-      if (data?.paidAt == null) {
-        return data?.createdAt || "-";
-      }
-      if (data?.paidAt != null) {
-        return data?.paidAt || "-";
-      }
-    }
   };
 
   const formatPrice = (price) => {
@@ -353,12 +298,11 @@ export default function DetailTransaksiBuyer() {
             onPress={handleSimulatePayment}
             // disabled={!isFormValid}
           />
-          <View className="flex-row items-center px-3 gap-3">
+          <View className="flex-row w-9/12 items-center justify-between px-3">
             <Text className="text-sm items-start justify-start text-[#616161]">
               Terdapat kendala?
             </Text>
-            <TouchableOpacity
-              onPress={() => console.log("Hubungi Kami pressed")}>
+            <TouchableOpacity onPress={() => Alert.alert("Hubungi Kami")}>
               <Text className="text-sm items-end justify-end text-[#3267E3]">
                 Silahkan Hubungi Kami
               </Text>
@@ -369,11 +313,11 @@ export default function DetailTransaksiBuyer() {
     }
     if (data?.status == "waiting_shipment") {
       return (
-        <View className="flex-row items-center px-3 gap-3">
+        <View className="flex-row w-9/12 items-center justify-between px-3">
           <Text className="text-sm items-start justify-start text-[#616161]">
             Terdapat kendala?
           </Text>
-          <TouchableOpacity onPress={() => console.log("Hubungi Kami pressed")}>
+          <TouchableOpacity onPress={() => Alert.alert("Hubungi Kami")}>
             <Text className="text-sm items-end justify-end text-[#3267E3]">
               Silahkan Hubungi Kami
             </Text>
@@ -388,11 +332,8 @@ export default function DetailTransaksiBuyer() {
             title="Komplain"
             onPress={() =>
               router.push({
-                pathname: "/Complaint/Index",
-                params: {
-                  transactionId: data?.id,
-                  sellerEmail: data?.sellerEmail,
-                },
+                pathname: "/dispute",
+                params: { data: JSON.stringify(data) },
               })
             }
             height={50}
@@ -439,7 +380,13 @@ export default function DetailTransaksiBuyer() {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <NavBackHeader title={"Detail Rekber Buyer"} />
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => router.back()}>
+          <Ionicons name="chevron-back-outline" size={24} color="#000" />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Detail Transaksi</Text>
+        <View style={{ width: 24 }} />
+      </View>
       {(() => {
         const steps = ["Transfer", "Dikemas", "Dikirim", "Diterima"];
         let currentStep = 0;
@@ -455,7 +402,6 @@ export default function DetailTransaksiBuyer() {
             currentStep = 2;
             break;
           case "completed":
-          case "refunded":
             currentStep = 3;
             break;
         }
@@ -659,141 +605,137 @@ export default function DetailTransaksiBuyer() {
         </View>
       </ScrollView>
       {/* Footer */}
-      <View className="p-3 border-t-2 rounded-t-3xl border-x-2 border-gray-200 drop-shadow-xl items-center mb-6">
+      <View className="p-3 border-t-2 rounded-t-3xl border-x-2 border-gray-200 drop-shadow-xl items-center">
         {setupFooter()}
       </View>
       {/* Modal Simulate Payment*/}
-      <Modalize
-        ref={modalizeRef}
-        adjustToContentHeight
-        handleStyle={{
-          backgroundColor: "#ccc",
-          width: 60,
-          alignSelf: "center",
-          top: 32,
-        }}
-        modalStyle={{
-          borderTopLeftRadius: 20,
-          borderTopRightRadius: 20,
-          paddingHorizontal: 24,
-          paddingTop: 32,
-          paddingBottom: 32,
-          backgroundColor: "#fff",
-        }}>
-        <View className="bg-white pb-8">
-          <Pressable onPress={closeModal}>
-            <View className="flex-row items-center mb-6">
-              <ChevronLeftCircle size={24} color="#00C2C2" />
-              <Text className="text-lg font-semibold text-gray-800 ml-2">
-                {isPaymentDone ? "Uang Kamu Kami Terima" : "Mengecek..."}
-              </Text>
-            </View>
-          </Pressable>
-
-          <View className="bg-green-100 flex-row items-center justify-between rounded-xl p-3 mb-4">
-            <Text className="text-base font-semibold text-gray-500">
-              ID Transaksi
-            </Text>
-            <View className="flex-row items-center">
-              <Text className="text-base font-semibold tracking-wider mt-1 ml-5">
-                {data?.transactionCode || "-"}
-              </Text>
-              <TouchableOpacity
-                onPress={() => handleCopy(data?.transactionCode)}>
-                <Image
-                  source={require("../../assets/copy.png")}
-                  style={{ marginLeft: 4, width: 17, height: 16 }}
-                />
-              </TouchableOpacity>
-            </View>
-          </View>
-
-          <View className="items-center px-4">
-            <StepSuccesBar
-              currentStep={isPaymentDone ? 1 : 0}
-              steps={["Mengecek", "Diterima"]}
-            />
-          </View>
-
-          {!isPaymentDone ? (
-            <>
-              <Text className="text-center text-gray-600 mt-6 mb-3">
-                Kamu sebaiknya transfer sebelum :
-              </Text>
-              <View className="items-center mb-3">
-                <Text className="text-2xl font-bold bg-yellow-100 px-4 py-1 rounded-lg text-yellow-800">
-                  <CountdownTimer
-                    deadline={data?.paymentDeadline || "-"}
-                    fromTime={data?.currentTimestamp || "-"}
-                  />
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={closeModal}>
+        <Pressable
+          className="flex-1 justify-end bg-black/30"
+          onPress={closeModal}>
+          <Pressable
+            className="bg-white px-5 pt-5 pb-8 rounded-t-3xl h-[55%]"
+            onPress={(event) => event.stopPropagation()}>
+            <Pressable onPress={closeModal}>
+              <View className="flex-row items-center mb-6">
+                <ChevronLeftCircle size={24} color="#00C2C2" />
+                <Text className="text-lg font-semibold text-gray-800 ml-2">
+                  {isPaymentDone ? "Uang Kamu Kami Terima" : "Mengecek..."}
                 </Text>
               </View>
-              <Text className="text-center text-gray-600 mb-5">
-                {formatDateWIB(data?.paymentDeadline || "-")}
-              </Text>
+            </Pressable>
 
-              <Pressable
-                className="bg-gray-100 py-3 rounded-xl flex-row justify-center items-center mb-5"
-                onPress={updateTransaction}>
-                <Play size={20} color="#000" />
-                <Text className="ml-2 font-semibold text-gray-800">
-                  Simulate Payment
+            <View className="bg-green-100 flex-row items-center justify-between rounded-xl p-3 mb-4">
+              <Text className="text-base font-semibold text-gray-500">
+                ID Transaksi
+              </Text>
+              <View className="flex-row items-center">
+                <Text className="text-base font-semibold tracking-wider mt-1 ml-5">
+                  {data?.transactionCode || "-"}
                 </Text>
-              </Pressable>
-            </>
-          ) : (
-            <>
-              <Text className="text-xl font-bold text-center mt-6 mb-1">
-                Transaksi Berhasil Diproses
-              </Text>
-              <Text className="text-center text-gray-600 mb-5">
-                {formatDateWIB(paymentDone?.paidAt || "-")}
-              </Text>
-              <View className="flex-row justify-center items-center mb-5">
-                <View className="flex-row items-center justify-between w-full">
-                  <Text className="text-lg font-medium ml-7">Pembeli</Text>
-                  <View className="flex-row items-center gap-3">
-                    <Image
-                      source={require("../../assets/logo-bni.png")}
-                      className="w-20 h-12"
-                      style={{ objectFit: "cover" }}
+                <TouchableOpacity
+                  onPress={() => handleCopy(data?.transactionCode)}>
+                  <Image
+                    source={require("../../assets/copy.png")}
+                    style={{ marginLeft: 4, width: 17, height: 16 }}
+                  />
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            <View className="items-center px-4">
+              <StepSuccesBar
+                currentStep={isPaymentDone ? 1 : 0}
+                steps={["Mengecek", "Diterima"]}
+              />
+            </View>
+
+            {!isPaymentDone ? (
+              <>
+                <Text className="text-center text-gray-600 mt-6 mb-3">
+                  Kamu sebaiknya transfer sebelum :
+                </Text>
+                <View className="items-center mb-3">
+                  <Text className="text-2xl font-bold bg-yellow-100 px-4 py-1 rounded-lg text-yellow-800">
+                    <CountdownTimer
+                      deadline={data?.paymentDeadline || "-"}
+                      fromTime={data?.currentTimestamp || "-"}
                     />
-                    <View className="flex-row items-center">
-                      <Text className="text-lg font-medium tracking-wider">
-                        0600604502
-                      </Text>
-                      <TouchableOpacity
-                        onPress={() => handleCopy("0600604502")}>
-                        <Image
-                          source={require("../../assets/copy.png")}
-                          style={{ marginLeft: 4, width: 17, height: 16 }}
-                        />
-                      </TouchableOpacity>
+                  </Text>
+                </View>
+                <Text className="text-center text-gray-600 mb-5">
+                  {formatDateWIB(data?.paymentDeadline || "-")}
+                </Text>
+
+                <Pressable
+                  className="bg-gray-100 py-3 rounded-xl flex-row justify-center items-center mb-5"
+                  onPress={updateTransaction}>
+                  <Play size={20} color="#000" />
+                  <Text className="ml-2 font-semibold text-gray-800">
+                    Simulate Payment
+                  </Text>
+                </Pressable>
+              </>
+            ) : (
+              <>
+                <Text className="text-xl font-bold text-center mt-6 mb-1">
+                  Transaksi Berhasil Diproses
+                </Text>
+                <Text className="text-center text-gray-600 mb-5">
+                  {formatDateWIB(paymentDone?.paidAt || "-")}
+                </Text>
+                <View className="flex-row justify-center items-center mb-5">
+                  <View className="flex-row items-center justify-between w-full">
+                    <Text className="text-lg font-medium ml-7">Pembeli</Text>
+                    <View className="flex-row items-center gap-3">
+                      <Image
+                        source={require("../../assets/logo-bni.png")}
+                        className="w-20 h-12"
+                        style={{ objectFit: "cover" }}
+                      />
+                      <View className="flex-row items-center">
+                        <Text className="text-lg font-medium tracking-wider">
+                          0600604502
+                        </Text>
+                        <TouchableOpacity
+                          onPress={() => handleCopy("0600604502")}>
+                          <Image
+                            source={require("../../assets/copy.png")}
+                            style={{ marginLeft: 4, width: 17, height: 16 }}
+                          />
+                        </TouchableOpacity>
+                      </View>
                     </View>
                   </View>
                 </View>
-              </View>
-            </>
-          )}
+              </>
+            )}
 
-          <View className="flex-row justify-center items-center gap-5">
-            <Text className="text-center text-gray-500">Terdapat kendala?</Text>
-            <Text className="text-blue-500 font-medium">
-              Silahkan Hubungi Kami
-            </Text>
-          </View>
-        </View>
-      </Modalize>
-
-      <BuyerKonfirmasi
-        visible={showPopup}
-        onClose={() => setShowPopup(false)}
-        onBtn2={handleConfirmReceived}
-        onBtn1={() => setShowPopup(false)}
-        title="Pastikan semua data di form sudah benar dan lengkap sebelum kamu kirim. Cek lagi, ya!"
-        btn1="Kembali"
-        btn2="Konfirmasi"
-      />
+            <View className="flex-row justify-center items-center gap-5">
+              <Text className="text-center text-gray-500">
+                Terdapat kendala?
+              </Text>
+              <Text className="text-blue-500 font-medium">
+                Silahkan Hubungi Kami
+              </Text>
+            </View>
+          </Pressable>
+        </Pressable>
+      </Modal>
+      {showPopup && (
+        <BuyerKonfirmasi
+          onClose={() => setShowPopup(false)}
+          onBtn2={handleConfirmReceived}
+          onBtn1={() => setShowPopup(false)}
+          title="Pastikan semua data di form sudah benar dan lengkap sebelum kamu kirim. Cek lagi, ya!"
+          btn1="Kembali"
+          btn2="Konfirmasi"
+        />
+      )}
     </View>
   );
 }
