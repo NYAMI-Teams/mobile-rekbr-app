@@ -169,7 +169,7 @@ const SellerCard = ({ data }) => {
       }
     }
 
-    if (status === "completed" || status === "canceled") {
+    if (status === "completed") {
       return (
         <View className="px-3 py-1 rounded-full">
           <Text className="font-poppins-semibold text-xs text-gray-800">
@@ -281,10 +281,10 @@ const SellerCard = ({ data }) => {
                 style={[
                   styles.statusDot,
                   status === "completed"
-                    ? "bg-green-400"
+                    ? { backgroundColor: "#4ade80" }
                     : status === "canceled" || status === "refunded"
-                    ? "bg-red-400"
-                    : "bg-yellow-400",
+                    ? { backgroundColor: "#f87171" }
+                    : { backgroundColor: "#facc15" },
                 ]}
               />
               <Text style={styles.statusText}>{renderStatus()}</Text>

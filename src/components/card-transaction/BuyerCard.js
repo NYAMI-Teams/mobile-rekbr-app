@@ -141,7 +141,9 @@ const BuyerCard = ({ data }) => {
     if (status === "waiting_shipment") {
       return (
         <View style={commonStyle}>
-          <Text style={styles.badgeText}>{formatDateWIB(data?.shipmentDeadline)}</Text>
+          <Text style={styles.badgeText}>
+            {formatDateWIB(data?.shipmentDeadline)}
+          </Text>
         </View>
       );
     }
@@ -162,7 +164,9 @@ const BuyerCard = ({ data }) => {
         );
       } else {
         return (
-          <TouchableOpacity onPress={() => setShowPopup(true)} style={styles.confirmBtn}>
+          <TouchableOpacity
+            onPress={() => setShowPopup(true)}
+            style={styles.confirmBtn}>
             <Text style={styles.confirmBtnText}>Barang Diterima</Text>
           </TouchableOpacity>
         );
@@ -171,7 +175,9 @@ const BuyerCard = ({ data }) => {
     if (status === "completed") {
       return (
         <View style={styles.dateBadge}>
-          <Text style={styles.badgeText}>{formatDateWIB(data?.buyerConfirmedAt)}</Text>
+          <Text style={styles.badgeText}>
+            {formatDateWIB(data?.buyerConfirmedAt)}
+          </Text>
         </View>
       );
     }
@@ -205,9 +211,11 @@ const BuyerCard = ({ data }) => {
   return (
     <TouchableOpacity
       onPress={() =>
-        router.push({ pathname: "/DetailTransaksi/Buyer", params: { id: data?.id } })
-      }
-    >
+        router.push({
+          pathname: "/DetailTransaksi/Buyer",
+          params: { id: data?.id },
+        })
+      }>
       <View style={styles.card}>
         <View style={styles.content}>
           {renderRows().map((row, index) => (
@@ -215,49 +223,56 @@ const BuyerCard = ({ data }) => {
               <Text style={styles.rowLabel}>{row.label}</Text>
               <View style={styles.rowValueContainer}>
                 <Text
-                  style={[styles.rowValue, row.value === "waiting_seller" && styles.dimmed]}
+                  style={[
+                    styles.rowValue,
+                    row.value === "waiting_seller" && styles.dimmed,
+                  ]}
                   numberOfLines={1}
-                  ellipsizeMode="tail"
-                >
+                  ellipsizeMode="tail">
                   {row.value === "waiting_seller"
                     ? "Resi belum diberikan seller"
                     : row.value || "-"}
                 </Text>
-                {row.copyable && !!row.value && row.value !== "waiting_seller" && (
-                  <Pressable onPress={() => handleCopy(row.value)}>
-                    <Image
-                      source={require("../../assets/copy.png")}
-                      style={styles.copyIcon}
-                    />
-                  </Pressable>
-                )}
+                {row.copyable &&
+                  !!row.value &&
+                  row.value !== "waiting_seller" && (
+                    <Pressable onPress={() => handleCopy(row.value)}>
+                      <Image
+                        source={require("../../assets/copy.png")}
+                        style={styles.copyIcon}
+                      />
+                    </Pressable>
+                  )}
               </View>
             </View>
           ))}
         </View>
 
         <View style={styles.footer}>
-          {status === "shipped" && data?.fundReleaseRequest?.status === "approved" && (
-            <View style={styles.adminNote}>
-              <Image
-                source={require("../../assets/admin1.png")}
-                style={styles.adminIcon}
-              />
-              <Text style={styles.adminText}>
-                Halo! Barang udah sampai. Cek dan konfirmasi, biar dana langsung ke penjual via BNI!
-              </Text>
-            </View>
-          )}
+          {status === "shipped" &&
+            data?.fundReleaseRequest?.status === "approved" && (
+              <View style={styles.adminNote}>
+                <Image
+                  source={require("../../assets/admin1.png")}
+                  style={styles.adminIcon}
+                />
+                <Text style={styles.adminText}>
+                  Halo! Barang udah sampai. Cek dan konfirmasi, biar dana
+                  langsung ke penjual via BNI!
+                </Text>
+              </View>
+            )}
           <View style={styles.statusRow}>
             <View style={styles.statusDotContainer}>
               <View
-                style={[styles.statusDot,
+                style={[
+                  styles.statusDot,
                   status === "completed"
-                    ? "bg-green-400"
+                    ? { backgroundColor: "#4ade80" }
                     : status === "canceled" || status === "refunded"
-                    ? "bg-red-400"
-                    : "bg-yellow-400"
-                )}
+                    ? { backgroundColor: "#f87171" }
+                    : { backgroundColor: "#facc15" },
+                ]}
               />
               <Text className="font-poppins text-xs text-gray-800">
                 {renderStatus()}
