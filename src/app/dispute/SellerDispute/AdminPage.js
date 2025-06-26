@@ -68,7 +68,7 @@ export default function AdminPage() {
         rejectedSteps={rejectedAdmin ? [0, 1] : rejectedSeller ? [0] : []}
       />
 
-      <ScrollView className="px-4">
+      <ScrollView className="px-4" key="admin-scroll-view">
         {/* Status Komplain */}
         <StatusKomplain
           status={
@@ -95,16 +95,18 @@ export default function AdminPage() {
                   {
                     content: item?.reason || item?.message || "-",
                   },
-                  ...(item?.evidence?.length > 0 ? [
-                    {
-                      imgTitle: "Bukti foto & video",
-                      images: item.evidence.map((url, index) => ({
-                        uri: url,
-                        key: `evidence-${index}`,
-                      })),
-                      key: `evidence-section-${index}`
-                    }
-                  ] : []),
+                  ...(item?.evidence?.length > 0
+                    ? [
+                        {
+                          imgTitle: "Bukti foto & video",
+                          images: item.evidence.map((url, index) => ({
+                            uri: url,
+                            key: `evidence-${index}`,
+                          })),
+                          key: `evidence-section-${index}`,
+                        },
+                      ]
+                    : []),
                 ]}
               />
               <View className="h-2 bg-[#f5f5f5] mt-3" />

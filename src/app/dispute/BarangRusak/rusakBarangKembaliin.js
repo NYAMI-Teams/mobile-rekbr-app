@@ -334,6 +334,40 @@ export default function RusakBarangKembaliinPage() {
             <View className="h-2 bg-[#f5f5f5] mt-3" />
           </>
         );
+
+      case "awaitingAdminConfirmation":
+        return (
+          <>
+            <InfoBanner contentBefore="Konfirmasi sedang dalam proses admin, tunggu admin ya!" />
+            <StatusKomplain status="Menunggu Admin" />
+            <View className="h-2 bg-[#f5f5f5] mt-3" />
+
+            {detailComplaint?.timeline
+              ?.slice()
+              .reverse()
+              .map((item, index) => (
+                <TrackDispute
+                  key={index}
+                  title={item.label}
+                  dateTime={formatDateWIB(item.timestamp)}
+                  details={[
+                    {
+                      content: item?.reason || item?.message || "-",
+                    },
+                    item?.evidence?.length > 0 && {
+                      imgTitle: "Bukti foto & video",
+                      images: item?.evidence.map((url, key) => ({
+                        uri: url,
+                        key,
+                      })),
+                    },
+                  ]}
+                />
+              ))}
+
+            <View className="h-2 bg-[#f5f5f5] mt-3" />
+          </>
+        );
       default:
         return (
           <>

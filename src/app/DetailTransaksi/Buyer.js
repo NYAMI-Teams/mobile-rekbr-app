@@ -70,7 +70,6 @@ export default function DetailTransaksiBuyer() {
       setPaymentDone(res.data);
       setIsPaymentDone(res.success);
       modalizeRef.current?.close();
-      router.replace("/buyer");
     } catch (error) {
       showToast("Gagal", "Gagal memperbarui transaksi", "error");
     }

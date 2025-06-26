@@ -100,6 +100,11 @@ export const postBuyerReturn = async (
 
 export const postBuyerReturnConfirm = async (id, reason, evidence) => {
   try {
+
+    console.log("ini id", id);
+    console.log("ini reason", reason);
+    console.log("ini evidence", evidence);
+
     const file = {
       uri: evidence?.uri,
       name: evidence?.fileName || evidence?.uri.split("/").pop(),
@@ -109,6 +114,11 @@ export const postBuyerReturnConfirm = async (id, reason, evidence) => {
     const formData = new FormData();
     formData.append("reason", reason);
     formData.append("evidence", file);
+
+    console.log("ini id", id);
+    console.log("ini reason", reason);
+    console.log("ini evidence", evidence);
+
     const res = await Api.post(
       `/buyer/complaints/${id}/request-confirmation`,
       formData
@@ -191,7 +201,7 @@ export const postSellerResponse = async (
     console.log("ini id", id);
     console.log("ini status", status);
     console.log("ini seller_response_reason", seller_response_reason);
-    console.log("ini arrPhoto", arrPhoto)
+    console.log("ini arrPhoto", arrPhoto);
 
     const res = await Api.patch(`/seller/complaints/${id}/respond`, formData);
     if (res) {
