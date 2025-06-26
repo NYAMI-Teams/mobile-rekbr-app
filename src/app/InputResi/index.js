@@ -8,20 +8,19 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
+  StyleSheet,
+  TouchableOpacity,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import InputField from "@/components/InputField";
 import AttachmentFilled from "@/components/AttachmentFilled";
 import DropDownField from "@/components/DropDownField";
-import { useRef, useState, useEffect } from "react"; // Tambahkan useEffect
-import { Animated, TouchableOpacity } from "react-native";
+import { useRef, useState, useEffect } from "react";
 import PrimaryButton from "@/components/PrimaryButton";
 import { useRouter } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
 import { ChevronLeftCircle } from "lucide-react-native";
 import BuyerKonfirmasi from "@/components/BuyerKonfirmasi";
-import { postResi } from "@/utils/api/seller";
-import { getListCourier } from "@/utils/api/seller";
+import { postResi, getListCourier } from "@/utils/api/seller";
 import Toast from "react-native-toast-message";
 import * as ImagePicker from "expo-image-picker";
 import * as ImageManipulator from "expo-image-manipulator";
@@ -33,8 +32,8 @@ export default function InputResi() {
   const { id } = useLocalSearchParams();
   const [isUploaded, setIsUploaded] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
-  const [image, setImage] = useState(null); // State untuk menyimpan URI gambar
-  const [hasCameraPermission, setHasCameraPermission] = useState(null); // State untuk izin kamera
+  const [image, setImage] = useState(null);
+  const [hasCameraPermission, setHasCameraPermission] = useState(null);
   const [resiNumberError, setResiNumberError] = useState("");
   const [resiNumber, setResiNumber] = useState("");
   const [courier, setCourier] = useState("");
@@ -42,7 +41,6 @@ export default function InputResi() {
   const [courierList, setCourierList] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
 
-  // Permintaan izin kamera saat komponen di-mount
   useEffect(() => {
     (async () => {
       const cameraStatus = await ImagePicker.requestCameraPermissionsAsync();
@@ -54,9 +52,7 @@ export default function InputResi() {
   const getCourier = async () => {
     try {
       const res = await getListCourier();
-      if (res) {
-        setCourierList(res.data);
-      }
+      if (res) setCourierList(res.data);
     } catch (error) {
       showToast("Gagal", "Gagal mengambil data ekspedisi", "error");
     }
@@ -69,68 +65,36 @@ export default function InputResi() {
 
   const handleUpload = async () => {
     if (hasCameraPermission === false) {
-      Alert.alert(
-        "Izin Kamera Diperlukan",
-        "Aplikasi memerlukan akses kamera untuk mengambil foto. Mohon berikan izin di pengaturan perangkat Anda."
-      );
+      Alert.alert("Izin Kamera Diperlukan", "Aplikasi memerlukan akses kamera.");
       return;
     }
 
     if (hasCameraPermission === null) {
-      Alert.alert(
-        "Meminta Izin",
-        "Aplikasi sedang meminta izin kamera. Mohon tunggu sebentar."
-      );
+      Alert.alert("Meminta Izin", "Mohon tunggu sebentar.");
       return;
     }
 
-    Alert.alert(
-      "Pilih Sumber Gambar",
-      "Ambil foto baru atau pilih dari galeri?",
-      [
-        {
-          text: "Kamera",
-          onPress: async () => {
-            await pickImage("camera");
-          },
-        },
-        {
-          text: "Galeri",
-          onPress: async () => {
-            await pickImage("gallery");
-          },
-        },
-        { text: "Batal", style: "cancel" },
-      ]
-    );
+    Alert.alert("Pilih Sumber Gambar", "Ambil foto baru atau pilih dari galeri?", [
+      { text: "Kamera", onPress: () => pickImage("camera") },
+      { text: "Galeri", onPress: () => pickImage("gallery") },
+      { text: "Batal", style: "cancel" },
+    ]);
   };
 
   const pickImage = async (source) => {
-    let result;
-    if (source === "camera") {
-      result = await ImagePicker.launchCameraAsync({
-        mediaTypes: "Images",
-        allowsEditing: true,
-        quality: 1,
-      });
-    } else {
-      result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: "Images",
-        allowsEditing: true,
-        quality: 1,
-      });
-    }
+    let result =
+      source === "camera"
+        ? await ImagePicker.launchCameraAsync({ mediaTypes: "Images", allowsEditing: true, quality: 1 })
+        : await ImagePicker.launchImageLibraryAsync({ mediaTypes: "Images", allowsEditing: true, quality: 1 });
 
-    if (!result.canceled && result.assets && result.assets.length > 0) {
+    if (!result.canceled && result.assets?.length > 0) {
       let imageAsset = result.assets[0];
       let quality = 0.7;
-      let compressed = await ImageManipulator.manipulateAsync(
-        imageAsset.uri,
-        [],
-        { compress: quality, format: ImageManipulator.SaveFormat.JPEG }
-      );
+      let compressed = await ImageManipulator.manipulateAsync(imageAsset.uri, [], {
+        compress: quality,
+        format: ImageManipulator.SaveFormat.JPEG,
+      });
 
-      // Loop kompresi hingga < 1MB atau quality terlalu kecil
       let blob, size;
       do {
         const response = await fetch(compressed.uri);
@@ -139,18 +103,14 @@ export default function InputResi() {
         if (size > 1024 * 1024) {
           quality -= 0.2;
           if (quality < 0.2) break;
-          compressed = await ImageManipulator.manipulateAsync(
-            imageAsset.uri,
-            [],
-            { compress: quality, format: ImageManipulator.SaveFormat.JPEG }
-          );
+          compressed = await ImageManipulator.manipulateAsync(imageAsset.uri, [], {
+            compress: quality,
+            format: ImageManipulator.SaveFormat.JPEG,
+          });
         }
       } while (size > 1024 * 1024 && quality >= 0.2);
 
-      setImage({
-        ...imageAsset,
-        uri: compressed.uri,
-      });
+      setImage({ ...imageAsset, uri: compressed.uri });
       setIsUploaded(true);
     } else {
       setImage(null);
@@ -186,46 +146,39 @@ export default function InputResi() {
   const handleResiNumberChange = (text) => {
     const cleanedText = text.replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
     setResiNumber(cleanedText);
-    if (cleanedText.length === 0) {
-      setResiNumberError("Nomor resi tidak boleh kosong.");
-    } else if (cleanedText.length < 5) {
-      setResiNumberError("Nomor resi terlalu pendek.");
-    } else {
-      setResiNumberError("");
-    }
+    setResiNumberError(
+      cleanedText.length === 0
+        ? "Nomor resi tidak boleh kosong."
+        : cleanedText.length < 5
+        ? "Nomor resi terlalu pendek."
+        : ""
+    );
   };
 
   return (
-    <View className="flex-1 bg-white justify-between">
-      {/* Header */}
+    <View style={styles.container}>
       <NavBackHeader title={"Form Pengiriman"} />
-
-      {/* Content */}
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        keyboardVerticalOffset={Platform.OS === 'ios' && 60}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 60 : 0}
         style={{ flex: 1 }}
       >
         <ScrollView
-          contentContainerStyle={{ flexGrow: 1 }}
+          contentContainerStyle={styles.scrollView}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
-          className="px-4"
         >
-          {/* Wrap content dengan ScrollView */}
-          <View className="flex-1 mt-4">
-            <View className="">
-              <InputField
-                title="Masukkan Nomor Resi"
-                placeholder="Masukkan Nomor Resi dengan benar"
-                value={resiNumber}
-                onChangeText={handleResiNumberChange}
-                errorText={resiNumberError}
-                keyboardType="default"
-                autoCapitalize="characters"
-              />
-            </View>
-            <TouchableOpacity className="mt-4" onPress={handleModal}>
+          <View style={styles.inner}>
+            <InputField
+              title="Masukkan Nomor Resi"
+              placeholder="Masukkan Nomor Resi dengan benar"
+              value={resiNumber}
+              onChangeText={handleResiNumberChange}
+              errorText={resiNumberError}
+              keyboardType="default"
+              autoCapitalize="characters"
+            />
+            <TouchableOpacity onPress={handleModal} style={styles.mt4}>
               <DropDownField
                 title="Pilih Ekspedisi"
                 placeholder="Pilih Ekspedisi pengiriman kamu"
@@ -234,49 +187,32 @@ export default function InputResi() {
                 editable={false}
               />
             </TouchableOpacity>
-            <TouchableOpacity onPress={handleUpload} className="mt-4">
+            <TouchableOpacity onPress={handleUpload} style={styles.mt4}>
               <AttachmentFilled
                 title="Unggah Bukti"
-                caption={
-                  isUploaded
-                    ? image?.uri?.split("/").pop()
-                    : "Berikan bukti berupa screenshot cek resi"
-                }
+                caption={isUploaded ? image?.uri?.split("/").pop() : "Berikan bukti berupa screenshot cek resi"}
                 captionColor={isUploaded ? "#08B20F" : "#9E9E9E"}
-                iconName={"camera"} // Pastikan AttachmentFilled Anda bisa menerima string 'camera' untuk ikon
+                iconName="camera"
                 boxColor={isUploaded ? "#F9F9F9" : "#49DBC8"}
                 iconsColor={isUploaded ? "#C2C2C2" : "#FFFFFF"}
-                cardColor={"#FFF"}
+                cardColor="#FFF"
                 alertText="Pastikan keterbacaan foto dan hindari bayangan"
                 alertColor={isUploaded ? "#08B20F" : "#C2C2C2"}
-                alertIconName={isUploaded ? "checkmark-circle" : "alert-circle"} // Pastikan ini juga sesuai dengan AttachmentFilled
+                alertIconName={isUploaded ? "checkmark-circle" : "alert-circle"}
                 alertIconColor={isUploaded ? "#08B20F" : "#C2C2C2"}
-                onPress={handleUpload}
               />
             </TouchableOpacity>
-            <View className="mt-4 mb-4">
-              {/* Tambahkan margin vertikal */}
-              {/* Image Preview */}
-              {!image ? null : (
-                <Image
-                  source={{ uri: image.uri }}
-                  className="w-full h-64 rounded-lg"
-                />
-              )}
-            </View>
+            {image && (
+              <View style={styles.imagePreview}>
+                <Image source={{ uri: image.uri }} style={styles.uploadedImage} />
+              </View>
+            )}
           </View>
-          {/* Button */}
-          <View className="w-full px-4 py-4 mb-8">
-            {/* Tambahkan padding horizontal dan vertikal */}
-            <PrimaryButton
-              title="Kirim"
-              onPress={handleBtnPress}
-            // disabled={courier == "" || resiNumber == "" || image == null}
-            />
+          <View style={styles.buttonWrapper}>
+            <PrimaryButton title="Kirim" onPress={handleBtnPress} />
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
-
 
       {showPopup && (
         <BuyerKonfirmasi
@@ -289,56 +225,28 @@ export default function InputResi() {
         />
       )}
 
-      {/* Bottom Sheet Modal */}
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => {
-          // Alert.alert("Modal has been closed."); // Komentar atau hapus ini untuk UX yang lebih baik
-          closeModal();
-        }}>
-        <TouchableOpacity
-          className="flex-1 bg-black/50 justify-end"
-          onPress={closeModal}>
-          <View className="bg-white rounded-t-lg h-[55%]">
-            {/* Close Button */}
-            <View className="flex-row justify-start p-4 ">
-              <TouchableOpacity
-                onPress={closeModal}
-                className="flex-row items-center mb-6">
-                {/* Tambahkan onPress untuk menutup modal */}
+      <Modal animationType="slide" transparent visible={modalVisible} onRequestClose={closeModal}>
+        <TouchableOpacity style={styles.modalOverlay} onPress={closeModal}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <TouchableOpacity onPress={closeModal} style={styles.modalHeaderBtn}>
                 <ChevronLeftCircle size={24} color="#00C2C2" />
-                <Text className="text-lg font-normal text-gray-800 ml-2">
-                  Pilih Ekspedisi
-                </Text>
+                <Text style={styles.modalHeaderText}>Pilih Ekspedisi</Text>
               </TouchableOpacity>
             </View>
-
-            {/* Modal Content */}
-            <View className="justify-between flex-1">
-              {/* Ubah h-[70%] menjadi flex-1 agar menyesuaikan sisa ruang */}
-              <ScrollView className="my-2" showsVerticalScrollIndicator={false}>
-                {/* Sembunyikan indikator scroll */}
-                <View className="flex-col gap-4 bg-slate-100/50 m-5 p-5 rounded-lg border border-gray-300">
-                  {courierList.map(
-                    (
-                      courier,
-                      index
-                    ) => (
-                      <TouchableOpacity
-                        key={index}
-                        className="p-5 border-b-2 border-gray-300/50 mb-4"
-                        onPress={() => handleSelectCourier(courier)}>
-                        <Text className="text-[15px] font-semibold">
-                          {courier.name}
-                        </Text>
-                      </TouchableOpacity>
-                    )
-                  )}
-                </View>
-              </ScrollView>
-            </View>
+            <ScrollView style={styles.modalScroll}>
+              <View style={styles.modalCourierList}>
+                {courierList.map((courier, index) => (
+                  <TouchableOpacity
+                    key={index}
+                    style={styles.courierItem}
+                    onPress={() => handleSelectCourier(courier)}
+                  >
+                    <Text style={styles.courierText}>{courier.name}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </ScrollView>
           </View>
         </TouchableOpacity>
       </Modal>
@@ -346,3 +254,82 @@ export default function InputResi() {
   );
 }
 
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#FFFFFF",
+    justifyContent: "space-between",
+  },
+  scrollView: {
+    flexGrow: 1,
+    paddingHorizontal: 16,
+  },
+  inner: {
+    flex: 1,
+    marginTop: 16,
+  },
+  mt4: {
+    marginTop: 16,
+  },
+  imagePreview: {
+    marginTop: 16,
+    marginBottom: 16,
+  },
+  uploadedImage: {
+    width: "100%",
+    height: 256,
+    borderRadius: 12,
+  },
+  buttonWrapper: {
+    width: "100%",
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    marginBottom: 32,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "flex-end",
+  },
+  modalContent: {
+    backgroundColor: "white",
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+    height: "55%",
+  },
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    padding: 16,
+  },
+  modalHeaderBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  modalHeaderText: {
+    fontSize: 18,
+    marginLeft: 8,
+    color: "#1F2937",
+  },
+  modalScroll: {
+    marginVertical: 8,
+  },
+  modalCourierList: {
+    marginHorizontal: 20,
+    padding: 16,
+    borderRadius: 12,
+    backgroundColor: "#F1F5F9",
+    borderColor: "#D1D5DB",
+    borderWidth: 1,
+  },
+  courierItem: {
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "rgba(107,114,128,0.3)",
+    marginBottom: 12,
+  },
+  courierText: {
+    fontSize: 15,
+    fontWeight: "600",
+  },
+});

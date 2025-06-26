@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, ScrollView, TouchableOpacity } from "react-native";
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ChevronLeft, Info } from "lucide-react-native";
 import PrimaryButton from "../../../components/PrimaryButton";
@@ -47,68 +47,60 @@ export default function TransactionSummary() {
   };
 
   return (
-    <View className="flex-1 bg-white relative">
+    <View style={styles.container}>
       {/* Header */}
-      <NavBackHeader title={"Ringkasan Transaksi Rekber"}/>
+      <NavBackHeader title="Ringkasan Transaksi Rekber" />
+
       <ScrollView
-        contentContainerStyle={{ paddingBottom: 160 }}
-        className="px-4 pt-6">
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Rekening Kamu */}
         <RekeningKamu bankData={bankData} />
 
         {/* Detail Transaksi */}
-        <View className="space-y-3 mb-6 mt-6">
-          <Text className="text-base text-gray-800">Pembeli Barang</Text>
-          <Text className="text-lg font-semibold text-gray-900">
-            {payload?.email}
-          </Text>
+        <View style={styles.transactionDetail}>
+          <Text style={styles.label}>Pembeli Barang</Text>
+          <Text style={styles.value}>{payload?.email}</Text>
 
-          <Text className="text-base text-gray-800 mt-4">Nama Barang</Text>
-          <Text className="text-lg font-semibold text-gray-900">
-            {payload?.itemName}
-          </Text>
+          <Text style={[styles.label, styles.marginTop]}>Nama Barang</Text>
+          <Text style={styles.value}>{payload?.itemName}</Text>
 
-          <Text className="text-base text-gray-800 mt-4">Nominal Barang</Text>
-          <Text className="text-lg font-semibold text-gray-900">
-            {formatCurrency(payload?.itemPrice)}
-          </Text>
+          <Text style={[styles.label, styles.marginTop]}>Nominal Barang</Text>
+          <Text style={styles.value}>{formatCurrency(payload?.itemPrice)}</Text>
         </View>
 
-        <View className="border-t border-gray-200 my-4" />
+        <View style={styles.divider} />
 
         {/* Biaya Tambahan */}
         {payload?.isInsurance && (
-          <View className="mb-4">
-            <View className="flex-row items-center mb-1">
-              <Text className="text-lg text-gray-800">
-                Asuransi Pengiriman BNI Life
-              </Text>
-              <Info size={14} color="#888" className="ml-1" />
+          <View style={styles.additionalFee}>
+            <View style={styles.rowCenter}>
+              <Text style={styles.additionalFeeTitle}>Asuransi Pengiriman BNI Life</Text>
+              <Info size={14} color="#888" style={styles.iconMargin} />
             </View>
-            <Text className="text-base font-medium text-gray-800">
+            <Text style={styles.additionalFeeValue}>
               {formatCurrency(insuranceFee)}
             </Text>
           </View>
         )}
 
-        <View className="mb-6 mt-3">
-          <View className="flex-row items-center mb-1">
-            <Text className="text-lg text-gray-800">Biaya Jasa Aplikasi</Text>
-            <Info size={14} color="#888" className="ml-1" />
+        <View style={styles.additionalFee}>
+          <View style={styles.rowCenter}>
+            <Text style={styles.additionalFeeTitle}>Biaya Jasa Aplikasi</Text>
+            <Info size={14} color="#888" style={styles.iconMargin} />
           </View>
-          <Text className="text-base font-medium text-gray-800">
+          <Text style={styles.additionalFeeValue}>
             {formatCurrency(serviceFee)}
           </Text>
         </View>
       </ScrollView>
 
       {/* Footer */}
-      <View className="p-3 border-t-2 rounded-t-3xl border-x-2 border-gray-200 drop-shadow-xl items-center justify-between mb-8">
-        <View className="flex-row justify-between items-center mb-4 w-full px-2">
-          <Text className="text-base text-gray-700 font-medium">
-            Total Tagihan Buyer
-          </Text>
-          <Text className="text-xl font-bold text-gray-900">
+      <View style={styles.footer}>
+        <View style={styles.footerRow}>
+          <Text style={styles.footerLabel}>Total Tagihan Buyer</Text>
+          <Text style={styles.footerTotal}>
             {formatCurrency(totalAmount)}
           </Text>
         </View>
@@ -121,4 +113,92 @@ export default function TransactionSummary() {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+    position: "relative",
+  },
+  scrollContent: {
+    paddingHorizontal: 16,
+    paddingTop: 24,
+    paddingBottom: 160,
+  },
+  transactionDetail: {
+    marginTop: 24,
+    marginBottom: 24,
+  },
+  label: {
+    fontSize: 16,
+    color: "#374151",
+  },
+  value: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#111827",
+  },
+  marginTop: {
+    marginTop: 16,
+  },
+  divider: {
+    borderTopWidth: 1,
+    borderTopColor: "#E5E7EB",
+    marginVertical: 16,
+  },
+  additionalFee: {
+    marginBottom: 16,
+  },
+  rowCenter: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 4,
+  },
+  additionalFeeTitle: {
+    fontSize: 16,
+    color: "#374151",
+  },
+  additionalFeeValue: {
+    fontSize: 16,
+    fontWeight: "500",
+    color: "#374151",
+  },
+  iconMargin: {
+    marginLeft: 4,
+  },
+  footer: {
+    padding: 12,
+    borderTopWidth: 2,
+    borderColor: "#E5E7EB",
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 4 },
+    shadowRadius: 8,
+    elevation: 5,
+    backgroundColor: "#fff",
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+  },
+  footerRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 16,
+    paddingHorizontal: 8,
+  },
+  footerLabel: {
+    fontSize: 16,
+    fontWeight: "500",
+    color: "#374151",
+  },
+  footerTotal: { 
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#111827",
+  },
+});
 

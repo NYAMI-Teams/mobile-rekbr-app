@@ -1,11 +1,11 @@
 import Success from "../../components/Success";
 import { useRouter } from "expo-router";
-import { View } from "react-native";
+import { View, StyleSheet } from "react-native";
 
 export default function SuccessLogin() {
   const router = useRouter();
   return (
-    <View className="flex-1 bg-white">
+    <View style={styles.container}>
       <Success
         title="Pendaftaran Akun Selesai"
         subTitle="Kamu Seller atau bukan? Biar bisa create Rekber, jangan lupa KYC dulu, ya!"
@@ -14,3 +14,10 @@ export default function SuccessLogin() {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "white",
+  },
+});

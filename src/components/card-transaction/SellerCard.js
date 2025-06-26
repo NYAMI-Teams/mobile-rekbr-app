@@ -1,5 +1,12 @@
 import React from "react";
-import { View, Text, Image, Pressable, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  Pressable,
+  TouchableOpacity,
+  StyleSheet,
+} from "react-native";
 import * as Clipboard from "expo-clipboard";
 import moment from "moment";
 import clsx from "clsx";
@@ -59,16 +66,6 @@ const SellerCard = ({ data }) => {
           },
         ];
       case "shipped":
-        return [
-          { label: "Nama Produk", value: data?.itemName || "-" },
-          { label: "Pembeli", value: data?.buyerEmail || "-" },
-          {
-            label: "Nomor Resi",
-            value: data?.shipment.trackingNumber || "-",
-            copyable: true,
-          },
-          { label: "Ekspedisi", value: data?.shipment.courier || "-" },
-        ];
       case "completed":
         return [
           { label: "Nama Produk", value: data?.itemName || "-" },
@@ -114,8 +111,8 @@ const SellerCard = ({ data }) => {
   const renderBottomSection = () => {
     if (status === "pending_payment") {
       return (
-        <View className="bg-yellow-100 px-3 py-1 rounded-full">
-          <Text className="font-poppins-semibold text-xs text-gray-800">
+        <View style={styles.badgeYellow}>
+          <Text style={styles.badgeText}>
             <CountdownTimer
               deadline={data?.paymentDeadline || "-"}
               fromTime={data?.currentTimestamp || "-"}
@@ -129,32 +126,27 @@ const SellerCard = ({ data }) => {
       return (
         <TouchableOpacity
           onPress={() =>
-            router.push({
-              pathname: `/InputResi`,
-              params: { id: data?.id },
-            })
+            router.push({ pathname: `/InputResi`, params: { id: data?.id } })
           }
-          className="bg-black px-3 py-1 rounded-full">
-          <Text className="font-poppins-semibold text-xs text-white">
-            Bukti Pengiriman
-          </Text>
+          style={styles.buttonBlack}
+        >
+          <Text style={styles.buttonTextWhite}>Bukti Pengiriman</Text>
         </TouchableOpacity>
       );
     }
 
     if (status === "shipped") {
-      if (data?.fundReleaseRequest?.status === "pending") {
+      const fundStatus = data?.fundReleaseRequest?.status;
+      if (fundStatus === "pending") {
         return (
-          <View className="bg-yellow-100 px-3 py-1 rounded-full">
-            <Text className="font-poppins-semibold text-xs text-gray-800">
-              Permintaan Ditinjau
-            </Text>
+          <View style={styles.badgeYellow}>
+            <Text style={styles.badgeText}>Permintaan Ditinjau</Text>
           </View>
         );
-      } else if (data?.fundReleaseRequest?.status === "approved") {
+      } else if (fundStatus === "approved") {
         return (
-          <View className="bg-yellow-100 px-3 py-1 rounded-full">
-            <Text className="font-poppins-semibold text-xs text-gray-800">
+          <View style={styles.badgeYellow}>
+            <Text style={styles.badgeText}>
               <CountdownTimer
                 deadline={data?.buyerConfirmDeadline || "-"}
                 fromTime={data?.currentTimestamp || "-"}
@@ -162,10 +154,7 @@ const SellerCard = ({ data }) => {
             </Text>
           </View>
         );
-      } else if (
-        data?.fundReleaseRequest?.status === "rejected" ||
-        data?.fundReleaseRequest?.status === null
-      ) {
+      } else {
         return (
           <TouchableOpacity
             onPress={() =>
@@ -174,16 +163,15 @@ const SellerCard = ({ data }) => {
                 params: { id: data?.id },
               })
             }
-            className="bg-black px-3 py-1 rounded-full">
-            <Text className="font-poppins-semibold text-xs text-white">
-              Minta Konfirmasi
-            </Text>
+            style={styles.buttonBlack}
+          >
+            <Text style={styles.buttonTextWhite}>Minta Konfirmasi</Text>
           </TouchableOpacity>
         );
       }
     }
 
-    if (status === "completed") {
+    if (status === "completed" || status === "canceled") {
       return (
         <View className="px-3 py-1 rounded-full">
           <Text className="font-poppins-semibold text-xs text-gray-800">
@@ -227,56 +215,50 @@ const SellerCard = ({ data }) => {
           pathname: `/DetailTransaksi/Seller`,
           params: { id: data?.id || "" },
         })
-      }>
-      <View className="border border-gray-200 rounded-lg overflow-hidden my-2 w-full bg-white">
-        {/* Detail Section */}
-        <View className="p-3">
+      }
+    >
+      <View style={styles.cardWrapper}>
+        <View style={styles.cardContent}>
           {renderRows().map((row, index) => (
-            <View
-              key={index}
-              className="flex-row justify-between items-start mb-2">
-              <Text className="font-poppins text-sm w-[40%]">{row.label}</Text>
-              <View className="flex-row items-center w-[60%] justify-end">
+            <View key={index} style={styles.rowItem}>
+              <Text style={styles.rowLabel}>{row.label}</Text>
+              <View style={styles.rowValueWrapper}>
                 <Text
-                  className={clsx(
-                    "font-poppins-semibold text-sm text-right",
-                    row.value === "waiting_seller"
-                      ? "text-gray-400"
-                      : "text-gray-900"
-                  )}
                   numberOfLines={1}
-                  ellipsizeMode="tail">
-                  {row.value == "waiting_seller"
+                  ellipsizeMode="tail"
+                  style={[
+                    styles.rowValue,
+                    row.value === "waiting_seller"
+                      ? { color: "#9ca3af" }
+                      : { color: "#111827" },
+                  ]}
+                >
+                  {row.value === "waiting_seller"
                     ? "Resi belum diberikan seller"
                     : row.value || "-"}
                 </Text>
-                {row.copyable &&
-                  !!row.value &&
-                  row.value !== "waiting_seller" && (
-                    <Pressable
-                      onPress={() => handleCopy(row.value)}
-                      className="p-1 rounded-full">
-                      <Image
-                        source={require("../../assets/copy.png")}
-                        className="w-4 h-4 opacity-70"
-                      />
-                    </Pressable>
-                  )}
+                {row.copyable && !!row.value && row.value !== "waiting_seller" && (
+                  <Pressable onPress={() => handleCopy(row.value)}>
+                    <Image
+                      source={require("../../assets/copy.png")}
+                      style={{ width: 16, height: 16, opacity: 0.7, marginLeft: 4 }}
+                    />
+                  </Pressable>
+                )}
               </View>
             </View>
           ))}
         </View>
 
-        {/* Status Message Section */}
-        <View className="bg-gray-100 border-t border-gray-200 p-3">
-          {/* Admin Message */}
+        {/* Bottom Section */}
+        <View style={styles.cardFooter}>
           {status === "shipped" && (
-            <View className="flex-row gap-1 mb-3">
+            <View style={{ flexDirection: "row", gap: 4, marginBottom: 12 }}>
               <Image
                 source={require("../../assets/admin1.png")}
-                className="w-4 h-4 mt-1"
+                style={{ width: 16, height: 16, marginTop: 2 }}
               />
-              <Text className="font-poppins text-xs text-gray-800 flex-1">
+              <Text style={styles.adminMessage}>
                 {data?.fundReleaseRequest?.status === null
                   ? "Cek no resi berkala, kalau pembeli nggak konfirmasi, minta konfirmasi pembeli lewat admin."
                   : data?.fundReleaseRequest?.status === "pending"
@@ -290,12 +272,11 @@ const SellerCard = ({ data }) => {
             </View>
           )}
 
-          {/* Status & Button/Countdown */}
-          <View className="flex-row justify-between items-center">
-            <View className="flex-row items-center">
+          <View style={styles.cardStatusRow}>
+            <View style={styles.statusIndicatorWrapper}>
               <View
-                className={clsx(
-                  "w-2 h-2 rounded-full mr-2",
+                style={[
+                  styles.statusDot,
                   status === "completed"
                     ? "bg-green-400"
                     : status === "canceled" || status === "refunded"
@@ -303,9 +284,7 @@ const SellerCard = ({ data }) => {
                     : "bg-yellow-400"
                 )}
               />
-              <Text className="font-poppins text-xs text-gray-800">
-                {renderStatus()}
-              </Text>
+              <Text style={styles.statusText}>{renderStatus()}</Text>
             </View>
             {renderBottomSection()}
           </View>
@@ -314,5 +293,97 @@ const SellerCard = ({ data }) => {
     </TouchableOpacity>
   );
 };
+
+const styles = StyleSheet.create({
+  cardWrapper: {
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
+    borderRadius: 12,
+    marginVertical: 8,
+    backgroundColor: "#fff",
+    overflow: "hidden",
+    width: "100%",
+  },
+  cardContent: {
+    padding: 12,
+  },
+  rowItem: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 8,
+    alignItems: "flex-start",
+  },
+  rowLabel: {
+    fontSize: 14,
+    width: "40%",
+    fontFamily: "Poppins-Regular",
+  },
+  rowValueWrapper: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-end",
+    width: "60%",
+  },
+  rowValue: {
+    fontSize: 14,
+    fontFamily: "Poppins-SemiBold",
+    textAlign: "right",
+    flex: 1,
+  },
+  cardFooter: {
+    backgroundColor: "#f3f4f6",
+    borderTopWidth: 1,
+    borderTopColor: "#e5e7eb",
+    padding: 12,
+  },
+  adminMessage: {
+    fontSize: 12,
+    fontFamily: "Poppins-Regular",
+    color: "#1f2937",
+    flex: 1,
+  },
+  cardStatusRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  statusIndicatorWrapper: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  statusDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    marginRight: 8,
+  },
+  statusText: {
+    fontSize: 12,
+    fontFamily: "Poppins-Regular",
+    color: "#1f2937",
+  },
+  badgeYellow: {
+    backgroundColor: "#fef3c7",
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 999,
+  },
+  badgeText: {
+    fontSize: 12,
+    fontFamily: "Poppins-SemiBold",
+    color: "#1f2937",
+  },
+  buttonBlack: {
+    backgroundColor: "#000",
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 999,
+  },
+  buttonTextWhite: {
+    fontSize: 12,
+    fontFamily: "Poppins-SemiBold",
+    color: "#fff",
+  },
+});
 
 export default SellerCard;

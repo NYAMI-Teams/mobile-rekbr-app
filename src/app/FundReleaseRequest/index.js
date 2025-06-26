@@ -1,10 +1,8 @@
 import { postFundRelease } from "../../utils/api/seller";
 import { useRouter } from "expo-router";
 import { useState, useEffect } from "react";
-import { Alert } from "react-native";
-import * as ImagePicker from "expo-image-picker";
-import * as ImageManipulator from "expo-image-manipulator";
 import {
+  Alert,
   SafeAreaView,
   View,
   Text,
@@ -13,8 +11,10 @@ import {
   Image,
   KeyboardAvoidingView,
   Platform,
+  StyleSheet,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import * as ImagePicker from "expo-image-picker";
+import * as ImageManipulator from "expo-image-manipulator";
 import PrimaryButton from "../../components/PrimaryButton";
 import AttachmentFilled from "../../components/AttachmentFilled";
 import InputField from "../../components/InputField";
@@ -26,9 +26,8 @@ import NavBackHeader from "@/components/NavBackHeader";
 export default function FundReleaseRequestScreen() {
   const router = useRouter();
   const [isUploaded, setIsUploaded] = useState(false);
-  const [image, setImage] = useState(null); // State untuk menyimpan URI gambar
-  const [hasCameraPermission, setHasCameraPermission] = useState(null); // State untuk izin kamera
-
+  const [image, setImage] = useState(null);
+  const [hasCameraPermission, setHasCameraPermission] = useState(null);
   const [alasanText, setAlasanText] = useState("");
   const [showPopup, setShowPopup] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -59,25 +58,21 @@ export default function FundReleaseRequestScreen() {
       return;
     }
 
-    Alert.alert(
-      "Pilih Sumber Gambar",
-      "Ambil foto baru atau pilih dari galeri?",
-      [
-        {
-          text: "Kamera",
-          onPress: async () => {
-            await pickImage("camera");
-          },
+    Alert.alert("Pilih Sumber Gambar", "Ambil foto baru atau pilih dari galeri?", [
+      {
+        text: "Kamera",
+        onPress: async () => {
+          await pickImage("camera");
         },
-        {
-          text: "Galeri",
-          onPress: async () => {
-            await pickImage("gallery");
-          },
+      },
+      {
+        text: "Galeri",
+        onPress: async () => {
+          await pickImage("gallery");
         },
-        { text: "Batal", style: "cancel" },
-      ]
-    );
+      },
+      { text: "Batal", style: "cancel" },
+    ]);
   };
 
   const pickImage = async (source) => {
@@ -105,7 +100,6 @@ export default function FundReleaseRequestScreen() {
         { compress: quality, format: ImageManipulator.SaveFormat.JPEG }
       );
 
-      // Loop kompresi hingga < 1MB atau quality terlalu kecil
       let blob, size;
       do {
         const response = await fetch(compressed.uri);
@@ -122,10 +116,7 @@ export default function FundReleaseRequestScreen() {
         }
       } while (size > 1024 * 1024 && quality >= 0.2);
 
-      setImage({
-        ...imageAsset,
-        uri: compressed.uri,
-      });
+      setImage({ ...imageAsset, uri: compressed.uri });
       setIsUploaded(true);
     } else {
       setImage(null);
@@ -152,32 +143,27 @@ export default function FundReleaseRequestScreen() {
   };
 
   return (
-    <View className="flex-1 bg-white">
-      {/* Header */}
+    <View style={styles.container}>
       <NavBackHeader title={"Permintaan Konfirmasi"} />
-      {/* Content */}
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        keyboardVerticalOffset={Platform.OS === 'ios' && 60}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 60 : 0}
         style={{ flex: 1 }}
       >
         <ScrollView
-          className="px-4 mt-3"
-          contentContainerStyle={{ flexGrow: 1 }}
+          contentContainerStyle={styles.scrollContainer}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          <View className="flex-1">
+          <View style={styles.innerContainer}>
+            <InputField
+              title="Alasan Permintaan Konfirmasi"
+              placeholder="Contohnya, barang telah diterima pembeli sejak 2 hari kemarin"
+              value={alasanText}
+              onChangeText={setAlasanText}
+            />
 
-            <View className="">
-              <InputField
-                title="Alasan Permintaan Konfirmasi"
-                placeholder="Contohnya, barang telah diterima pembeli sejak 2 hari kemarin"
-                value={alasanText}
-                onChangeText={setAlasanText}
-              />
-            </View>
-            <TouchableOpacity onPress={handleUpload} className="mt-4">
+            <TouchableOpacity onPress={handleUpload} style={styles.uploadButton}>
               <AttachmentFilled
                 title="Unggah Bukti"
                 caption={
@@ -186,35 +172,32 @@ export default function FundReleaseRequestScreen() {
                     : "Berikan bukti berupa screenshot cek resi"
                 }
                 captionColor={isUploaded ? "#08B20F" : "#9E9E9E"}
-                iconName={"camera"} // Pastikan AttachmentFilled Anda bisa menerima string 'camera' untuk ikon
+                iconName={"camera"}
                 boxColor={isUploaded ? "#F9F9F9" : "#49DBC8"}
                 iconsColor={isUploaded ? "#C2C2C2" : "#FFFFFF"}
                 cardColor={"#FFF"}
                 alertText="Pastikan keterbacaan foto dan hindari bayangan"
                 alertColor={isUploaded ? "#08B20F" : "#C2C2C2"}
-                alertIconName={isUploaded ? "checkmark-circle" : "alert-circle"} // Pastikan ini juga sesuai dengan AttachmentFilled
+                alertIconName={isUploaded ? "checkmark-circle" : "alert-circle"}
                 alertIconColor={isUploaded ? "#08B20F" : "#C2C2C2"}
                 onPress={handleUpload}
               />
             </TouchableOpacity>
-            <View className="mt-4 mb-4">
-              {!image ? null : (
-                <Image
-                  source={{ uri: image?.uri }}
-                  className="w-full h-64 rounded-lg"
-                />
-              )}
-            </View>
+
+            {image && (
+              <View style={styles.imageContainer}>
+                <Image source={{ uri: image?.uri }} style={styles.uploadedImage} />
+              </View>
+            )}
           </View>
-          {/* Button */}
-          <View className="w-full py-4 mb-8">
+
+          <View style={styles.buttonContainer}>
             <PrimaryButton
               title="Kirim"
               onPress={handleBtnPress}
               disabled={isLoading}
             />
           </View>
-
         </ScrollView>
       </KeyboardAvoidingView>
 
@@ -228,6 +211,38 @@ export default function FundReleaseRequestScreen() {
           btn2="Konfirmasi"
         />
       )}
-    </View >
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#FFFFFF",
+  },
+  scrollContainer: {
+    flexGrow: 1,
+    paddingHorizontal: 16,
+    marginTop: 12,
+  },
+  innerContainer: {
+    flex: 1,
+  },
+  uploadButton: {
+    marginTop: 16,
+  },
+  imageContainer: {
+    marginTop: 16,
+    marginBottom: 16,
+  },
+  uploadedImage: {
+    width: "100%",
+    height: 256,
+    borderRadius: 12,
+  },
+  buttonContainer: {
+    width: "100%",
+    paddingVertical: 16,
+    marginBottom: 32,
+  },
+});
