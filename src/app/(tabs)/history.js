@@ -39,8 +39,6 @@ export default function History() {
       const res = await fetchFn(currentOffset, limit);
       const newData = res?.data || [];
 
-      await new Promise((resolve) => setTimeout(resolve, 800));
-
       if (reset) {
         setData(newData);
       } else {

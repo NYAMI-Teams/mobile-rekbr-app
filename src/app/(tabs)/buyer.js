@@ -27,8 +27,6 @@ export default function Buyer() {
       const res = await getBuyerTransactions(currentOffset, limit);
       const newData = res?.data || [];
 
-      await new Promise((resolve) => setTimeout(resolve, 800));
-
       if (reset) {
         setTransactions(newData);
       } else {

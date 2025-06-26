@@ -52,8 +52,6 @@ export default function Seller() {
       const res = await getSellerTransactions(currentOffset, limit);
       const newData = res.data || [];
 
-      await new Promise((resolve) => setTimeout(resolve, 800));
-
       if (reset) {
         setTransactions(newData);
       } else {
