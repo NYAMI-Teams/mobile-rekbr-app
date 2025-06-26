@@ -1,38 +1,29 @@
 {
   "expo": {
-    "name": "Rekbr App",
+    "name": "mobile-rekbr-app",
     "slug": "mobile-rekbr-app",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./src/assets/icon.png",
+    "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
-    "scheme": "mobile-rekbr-app",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
     "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.nyamiteams.rekbrapp"
+      "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./src/assets/logo-app.png",
+        "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true,
-      "package": "com.nyamiteams.rekbrapp"
+      "edgeToEdgeEnabled": true
     },
     "web": {
-      "favicon": "./src/assets/favicon.png",
-      "bundler": "metro"
-    },
-    "plugins": [
-      "expo-router"
-    ],
-    "extra": {
-      "router": {},
-      "eas": {
-        "projectId": "05fa522e-54e0-4168-b260-5abb3e7db0a2"
-      }
-    },
-    "owner": "danilardi"
+      "favicon": "./assets/favicon.png"
+    }
   }
 }
