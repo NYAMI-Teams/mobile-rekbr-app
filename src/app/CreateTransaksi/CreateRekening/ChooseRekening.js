@@ -75,14 +75,13 @@ export default function ChooseRekening() {
   const fetchBankAccount = async () => {
     try {
       const res = await getListBankAccount();
-      console.log(res);
       if (res) {
         setSaved(res.data);
         return res.data;
       }
     } catch (error) {
       if (error?.message == "Tidak ada akun yang ditemukan") {
-        return
+        return;
       }
       showToast(
         "Gagal",
@@ -128,7 +127,7 @@ export default function ChooseRekening() {
 
   const openModal = () => {
     modalizeRef.current?.open();
-  }
+  };
 
   const closeModal = () => {
     modalizeRef.current?.close();
@@ -209,8 +208,11 @@ export default function ChooseRekening() {
 
   return (
     <>
-      <View className="flex-1 w-full h-full bg-white">
-        <NavBackHeader title={"Pilih Rekening Kamu"} onBackPress={() => router.back()} />
+      <View style={styles.flex1}>
+        <NavBackHeader
+          title={"Pilih Rekening Kamu"}
+          onBackPress={() => router.back()}
+        />
 
         <View style={styles.topBackground}>
           <Image
@@ -251,7 +253,8 @@ export default function ChooseRekening() {
                 style={{
                   paddingHorizontal: 16,
                   paddingTop: 16,
-                }}>
+                }}
+              >
                 <Text style={styles.sectionTitle}>Rekening Favorit kamu!</Text>
                 {favorites.length === 0 ? (
                   <Text style={styles.noFavoritesText}>
@@ -292,7 +295,8 @@ export default function ChooseRekening() {
             style={styles.addButton}
             onPress={() => {
               openModal();
-            }}>
+            }}
+          >
             <Text style={styles.addButtonText}>+ Rekening</Text>
           </TouchableOpacity>
         </View>
@@ -316,23 +320,24 @@ export default function ChooseRekening() {
           paddingVertical: 32,
         }}
       >
-        {/* Gunakan View pembungkus dengan margin/padding seperlunya */}
-        <View className="bg-white">
-          {/* Header dan tombol back */}
-          <Pressable onPress={isAlreadyCheckedRekening
-            ? handleBackToInputRekening
-            : isSelectBankDone
-              ? handleBackToBankSelection
-              : closeModal
-          }>
-            <View className="flex-row items-center mb-6">
+        <View style={styles.modalContent}>
+          <Pressable
+            onPress={
+              isAlreadyCheckedRekening
+                ? handleBackToInputRekening
+                : isSelectBankDone
+                ? handleBackToBankSelection
+                : closeModal
+            }
+          >
+            <View style={styles.modalHeader}>
               <ChevronLeftCircle size={24} color="#00C2C2" />
-              <Text className="text-lg font-normal text-gray-800 ml-2">
+              <Text style={styles.modalHeaderText}>
                 {!isSelectBankDone
                   ? "Pilih Bank Kamu"
                   : !isAlreadyCheckedRekening
-                    ? "Masukan No Rekening Kamu"
-                    : "Rekening Kamu Ditemukan"}
+                  ? "Masukan No Rekening Kamu"
+                  : "Rekening Kamu Ditemukan"}
               </Text>
             </View>
           </Pressable>
@@ -354,65 +359,62 @@ export default function ChooseRekening() {
             <>
               {/* === State 2: Masukkan No Rekening === */}
               {selectedBank && (
-                <View className="flex-row items-center mt-2 mb-2 gap-4">
-                  <View className="w-20 h-10 rounded bg-[#EDFBFA] justify-center items-center py-2">
+                <View style={styles.selectedBankRow}>
+                  <View style={styles.selectedBankLogoBox}>
                     <Image
                       source={{ uri: selectedBank.logoUrl }}
-                      className="w-12 h-12 object-contain"
+                      style={styles.selectedBankLogo}
                       resizeMode="contain"
                     />
                   </View>
-                  <Text className="text-base font-normal">
+                  <Text style={styles.selectedBankName}>
                     {selectedBank.bankName}
                   </Text>
                 </View>
               )}
 
-              <View className="mt-2">
-                <Text className="text-sm font-normal mb-1">
-                  Nomor Rekening
-                </Text>
+              <View style={styles.inputRekeningBox}>
+                <Text style={styles.inputRekeningLabel}>Nomor Rekening</Text>
                 <TextInput
                   value={accountNumber}
                   placeholder="Contoh : 00900604501"
                   editable={false}
-                  className="border border-gray-300 rounded-lg px-4 py-3 text-base bg-gray-100 text-black"
+                  style={styles.inputRekeningInput}
+                  placeholderTextColor="#999"
                 />
               </View>
 
               {/* Keypad */}
-              <View className="w-full items-center justify-center">
-                <View className="flex-row flex-wrap justify-center items-center mt-8 px-6 w-[80%]">
+              <View style={styles.keypadContainer}>
+                <View style={styles.keypadRowWrap}>
                   {keys.map((key, index) => {
                     if (index < 9) {
                       return (
-                        <View key={index} className="w-1/3 items-center justify-center mb-4">
+                        <View key={index} style={styles.keypadItemWrap}>
                           <TouchableOpacity
                             onPress={() => handleKeyPress(key)}
-                            className="size-[62px] rounded-full bg-white border border-gray-300 justify-center items-center shadow-sm"
+                            style={styles.keypadButton}
                           >
-                            <Text className="text-2xl font-normal text-gray-800">
-                              {key}
-                            </Text>
+                            <Text style={styles.keypadButtonText}>{key}</Text>
                           </TouchableOpacity>
                         </View>
                       );
                     }
                     if (index === 9) {
                       return (
-                        <View key="last-row" className="flex-row w-full justify-around items-center mt-2">
-                          <View className="size-[62px] opacity-0" />
+                        <View key="last-row" style={styles.keypadLastRow}>
+                          <View style={[styles.keypadButton, { opacity: 0 }]} />
                           <TouchableOpacity
                             onPress={() => handleKeyPress("0")}
-                            className="size-[62px] rounded-full bg-white border border-gray-300 justify-center items-center shadow-sm"
+                            style={styles.keypadButton}
                           >
-                            <Text className="text-2xl font-normal text-gray-800">0</Text>
+                            <Text style={styles.keypadButtonText}>0</Text>
                           </TouchableOpacity>
                           <TouchableOpacity
                             onPress={() => handleKeyPress("x")}
-                            className="size-[62px] rounded-full bg-white border border-gray-300 justify-center items-center shadow-sm"
+                            style={styles.keypadButton}
                           >
-                            <Text className="text-2xl font-normal text-gray-800">x</Text>
+                            <Text style={styles.keypadButtonText}>x</Text>
                           </TouchableOpacity>
                         </View>
                       );
@@ -424,35 +426,33 @@ export default function ChooseRekening() {
 
               <TouchableOpacity
                 onPress={checkRekening}
-                className="bg-black rounded-lg py-4 mt-3 mb-6"
+                style={styles.cekRekeningButton}
               >
-                <Text className="text-white text-center font-semibold text-base">
-                  Cek Rekening
-                </Text>
+                <Text style={styles.cekRekeningButtonText}>Cek Rekening</Text>
               </TouchableOpacity>
             </>
           ) : (
             <>
               {/* === State 3: Rekening ditemukan === */}
-              <View className="w-full bg-[#EAFBF8] rounded-2xl p-4 gap-2 mb-16">
-                <Text className="text-base font-medium">{accountName}</Text>
-                <View className="flex-row mt-2 gap-2 items-center">
+              <View style={styles.rekeningDitemukanBox}>
+                <Text style={styles.rekeningDitemukanName}>{accountName}</Text>
+                <View style={styles.rekeningDitemukanRow}>
                   <Image
                     source={{ uri: selectedBank.logoUrl }}
-                    style={{
-                      width: 60,
-                      height: 32,
-                      resizeMode: "contain",
-                    }}
+                    style={styles.rekeningDitemukanLogo}
                   />
-                  <View className="flex-col justify-center p-2">
-                    <Text className="text-sm font-medium">{selectedBank.bankName}</Text>
-                    <Text className="text-sm font-normal">{formatAccountNumber(accountNumber)}</Text>
+                  <View style={styles.rekeningDitemukanCol}>
+                    <Text style={styles.rekeningDitemukanBankName}>
+                      {selectedBank.bankName}
+                    </Text>
+                    <Text style={styles.rekeningDitemukanAccountNumber}>
+                      {formatAccountNumber(accountNumber)}
+                    </Text>
                   </View>
                 </View>
               </View>
 
-              <View className="mb-6">
+              <View style={styles.saveButtonBox}>
                 <PrimaryButton
                   onPress={handleToCreateRekbr}
                   title="Simpan dan Gunakan Rekening"
@@ -504,7 +504,8 @@ const AnimatedAccountItem = ({
             selectedBank: JSON.stringify(item),
           },
         });
-      }}>
+      }}
+    >
       <Animated.View
         style={[
           styles.accountItem,
@@ -512,7 +513,8 @@ const AnimatedAccountItem = ({
             opacity: fadeAnim,
             transform: [{ scale: scaleAnim }],
           },
-        ]}>
+        ]}
+      >
         <View style={{ flexDirection: "row", alignItems: "center", flex: 1 }}>
           <Image source={{ uri: item.bank.logoUrl }} style={styles.bankLogo} />
           <View style={{ marginLeft: 12 }}>
@@ -539,29 +541,11 @@ const AnimatedAccountItem = ({
 };
 
 const styles = StyleSheet.create({
-  accountItemContainer: {
-    marginBottom: 16,
-    width: "100%",
-  },
-  appBar: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-  },
-  backButton: {
-    paddingRight: 12,
-  },
-  backIcon: {
-    width: 24,
-    height: 24,
-  },
-  appBarTitle: {
+  flex1: {
     flex: 1,
-    textAlign: "center",
-    fontSize: 18,
-    fontWeight: "600",
-    marginRight: 24,
+    width: "100%",
+    height: "100%",
+    backgroundColor: "#fff",
   },
   topBackground: {
     backgroundColor: "#EAFBF8",
@@ -678,5 +662,163 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 16,
     fontWeight: "600",
+  },
+  modalContent: {
+    backgroundColor: "#fff",
+    width: "100%",
+  },
+  modalHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 24,
+  },
+  modalHeaderText: {
+    fontSize: 18,
+    fontWeight: "400",
+    color: "#1F2937",
+    marginLeft: 8,
+  },
+  selectedBankRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 8,
+    marginBottom: 8,
+    gap: 16,
+  },
+  selectedBankLogoBox: {
+    width: 80,
+    height: 40,
+    borderRadius: 8,
+    backgroundColor: "#EDFBFA",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingVertical: 8,
+  },
+  selectedBankLogo: {
+    width: 48,
+    height: 32,
+    resizeMode: "contain",
+  },
+  selectedBankName: {
+    fontSize: 16,
+    fontWeight: "400",
+    marginLeft: 16,
+  },
+  inputRekeningBox: {
+    marginTop: 8,
+  },
+  inputRekeningLabel: {
+    fontSize: 14,
+    fontWeight: "400",
+    marginBottom: 4,
+  },
+  inputRekeningInput: {
+    borderWidth: 1,
+    borderColor: "#E0E0E0",
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    fontSize: 16,
+    backgroundColor: "#F3F4F6",
+    color: "#000",
+  },
+  keypadContainer: {
+    width: "100%",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  keypadRowWrap: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 32,
+    paddingHorizontal: 24,
+    width: "80%",
+  },
+  keypadItemWrap: {
+    width: "33%",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 16,
+  },
+  keypadButton: {
+    width: 62,
+    height: 62,
+    borderRadius: 31,
+    backgroundColor: "#fff",
+    borderWidth: 1,
+    borderColor: "#E0E0E0",
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOpacity: 0.05,
+    shadowOffset: { width: 0, height: 1 },
+    shadowRadius: 2,
+  },
+  keypadButtonText: {
+    fontSize: 28,
+    fontWeight: "400",
+    color: "#1F2937",
+  },
+  keypadLastRow: {
+    flexDirection: "row",
+    width: "100%",
+    justifyContent: "space-around",
+    alignItems: "center",
+    marginTop: 8,
+  },
+  cekRekeningButton: {
+    backgroundColor: "#000",
+    borderRadius: 8,
+    paddingVertical: 16,
+    marginTop: 12,
+    marginBottom: 24,
+  },
+  cekRekeningButtonText: {
+    color: "#fff",
+    textAlign: "center",
+    fontWeight: "600",
+    fontSize: 16,
+  },
+  rekeningDitemukanBox: {
+    width: "100%",
+    backgroundColor: "#EAFBF8",
+    borderRadius: 20,
+    padding: 16,
+    gap: 8,
+    marginBottom: 48,
+  },
+  rekeningDitemukanName: {
+    fontSize: 16,
+    fontWeight: "600",
+    marginBottom: 8,
+  },
+  rekeningDitemukanRow: {
+    flexDirection: "row",
+    marginTop: 8,
+    gap: 8,
+    alignItems: "center",
+  },
+  rekeningDitemukanLogo: {
+    width: 60,
+    height: 32,
+    resizeMode: "contain",
+  },
+  rekeningDitemukanCol: {
+    flexDirection: "column",
+    justifyContent: "center",
+    padding: 8,
+  },
+  rekeningDitemukanBankName: {
+    fontSize: 14,
+    fontWeight: "600",
+  },
+  rekeningDitemukanAccountNumber: {
+    fontSize: 14,
+    fontWeight: "400",
+  },
+  saveButtonBox: {
+    marginBottom: 24,
   },
 });
