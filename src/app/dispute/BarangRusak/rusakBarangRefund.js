@@ -4,11 +4,9 @@ import {
   Text,
   ScrollView,
   TouchableOpacity,
-  Modal,
-  TouchableWithoutFeedback,
+  StyleSheet,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { ClipboardPaste, ChevronLeft, ChevronDown } from "lucide-react-native";
+import { ChevronLeft } from "lucide-react-native";
 
 import CopyField from "../../../components/dispute/copyField";
 import TextView from "../../../components/dispute/textView";
@@ -19,16 +17,16 @@ import { TrackDispute } from "../../../components/dispute/TrackDispute";
 
 export default function DetailKomplain() {
   const [showOptionModal, setShowOptionModal] = useState(false);
-  const [ditolak, setDitolak] = useState(false); // ✅ perbaikan useState
+  const [ditolak, setDitolak] = useState(false);
 
   return (
-    <View className="flex-1 bg-white">
+    <View style={styles.container}>
       {/* Header */}
-      <View className="flex-row items-center justify-between p-4">
-        <TouchableOpacity onPress={() => router.back()}>
+      <View style={styles.header}>
+        <TouchableOpacity>
           <ChevronLeft size={24} color="black" />
         </TouchableOpacity>
-        <Text className="text-base font-semibold">Detail Komplain</Text>
+        <Text style={styles.headerTitle}>Detail Komplain</Text>
         <View style={{ width: 24 }} />
       </View>
 
@@ -38,16 +36,7 @@ export default function DetailKomplain() {
         steps={["Menunggu", "Kembaliin", "Refund", "Selesai"]}
       />
 
-      <ScrollView className="px-4">
-        {/* Header */}
-        <View className="flex-row items-center justify-between py-4">
-          <TouchableOpacity>
-            <ChevronLeft size={24} color="black" />
-          </TouchableOpacity>
-          <Text className="text-xl font-semibold">Detail Komplain</Text>
-          <View style={{ width: 24 }} />
-        </View>
-
+      <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Stepper */}
         <StepProgressBar
           currentStep={2}
@@ -57,19 +46,8 @@ export default function DetailKomplain() {
 
         <InfoBanner contentBefore="Tunggu approval bukti dari admin, ya! Kalau bukti kamu oke, permintaan konfirmasi bakal langsung dikirim ke seller!" />
 
-        {/* Status Komplain */}
         <StatusKomplain status="Menunggu Pengembalian Barang" />
 
-        {/* Estimasi Box */}
-        {/* <View className="bg-[#F9FAFB] rounded-xl px-4 py-3 mb-4">
-          <Text className="text-sm text-black leading-relaxed">
-            Estimasi dana terkirim dan selesai paling lambat{" "}
-            <Text className="font-semibold">23 Juni 2025</Text>, waktu dan
-            tanggal pasti tergantung pada pihak terkait
-          </Text>
-        </View> */}
-
-        {/* Track Dispute */}
         <TrackDispute
           title="Permintaan konfirmasi buyer"
           dateTime="21 Juni 2025, 10:00 WIB"
@@ -137,17 +115,29 @@ export default function DetailKomplain() {
           title="Virtual Account"
           content="8 0 8 0 1 2 3 4 5 6 7 8 9"
         />
-
-        {/* ✅ Tombol untuk mengaktifkan setDitolak(true) */}
-        {/* <TouchableOpacity
-          onPress={() => setDitolak(true)}
-          className="mt-6 bg-red-500 py-3 rounded-xl"
-        >
-          <Text className="text-white text-center font-semibold">
-            Tandai Komplain Ditolak
-          </Text>
-        </TouchableOpacity> */}
       </ScrollView>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: 16,
+  },
+  headerTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "black",
+  },
+  scrollContent: {
+    paddingHorizontal: 16,
+    paddingBottom: 16,
+  },
+});

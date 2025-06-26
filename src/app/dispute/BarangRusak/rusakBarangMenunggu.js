@@ -7,6 +7,7 @@ import {
   Modal,
   TouchableWithoutFeedback,
   Alert,
+  StyleSheet,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ChevronLeft } from "lucide-react-native";
@@ -65,18 +66,13 @@ export default function DetailKomplain() {
       "Konfirmasi",
       "Yakin ingin membatalkan komplain?",
       [
-        {
-          text: "Tidak",
-          style: "cancel",
-        },
+        { text: "Tidak", style: "cancel" },
         {
           text: "Ya, Batalkan",
           style: "destructive",
           onPress: () => {
             postBuyerCancelComplaint(complaintId)
-              .then(() => {
-                router.replace("../../(tabs)/complaint");
-              })
+              .then(() => router.replace("../../(tabs)/complaint"))
               .catch((err) => {
                 showToast(
                   "Gagal",
@@ -93,20 +89,18 @@ export default function DetailKomplain() {
   };
 
   return (
-    <View className="flex-1 bg-white">
-      {/* Header */}
-      <View className="flex-row items-center justify-between p-4">
+    <View style={styles.container}>
+      <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()}>
           <ChevronLeft size={24} color="black" />
         </TouchableOpacity>
-        <Text className="text-base font-semibold">Detail Komplain</Text>
+        <Text style={styles.headerTitle}>Detail Komplain</Text>
         <View style={{ width: 24 }} />
       </View>
 
-      {/* Stepper */}
-      <View className="items-center w-full">
+      <View style={styles.stepperWrapper}>
         <StepProgressBar
-          key={"rusak_barang_menunggu"}
+          key="rusak_barang_menunggu"
           currentStep={0}
           steps={
             isNeedAdmin
@@ -117,8 +111,7 @@ export default function DetailKomplain() {
         />
       </View>
 
-      <ScrollView className="px-4">
-        {/* Alert Info */}
+      <ScrollView contentContainerStyle={styles.scrollViewContent}>
         <InfoBanner
           contentBefore="Jika seller nggak respon sampai"
           dateTime={
@@ -127,7 +120,6 @@ export default function DetailKomplain() {
           contentAfter=" pengajuanmu bakal otomatis disetujui ya!"
         />
 
-        {/* Status Komplain */}
         <StatusKomplain status="Menunggu Persetujuan Seller" />
 
         {detailComplaint?.timeline
@@ -139,9 +131,7 @@ export default function DetailKomplain() {
               title={item?.label}
               dateTime={formatDateWIB(item?.timestamp)}
               details={[
-                {
-                  content: item?.reason || item?.message || "-",
-                },
+                { content: item?.reason || item?.message || "-" },
                 item?.evidence?.length > 0 && {
                   imgTitle: "Bukti foto & video",
                   images: item?.evidence.map((url, key) => ({ uri: url, key })),
@@ -150,7 +140,6 @@ export default function DetailKomplain() {
             />
           ))}
 
-        {/* Data Seller & Transaksi */}
         <TextView
           title="Seller"
           content={detailComplaint?.transaction?.sellerEmail}
@@ -183,65 +172,152 @@ export default function DetailKomplain() {
         />
       </ScrollView>
 
-      {/* Footer */}
-      <View className="flex-row items-center px-4 py-3 border-t border-gray-100 bg-white">
+      <View style={styles.footer}>
         <TouchableOpacity
           onPress={() => setShowOptionModal(true)}
-          className="h-11 w-16 bg-white rounded-xl border border-black items-center justify-center">
-          <Text className="text-black text-[20px] font-semibold">⋯</Text>
+          style={styles.moreButton}
+        >
+          <Text style={styles.moreButtonText}>⋯</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          className="flex-1 ml-2 h-11 bg-black rounded-xl items-center justify-center"
-          onPress={() => router.push("../../(tabs)/complaint")}>
-          <Text className="text-white font-semibold text-sm">
-            Kirim Seller Email
-          </Text>
+          style={styles.emailButton}
+          onPress={() => router.push("../../(tabs)/complaint")}
+        >
+          <Text style={styles.emailButtonText}>Kirim Seller Email</Text>
         </TouchableOpacity>
       </View>
 
-      {/* Modal Slide Popup - Lainnya */}
       <Modal
         visible={showOptionModal}
         transparent
         animationType="slide"
-        onRequestClose={() => setShowOptionModal(false)}>
+        onRequestClose={() => setShowOptionModal(false)}
+      >
         <TouchableWithoutFeedback onPress={() => setShowOptionModal(false)}>
-          <View className="flex-1 bg-black/40" />
+          <View style={styles.modalOverlay} />
         </TouchableWithoutFeedback>
 
-        <View className="bg-white rounded-t-3xl pt-3 pb-8 px-6">
-          <View className="w-10 h-1.5 bg-gray-300 rounded-full self-center mb-5" />
-
-          <Text className="text-base font-semibold text-black mb-4">
-            Lainnya
-          </Text>
+        <View style={styles.modalContent}>
+          <View style={styles.modalHandle} />
+          <Text style={styles.modalTitle}>Lainnya</Text>
 
           <TouchableOpacity
-            className="mb-4"
-            onPress={() =>
-              router.replace("/dispute/BarangRusak/pilihKomplain")
-            }>
-            <Text className="text-sm font-medium text-black">
-              Ubah Detail Komplain
-            </Text>
+            style={styles.modalItem}
+            onPress={() => router.replace("/dispute/BarangRusak/pilihKomplain")}
+          >
+            <Text style={styles.modalItemText}>Ubah Detail Komplain</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={handleCancelComplaint} className="mb-4">
-            <Text className="text-sm font-medium text-black">
-              Batalkan Komplain
-            </Text>
+          <TouchableOpacity
+            onPress={handleCancelComplaint}
+            style={styles.modalItem}
+          >
+            <Text style={styles.modalItemText}>Batalkan Komplain</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             onPress={() => console.log("Simulate pressed")}
-            className="mb-4">
-            <Text className="text-sm font-medium text-black">
-              Simulate reject
-            </Text>
+            style={styles.modalItem}
+          >
+            <Text style={styles.modalItemText}>Simulate reject</Text>
           </TouchableOpacity>
         </View>
       </Modal>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: "white" },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: 16,
+  },
+  headerTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  stepperWrapper: {
+    alignItems: "center",
+    width: "100%",
+  },
+  scrollViewContent: {
+    paddingHorizontal: 16,
+    paddingBottom: 20,
+  },
+  footer: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderTopWidth: 1,
+    borderColor: "#f3f4f6",
+    backgroundColor: "white",
+  },
+  moreButton: {
+    height: 44,
+    width: 64,
+    backgroundColor: "white",
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "black",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  moreButtonText: {
+    fontSize: 20,
+    color: "black",
+    fontWeight: "600",
+  },
+  emailButton: {
+    flex: 1,
+    height: 44,
+    backgroundColor: "black",
+    borderRadius: 12,
+    justifyContent: "center",
+    alignItems: "center",
+    marginLeft: 8,
+  },
+  emailButtonText: {
+    color: "white",
+    fontSize: 14,
+    fontWeight: "600",
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.4)",
+  },
+  modalContent: {
+    backgroundColor: "white",
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    paddingTop: 12,
+    paddingBottom: 32,
+    paddingHorizontal: 24,
+  },
+  modalHandle: {
+    width: 40,
+    height: 6,
+    backgroundColor: "#D1D5DB",
+    borderRadius: 3,
+    alignSelf: "center",
+    marginBottom: 20,
+  },
+  modalTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "black",
+    marginBottom: 16,
+  },
+  modalItem: {
+    marginBottom: 16,
+  },
+  modalItemText: {
+    fontSize: 14,
+    fontWeight: "500",
+    color: "black",
+  },
+});

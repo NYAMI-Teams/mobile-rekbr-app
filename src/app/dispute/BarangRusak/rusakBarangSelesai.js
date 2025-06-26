@@ -1,8 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, TouchableOpacity, ScrollView } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  StyleSheet,
+} from "react-native";
 import { ChevronLeft } from "lucide-react-native";
-import { useLocalSearchParams, useNavigation } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import PrimaryButton from "../../../components/PrimaryButton";
 import { InfoBanner } from "../../../components/dispute/InfoBanner";
 import StepProgressBar from "../../../components/ProgressBar";
@@ -11,7 +16,6 @@ import { TrackDispute } from "../../../components/dispute/TrackDispute";
 import TextView from "../../../components/dispute/textView";
 import Tagihan from "../../../components/DetailRekber/Tagihan";
 import CopyField from "../../../components/dispute/copyField";
-import { useRouter } from "expo-router";
 import { getDetailBuyerComplaint } from "../../../utils/api/complaint";
 import { showToast, formatCurrency } from "../../../utils";
 import moment from "moment";
@@ -41,20 +45,21 @@ export default function RusakBarangSelesai() {
   };
 
   return (
-    <View className="flex-1 bg-white">
+    <View style={styles.container}>
       {/* Header */}
-      <View className="flex-row items-center justify-between p-4">
+      <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()}>
           <ChevronLeft size={24} color="black" />
         </TouchableOpacity>
-        <Text className="text-base font-semibold">Detail Komplain</Text>
-        <View style={{ width: 24 }} />
+        <Text style={styles.headerTitle}>Detail Komplain</Text>
+        <View style={styles.headerSpacer} />
       </View>
 
       <StepProgressBar
         currentStep={3}
         steps={["Seller", "Admin", "Kembaliin", "Refund"]}
       />
+
       <StatusKomplain
         status={
           detailComplaint.status === "completed"
@@ -63,9 +68,9 @@ export default function RusakBarangSelesai() {
         }
       />
 
-      <View className="h-2 bg-[#f5f5f5] mt-3" />
+      <View style={styles.separator} />
 
-      <ScrollView className="px-4 pt-4 pb-40">
+      <ScrollView contentContainerStyle={styles.scrollContent}>
         {detailComplaint?.timeline
           ?.slice()
           .reverse()
@@ -86,7 +91,7 @@ export default function RusakBarangSelesai() {
             />
           ))}
 
-        <View className="h-2 bg-[#f5f5f5] mt-3" />
+        <View style={styles.separator} />
 
         <TextView
           title="Seller"
@@ -96,7 +101,8 @@ export default function RusakBarangSelesai() {
           title="Nama Barang"
           content={detailComplaint?.transaction?.itemName || "-"}
         />
-        <View className="p-3">
+
+        <View style={styles.tagihanContainer}>
           <Tagihan
             caption="Tagihan Rekber"
             price={formatCurrency(
@@ -139,3 +145,37 @@ export default function RusakBarangSelesai() {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#ffffff",
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: 16,
+  },
+  headerTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#000",
+  },
+  headerSpacer: {
+    width: 24,
+  },
+  separator: {
+    height: 8,
+    backgroundColor: "#f5f5f5",
+    marginTop: 12,
+  },
+  scrollContent: {
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    paddingBottom: 80,
+  },
+  tagihanContainer: {
+    padding: 12,
+  },
+});

@@ -3,28 +3,25 @@ import React, { useState } from "react";
 import {
   View,
   Text,
-  TextInput,
   TouchableOpacity,
   ScrollView,
   Image,
   Modal,
   TouchableWithoutFeedback,
+  StyleSheet,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { ChevronLeft, ClipboardPaste, ChevronDown } from "lucide-react-native";
-import { router, useNavigation } from "expo-router";
-import PrimaryButton from "../../../components/PrimaryButton";
-
+import { ChevronLeft, ChevronDown } from "lucide-react-native";
+import { useRouter } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system";
 import * as MediaLibrary from "expo-media-library";
+
+import PrimaryButton from "../../../components/PrimaryButton";
 import ProblemDisplay from "../../../components/dispute/problemDisplay";
 import ProductCard from "../../../components/dispute/productCard";
 import { InputField } from "../../../components/dispute/InputField";
 import { UploadProve } from "../../../components/dispute/UploadProve";
-import { InfoBanner } from "../../../components/dispute/InfoBanner";
 import { TrackDispute } from "../../../components/dispute/TrackDispute";
-import { useRouter } from "expo-router";
 
 export default function KomplainBatal() {
   const router = useRouter();
@@ -46,7 +43,6 @@ export default function KomplainBatal() {
   ];
 
   const handleSubmit = () => setShowConfirmModal(true);
-
   const handleConfirm = () => {
     setShowConfirmModal(false);
     router.push("../../(tabs)/complaint");
@@ -121,36 +117,29 @@ export default function KomplainBatal() {
   };
 
   return (
-    <View className="flex-1 bg-white">
+    <View style={styles.container}>
       {/* Header */}
-      <View className="flex-row items-center justify-between p-4">
+      <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()}>
           <ChevronLeft size={24} color="black" />
         </TouchableOpacity>
-        <Text className="text-base font-semibold">Detail Komplain</Text>
+        <Text style={styles.headerTitle}>Detail Komplain</Text>
         <View style={{ width: 24 }} />
       </View>
 
-      <View className="h-2 bg-[#f5f5f5] mt-3" />
-      <ScrollView className="px-4 pt-2 pb-4">
+      <View style={styles.separator} />
+      <ScrollView contentContainerStyle={styles.contentContainer}>
         <TrackDispute
           title=" Komplain Dibatalkan"
           dateTime="19 Juni 2025, 10 : 00 WIB"
-          details={[
-            {
-              content: "Kamu membatalkan komplain ini.",
-            },
-          ]}
+          details={[{ content: "Kamu membatalkan komplain ini." }]}
         />
-        <View className="h-2 bg-[#f5f5f5] mt-3" />
+        <View style={styles.separator} />
 
-        {/* Masalah */}
         <ProblemDisplay
           image={require("../../../assets/barangrusak.png")}
           problemType="Barang rusak"
         />
-
-        {/* Info Barang */}
         <ProductCard
           productName="iPhone 13 Pro Max"
           idx="RKB - 8080123456789"
@@ -159,14 +148,10 @@ export default function KomplainBatal() {
           expedisi="J&T Express Indonesia"
           nominal="1000000"
         />
-
-        {/* Alasan */}
         <InputField
           title="Alasan kerusakan"
           placeholder="Jelaskan kerusakan barang dan lampirkan foto."
         />
-
-        {/* Bukti */}
         <UploadProve
           media={media}
           pickMedia={pickMedia}
@@ -174,59 +159,58 @@ export default function KomplainBatal() {
         />
 
         {/* Solusi */}
-        <Text className="text-sm font-semibold text-black mb-2">
-          Solusi apa yang kamu inginkan
-        </Text>
-        <Text className="text-xs text-gray-600 mb-3">
+        <Text style={styles.solutionTitle}>Solusi apa yang kamu inginkan</Text>
+        <Text style={styles.solutionSubtitle}>
           Solusi bisa berubah, sesuai kesepakatan antara Seller, Buyer dan Tim
           Rekbr by BNI
         </Text>
         <TouchableOpacity
-          className="flex-row justify-between items-center bg-white border border-gray-300 rounded-xl px-4 py-4"
-          onPress={() => setShowModal(true)}>
+          style={styles.solutionSelector}
+          onPress={() => setShowModal(true)}
+        >
           <Text
-            className={`text-sm ${
-              selectedSolution ? "text-black" : "text-gray-400"
-            }`}>
+            style={
+              selectedSolution
+                ? styles.solutionText
+                : styles.solutionPlaceholder
+            }
+          >
             {selectedSolution || "Pilih solusi kamu"}
           </Text>
           <ChevronDown size={16} color="#999" />
         </TouchableOpacity>
       </ScrollView>
 
-      {/* Tombol Kirim */}
-      <View className="absolute bottom-4 left-4 right-4">
+      <View style={styles.buttonContainer}>
         <PrimaryButton title="Ajukan Komplain Kembali" onPress={handleSubmit} />
       </View>
 
       {/* Modal Konfirmasi Kirim */}
       <Modal visible={showConfirmModal} transparent animationType="fade">
-        <View className="flex-1 justify-center items-center bg-black/40 px-6">
-          <View className="bg-white rounded-2xl w-full px-6 pt-5 pb-5">
-            <View className="flex-row items-start space-x-3 mb-7">
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalBox}>
+            <View style={styles.modalHeader}>
               <Image
                 source={require("../../../assets/icon-info-blue.png")}
-                className="w-5 h-5 mt-1"
+                style={styles.icon}
                 resizeMode="contain"
               />
-              <Text className="text-[17px] text-black font-semibold leading-[22px] flex-1">
+              <Text style={styles.modalTitle}>
                 Apakah kamu sudah yakin untuk ringkasan komplain ini?
               </Text>
             </View>
-            <View className="flex-row justify-between">
+            <View style={styles.modalActions}>
               <TouchableOpacity
                 onPress={() => setShowConfirmModal(false)}
-                className="w-[48%] py-[14px] border border-gray-300 rounded-xl items-center">
-                <Text className="text-[16px] font-semibold text-black">
-                  Kembali
-                </Text>
+                style={styles.cancelButton}
+              >
+                <Text style={styles.cancelText}>Kembali</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={handleConfirm}
-                className="w-[48%] py-[14px] bg-blue-600 rounded-xl items-center">
-                <Text className="text-[16px] font-semibold text-white">
-                  Konfirmasi
-                </Text>
+                style={styles.confirmButton}
+              >
+                <Text style={styles.confirmText}>Konfirmasi</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -235,29 +219,28 @@ export default function KomplainBatal() {
 
       {/* Modal Pilih Solusi */}
       <Modal visible={showModal} transparent animationType="slide">
-        <View className="flex-1 justify-end">
+        <View style={styles.modalBottomOverlay}>
           <TouchableWithoutFeedback onPress={() => setShowModal(false)}>
-            <View className="flex-1 bg-black/30" />
+            <View style={styles.modalDimmed} />
           </TouchableWithoutFeedback>
-          <View className="bg-white rounded-t-3xl px-6 pt-6 pb-10">
-            <View className="w-10 h-1.5 bg-gray-300 rounded-full self-center mb-4" />
-            <Text className="text-base font-semibold mb-4">Pilih Solusi</Text>
+          <View style={styles.modalBottomSheet}>
+            <View style={styles.handleBar} />
+            <Text style={styles.modalOptionTitle}>Pilih Solusi</Text>
             {solutionOptions.map((item, index) => (
               <TouchableOpacity
                 key={index}
-                className={`mb-3 p-4 rounded-xl border ${
-                  selectedSolution === item.title
-                    ? "border-gray-800 bg-gray-50"
-                    : "border-gray-200"
-                }`}
+                style={[
+                  styles.solutionOption,
+                  selectedSolution === item.title &&
+                    styles.solutionOptionSelected,
+                ]}
                 onPress={() => {
                   setSelectedSolution(item.title);
                   setShowModal(false);
-                }}>
-                <Text className="text-sm font-semibold text-black mb-1">
-                  {item.title}
-                </Text>
-                <Text className="text-xs text-gray-600">{item.desc}</Text>
+                }}
+              >
+                <Text style={styles.solutionOptionTitle}>{item.title}</Text>
+                <Text style={styles.solutionOptionDesc}>{item.desc}</Text>
               </TouchableOpacity>
             ))}
           </View>
@@ -266,65 +249,53 @@ export default function KomplainBatal() {
 
       {/* Modal Tips Upload */}
       <Modal visible={showTipsModal} transparent animationType="slide">
-        <View className="flex-1 justify-end">
+        <View style={styles.modalBottomOverlay}>
           <TouchableWithoutFeedback onPress={() => setShowTipsModal(false)}>
-            <View className="flex-1 bg-black/30" />
+            <View style={styles.modalDimmed} />
           </TouchableWithoutFeedback>
-          <View
-            className="bg-white rounded-t-3xl pt-4 px-6 pb-6"
-            style={{ maxHeight: "85%" }}>
-            <View className="w-12 h-1.5 bg-gray-300 rounded-full self-center mb-6" />
-            <Text className="text-lg font-semibold mb-4">
-              Tips Upload Bukti
-            </Text>
+          <View style={styles.modalTips}>
+            <View style={styles.handleBarWide} />
+            <Text style={styles.tipsTitle}>Tips Upload Bukti</Text>
             {[
               "Tampilkan kondisi barang sebelum kemasan dibuka",
               "Tampilkan kondisi barang sebelum kemasan dibuka",
               "Jika kerusakan disebabkan oleh kurir, tampilkan penyebab kerusakan jika memungkinkan",
               "Khusus video, tampilkan kerusakan yang menunjukkan tidak berfungsinya barang.",
             ].map((tip, index) => (
-              <View key={index} className="flex-row items-start mb-3">
+              <View key={index} style={styles.tipRow}>
                 <Image
                   source={require("../../../assets/icon-check-green.png")}
-                  className="w-5 h-5 mt-0.5 mr-2"
+                  style={styles.tipIcon}
                   resizeMode="contain"
                 />
-                <Text className="text-sm text-black leading-snug flex-1">
-                  {tip}
-                </Text>
+                <Text style={styles.tipText}>{tip}</Text>
               </View>
             ))}
 
-            <View
-              style={{ backgroundColor: "#F3F4F6" }}
-              className="p-4 rounded-xl mt-4">
-              <Text className="text-sm font-semibold text-black mb-2">
-                Format yang didukung:
+            <View style={styles.tipBox}>
+              <Text style={styles.tipBoxTitle}>Format yang didukung:</Text>
+              <Text style={styles.tipBoxText}>
+                • Maksimal <Text style={styles.bold}>5 foto</Text> atau{" "}
+                <Text style={styles.bold}>4 foto dan 1 video</Text>
               </Text>
-              <Text className="text-sm text-black leading-tight mb-1">
-                • Maksimal <Text className="font-semibold">5 foto</Text> atau{" "}
-                <Text className="font-semibold">4 foto dan 1 video</Text>
+              <Text style={styles.tipBoxText}>
+                • Format yang diterima:{" "}
+                <Text style={styles.bold}>.jpg, .png, .mp4, .mov</Text>
               </Text>
-              <Text className="text-sm text-black leading-tight mb-1">
-                • Format yang diterima adalah{" "}
-                <Text className="font-semibold">.jpg, .png, .mp4, .mov</Text>
+              <Text style={styles.tipBoxText}>
+                • Ukuran maksimal foto: <Text style={styles.bold}>10 MB</Text>
               </Text>
-              <Text className="text-sm text-black leading-tight mb-1">
-                • Ukuran maksimal foto adalah{" "}
-                <Text className="font-semibold">10 MB per file</Text>
+              <Text style={styles.tipBoxText}>
+                • Ukuran maksimal video: <Text style={styles.bold}>50 MB</Text>
               </Text>
-              <Text className="text-sm text-black leading-tight mb-1">
-                • Ukuran maksimal video adalah{" "}
-                <Text className="font-semibold">50 MB per file</Text>
+              <Text style={styles.tipBoxText}>
+                • Durasi video maksimal:{" "}
+                <Text style={styles.bold}>5 menit</Text>
               </Text>
-              <Text className="text-sm text-black leading-tight mb-1">
-                • Durasi video maksimal adalah{" "}
-                <Text className="font-semibold">5 menit</Text>
-              </Text>
-              <Text className="text-sm text-black leading-tight">
+              <Text style={styles.tipBoxText}>
                 • Jika video terlalu besar, gunakan video compressor atau{" "}
-                <Text className="font-semibold">upload video ke YouTube</Text>{" "}
-                dan sertakan link di field alasan
+                <Text style={styles.bold}>upload ke YouTube</Text> dan sertakan
+                link-nya
               </Text>
             </View>
           </View>
@@ -333,3 +304,150 @@ export default function KomplainBatal() {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: "white" },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: 16,
+  },
+  headerTitle: { fontSize: 16, fontWeight: "600", color: "#000" },
+  separator: { height: 8, backgroundColor: "#f5f5f5", marginTop: 12 },
+  contentContainer: { paddingHorizontal: 16, paddingTop: 8, paddingBottom: 16 },
+  solutionTitle: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#000",
+    marginBottom: 4,
+  },
+  solutionSubtitle: { fontSize: 12, color: "#6B7280", marginBottom: 12 },
+  solutionSelector: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#D1D5DB",
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    backgroundColor: "#fff",
+  },
+  solutionText: { fontSize: 14, color: "#000" },
+  solutionPlaceholder: { fontSize: 14, color: "#9CA3AF" },
+  buttonContainer: { position: "absolute", bottom: 16, left: 16, right: 16 },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.4)",
+    paddingHorizontal: 24,
+  },
+  modalBox: {
+    backgroundColor: "white",
+    borderRadius: 20,
+    width: "100%",
+    paddingHorizontal: 24,
+    paddingTop: 20,
+    paddingBottom: 20,
+  },
+  modalHeader: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 12,
+    marginBottom: 24,
+  },
+  modalTitle: { fontSize: 17, fontWeight: "600", color: "#000", flex: 1 },
+  icon: { width: 20, height: 20, marginTop: 4 },
+  modalActions: { flexDirection: "row", justifyContent: "space-between" },
+  cancelButton: {
+    width: "48%",
+    paddingVertical: 14,
+    borderWidth: 1,
+    borderColor: "#D1D5DB",
+    borderRadius: 12,
+    alignItems: "center",
+  },
+  confirmButton: {
+    width: "48%",
+    paddingVertical: 14,
+    backgroundColor: "#2563EB",
+    borderRadius: 12,
+    alignItems: "center",
+  },
+  cancelText: { fontSize: 16, fontWeight: "600", color: "#000" },
+  confirmText: { fontSize: 16, fontWeight: "600", color: "#fff" },
+  modalBottomOverlay: { flex: 1, justifyContent: "flex-end" },
+  modalDimmed: { flex: 1, backgroundColor: "rgba(0,0,0,0.3)" },
+  modalBottomSheet: {
+    backgroundColor: "white",
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    paddingHorizontal: 24,
+    paddingTop: 24,
+    paddingBottom: 40,
+  },
+  modalOptionTitle: { fontSize: 16, fontWeight: "600", marginBottom: 16 },
+  handleBar: {
+    width: 40,
+    height: 6,
+    backgroundColor: "#D1D5DB",
+    borderRadius: 4,
+    alignSelf: "center",
+    marginBottom: 12,
+  },
+  solutionOption: {
+    padding: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+    marginBottom: 12,
+  },
+  solutionOptionSelected: {
+    borderColor: "#111827",
+    backgroundColor: "#F9FAFB",
+  },
+  solutionOptionTitle: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#000",
+    marginBottom: 4,
+  },
+  solutionOptionDesc: { fontSize: 12, color: "#6B7280" },
+  modalTips: {
+    backgroundColor: "white",
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    paddingHorizontal: 24,
+    paddingTop: 16,
+    paddingBottom: 24,
+    maxHeight: "85%",
+  },
+  handleBarWide: {
+    width: 48,
+    height: 6,
+    backgroundColor: "#D1D5DB",
+    borderRadius: 4,
+    alignSelf: "center",
+    marginBottom: 24,
+  },
+  tipsTitle: { fontSize: 18, fontWeight: "600", marginBottom: 16 },
+  tipRow: { flexDirection: "row", alignItems: "flex-start", marginBottom: 12 },
+  tipIcon: { width: 20, height: 20, marginTop: 2, marginRight: 8 },
+  tipText: { fontSize: 14, color: "#000", flex: 1, lineHeight: 20 },
+  tipBox: {
+    backgroundColor: "#F3F4F6",
+    padding: 16,
+    borderRadius: 12,
+    marginTop: 16,
+  },
+  tipBoxTitle: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#000",
+    marginBottom: 8,
+  },
+  tipBoxText: { fontSize: 14, color: "#000", lineHeight: 20, marginBottom: 4 },
+  bold: { fontWeight: "600" },
+});
