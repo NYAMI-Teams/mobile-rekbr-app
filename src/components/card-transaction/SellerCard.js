@@ -128,8 +128,7 @@ const SellerCard = ({ data }) => {
           onPress={() =>
             router.push({ pathname: `/InputResi`, params: { id: data?.id } })
           }
-          style={styles.buttonBlack}
-        >
+          style={styles.buttonBlack}>
           <Text style={styles.buttonTextWhite}>Bukti Pengiriman</Text>
         </TouchableOpacity>
       );
@@ -163,8 +162,7 @@ const SellerCard = ({ data }) => {
                 params: { id: data?.id },
               })
             }
-            style={styles.buttonBlack}
-          >
+            style={styles.buttonBlack}>
             <Text style={styles.buttonTextWhite}>Minta Konfirmasi</Text>
           </TouchableOpacity>
         );
@@ -215,8 +213,7 @@ const SellerCard = ({ data }) => {
           pathname: `/DetailTransaksi/Seller`,
           params: { id: data?.id || "" },
         })
-      }
-    >
+      }>
       <View style={styles.cardWrapper}>
         <View style={styles.cardContent}>
           {renderRows().map((row, index) => (
@@ -231,20 +228,26 @@ const SellerCard = ({ data }) => {
                     row.value === "waiting_seller"
                       ? { color: "#9ca3af" }
                       : { color: "#111827" },
-                  ]}
-                >
+                  ]}>
                   {row.value === "waiting_seller"
                     ? "Resi belum diberikan seller"
                     : row.value || "-"}
                 </Text>
-                {row.copyable && !!row.value && row.value !== "waiting_seller" && (
-                  <Pressable onPress={() => handleCopy(row.value)}>
-                    <Image
-                      source={require("../../assets/copy.png")}
-                      style={{ width: 16, height: 16, opacity: 0.7, marginLeft: 4 }}
-                    />
-                  </Pressable>
-                )}
+                {row.copyable &&
+                  !!row.value &&
+                  row.value !== "waiting_seller" && (
+                    <Pressable onPress={() => handleCopy(row.value)}>
+                      <Image
+                        source={require("../../assets/copy.png")}
+                        style={{
+                          width: 16,
+                          height: 16,
+                          opacity: 0.7,
+                          marginLeft: 4,
+                        }}
+                      />
+                    </Pressable>
+                  )}
               </View>
             </View>
           ))}
@@ -281,8 +284,8 @@ const SellerCard = ({ data }) => {
                     ? "bg-green-400"
                     : status === "canceled" || status === "refunded"
                     ? "bg-red-400"
-                    : "bg-yellow-400"
-                )}
+                    : "bg-yellow-400",
+                ]}
               />
               <Text style={styles.statusText}>{renderStatus()}</Text>
             </View>
