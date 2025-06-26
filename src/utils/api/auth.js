@@ -14,6 +14,15 @@ export const login = async (email, password) => {
   }
 };
 
+export const savePushToken = async (token) => {
+  try {
+    const res = await Api.post(`/push-token`, { token });
+    return res;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const register = async (email, password) => {
   try {
     const res = await Api.post(`/user/register`, {

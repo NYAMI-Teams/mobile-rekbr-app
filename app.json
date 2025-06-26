@@ -18,21 +18,30 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.nyamiteams.rekbrapp"
+      "package": "com.nyamiteams.rekbrapp",
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "favicon": "./src/assets/favicon.png",
       "bundler": "metro"
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      [
+        "expo-notifications",
+        {
+          "android": {
+            "googleServicesFile": "./google-services.json"
+          }
+        }
+      ]
     ],
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "05fa522e-54e0-4168-b260-5abb3e7db0a2"
+        "projectId": "3bab7677-1f5b-42c2-8f97-a1fa0fea701e"
       }
     },
-    "owner": "danilardi"
+    "owner": "farinojoshua"
   }
 }
