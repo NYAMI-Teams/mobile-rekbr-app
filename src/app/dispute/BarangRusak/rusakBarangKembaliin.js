@@ -89,21 +89,31 @@ export default function RusakBarangKembaliinPage() {
             <StatusKomplain status="Menunggu Pengembalian Barang" />
             <View className="h-2 bg-[#f5f5f5] mt-3" />
 
-            {detailComplaint?.timeline?.map((item, index) => (
-              <>
-                <TrackDispute
-                  key={index}
-                  title={item?.label}
-                  dateTime={formatDateWIB(item?.timestamp)}
-                  details={[
-                    {
-                      content: item?.message || "-",
-                    },
-                  ]}
-                />
-                <View className="h-2 bg-[#f5f5f5] mt-3" />
-              </>
-            ))}
+            {detailComplaint?.timeline
+              ?.slice()
+              .reverse()
+              .map((item, index) => (
+                <>
+                  <TrackDispute
+                    key={index}
+                    title={item?.label}
+                    dateTime={formatDateWIB(item?.timestamp)}
+                    details={[
+                      {
+                        content: item?.message || item?.reason || "-",
+                      },
+                      item?.evidence?.length > 0 && {
+                        imgTitle: "Bukti foto & video",
+                        images: item?.evidence.map((url, key) => ({
+                          uri: url,
+                          key,
+                        })),
+                      },
+                    ]}
+                  />
+                  <View className="h-2 bg-[#f5f5f5] mt-3" />
+                </>
+              ))}
           </>
         );
 
@@ -113,21 +123,31 @@ export default function RusakBarangKembaliinPage() {
             <StatusKomplain status="Menunggu Pengembalian Barang" />
             <InfoBanner contentBefore="Seller nggak kasih kabar, jadi sekarang giliran kamu buat lanjut prosesnya. Ayo upload bukti pengembalian barang!" />
             <View className="h-2 bg-[#f5f5f5] mt-3" />
-            {detailComplaint?.timeline?.map((item, index) => (
-              <>
-                <TrackDispute
-                  key={index}
-                  title={item?.label}
-                  dateTime={formatDateWIB(item?.timestamp)}
-                  details={[
-                    {
-                      content: item?.message || "-",
-                    },
-                  ]}
-                />
-                <View className="h-2 bg-[#f5f5f5] mt-3" />
-              </>
-            ))}
+            {detailComplaint?.timeline
+              ?.slice()
+              .reverse()
+              .map((item, index) => (
+                <>
+                  <TrackDispute
+                    key={index}
+                    title={item?.label}
+                    dateTime={formatDateWIB(item?.timestamp)}
+                    details={[
+                      {
+                        content: item?.message || item?.reason || "-",
+                      },
+                      item?.evidence?.length > 0 && {
+                        imgTitle: "Bukti foto & video",
+                        images: item?.evidence.map((url, key) => ({
+                          uri: url,
+                          key,
+                        })),
+                      },
+                    ]}
+                  />
+                  <View className="h-2 bg-[#f5f5f5] mt-3" />
+                </>
+              ))}
           </>
         );
 
@@ -135,7 +155,7 @@ export default function RusakBarangKembaliinPage() {
         return (
           <>
             <InfoBanner contentBefore="Barang harus segera kamu kirim. Pastikan aman dan lampirkan bukti resi." />
-            <StatusKomplain status="Menunggu Pengembalian Barang" />
+            <StatusKomplain status="Menunggu Pengembalian Barang" />{" "}
           </>
         );
 
@@ -174,11 +194,14 @@ export default function RusakBarangKembaliinPage() {
       case "returnRequested":
         return (
           <>
-            <InfoBanner contentBefore="Tunggu konfirmasi dari seller soal barang yang kamu kembalikan, baru deh dana bakal kembali ke kamu." />
+            <InfoBanner contentBefore="Kembalikan dengan baik, kemasan aman, dan berikan bukti pengiriman kembali ! Proses maksimal 1 x 24 jam." />
             <StatusKomplain status="Menunggu Pengembalian Barang" />
             <View className="h-2 bg-[#f5f5f5] mt-3" />
-            <>
-              {detailComplaint?.timeline?.map((item, index) => (
+
+            {detailComplaint?.timeline
+              ?.slice()
+              .reverse()
+              .map((item, index) => (
                 <>
                   <TrackDispute
                     key={index}
@@ -186,18 +209,20 @@ export default function RusakBarangKembaliinPage() {
                     dateTime={formatDateWIB(item?.timestamp)}
                     details={[
                       {
-                        content: item?.message || "-",
+                        content: item?.reason || item?.message || "-",
                       },
                       item?.evidence?.length > 0 && {
                         imgTitle: "Bukti foto & video",
-                        images: item?.evidence.map((url) => ({ uri: url })),
+                        images: item?.evidence.map((url, key) => ({
+                          uri: url,
+                          key,
+                        })),
                       },
                     ]}
                   />
                   <View className="h-2 bg-[#f5f5f5] mt-3" />
                 </>
               ))}
-            </>
           </>
         );
 
@@ -244,45 +269,78 @@ export default function RusakBarangKembaliinPage() {
                 />
               </>
             ) : (
-              <TrackDispute
-                title="Pengembalian barang oleh buyer"
-                dateTime={formatDateWIB(
-                  detailComplaint?.returnShipment?.shipmentDate || "-"
-                )}
-                details={[
-                  {
-                    resiNumber:
-                      detailComplaint?.returnShipment?.trackingNumber || "-",
-                    expedition:
-                      detailComplaint?.returnShipment?.courierName || "-",
-                  },
-                ]}
-              />
+              <></>
             )}
 
-            <View className="h-2 bg-[#f5f5f5] mt-3" />
-
-            {detailComplaint?.timeline?.map((item, index) => {
-              <TrackDispute
-                key={item?.index}
-                title={item?.label}
-                dateTime={item?.timestamp}
-                details={[
-                  {
-                    content: item?.reason,
-                  },
-                  item?.evidence?.length > 0 && {
-                    imgTitle: "Bukti foto & video",
-                    images: item?.evidence.map((url) => ({ uri: url })),
-                  },
-                ]}
-              />;
-            })}
+            {detailComplaint?.timeline
+              ?.slice()
+              .reverse()
+              .map((item, index) => (
+                <TrackDispute
+                  key={index}
+                  title={item.label}
+                  dateTime={formatDateWIB(item.timestamp)}
+                  details={[
+                    {
+                      content: item?.reason || item?.message || "-",
+                    },
+                    item?.evidence?.length > 0 && {
+                      imgTitle: "Bukti foto & video",
+                      images: item?.evidence.map((url, key) => ({
+                        uri: url,
+                        key,
+                      })),
+                    },
+                    item?.trackingNumber !== null && {
+                      resiNumber: item?.trackingNumber,
+                      expedition: item?.courier,
+                    },
+                  ]}
+                />
+              ))}
           </>
         );
 
+      case "awaitingSellerConfirmation":
+        return (
+          <>
+            <InfoBanner contentBefore="Konfirmasi resi udah dikirim ke seller, tunggu approval mereka ya!" />
+            <StatusKomplain status="Menunggu Seller" />
+            <View className="h-2 bg-[#f5f5f5] mt-3" />
+
+            {detailComplaint?.timeline
+              ?.slice()
+              .reverse()
+              .map((item, index) => (
+                <TrackDispute
+                  key={index}
+                  title={item.label}
+                  dateTime={formatDateWIB(item.timestamp)}
+                  details={[
+                    {
+                      content: item?.reason || item?.message || "-",
+                    },
+                    item?.evidence?.length > 0 && {
+                      imgTitle: "Bukti foto & video",
+                      images: item?.evidence.map((url, key) => ({
+                        uri: url,
+                        key,
+                      })),
+                    },
+                  ]}
+                />
+              ))}
+
+            <View className="h-2 bg-[#f5f5f5] mt-3" />
+          </>
+        );
       default:
-        return console.log("Ini error");
+        return (
+          <>
+            <InfoBanner contentBefore="-" />
+            <StatusKomplain status="-" />
+          </>
+        );
     }
   };
 

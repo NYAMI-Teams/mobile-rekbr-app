@@ -8,8 +8,8 @@ const statusconfig = {
   waitingSellerApproval: {
     color: "#FBBF24",
     text: "Persetujuan Seller",
-    note: "Jika seller nggak respon sampai",
-    notebold: "  18 Juni 2025, 10 : 00 WIB,",
+    note: "Jika seller nggak respon sampai ",
+    notebold: " 18 Juni 2025, 10 : 00 WIB,",
     noteafter: " pengajuanmu bakal otomatis disetujui ya!",
     status: "18 Juni 2025, 10 : 00 WIB",
     statusColor: "#FEF2D3",
@@ -51,7 +51,20 @@ const statusconfig = {
     note: "Setelah ditinjau, bukti belum cukup kuat. Dana diteruskan ke seller dan transaksi dianggap selesai.",
     button: null,
   },
-  awaitingSellerConfirmation: {},
+  awaitingSellerConfirmation: {
+    color: "#FBBF24",
+    text: "Menunggu Pengembalian",
+    note: "Buyer akan mengembalikan barang dalam 24 jam, konfirmasi bila barang telah sampai dan diterima.",
+    button: null,
+  },
+  awaitingAdminConfirmation: {
+    color: "#FBBF24",
+    text: "Menunggu Pengembalian",
+    note: "Tunggu approval kami, ya! Kalau bukti kamu oke, permintaan konfirmasi bakal langsung dikirim ke seller!",
+    button: "Permintaan Ditinjau",
+    btnColor: "#FEF2D3",
+    btnTextColor: "black",
+  },
   approvedBySeller: {
     color: "#FBBF24",
     text: "Menunggu Pengembalian",
@@ -66,12 +79,18 @@ const statusconfig = {
     notebold: " Proses maksimal 1 x 24 jam.",
     button: "Bukti Pengembalian",
   },
+  canceledByBuyer: {
+    color: "#CB3A31",
+    text: "Komplain Dibatalkan",
+    note: "",
+    button: null,
+  },
 
   // Buyer Hilang Barang
   underInvestigation: {
     color: "#FBBF24",
     text: "Investigasi Pengiriman",
-    note: "",
+    note: "Hey, kami lagi cek pengiriman barang kamu di ekspedisi, nih. Kita bakal nilai kesalahan ini dan cari solusi terbaik!",
     button: null,
   },
 
@@ -157,11 +176,6 @@ const RusakBarangCard = ({
 }) => {
   const config = statusconfig[status];
 
-  const formatDateWIB = (dateTime) => {
-    if (!dateTime) return "Invalid date";
-    return moment(dateTime).utcOffset(7).format("DD MMMM YYYY, HH:mm [WIB]");
-  };
-
   return (
     <TouchableOpacity onPress={onPress} activeOpacity={0.8}>
       <View className="bg-white border border-[#E5E7EB] rounded-2xl px-4 pt-4 pb-3 shadow-sm mb-8">
@@ -218,8 +232,7 @@ const RusakBarangCard = ({
                 <Text className="text-xs text-black">{config?.note}</Text>
                 {status !== "returnInTransit" && (
                   <Text className="text-xs text-black font-semibold">
-                    {" "}
-                    {formatDateWIB(time) || "-"}
+                    {time}
                   </Text>
                 )}
                 <Text className="text-xs text-black">{config?.noteafter}</Text>
@@ -253,10 +266,7 @@ const RusakBarangCard = ({
               <View
                 className="flex-row items-center space-x-1 p-2 rounded-lg"
                 style={{ backgroundColor: config?.statusColor }}>
-                <Text className="text-xs text-black ml-2">
-                  {" "}
-                  {formatDateWIB(time) || "-"}
-                </Text>
+                <Text className="text-xs text-black ml-2"> {time}</Text>
               </View>
             )}
           </View>

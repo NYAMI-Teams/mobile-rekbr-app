@@ -127,26 +127,36 @@ export default function DisputeScreen() {
             seller={item?.transaction?.sellerEmail}
             noResi={
               item?.status === "return_in_transit" ||
-              item?.status === "approved_by_admin"
+              item?.status === "approved_by_admin" ||
+              item?.status === "completed" ||
+              item?.status === "awaiting_seller_confirmation"
                 ? item?.returnShipment?.trackingNumber || "-"
                 : "-"
             }
             expedisi={
               item?.status === "return_in_transit" ||
-              item?.status === "approved_by_admin"
+              item?.status === "approved_by_admin" ||
+              item?.status === "completed" ||
+              item?.status === "awaiting_seller_confirmation"
                 ? item?.returnShipment?.courierName || "-"
                 : "-"
             }
-            time={item?.sellerConfirmDeadline} // ini perlu dibuat function base on status, karena timenya beda beda
+            typeDespute={disputeTypeLabel(item?.type)}
+            time={dateShow(mappedStatus, item)}
             status={mappedStatus}
             onPress={() => handleBuyerComplaintPress(item, mappedStatus)}
             onPressButton={
               mappedStatus === "returnRequested"
-                ? () =>
+                ? () => {
+                    console.log("Masuk Sini");
+
                     router.push({
                       pathname: "/dispute/BarangRusak/pengembalianForm",
                       params: { complaintId: item?.id },
-                    })
+                    });
+
+                    console.log("Beres Masuk Sini");
+                  }
                 : mappedStatus === "returnInTransit"
                 ? () =>
                     router.push({
@@ -187,40 +197,25 @@ export default function DisputeScreen() {
             buyer={item?.transaction?.buyerEmail || ""}
             noResi={
               item?.status === "return_in_transit" ||
-              item?.status === "approved_by_admin"
+              item?.status === "approved_by_admin" ||
+              item?.status === "completed" ||
+              item?.status === "awaiting_seller_confirmation"
                 ? item?.returnShipment?.trackingNumber || "-"
                 : "-"
             }
             expedisi={
               item?.status === "return_in_transit" ||
-              item?.status === "approved_by_admin"
+              item?.status === "approved_by_admin" ||
+              item?.status === "completed" ||
+              item?.status === "awaiting_seller_confirmation"
                 ? item?.returnShipment?.courierName || "-"
                 : "-"
             }
             typeDespute={disputeTypeLabel(item?.type)}
-            time={formatDateWIB(item?.sellerConfirmDeadline)}
+            time={dateShow(mappedStatus, item)}
             status={mappedStatus}
             onPress={() => handleSellerComplaintPress(item, mappedStatus)}
-            onPressButton={
-              mappedStatus === "returnRequested"
-                ? () => {
-                    console.log("ini status dari seller", mappedStatus);
-                    router.push({
-                      pathname: "/dispute/BarangRusak/pengembalianForm",
-                      params: { complaintId: item?.id },
-                    });
-                  }
-                : mappedStatus === "returnInTransit"
-                ? () => {
-                    router.push({
-                      pathname: "/dispute/BarangRusak/konfirmasiSellerForm",
-                      params: { complaintId: item?.id },
-                    });
-                  }
-                : () => {
-                    console.log("Null", mappedStatus);
-                  } // Default empty function
-            }
+            onPressButton={() => {}}
           />
         );
       });
@@ -247,6 +242,7 @@ export default function DisputeScreen() {
     completed: "Completed",
     rejected_by_admin: "rejectedByAdmin",
     canceled_by_buyer: "canceledByBuyer",
+    awaiting_admin_confirmation: "awaitingAdminConfirmation",
     awaiting_seller_confirmation: "awaitingSellerConfirmation",
   };
 
@@ -258,24 +254,48 @@ export default function DisputeScreen() {
     awaiting_admin_approval: "awaitingAdminApproval",
     approved_by_seller: "approvedBySeller",
     approved_by_admin: "approvedByAdmin",
-    under_investigtion: "underInvestigation",
+    under_investigation: "underInvestigation",
     awaiting_seller_confirmation: "awaitingSellerConfirmation",
     completed: "Completed",
     rejected_by_admin: "rejectedByAdmin",
     canceled_by_buyer: "canceledByBuyer",
+    awaiting_admin_confirmation: "awaitingAdminConfirmation",
   };
 
-  const hiddenStatusesBuyer = [
-    "completed", //kalo seller masuk ke status map
-    "rejected_by_admin",
-    "canceled_by_buyer",
-    "awaiting_seller_confirmation", // kalo seller masuk ke status map
-  ];
+  const formatDateWIB = (dateTime) => {
+    if (!dateTime) return "Invalid date";
+    return moment(dateTime).utcOffset(7).format("DD MMMM YYYY, HH:mm [WIB]");
+  };
 
-  const hiddenStatusesSeller = ["rejected_by_admin", "canceled_by_buyer"];
+  const dateShow = (status, data) => {
+    console.log("ini status dari Complain awal", status);
+
+    switch (status) {
+      case "waitingSellerApproval":
+        return formatDateWIB(data?.sellerResponseDeadline) || "Invalid date";
+      case "returnRequested":
+        return ` Proses maksimal 1 x 24 jam atau ${formatDateWIB(
+          data?.buyerDeadlineInputShipment
+        )}`;
+      case "sellerRejected":
+      case "returnInTransit":
+      case "awaitingAdminApproval":
+      case "approvedBySeller":
+      case "approvedByAdmin":
+      case "underInvestigation":
+      case "awaitingSellerConfirmation":
+      case "Completed":
+      case "rejectedByAdmin":
+      case "canceledByBuyer":
+      case "awaitingAdminConfirmation":
+        return "";
+      default:
+        return "Invalid status";
+    }
+  };
 
   const disputeTypeLabel = (type) => {
-    if (type === "Barang rusak") return "Barang Rusak";
+    if (type === "damaged") return "Barang Rusak";
     if (type === "lost") return "Barang Hilang";
     return "-";
   };
@@ -297,18 +317,24 @@ export default function DisputeScreen() {
           },
         });
       },
-      Completed: () =>
-        router.push({
-          pathname: "/dispute/BarangRusak/rusakBarangSelesai",
-          params: { complaintId: item?.id },
-        }),
+      Completed: () => {
+        if (item?.type == "damaged") {
+          router.push({
+            pathname: "/dispute/BarangRusak/rusakBarangSelesai",
+            params: { complaintId: item?.id },
+          });
+        } else {
+          router.push({
+            pathname: "/Complaint/Detail",
+            params: { id: item?.id, role: "buyer" },
+          });
+        }
+      },
       sellerRejected: () =>
         router.push({
           pathname: "/dispute/BarangRusak/rusakBarangAdmin",
           params: {
             complaintId: item?.id,
-            status: "sellerRejected",
-            rejectedAdmin: false,
           },
         }),
       returnInTransit: () =>
@@ -336,11 +362,19 @@ export default function DisputeScreen() {
             status: "awaitingAdminApproval",
           },
         }),
-      rejectedByAdmin: () =>
-        router.push({
-          pathname: "/dispute/BarangRusak/rusakBarangAdmin",
-          params: { complaintId: item?.id, rejectedAdmin: true },
-        }),
+      rejectedByAdmin: () => {
+        if (item?.type == "damaged") {
+          router.push({
+            pathname: "/dispute/BarangRusak/rusakBarangAdmin",
+            params: { complaintId: item?.id, rejectedAdmin: true },
+          });
+        } else {
+          router.push({
+            pathname: "/Complaint/Detail",
+            params: { id: item?.id, role: "buyer" },
+          });
+        }
+      },
       awaitingSellerConfirmation: () =>
         //marking
         router.push({
@@ -348,6 +382,14 @@ export default function DisputeScreen() {
           params: {
             complaintId: item?.id,
             status: "awaitingSellerConfirmation",
+          },
+        }),
+      awaitingAdminConfirmation: () =>
+        router.push({
+          pathname: "/dispute/BarangRusak/rusakBarangKembaliin",
+          params: {
+            complaintId: item?.id,
+            status: "awaitingAdminConfirmation",
           },
         }),
       approvedBySeller: () =>
@@ -365,11 +407,28 @@ export default function DisputeScreen() {
           },
         });
       },
+      canceledByBuyer: () => {
+        if (item?.type === "damaged") {
+          router.push({
+            pathname: "/dispute/BarangRusak/pilihKomplain",
+            params: {
+              id: item?.transaction?.id,
+            },
+          });
+        } else {
+          router.push({
+            pathname: "/Complaint/Create",
+            params: {
+              id: item?.transaction?.id,
+            },
+          });
+        }
+      },
       underInvestigation: () =>
         //marking
         router.push({
           pathname: "/Complaint/Detail",
-          params: { id: item?.id },
+          params: { id: item?.id, role: "buyer" },
         }),
     };
 
@@ -391,30 +450,36 @@ export default function DisputeScreen() {
           pathname: "/dispute/SellerDispute/AdminPage",
           params: {
             id: item?.id,
-            rejectedAdmin: false,
-            status: "awaitingAdminApproval",
           },
         }),
       returnRequested: () => {
         router.push({
           pathname: "/dispute/SellerDispute/KembaliinPage",
           params: {
-            complaintId: item?.id,
+            id: item?.id,
             status: "returnRequested",
           },
         });
       },
-      Completed: () =>
-        router.push({
-          pathname: "/dispute/SellerDispute/SelesaiPage",
-          params: { complaintId: item?.id },
-        }),
+      Completed: () => {
+        if (item?.type == "damaged") {
+          router.push({
+            pathname: "/dispute/SellerDispute/SelesaiPage",
+            params: { complaintId: item?.id },
+          });
+        } else {
+          router.push({
+            pathname: "/Complaint/Detail",
+            params: { id: item?.id, role: "seller" },
+          });
+        }
+      },
       sellerRejected: () => {},
       returnInTransit: () =>
         router.push({
           pathname: "/dispute/SellerDispute/KembaliinPage",
           params: {
-            complaintId: item?.id,
+            id: item?.id,
             status: "returnInTransit",
           },
         }),
@@ -422,29 +487,46 @@ export default function DisputeScreen() {
         router.push({
           pathname: "/dispute/SellerDispute/KembaliinPage",
           params: {
-            complaintId: item?.id,
+            id: item?.id,
             status: "disputeProved",
           },
         }),
-      rejectedByAdmin: () =>
-        router.push({
-          pathname: "/dispute/SellerDispute/SellerPage",
-          params: { complaintId: item?.id, rejectedAdmin: true },
-        }),
+      rejectedByAdmin: () => {
+        if (item?.type == "damaged") {
+          router.push({
+            pathname: "/dispute/SellerDispute/AdminPage",
+            params: { id: item?.id },
+          });
+        } else {
+          router.push({
+            pathname: "/Complaint/Detail",
+            params: { id: item?.id, role: "seller" },
+          });
+        }
+      },
+
       awaitingSellerConfirmation: () =>
         //marking
         router.push({
           pathname: "/dispute/SellerDispute/KembaliinPage",
           params: {
-            complaintId: item?.id,
+            id: item?.id,
             status: "awaitingSellerConfirmation",
+          },
+        }),
+      awaitingAdminConfirmation: () =>
+        router.push({
+          pathname: "/dispute/SellerDispute/KembaliinPage",
+          params: {
+            id: item?.id,
+            status: "awaitingAdminConfirmation",
           },
         }),
       approvedBySeller: () =>
         //marking
         router.push({
           pathname: "/dispute/SellerDispute/KembaliinPage",
-          params: { complaintId: item?.id, status: "approvedBySeller" },
+          params: { id: item?.id, status: "approvedBySeller" },
         }),
       approvedByAdmin: () => {
         router.push({
@@ -459,7 +541,7 @@ export default function DisputeScreen() {
         //marking
         router.push({
           pathname: "/Complaint/Detail",
-          params: { id: item?.id },
+          params: { id: item?.id, role: "seller" },
         }),
     };
 

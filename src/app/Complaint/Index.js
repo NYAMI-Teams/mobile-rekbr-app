@@ -14,27 +14,24 @@ export default function HomeDispute() {
     {
       label: "Barang belum sampai atau kesasar",
       icon: require("../../assets/belumsampai.png"),
+      route: "/Complaint/Create",
     },
     {
       label: "Barang rusak",
       icon: require("../../assets/barangrusak.png"),
+      route: "/dispute/BarangRusak/pilihKomplain",
     },
     {
       label: "Tidak sesuai deskripsi",
       icon: require("../../assets/tidaksesuai.png"),
+      route: "/dispute/TidakSesuai",
     },
     {
       label: "Masalah atau komplain lainnya",
       icon: require("../../assets/komplain.png"),
+      route: "/dispute/KomplainLainnya",
     },
   ];
-
-  const routeMap = {
-    "Barang belum sampai atau kesasar": "/Complaint/Create",
-    "Barang rusak": "/dispute/BarangRusak/pilihKomplain",
-    "Tidak sesuai deskripsi": "/dispute/TidakSesuai", //PR
-    "Masalah atau komplain lainnya": "/dispute/KomplainLainnya",
-  };
 
   return (
     <View className="flex-1 bg-white">
@@ -95,10 +92,11 @@ export default function HomeDispute() {
               key={index}
               className="w-[48%] h-40 bg-white border border-gray-300 rounded-xl px-4 py-10 items-center justify-between"
               onPress={() => {
-                const route = routeMap[item.label];
-                if (route) {
+                console.log("route", `${item.route}`);
+                console.log("transactionId", transactionId);
+                if (item.route) {
                   router.push({
-                    pathname: route,
+                    pathname: `${item.route}`,
                     params: { id: transactionId },
                   });
                 }

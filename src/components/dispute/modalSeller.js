@@ -15,26 +15,26 @@ import { Pressable } from "react-native";
 import { Alert } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import * as ImageManipulator from "expo-image-manipulator";
-import { Feather } from "lucide-react-native";
 import { postSellerResponse } from "../../utils/api/complaint";
 import PrimaryButton from "../PrimaryButton";
 import { showToast } from "../../utils";
 import { useRouter } from "expo-router";
+import { Feather } from "@expo/vector-icons";
 
-export default function ModalSeller({ showPopup, setShowPopup, id }) {
+export default function ModalSeller({ showPopup, setShowPopup, id, isTolak }) {
   const router = useRouter();
   const [tanggapanSeller, setTanggapanSeller] = useState("");
   const [isInputValid, setIsInputValid] = useState(false);
   const [arrPhoto, setArrPhoto] = useState([]);
   const [isUploaded, setIsUploaded] = useState(false);
   const [hasCameraPermission, setHasCameraPermission] = useState(null);
-  const status = "approved";
 
   useEffect(() => {
     (async () => {
       const cameraStatus = await ImagePicker.requestCameraPermissionsAsync();
       setHasCameraPermission(cameraStatus.status === "granted");
     })();
+    console.log("ini isTolak", isTolak);
   }, []);
 
   const handleUpload = async () => {
@@ -141,21 +141,32 @@ export default function ModalSeller({ showPopup, setShowPopup, id }) {
   };
 
   const handleSellerResponse = async () => {
-    setShowPopup(false);
-    // hitted API
     try {
+      if (!isInputValid) {
+        showToast("Error", "Tanggapan harus minimal 25 karakter", "error");
+        return;
+      }
+
+      let status = isTolak ? "rejected" : "return_requested";
       const res = await postSellerResponse(
         id,
         status,
         tanggapanSeller,
         arrPhoto
       );
+
       showToast("Berhasil", res?.message, "success");
       console.log("ini res", res);
-      router.replace("../../(tabs)/dispute");
+      router.replace("/(tabs)/complaint");
+      setShowPopup(false);
     } catch (err) {
       console.log("Gagal cok ===> ", err.message);
       showToast("Gagal", err?.message, "error");
+      // Re-enable the button on error
+      const button = document.querySelector("button[title='Kirim']");
+      if (button) {
+        button.disabled = false;
+      }
     }
   };
 

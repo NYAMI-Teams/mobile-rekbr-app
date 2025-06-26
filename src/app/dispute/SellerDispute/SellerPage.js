@@ -27,7 +27,17 @@ export default function SellerPage() {
   const { id } = useLocalSearchParams();
   const [detailComplaint, setDetailComplaint] = useState({});
   const [showPopup, setShowPopup] = useState(false);
-  const handleSubmit = () => setShowPopup(true);
+  const [isTolak, setIsTolak] = useState(false);
+  const [rejectedAdmin, setRejectedAdmin] = useState(false);
+  const [rejectedSeller, setRejectedSeller] = useState(false);
+  const handleSubmitTolak = () => {
+    setIsTolak(true);
+    setShowPopup(true);
+  };
+  const handleSubmitSetuju = () => {
+    setIsTolak(false);
+    setShowPopup(true);
+  };
 
   useEffect(() => {
     if (id) {
@@ -39,6 +49,11 @@ export default function SellerPage() {
     try {
       const res = await getDetailSellerComplaint(id);
       setDetailComplaint(res.data);
+      console.log(res.data.admin_decision === "rejected", "rejected admin");
+      console.log(res.data.seller_decision === "rejected", "rejected seller");
+
+      setRejectedAdmin(res.data.admin_decision === "rejected" ? true : false);
+      setRejectedSeller(res.data.seller_decision === "rejected" ? true : false);
       console.log(
         "ini detail complaint as seller",
         JSON.stringify(res.data, null, 2)
@@ -62,18 +77,18 @@ export default function SellerPage() {
 
       {/* Stepper */}
       <StepProgressBar
-        currentStep={0}
+        currentStep={rejectedSeller ? 1 : rejectedAdmin ? 2 : 0}
         steps={["Seller", "Admin", "Kembaliin", "Refunded"]}
-        rejectedSteps={[]}
+        rejectedSteps={rejectedSeller ? [0] : rejectedAdmin ? [0, 1] : []}
       />
 
       <ScrollView className="px-4">
         <InfoBanner
-          contentBefore="Jika kamu nggak respon sampai "
+          contentBefore="Jika kamu nggak respon sampai"
           dateTime={
-            formatDateWIB(detailComplaint?.seller_confirm_deadline) || "null"
+            formatDateWIB(detailComplaint?.seller_response_deadline) || "null"
           }
-          contentAfter="pengajuan ini bakal otomatis disetujui, ya!"
+          contentAfter=" pengajuan ini bakal otomatis disetujui, ya!"
         />
 
         <StatusKomplain status="Menunggu Seller Setuju" />
@@ -147,24 +162,31 @@ export default function SellerPage() {
       </ScrollView>
 
       {/* Bottom Action */}
-      <View
-        className="flex-row px-4 pb-4 pt-2 bg-white"
-        style={{ position: "absolute", bottom: 0, left: 0, right: 0 }}>
-        <PrimaryButton
-          title="Tolak"
-          onPress={handleSubmit}
-          width="48%"
-          btnColor="#F9F9F9"
-          textColor="#000000"
-          style={{ marginRight: 8 }}
-        />
-        <PrimaryButton title="Setuju" onPress={handleSubmit} width="48%" />
-      </View>
+      {rejectedAdmin === false && (
+        <View
+          className="flex-row px-4 pb-4 pt-2 bg-white"
+          style={{ position: "absolute", bottom: 0, left: 0, right: 0 }}>
+          <PrimaryButton
+            title="Tolak"
+            onPress={handleSubmitTolak}
+            width="48%"
+            btnColor="#F9F9F9"
+            textColor="#000000"
+            style={{ marginRight: 8 }}
+          />
+          <PrimaryButton
+            title="Setuju"
+            onPress={handleSubmitSetuju}
+            width="48%"
+          />
+        </View>
+      )}
 
       {showPopup && (
         <ModalSeller
           showPopup={showPopup}
           setShowPopup={setShowPopup}
+          isTolak={isTolak}
           id={id}
         />
       )}

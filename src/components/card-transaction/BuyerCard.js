@@ -90,6 +90,19 @@ const BuyerCard = ({ data }) => {
             copyable: true,
           },
         ];
+      case "refunded":
+        return [
+          { label: "Nama Produk", value: data?.itemName || "-" },
+          { label: "Penjual", value: data?.sellerEmail || "-" },
+          {
+            label: data?.shipmentDeadline == null ? "Nomor VA" : "Nomor Resi",
+            value:
+              data?.shipmentDeadline == null
+                ? data?.virtualAccount
+                : data?.shipment?.trackingNumber || "waiting_seller",
+            copyable: true,
+          },
+        ];
       default:
         return [];
     }
@@ -107,6 +120,8 @@ const BuyerCard = ({ data }) => {
         return "Barang Diterima";
       case "canceled":
         return "Dibatalkan";
+      case "refunded":
+        return "Dikembalikan";
       default:
         return "";
     }
@@ -190,6 +205,16 @@ const BuyerCard = ({ data }) => {
       );
     }
 
+    if (status === "refunded") {
+      return (
+        <View className="px-3 py-1 rounded-full">
+          <Text className="font-poppins-semibold text-xs text-gray-800">
+            {formatDateWIB(data?.createdAt || "-")}
+          </Text>
+        </View>
+      );
+    }
+
     return null;
   };
 
@@ -267,9 +292,9 @@ const BuyerCard = ({ data }) => {
                   "w-2 h-2 rounded-full mr-2",
                   status === "completed"
                     ? "bg-green-400"
-                    : status === "canceled"
-                      ? "bg-red-400"
-                      : "bg-yellow-400"
+                    : status === "canceled" || status === "refunded"
+                    ? "bg-red-400"
+                    : "bg-yellow-400"
                 )}
               />
               <Text className="font-poppins text-xs text-gray-800">

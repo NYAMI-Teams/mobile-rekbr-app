@@ -8,17 +8,15 @@ const statusconfig = {
     color: "#FBBF24",
     text: "Persetujuan Seller",
     note: "Jika kamu nggak respon sampai ",
-    notebold: "  18 Juni 2025, 10:00 WIB,",
     noteafter: " pengajuan ini bakal otomatis disetujui, ya!",
-    status: "18 Juni 2025, 10 : 00 WIB",
     statusColor: "#FEF2D3",
   },
   returnRequested: {
     color: "#FBBF24",
     text: "Menunggu Pengembalian",
-    note: "Kembalikan dengan baik, kemasan aman, dan berikan bukti pengiriman kembali!",
-    notebold: " Proses maksimal 1 x 24 jam.",
-    button: "Bukti Pengembalian",
+    note: "Buyer akan mengembalikan barang dalam 24 jam, konfirmasi bila barang telah sampai dan diterima.",
+    notebold: null,
+    button: null,
   },
   Completed: {
     color: "#06B217",
@@ -35,8 +33,8 @@ const statusconfig = {
   returnInTransit: {
     color: "#FBBF24",
     text: "Menunggu Pengembalian",
-    note: "Cek no resi berkala, kalau seller nggak konfirmasi, minta konfirmasi seller lewat admin. ",
-    button: "Minta Konfirmasi",
+    note: "Konfirmasi bila barang telah sampai dan diterima ya!",
+    button: null,
   },
   awaitingAdminApproval: {
     color: "#CB3A31",
@@ -70,7 +68,14 @@ const statusconfig = {
   underInvestigation: {
     color: "#FBBF24",
     text: "Investigasi Pengiriman",
-    note: "",
+    note: "Hey, kami lagi cek pengiriman barang kamu di ekspedisi, nih. Kita bakal nilai kesalahan ini dan cari solusi terbaik!",
+    button: null,
+  },
+
+  canceledByBuyer: {
+    color: "#CB3A31",
+    text: "Komplain Dibatalkan",
+    note: "Komplain dibatalkan oleh buyer dan riwayat komplain hanya tersedia untuk buyer",
     button: null,
   },
 
@@ -80,6 +85,15 @@ const statusconfig = {
     text: "Menunggu Pengembalian",
     note: "Buyer akan mengembalikan barang dalam 24 jam, konfirmasi bila barang telah sampai dan diterima.",
     button: "Barang Diterima",
+  },
+
+  awaitingAdminConfirmation: {
+    color: "#FBBF24",
+    text: "Menunggu Pengembalian",
+    note: "Tunggu approval kami, ya! Kalau bukti kamu oke, permintaan konfirmasi bakal langsung dikirim ke seller!",
+    button: "Permintaan Ditinjau",
+    btnColor: "#FEF2D3",
+    btnTextColor: "black",
   },
 };
 
@@ -152,7 +166,7 @@ const SellerDisputeListCard = ({
               <Text className="flex-1 text-xs text-gray-700 leading-5">
                 <Text className="text-xs text-black">{config?.note}</Text>
                 <Text className="text-xs text-black font-semibold">{time}</Text>
-                <Text className="text-xs text-black">{config?.noteafter}</Text>
+                <Text className="text-xs text-black"> {config?.noteafter}</Text>
               </Text>
             </View>
           )}

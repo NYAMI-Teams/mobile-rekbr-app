@@ -48,6 +48,10 @@ export default function DetailTransaksiBuyer() {
       try {
         const res = await getDetailBuyerTransaction(id);
         setData(res.data);
+        console.log(
+          "Ini Detail Buyer Transaction",
+          JSON.stringify(res.data, null, 2)
+        );
       } catch (err) {
         showToast(
           "Gagal",
@@ -65,6 +69,8 @@ export default function DetailTransaksiBuyer() {
       const res = await updateBuyerTransaction(data?.id);
       setPaymentDone(res.data);
       setIsPaymentDone(res.success);
+      modalizeRef.current?.close();
+      router.replace("/buyer");
     } catch (error) {
       showToast("Gagal", "Gagal memperbarui transaksi", "error");
     }
@@ -74,6 +80,7 @@ export default function DetailTransaksiBuyer() {
     try {
       const res = await buyerConfirmReceivedTransaction(data?.id);
       setShowPopup(false);
+      modalizeRef.current?.close();
       router.replace("/buyer");
     } catch (error) {
       showToast("Gagal", "Gagal memperbarui transaksi", "error");
@@ -247,6 +254,28 @@ export default function DetailTransaksiBuyer() {
         ];
       }
     }
+    if (data?.status == "refunded") {
+      if (data?.paidAt == null) {
+        return [
+          {
+            status: "Waktu bikin Rekbr",
+            date: data?.createdAt || "-",
+          },
+        ];
+      }
+      if (data?.paidAt != null) {
+        return [
+          {
+            status: "Waktu bikin Rekbr",
+            date: data?.createdAt || "-",
+          },
+          {
+            status: "Waktu pembeli Bayar",
+            date: data?.paidAt || "-",
+          },
+        ];
+      }
+    }
   };
 
   const setupCaptionTimeStamp = () => {
@@ -292,6 +321,14 @@ export default function DetailTransaksiBuyer() {
       return data?.buyerConfirmedAt || "-";
     }
     if (data?.status == "canceled") {
+      if (data?.paidAt == null) {
+        return data?.createdAt || "-";
+      }
+      if (data?.paidAt != null) {
+        return data?.paidAt || "-";
+      }
+    }
+    if (data?.status == "refunded") {
       if (data?.paidAt == null) {
         return data?.createdAt || "-";
       }
@@ -419,6 +456,7 @@ export default function DetailTransaksiBuyer() {
             currentStep = 2;
             break;
           case "completed":
+          case "refunded":
             currentStep = 3;
             break;
         }

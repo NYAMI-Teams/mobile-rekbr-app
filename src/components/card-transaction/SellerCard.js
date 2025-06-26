@@ -38,6 +38,8 @@ const SellerCard = ({ data }) => {
         return "Barang Diterima";
       case "canceled":
         return "Dibatalkan";
+      case "refunded":
+        return "Dikembalikan";
       default:
         return "";
     }
@@ -79,6 +81,19 @@ const SellerCard = ({ data }) => {
           { label: "Ekspedisi", value: data?.shipment.courier || "-" },
         ];
       case "canceled":
+        return [
+          { label: "Nama Produk", value: data?.itemName || "-" },
+          { label: "Pembeli", value: data?.buyerEmail || "-" },
+          {
+            label: data?.shipmentDeadline == null ? "Nomor VA" : "Nomor Resi",
+            value:
+              data?.shipmentDeadline == null
+                ? data?.virtualAccount
+                : data?.shipment?.trackingNumber || "waiting_seller",
+            copyable: true,
+          },
+        ];
+      case "refunded":
         return [
           { label: "Nama Produk", value: data?.itemName || "-" },
           { label: "Pembeli", value: data?.buyerEmail || "-" },
@@ -192,6 +207,16 @@ const SellerCard = ({ data }) => {
       );
     }
 
+    if (status === "refunded") {
+      return (
+        <View className="px-3 py-1 rounded-full">
+          <Text className="font-poppins-semibold text-xs text-gray-800">
+            {formatDateWIB(data?.createdAt || "-")}
+          </Text>
+        </View>
+      );
+    }
+
     return null;
   };
 
@@ -255,12 +280,12 @@ const SellerCard = ({ data }) => {
                 {data?.fundReleaseRequest?.status === null
                   ? "Cek no resi berkala, kalau pembeli nggak konfirmasi, minta konfirmasi pembeli lewat admin."
                   : data?.fundReleaseRequest?.status === "pending"
-                    ? "Tunggu approval kami, ya! Kalau bukti kamu oke, permintaan konfirmasi bakal langsung dikirim ke pembeli!"
-                    : data?.fundReleaseRequest?.status === "rejected"
-                      ? "Permintaan konfirmasi ke pembeli ditolak. Pastikan data atau bukti yang kamu kirim sudah lengkap dan sesuai."
-                      : data?.fundReleaseRequest?.status === "approved"
-                        ? "Konfirmasi udah dikirim ke pembeli! Sekarang tinggal tunggu respon mereka dalam 1 x 24 jam."
-                        : "-"}
+                  ? "Tunggu approval kami, ya! Kalau bukti kamu oke, permintaan konfirmasi bakal langsung dikirim ke pembeli!"
+                  : data?.fundReleaseRequest?.status === "rejected"
+                  ? "Permintaan konfirmasi ke pembeli ditolak. Pastikan data atau bukti yang kamu kirim sudah lengkap dan sesuai."
+                  : data?.fundReleaseRequest?.status === "approved"
+                  ? "Konfirmasi udah dikirim ke pembeli! Sekarang tinggal tunggu respon mereka dalam 1 x 24 jam."
+                  : "-"}
               </Text>
             </View>
           )}
@@ -273,9 +298,9 @@ const SellerCard = ({ data }) => {
                   "w-2 h-2 rounded-full mr-2",
                   status === "completed"
                     ? "bg-green-400"
-                    : status === "canceled"
-                      ? "bg-red-400"
-                      : "bg-yellow-400"
+                    : status === "canceled" || status === "refunded"
+                    ? "bg-red-400"
+                    : "bg-yellow-400"
                 )}
               />
               <Text className="font-poppins text-xs text-gray-800">

@@ -26,11 +26,11 @@ import moment from "moment";
 
 export default function DetailKomplain() {
   const router = useRouter();
+  const { complaintId } = useLocalSearchParams();
   const [showOptionModal, setShowOptionModal] = useState(false);
   const [isNeedAdmin, setIsNeedAdmin] = useState(false);
   const [ditolak, setDitolak] = useState(false);
   const [detailComplaint, setDetailComplaint] = useState({});
-  const { complaintId } = useLocalSearchParams();
 
   useEffect(() => {
     if (complaintId) {
@@ -106,6 +106,7 @@ export default function DetailKomplain() {
       {/* Stepper */}
       <View className="items-center w-full">
         <StepProgressBar
+          key={"rusak_barang_menunggu"}
           currentStep={0}
           steps={
             isNeedAdmin
@@ -121,7 +122,7 @@ export default function DetailKomplain() {
         <InfoBanner
           contentBefore="Jika seller nggak respon sampai"
           dateTime={
-            formatDateWIB(detailComplaint?.seller_confirm_deadline) || "null"
+            formatDateWIB(detailComplaint?.seller_response_deadline) || "null"
           }
           contentAfter=" pengajuanmu bakal otomatis disetujui ya!"
         />
@@ -129,41 +130,22 @@ export default function DetailKomplain() {
         {/* Status Komplain */}
         <StatusKomplain status="Menunggu Persetujuan Seller" />
 
-        {/* Pengajuan */}
         {detailComplaint?.timeline
           ?.slice()
           .reverse()
           .map((item, index) => (
             <TrackDispute
               key={index}
-              title={item.label}
-              dateTime={new Date(item.timestamp).toLocaleString("id-ID", {
-                day: "2-digit",
-                month: "long",
-                year: "numeric",
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
+              title={item?.label}
+              dateTime={formatDateWIB(item?.timestamp)}
               details={[
                 {
-                  content:
-                    index === detailComplaint.timeline.length - 1
-                      ? detailComplaint?.buyer_reason
-                      : "Proses komplain sedang berjalan.",
+                  content: item?.reason || item?.message || "-",
                 },
-                ...(index === detailComplaint.timeline.length - 1 &&
-                detailComplaint?.buyer_evidence_urls?.length
-                  ? [
-                      {
-                        imgTitle: "Bukti foto & video",
-                        images: detailComplaint.buyer_evidence_urls.map(
-                          (url) => ({
-                            uri: url,
-                          })
-                        ),
-                      },
-                    ]
-                  : []),
+                item?.evidence?.length > 0 && {
+                  imgTitle: "Bukti foto & video",
+                  images: item?.evidence.map((url, key) => ({ uri: url, key })),
+                },
               ]}
             />
           ))}
@@ -193,15 +175,11 @@ export default function DetailKomplain() {
         />
         <CopyField
           title="ID Transaksi"
-          content={detailComplaint?.transaction?.transactionCode
-            ?.split("")
-            .join(" ")}
+          content={detailComplaint?.transaction?.transactionCode}
         />
         <CopyField
           title="Virtual Account"
-          content={detailComplaint?.transaction?.virtualAccount
-            ?.split("")
-            .join(" ")}
+          content={detailComplaint?.transaction?.virtualAccount}
         />
       </ScrollView>
 
