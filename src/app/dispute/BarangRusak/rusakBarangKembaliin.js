@@ -1,5 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, TouchableOpacity, ScrollView, Image } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  Image,
+  StyleSheet, // Import StyleSheet
+  ActivityIndicator, // Added for loading state, though not used in original snippet
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ChevronLeft } from "lucide-react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -14,11 +22,13 @@ import Tagihan from "../../../components/DetailRekber/Tagihan";
 import CopyField from "../../../components/dispute/copyField";
 import { getDetailBuyerComplaint } from "../../../utils/api/complaint";
 import moment from "moment";
+import { showToast } from "../../../utils"; // Assuming showToast is in utils
 
 export default function RusakBarangKembaliinPage() {
   const router = useRouter();
   const { complaintId, status } = useLocalSearchParams();
   const [detailComplaint, setDetailComplaint] = useState({});
+  const [isLoading, setIsLoading] = useState(true); // Added loading state
 
   useEffect(() => {
     if (complaintId) {
@@ -27,6 +37,7 @@ export default function RusakBarangKembaliinPage() {
   }, [complaintId]);
 
   const fetchComplaintDetails = async () => {
+    setIsLoading(true); // Set loading to true
     try {
       const res = await getDetailBuyerComplaint(complaintId);
       setDetailComplaint(res.data);
@@ -44,6 +55,8 @@ export default function RusakBarangKembaliinPage() {
         "Gagal mengambil data transaksi. Silahkan coba lagi.",
         "error"
       );
+    } finally {
+      setIsLoading(false); // Set loading to false
     }
   };
 
@@ -81,21 +94,29 @@ export default function RusakBarangKembaliinPage() {
   };
 
   const renderStatusSection = () => {
+    if (isLoading) {
+      return (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#000000" />
+          <Text style={styles.loadingText}>Loading details...</Text>
+        </View>
+      );
+    }
+
     switch (status) {
       case "approvedByAdmin":
         return (
           <>
             <InfoBanner contentBefore="Kembalikan dengan baik, kemasan aman, dan berikan bukti pengiriman kembali ! Proses maksimal 1 x 24 jam." />
             <StatusKomplain status="Menunggu Pengembalian Barang" />
-            <View className="h-2 bg-[#f5f5f5] mt-3" />
+            <View style={styles.divider} />
 
             {detailComplaint?.timeline
               ?.slice()
               .reverse()
               .map((item, index) => (
-                <>
+                <React.Fragment key={index}>
                   <TrackDispute
-                    key={index}
                     title={item?.label}
                     dateTime={formatDateWIB(item?.timestamp)}
                     details={[
@@ -111,8 +132,8 @@ export default function RusakBarangKembaliinPage() {
                       },
                     ]}
                   />
-                  <View className="h-2 bg-[#f5f5f5] mt-3" />
-                </>
+                  <View style={styles.divider} />
+                </React.Fragment>
               ))}
           </>
         );
@@ -122,14 +143,13 @@ export default function RusakBarangKembaliinPage() {
           <>
             <StatusKomplain status="Menunggu Pengembalian Barang" />
             <InfoBanner contentBefore="Seller nggak kasih kabar, jadi sekarang giliran kamu buat lanjut prosesnya. Ayo upload bukti pengembalian barang!" />
-            <View className="h-2 bg-[#f5f5f5] mt-3" />
+            <View style={styles.divider} />
             {detailComplaint?.timeline
               ?.slice()
               .reverse()
               .map((item, index) => (
-                <>
+                <React.Fragment key={index}>
                   <TrackDispute
-                    key={index}
                     title={item?.label}
                     dateTime={formatDateWIB(item?.timestamp)}
                     details={[
@@ -145,8 +165,8 @@ export default function RusakBarangKembaliinPage() {
                       },
                     ]}
                   />
-                  <View className="h-2 bg-[#f5f5f5] mt-3" />
-                </>
+                  <View style={styles.divider} />
+                </React.Fragment>
               ))}
           </>
         );
@@ -155,7 +175,7 @@ export default function RusakBarangKembaliinPage() {
         return (
           <>
             <InfoBanner contentBefore="Barang harus segera kamu kirim. Pastikan aman dan lampirkan bukti resi." />
-            <StatusKomplain status="Menunggu Pengembalian Barang" />{" "}
+            <StatusKomplain status="Menunggu Pengembalian Barang" />
           </>
         );
 
@@ -196,15 +216,14 @@ export default function RusakBarangKembaliinPage() {
           <>
             <InfoBanner contentBefore="Kembalikan dengan baik, kemasan aman, dan berikan bukti pengiriman kembali ! Proses maksimal 1 x 24 jam." />
             <StatusKomplain status="Menunggu Pengembalian Barang" />
-            <View className="h-2 bg-[#f5f5f5] mt-3" />
+            <View style={styles.divider} />
 
             {detailComplaint?.timeline
               ?.slice()
               .reverse()
               .map((item, index) => (
-                <>
+                <React.Fragment key={index}>
                   <TrackDispute
-                    key={index}
                     title={item?.label}
                     dateTime={formatDateWIB(item?.timestamp)}
                     details={[
@@ -220,8 +239,8 @@ export default function RusakBarangKembaliinPage() {
                       },
                     ]}
                   />
-                  <View className="h-2 bg-[#f5f5f5] mt-3" />
-                </>
+                  <View style={styles.divider} />
+                </React.Fragment>
               ))}
           </>
         );
@@ -247,15 +266,16 @@ export default function RusakBarangKembaliinPage() {
                   : "Menunggu Pengembalian Barang"
               }
             />
-            <View className="h-2 bg-[#f5f5f5] mt-3" />
+            <View style={styles.divider} />
 
             {detailComplaint?.buyer_deadline_input_shipment <
             detailComplaint?.updated_at ? (
               <>
                 <TouchableOpacity
-                  onPress={() => console.log("Hubungi kami di klik!")}>
-                  <View className="items-end px-4 mt-4">
-                    <Text className="text-[#3267E3] font-bold">
+                  onPress={() => console.log("Hubungi kami di klik!")}
+                >
+                  <View style={styles.contactUsContainer}>
+                    <Text style={styles.contactUsText}>
                       Silahkan Hubungi Kami
                     </Text>
                   </View>
@@ -306,7 +326,7 @@ export default function RusakBarangKembaliinPage() {
           <>
             <InfoBanner contentBefore="Konfirmasi resi udah dikirim ke seller, tunggu approval mereka ya!" />
             <StatusKomplain status="Menunggu Seller" />
-            <View className="h-2 bg-[#f5f5f5] mt-3" />
+            <View style={styles.divider} />
 
             {detailComplaint?.timeline
               ?.slice()
@@ -331,7 +351,7 @@ export default function RusakBarangKembaliinPage() {
                 />
               ))}
 
-            <View className="h-2 bg-[#f5f5f5] mt-3" />
+            <View style={styles.divider} />
           </>
         );
 
@@ -340,7 +360,7 @@ export default function RusakBarangKembaliinPage() {
           <>
             <InfoBanner contentBefore="Konfirmasi sedang dalam proses admin, tunggu admin ya!" />
             <StatusKomplain status="Menunggu Admin" />
-            <View className="h-2 bg-[#f5f5f5] mt-3" />
+            <View style={styles.divider} />
 
             {detailComplaint?.timeline
               ?.slice()
@@ -365,7 +385,7 @@ export default function RusakBarangKembaliinPage() {
                 />
               ))}
 
-            <View className="h-2 bg-[#f5f5f5] mt-3" />
+            <View style={styles.divider} />
           </>
         );
       default:
@@ -385,13 +405,13 @@ export default function RusakBarangKembaliinPage() {
   };
 
   return (
-    <View className="flex-1 bg-white">
-      <View className="flex-row items-center justify-between p-4">
+    <View style={styles.container}>
+      <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()}>
           <ChevronLeft size={24} color="black" />
         </TouchableOpacity>
-        <Text className="text-base font-semibold">Detail Komplain</Text>
-        <View style={{ width: 24 }} />
+        <Text style={styles.headerTitle}>Detail Komplain</Text>
+        <View style={styles.headerSpacer} />
       </View>
 
       <StepProgressBar
@@ -407,58 +427,121 @@ export default function RusakBarangKembaliinPage() {
         }
       />
 
-      <ScrollView className="px-4 pb-40">
+      <ScrollView style={styles.scrollView}>
         {renderStatusSection()}
 
         {/* Data Transaksi */}
-        <TextView
-          title="Seller"
-          content={detailComplaint?.transaction?.sellerEmail}
-        />
-        <TextView
-          title="Nama Barang"
-          content={detailComplaint?.transaction?.itemName}
-        />
-        <View className="p-3">
-          <Tagihan
-            caption="Tagihan Rekber"
-            price={formatPrice(detailComplaint?.transaction?.totalAmount)}
-            details={[
-              {
-                status: "Harga Barang",
-                price: formatPrice(detailComplaint?.transaction?.itemPrice),
-              },
-              {
-                status: "Asuransi Pengiriman BNI Life (0.2%)",
-                price: formatPrice(detailComplaint?.transaction?.insuranceFee),
-              },
-              {
-                status: "Biaya Jasa Aplikasi",
-                price: formatPrice(detailComplaint?.transaction?.platformFee),
-              },
-            ]}
-          />
-        </View>
-        <CopyField
-          title="No Resi"
-          content={
-            detailComplaint?.transaction?.shipment?.trackingNumber || "-"
-          }
-        />
-        <TextView
-          title="Ekspedisi"
-          content={detailComplaint?.transaction?.shipment?.courier || "-"}
-        />
-        <CopyField
-          title="ID Transaksi"
-          content={detailComplaint?.transaction?.transactionCode}
-        />
-        <CopyField
-          title="Virtual Account"
-          content={detailComplaint?.transaction?.virtualAccount}
-        />
+        {!isLoading && (
+          <>
+            <TextView
+              title="Seller"
+              content={detailComplaint?.transaction?.sellerEmail}
+            />
+            <TextView
+              title="Nama Barang"
+              content={detailComplaint?.transaction?.itemName}
+            />
+            <View style={styles.tagihanContainer}>
+              <Tagihan
+                caption="Tagihan Rekber"
+                price={formatPrice(detailComplaint?.transaction?.totalAmount)}
+                details={[
+                  {
+                    status: "Harga Barang",
+                    price: formatPrice(detailComplaint?.transaction?.itemPrice),
+                  },
+                  {
+                    status: "Asuransi Pengiriman BNI Life (0.2%)",
+                    price: formatPrice(
+                      detailComplaint?.transaction?.insuranceFee
+                    ),
+                  },
+                  {
+                    status: "Biaya Jasa Aplikasi",
+                    price: formatPrice(
+                      detailComplaint?.transaction?.platformFee
+                    ),
+                  },
+                ]}
+              />
+            </View>
+            <CopyField
+              title="No Resi"
+              content={
+                detailComplaint?.transaction?.shipment?.trackingNumber || "-"
+              }
+            />
+            <TextView
+              title="Ekspedisi"
+              content={detailComplaint?.transaction?.shipment?.courier || "-"}
+            />
+            <CopyField
+              title="ID Transaksi"
+              content={detailComplaint?.transaction?.transactionCode}
+            />
+            <CopyField
+              title="Virtual Account"
+              content={detailComplaint?.transaction?.virtualAccount}
+            />
+          </>
+        )}
       </ScrollView>
-      <View className="p-4">{renderPrimaryButton()}</View>
+      <View style={styles.buttonContainer}>{renderPrimaryButton()}</View>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#ffffff", // bg-white
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: 16, // p-4
+  },
+  headerTitle: {
+    fontSize: 16, // text-base
+    fontWeight: "600", // font-semibold
+  },
+  headerSpacer: {
+    width: 24, // Matches ChevronLeft size for alignment
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 20, // Example margin
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: "#555",
+  },
+  scrollView: {
+    paddingHorizontal: 16, // px-4
+    paddingBottom: 160, // pb-40
+  },
+  divider: {
+    height: 8, // h-2
+    backgroundColor: "#f5f5f5", // bg-[#f5f5f5]
+    marginTop: 12, // mt-3
+  },
+  contactUsContainer: {
+    alignItems: "flex-end", // items-end
+    paddingHorizontal: 16, // px-4
+    marginTop: 16, // mt-4
+  },
+  contactUsText: {
+    color: "#3267E3", // text-[#3267E3]
+    fontWeight: "700", // font-bold
+  },
+  tagihanContainer: {
+    padding: 12, // p-3
+  },
+  buttonContainer: {
+    padding: 16, // p-4
+  },
+});

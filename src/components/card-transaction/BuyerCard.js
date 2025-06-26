@@ -197,8 +197,8 @@ const BuyerCard = ({ data }) => {
 
     if (status === "refunded") {
       return (
-        <View className="px-3 py-1 rounded-full">
-          <Text className="font-poppins-semibold text-xs text-gray-800">
+        <View style={styles.dateBadge}>
+          <Text style={styles.badgeText}>
             {formatDateWIB(data?.createdAt || "-")}
           </Text>
         </View>
@@ -274,9 +274,7 @@ const BuyerCard = ({ data }) => {
                     : { backgroundColor: "#facc15" },
                 ]}
               />
-              <Text className="font-poppins text-xs text-gray-800">
-                {renderStatus()}
-              </Text>
+              <Text style={styles.statusText}>{renderStatus()}</Text>
             </View>
             {renderBottomSection()}
           </View>

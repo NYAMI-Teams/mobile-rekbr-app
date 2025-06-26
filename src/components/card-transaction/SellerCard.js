@@ -171,8 +171,8 @@ const SellerCard = ({ data }) => {
 
     if (status === "completed") {
       return (
-        <View className="px-3 py-1 rounded-full">
-          <Text className="font-poppins-semibold text-xs text-gray-800">
+        <View style={styles.dateBadge}>
+          <Text style={styles.badgeText}>
             {formatDateWIB(data?.buyerConfirmedAt || "-")}
           </Text>
         </View>
@@ -181,8 +181,8 @@ const SellerCard = ({ data }) => {
 
     if (status === "canceled") {
       return (
-        <View className="px-3 py-1 rounded-full">
-          <Text className="font-poppins-semibold text-xs text-gray-800">
+        <View style={styles.dateBadge}>
+          <Text style={styles.badgeText}>
             {formatDateWIB(
               data?.shipmentDeadline == null
                 ? data?.paymentDeadline
@@ -195,8 +195,8 @@ const SellerCard = ({ data }) => {
 
     if (status === "refunded") {
       return (
-        <View className="px-3 py-1 rounded-full">
-          <Text className="font-poppins-semibold text-xs text-gray-800">
+        <View style={styles.dateBadge}>
+          <Text style={styles.badgeText}>
             {formatDateWIB(data?.createdAt || "-")}
           </Text>
         </View>
@@ -344,6 +344,11 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins-Regular",
     color: "#1f2937",
     flex: 1,
+  },
+  dateBadge: {
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 999,
   },
   cardStatusRow: {
     flexDirection: "row",

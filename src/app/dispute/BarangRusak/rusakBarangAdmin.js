@@ -4,11 +4,12 @@ import {
   Text,
   ScrollView,
   TouchableOpacity,
-  Modal,
-  TouchableWithoutFeedback,
+  StyleSheet,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { ClipboardPaste, ChevronLeft, ChevronDown } from "lucide-react-native";
+import { ChevronLeft } from "lucide-react-native";
+import { useRouter, useLocalSearchParams } from "expo-router";
+import { getDetailBuyerComplaint } from "../../../utils/api/complaint";
+import moment from "moment";
 
 import CopyField from "../../../components/dispute/copyField";
 import TextView from "../../../components/dispute/textView";
@@ -16,9 +17,6 @@ import { InfoBanner } from "../../../components/dispute/InfoBanner";
 import { StatusKomplain } from "../../../components/dispute/statusKomplain";
 import StepProgressBar from "../../../components/ProgressBar";
 import { TrackDispute } from "../../../components/dispute/TrackDispute";
-import { useRouter, useLocalSearchParams } from "expo-router";
-import { getDetailBuyerComplaint } from "../../../utils/api/complaint";
-import moment from "moment";
 
 export default function AdminPage() {
   const router = useRouter();
@@ -33,15 +31,10 @@ export default function AdminPage() {
   }, [complaintId]);
 
   const fetchComplaintDetails = async () => {
-    console.log("ini complaint id", complaintId);
     try {
       const res = await getDetailBuyerComplaint(complaintId);
       setDetailComplaint(res.data);
-      setDitolak(res.data?.status === "awaiting_admin_approval" ? false : true);
-      console.log(
-        "ini detail complaint rusak barang admin",
-        JSON.stringify(res.data, null, 2)
-      );
+      setDitolak(res.data?.status !== "awaiting_admin_approval");
     } catch (err) {
       showToast(
         "Gagal",
@@ -57,13 +50,13 @@ export default function AdminPage() {
   };
 
   return (
-    <View className="flex-1 bg-white">
+    <View style={styles.container}>
       {/* Header */}
-      <View className="flex-row items-center justify-between py-4 px-4">
+      <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()}>
           <ChevronLeft size={24} color="black" />
         </TouchableOpacity>
-        <Text className="text-base font-semibold">Detail Komplain</Text>
+        <Text style={styles.headerText}>Detail Komplain</Text>
         <View style={{ width: 24 }} />
       </View>
 
@@ -71,7 +64,7 @@ export default function AdminPage() {
       <StepProgressBar
         key={"admin_detail_complaint"}
         currentStep={1}
-        steps={["Seller", "Admin", "Kembaliin", "Refunded"]} //MARKING
+        steps={["Seller", "Admin", "Kembaliin", "Refunded"]}
         rejectedSteps={
           detailComplaint?.seller_decision === "approved"
             ? []
@@ -81,8 +74,7 @@ export default function AdminPage() {
         }
       />
 
-      <ScrollView className="px-4">
-        {/* Status Komplain */}
+      <ScrollView contentContainerStyle={styles.scrollView}>
         <StatusKomplain
           status={ditolak ? "Komplain Ditolak" : "Menunggu Persetujuan Admin"}
         />
@@ -115,7 +107,6 @@ export default function AdminPage() {
             />
           ))}
 
-        {/* Data Seller & Transaksi */}
         <TextView
           title="Seller"
           content={detailComplaint?.transaction?.sellerEmail}
@@ -150,3 +141,26 @@ export default function AdminPage() {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "white",
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+  },
+  headerText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "black",
+  },
+  scrollView: {
+    paddingHorizontal: 16,
+    paddingBottom: 20,
+  },
+});

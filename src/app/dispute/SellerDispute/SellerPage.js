@@ -1,7 +1,12 @@
-import { useRouter } from "expo-router";
-import { ScrollView, Text, TouchableOpacity, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { ClipboardPaste, ChevronLeft, ChevronDown } from "lucide-react-native";
+import { useRouter, useLocalSearchParams } from "expo-router";
+import {
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+  StyleSheet,
+} from "react-native";
+import { ChevronLeft } from "lucide-react-native";
 import StepProgressBar from "../../../components/ProgressBar";
 import { InfoBanner } from "../../../components/dispute/InfoBanner";
 import { StatusKomplain } from "../../../components/dispute/statusKomplain";
@@ -9,11 +14,9 @@ import { TrackDispute } from "../../../components/dispute/TrackDispute";
 import TextView from "../../../components/dispute/textView";
 import CopyField from "../../../components/dispute/copyField";
 import PrimaryButton from "../../../components/PrimaryButton";
-import { useState } from "react";
 import ModalSeller from "../../../components/dispute/modalSeller";
-import { useLocalSearchParams } from "expo-router";
+import { useEffect, useState } from "react";
 import { getDetailSellerComplaint } from "../../../utils/api/complaint";
-import { useEffect } from "react";
 import { showToast, formatCurrency } from "../../../utils";
 import moment from "moment";
 
@@ -30,10 +33,12 @@ export default function SellerPage() {
   const [isTolak, setIsTolak] = useState(false);
   const [rejectedAdmin, setRejectedAdmin] = useState(false);
   const [rejectedSeller, setRejectedSeller] = useState(false);
+
   const handleSubmitTolak = () => {
     setIsTolak(true);
     setShowPopup(true);
   };
+
   const handleSubmitSetuju = () => {
     setIsTolak(false);
     setShowPopup(true);
@@ -49,15 +54,8 @@ export default function SellerPage() {
     try {
       const res = await getDetailSellerComplaint(id);
       setDetailComplaint(res.data);
-      console.log(res.data.admin_decision === "rejected", "rejected admin");
-      console.log(res.data.seller_decision === "rejected", "rejected seller");
-
-      setRejectedAdmin(res.data.admin_decision === "rejected" ? true : false);
-      setRejectedSeller(res.data.seller_decision === "rejected" ? true : false);
-      console.log(
-        "ini detail complaint as seller",
-        JSON.stringify(res.data, null, 2)
-      );
+      setRejectedAdmin(res.data.admin_decision === "rejected");
+      setRejectedSeller(res.data.seller_decision === "rejected");
     } catch (error) {
       console.error("Error fetching complaint details:", error);
       showToast("Gagal", error?.message, "error");
@@ -65,13 +63,13 @@ export default function SellerPage() {
   };
 
   return (
-    <View className="flex-1 bg-white">
+    <View style={styles.container}>
       {/* Header */}
-      <View className="flex-row items-center justify-between py-4 px-4">
+      <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()}>
           <ChevronLeft size={24} color="black" />
         </TouchableOpacity>
-        <Text className="text-base font-semibold">Detail Komplain</Text>
+        <Text style={styles.headerTitle}>Detail Komplain</Text>
         <View style={{ width: 24 }} />
       </View>
 
@@ -82,7 +80,7 @@ export default function SellerPage() {
         rejectedSteps={rejectedSeller ? [0] : rejectedAdmin ? [0, 1] : []}
       />
 
-      <ScrollView className="px-4">
+      <ScrollView contentContainerStyle={styles.scrollContent}>
         <InfoBanner
           contentBefore="Jika kamu nggak respon sampai"
           dateTime={
@@ -93,7 +91,7 @@ export default function SellerPage() {
 
         <StatusKomplain status="Menunggu Seller Setuju" />
 
-        <View className="h-2 bg-[#f5f5f5] mt-3" />
+        <View style={styles.separator} />
 
         {/* Pengajuan */}
         {detailComplaint?.timeline
@@ -117,9 +115,7 @@ export default function SellerPage() {
                       {
                         imgTitle: "Bukti foto & video",
                         images: detailComplaint.buyer_evidence_urls.map(
-                          (url) => ({
-                            uri: url,
-                          })
+                          (url) => ({ uri: url })
                         ),
                       },
                     ]
@@ -128,7 +124,7 @@ export default function SellerPage() {
             />
           ))}
 
-        {/* Data Seller & Transaksi */}
+        {/* Data Transaksi */}
         <TextView
           title="Buyer"
           content={detailComplaint?.transaction?.buyerEmail}
@@ -158,14 +154,12 @@ export default function SellerPage() {
           content={detailComplaint?.transaction?.virtualAccount || "-"}
         />
 
-        <View className="h-2 bg-[#f5f5f5] mt-3" />
+        <View style={styles.bottomSpacing} />
       </ScrollView>
 
       {/* Bottom Action */}
-      {rejectedAdmin === false && (
-        <View
-          className="flex-row px-4 pb-4 pt-2 bg-white"
-          style={{ position: "absolute", bottom: 0, left: 0, right: 0 }}>
+      {!rejectedAdmin && (
+        <View style={styles.bottomActions}>
           <PrimaryButton
             title="Tolak"
             onPress={handleSubmitTolak}
@@ -193,3 +187,44 @@ export default function SellerPage() {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#ffffff",
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+  },
+  headerTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#000000",
+  },
+  scrollContent: {
+    paddingHorizontal: 16,
+  },
+  separator: {
+    height: 8,
+    backgroundColor: "#f5f5f5",
+    marginTop: 12,
+  },
+  bottomSpacing: {
+    height: 80,
+  },
+  bottomActions: {
+    flexDirection: "row",
+    paddingHorizontal: 16,
+    paddingBottom: 16,
+    paddingTop: 8,
+    backgroundColor: "#ffffff",
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+  },
+});
