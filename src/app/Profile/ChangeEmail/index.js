@@ -5,14 +5,13 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  StyleSheet,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import InputField from "@/components/InputField";
 import { useState } from "react";
 import PrimaryButton from "@/components/PrimaryButton";
-import { Feather } from "@expo/vector-icons";
 import { getProfile, resendVerifyEmail } from "@/utils/api/auth";
 import { showToast } from "@/utils";
 
@@ -29,7 +28,6 @@ export default function ChangeEmailScreen() {
 
   const handleBtnPress = () => {
     if (checkEmailSaatIniBtn) {
-      //Hit API OTP
       handleUpdateEmail();
     } else {
       handleVerifyEmailSaatIni(emailSaatIni);
@@ -43,7 +41,6 @@ export default function ChangeEmailScreen() {
   const handleVerifyEmailSaatIni = async (text) => {
     try {
       const res = await getProfile();
-
       if (res.data.email == text) {
         setEmailSaatIniValid(true);
         setCheckEmailSaatIniBtn(true);
@@ -60,7 +57,6 @@ export default function ChangeEmailScreen() {
 
   const handleUpdateEmail = async () => {
     try {
-      // BELUM FIX NUNGGU BE
       const res = await resendVerifyEmail(emailBaru);
       router.push({
         pathname: "/auth/otp",
@@ -73,15 +69,13 @@ export default function ChangeEmailScreen() {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#fff" }}>
+    <View style={styles.container}>
       {/* Header */}
-      <View className="flex-row justify-between items-center w-full px-4 pt-4">
+      <View style={styles.header}>
         <TouchableOpacity onPress={handleBackBtn}>
           <Ionicons name="chevron-back-outline" size={24} color="#000" />
         </TouchableOpacity>
-        <Text className="text-[16px] font-semibold text-black">
-          Ganti Email
-        </Text>
+        <Text style={styles.headerTitle}>Ganti Email</Text>
         <View style={{ width: 24 }} />
       </View>
 
@@ -92,14 +86,13 @@ export default function ChangeEmailScreen() {
         style={{ flex: 1 }}
       >
         <ScrollView
-          className="px-4 mt-5"
-          contentContainerStyle={{ flexGrow: 1 }}
+          contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          <View className="flex-1">
+          <View style={{ flex: 1 }}>
             {/* Email Saat Ini */}
-            <View className="relative mb-4">
+            <View style={styles.inputGroup}>
               <InputField
                 title="Masukkan Email Saat Ini"
                 placeholder="Masukkan email kamu saat ini"
@@ -108,8 +101,8 @@ export default function ChangeEmailScreen() {
                 keyboardType="email-address"
                 editable={!emailSaatIniValid}
               />
-              {/* Alert Validasi Email*/}
-              <View className="flex-row items-center mt-2 mx-5">
+              {/* Alert Validasi */}
+              <View style={styles.validationContainer}>
                 <Feather
                   name={
                     isEmailValid(emailSaatIni)
@@ -128,12 +121,17 @@ export default function ChangeEmailScreen() {
                   }
                 />
                 <Text
-                  className={`ml-2 text-sm ${isEmailValid(emailSaatIni)
-                    ? emailSaatIniValid
-                      ? "text-green-600"
-                      : "text-yellow-600"
-                    : "text-red-400"
-                    }`}>
+                  style={[
+                    styles.validationText,
+                    {
+                      color: isEmailValid(emailSaatIni)
+                        ? emailSaatIniValid
+                          ? "#4ade80"
+                          : "#fbbf24"
+                        : "#f87171",
+                    },
+                  ]}
+                >
                   {isEmailValid(emailSaatIni)
                     ? emailSaatIniValid
                       ? "Email Ditemukan"
@@ -142,9 +140,10 @@ export default function ChangeEmailScreen() {
                 </Text>
               </View>
             </View>
+
             {/* Email Baru */}
             {emailSaatIniValid && (
-              <View className="relative mb-4">
+              <View style={styles.inputGroup}>
                 <InputField
                   title="Masukkan Email Baru"
                   placeholder="Masukkan email baru kamu"
@@ -152,18 +151,19 @@ export default function ChangeEmailScreen() {
                   onChangeText={setEmailBaru}
                   keyboardType="email-address"
                 />
-                {/* Alert Validasi Email*/}
-                <View className="flex-row items-center mt-2 mx-5">
+                {/* Alert Validasi */}
+                <View style={styles.validationContainer}>
                   <Feather
                     name={isEmailValid(emailBaru) ? "check-circle" : "x-circle"}
                     size={18}
                     color={isEmailValid(emailBaru) ? "#4ade80" : "#f87171"}
                   />
                   <Text
-                    className={`ml-2 text-sm ${isEmailValid(emailBaru)
-                      ? "text-green-600"
-                      : "text-red-400"
-                      }`}>
+                    style={[
+                      styles.validationText,
+                      { color: isEmailValid(emailBaru) ? "#4ade80" : "#f87171" },
+                    ]}
+                  >
                     {isEmailValid(emailBaru)
                       ? "Email valid"
                       : "Email tidak valid"}
@@ -172,17 +172,61 @@ export default function ChangeEmailScreen() {
               </View>
             )}
           </View>
+
           {/* Button */}
-          <View className="w-full py-4 mb-8">
+          <View style={styles.buttonContainer}>
             <PrimaryButton
-              title={`${checkEmailSaatIniBtn ? "Email Baru" : "Check Email Saat Ini"
-                }`}
+              title={
+                checkEmailSaatIniBtn ? "Email Baru" : "Check Email Saat Ini"
+              }
               onPress={handleBtnPress}
             />
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
-
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    width: "100%",
+    paddingHorizontal: 16,
+    paddingTop: 16,
+  },
+  headerTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#000",
+  },
+  scrollContent: {
+    flexGrow: 1,
+    paddingHorizontal: 16,
+    marginTop: 20,
+  },
+  inputGroup: {
+    marginBottom: 16,
+  },
+  validationContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 8,
+    marginHorizontal: 20,
+  },
+  validationText: {
+    marginLeft: 8,
+    fontSize: 14,
+  },
+  buttonContainer: {
+    width: "100%",
+    paddingVertical: 16,
+    marginBottom: 32,
+  },
+});

@@ -1,4 +1,4 @@
-// BankScreens.jsx
+// BankSelector.jsx
 
 import React, { useState } from 'react';
 import {
@@ -8,6 +8,7 @@ import {
     TouchableOpacity,
     Image,
     ScrollView,
+    StyleSheet,
 } from 'react-native';
 import { Search } from 'lucide-react-native';
 
@@ -20,10 +21,10 @@ const BankSelector = ({ banks, onSelectBank }) => {
 
     return (
         <View>
-            <View className="flex-row items-center border border-gray-300 rounded-xl px-4 py-2 mb-5">
+            <View style={styles.searchContainer}>
                 <TextInput
                     placeholder="Cari Bank"
-                    className="flex-1 text-base text-gray-800"
+                    style={styles.searchInput}
                     placeholderTextColor="#A0A0A0"
                     value={searchQuery}
                     onChangeText={setSearchQuery}
@@ -31,28 +32,68 @@ const BankSelector = ({ banks, onSelectBank }) => {
                 <Search size={18} color="#A0A0A0" />
             </View>
 
-            <Text className="text-base font-semibold text-gray-800 mb-4">
-                Bank Terpopuler
-            </Text>
+            <Text style={styles.sectionTitle}>Bank Terpopuler</Text>
 
-            <ScrollView className="mb-5" showsVerticalScrollIndicator={false}>
+            <ScrollView style={styles.bankList} showsVerticalScrollIndicator={false}>
                 {filteredBanks?.map((item) => (
                     <TouchableOpacity
                         key={item.id}
                         onPress={() => onSelectBank(item)}
-                        className="flex-row items-center space-x-3 mb-5"
+                        style={styles.bankItem}
                     >
                         <Image
                             source={{ uri: item.logoUrl }}
-                            className="w-20 h-20 rounded-md"
+                            style={styles.bankLogo}
                             resizeMode="contain"
                         />
-                        <Text className="text-xl text-gray-800 ml-3">{item.bankName}</Text>
+                        <Text style={styles.bankName}>{item.bankName}</Text>
                     </TouchableOpacity>
                 ))}
             </ScrollView>
         </View>
     );
 };
+
+const styles = StyleSheet.create({
+    searchContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: '#D1D5DB', // gray-300
+        borderRadius: 12,
+        paddingHorizontal: 16,
+        paddingVertical: 8,
+        marginBottom: 20,
+    },
+    searchInput: {
+        flex: 1,
+        fontSize: 16,
+        color: '#1F2937', // gray-800
+    },
+    sectionTitle: {
+        fontSize: 16,
+        fontWeight: '600',
+        color: '#1F2937', // gray-800
+        marginBottom: 16,
+    },
+    bankList: {
+        marginBottom: 20,
+    },
+    bankItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 20,
+    },
+    bankLogo: {
+        width: 80,
+        height: 80,
+        borderRadius: 8,
+    },
+    bankName: {
+        fontSize: 20,
+        color: '#1F2937', // gray-800
+        marginLeft: 12,
+    },
+});
 
 export default BankSelector;

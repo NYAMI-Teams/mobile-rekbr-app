@@ -6,6 +6,7 @@ import {
   ActivityIndicator,
   RefreshControl,
   TouchableOpacity,
+  StyleSheet, // Import StyleSheet
 } from "react-native";
 import { useRouter } from "expo-router";
 
@@ -50,8 +51,6 @@ export default function DisputeScreen() {
       } else {
         setIsEmptyBuyerComplaints(true);
       }
-      // console.log("ini complaints", res.data);r
-
       setBuyerComplaints(res.data);
       console.log("Complaints as Buyer:", JSON.stringify(res.data, null, 2));
     } catch (err) {
@@ -74,8 +73,6 @@ export default function DisputeScreen() {
       } else {
         setIsEmptySellerComplaints(true);
       }
-      // console.log("ini complaints", res.data);r
-
       setSellerComplaints(res.data);
       console.log("Complaints as Seller:", JSON.stringify(res.data, null, 2));
     } catch (err) {
@@ -103,7 +100,7 @@ export default function DisputeScreen() {
     if (selectedTab === "pembelian") {
       if (isEmptyBuyerComplaints) {
         return (
-          <View className="justify-center items-center">
+          <View style={styles.emptyIllustrationContainer}>
             <EmptyIllustration
               text={
                 "Belum ada dispute, semua transaksi rekber kamu aman, mulus, dan lancar jaya!"
@@ -175,7 +172,7 @@ export default function DisputeScreen() {
         console.log("Masuk seller");
 
         return (
-          <View className="justify-center items-center">
+          <View style={styles.emptyIllustrationContainer}>
             <EmptyIllustration
               text={
                 "Belum ada dispute. Semua transaksi rekber kamu aman, mulus, dan lancar jaya!"
@@ -264,11 +261,6 @@ export default function DisputeScreen() {
     rejected_by_admin: "rejectedByAdmin",
     canceled_by_buyer: "canceledByBuyer",
     awaiting_admin_confirmation: "awaitingAdminConfirmation",
-  };
-
-  const formatDateWIB = (dateTime) => {
-    if (!dateTime) return "Invalid date";
-    return moment(dateTime).utcOffset(7).format("DD MMMM YYYY, HH:mm [WIB]");
   };
 
   const dateShow = (status, data) => {
@@ -556,50 +548,62 @@ export default function DisputeScreen() {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#fff" }}>
-      {/* <View className="flex-1 bg-white"> */}
-      <View className="flex-row w-full px-4 h-10">
+    <View style={styles.container}>
+      <View style={styles.tabContainer}>
         <TouchableOpacity
           onPress={() => handleTabPress("pembelian")}
-          className={`flex-1 items-center justify-center h-full ${
+          style={[
+            styles.tabButton,
             selectedTab === "pembelian"
-              ? "border-b-2 border-[#49DBC8]"
-              : "border-b-2 border-gray-300"
-          }`}>
+              ? styles.tabButtonActive
+              : styles.tabButtonInactive,
+          ]}
+        >
           <Text
-            className={`text-xs font-semibold ${
-              selectedTab === "pembelian" ? "text-black" : "text-gray-400"
-            }`}>
+            style={[
+              styles.tabText,
+              selectedTab === "pembelian"
+                ? styles.tabTextActive
+                : styles.tabTextInactive,
+            ]}
+          >
             Pembelian
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => handleTabPress("penjualan")}
-          className={`flex-1 items-center justify-center h-full ${
+          style={[
+            styles.tabButton,
             selectedTab === "penjualan"
-              ? "border-b-2 border-[#49DBC8]"
-              : "border-b-2 border-gray-300"
-          }`}>
+              ? styles.tabButtonActive
+              : styles.tabButtonInactive,
+          ]}
+        >
           <Text
-            className={`text-xs font-semibold ${
-              selectedTab === "penjualan" ? "text-black" : "text-gray-400"
-            }`}>
+            style={[
+              styles.tabText,
+              selectedTab === "penjualan"
+                ? styles.tabTextActive
+                : styles.tabTextInactive,
+            ]}
+          >
             Penjualan
           </Text>
         </TouchableOpacity>
       </View>
       {isLoading ? (
-        <View className="flex-1 items-center mt-5">
+        <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#000" />
         </View>
       ) : (
-        <View className="bg-white">
+        <View style={styles.contentContainer}>
           <ScrollView
-            className="px-4 my-3"
+            style={styles.scrollView}
             showsVerticalScrollIndicator={false}
             refreshControl={
               <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-            }>
+            }
+          >
             {renderContent()}
           </ScrollView>
         </View>
@@ -607,3 +611,56 @@ export default function DisputeScreen() {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
+  tabContainer: {
+    flexDirection: "row",
+    width: "100%",
+    paddingHorizontal: 16, // px-4
+    height: 40, // h-10
+  },
+  tabButton: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    height: "100%",
+  },
+  tabButtonActive: {
+    borderBottomWidth: 2,
+    borderBottomColor: "#49DBC8",
+  },
+  tabButtonInactive: {
+    borderBottomWidth: 2,
+    borderBottomColor: "#D1D5DB", // gray-300
+  },
+  tabText: {
+    fontSize: 12, // text-xs
+    fontWeight: "600", // font-semibold
+  },
+  tabTextActive: {
+    color: "#000", // text-black
+  },
+  tabTextInactive: {
+    color: "#9CA3AF", // gray-400
+  },
+  loadingContainer: {
+    flex: 1,
+    alignItems: "center",
+    marginTop: 20, // mt-5
+  },
+  contentContainer: {
+    backgroundColor: "#fff",
+  },
+  scrollView: {
+    paddingHorizontal: 16, // px-4
+    marginVertical: 12, // my-3
+  },
+  emptyIllustrationContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+  },
+});

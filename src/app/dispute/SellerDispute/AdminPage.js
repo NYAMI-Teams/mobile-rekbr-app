@@ -1,14 +1,19 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { ScrollView, Text, TouchableOpacity } from "react-native";
-import { SafeAreaView, View } from "react-native";
-import { ClipboardPaste, ChevronLeft, ChevronDown } from "lucide-react-native";
+import {
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+  StyleSheet,
+} from "react-native";
+import { ChevronLeft } from "lucide-react-native";
+import { useEffect, useState } from "react";
 import StepProgressBar from "../../../components/ProgressBar";
 import TextView from "../../../components/dispute/textView";
 import CopyField from "../../../components/dispute/copyField";
 import { StatusKomplain } from "../../../components/dispute/statusKomplain";
 import { TrackDispute } from "../../../components/dispute/TrackDispute";
 import { getDetailSellerComplaint } from "../../../utils/api/complaint";
-import { useEffect, useState } from "react";
 import { showToast, formatCurrency } from "../../../utils";
 import moment from "moment";
 import { InfoBanner } from "@/components/dispute/InfoBanner";
@@ -35,8 +40,8 @@ export default function AdminPage() {
     try {
       const res = await getDetailSellerComplaint(id);
       setDetailComplaint(res.data);
-      setRejectedAdmin(res.data.admin_decision === "rejected" ? true : false);
-      setRejectedSeller(res.data.seller_decision === "rejected" ? true : false);
+      setRejectedAdmin(res.data.admin_decision === "rejected");
+      setRejectedSeller(res.data.seller_decision === "rejected");
       console.log(
         "ini detail complaint as seller",
         JSON.stringify(res.data, null, 2)
@@ -49,15 +54,16 @@ export default function AdminPage() {
       );
     }
   };
+
   return (
-    <View className="flex-1 bg-white">
+    <View style={styles.container}>
       {/* Header */}
-      <View className="flex-row items-center justify-between py-4 px-4">
+      <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()}>
           <ChevronLeft size={24} color="black" />
         </TouchableOpacity>
-        <Text className="text-base font-semibold">Detail Komplain</Text>
-        <View style={{ width: 24 }} />
+        <Text style={styles.headerTitle}>Detail Komplain</Text>
+        <View style={styles.headerSpacer} />
       </View>
 
       {/* Stepper */}
@@ -68,8 +74,10 @@ export default function AdminPage() {
         rejectedSteps={rejectedAdmin ? [0, 1] : rejectedSeller ? [0] : []}
       />
 
-      <ScrollView className="px-4" key="admin-scroll-view">
-        {/* Status Komplain */}
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        key="admin-scroll-view"
+      >
         <StatusKomplain
           status={
             rejectedAdmin ? "Komplain Ditolak" : "Menunggu Persetujuan Admin"
@@ -79,16 +87,16 @@ export default function AdminPage() {
         {rejectedAdmin && (
           <InfoBanner contentBefore="Setelah ditinjau, bukti belum cukup kuat. Dana diteruskan ke seller dan transaksi dianggap selesai." />
         )}
-        <View className="h-2 bg-[#f5f5f5] mt-3" />
 
-        {/* Pengajuan */}
+        <View style={styles.separator} />
+
+        {/* Pengajuan Komplain */}
         {detailComplaint?.timeline
           ?.slice()
           .reverse()
           .map((item, index) => (
-            <>
+            <View key={index}>
               <TrackDispute
-                key={index}
                 title={item.label}
                 dateTime={formatDateWIB(item.timestamp) || "null"}
                 details={[
@@ -99,21 +107,20 @@ export default function AdminPage() {
                     ? [
                         {
                           imgTitle: "Bukti foto & video",
-                          images: item.evidence.map((url, index) => ({
+                          images: item.evidence.map((url, idx) => ({
                             uri: url,
-                            key: `evidence-${index}`,
+                            key: `evidence-${idx}`,
                           })),
-                          key: `evidence-section-${index}`,
                         },
                       ]
                     : []),
                 ]}
               />
-              <View className="h-2 bg-[#f5f5f5] mt-3" />
-            </>
+              <View style={styles.separator} />
+            </View>
           ))}
 
-        {/* Data Seller & Transaksi */}
+        {/* Data Transaksi */}
         <TextView
           title="Buyer"
           content={detailComplaint?.transaction?.buyerEmail}
@@ -146,3 +153,33 @@ export default function AdminPage() {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#ffffff",
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+  },
+  headerTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#000",
+  },
+  headerSpacer: {
+    width: 24,
+  },
+  scrollContent: {
+    paddingHorizontal: 16,
+  },
+  separator: {
+    height: 8,
+    backgroundColor: "#f5f5f5",
+    marginTop: 12,
+  },
+});

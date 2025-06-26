@@ -6,7 +6,6 @@ import {
   Image,
   TouchableOpacity,
   ScrollView,
-  SafeAreaView,
 } from "react-native";
 import { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
@@ -23,7 +22,6 @@ export default function DataDiri() {
   const [isUploaded, setIsUploaded] = useState(false);
   const [notification, setNotification] = useState("");
 
-  // State untuk form field
   const [ktpNumber, setKtpNumber] = useState("");
   const [fullName, setFullName] = useState("");
   const [birthDate, setBirthDate] = useState("");
@@ -40,7 +38,6 @@ export default function DataDiri() {
     setIsUploaded(true);
     setNotification("Data KTP terisi otomatis, cek lagi");
 
-    // Simulasi hasil OCR KTP
     setKtpNumber("1273040311020000");
     setFullName("IRGI MUTTAQIN FAHREZI SITUMORANG");
     setBirthDate("03 November 2000");
@@ -69,7 +66,6 @@ export default function DataDiri() {
 
   return (
     <View style={styles.container}>
-
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()}>
@@ -116,6 +112,7 @@ export default function DataDiri() {
           />
         </View>
 
+        {/* Form Fields */}
         <View style={styles.content}>
           <InputField
             title="Nomor Kartu Tanda Penduduk (KTP)"
@@ -206,7 +203,7 @@ export default function DataDiri() {
             editable={false}
           />
         </View>
-        <View style={styles.content} className="mb-4">
+        <View style={styles.contentWithMarginBottom}>
           <DropDownField
             title="Kelurahan / Desa"
             placeholder="Pilih kelurahan / desa anda"
@@ -252,10 +249,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
   },
-  backArrow: {
-    fontSize: 24,
-    color: "#000",
-  },
   headerTitle: {
     flex: 1,
     textAlign: "center",
@@ -267,6 +260,12 @@ const styles = StyleSheet.create({
     flex: 1,
     marginTop: 16,
     marginHorizontal: 20,
+  },
+  contentWithMarginBottom: {
+    flex: 1,
+    marginTop: 16,
+    marginHorizontal: 20,
+    marginBottom: 16,
   },
   notification: {
     flexDirection: "row",
@@ -286,19 +285,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingBottom: 16,
     backgroundColor: "#fff",
-  },
-  button: {
-    width: "100%",
-    paddingVertical: 16,
-    borderRadius: 12,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 16,
-  },
-  buttonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
   },
   footer: {
     flexDirection: "row",

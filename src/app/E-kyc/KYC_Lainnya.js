@@ -6,7 +6,6 @@ import {
   Image,
   TouchableOpacity,
   ScrollView,
-  SafeAreaView,
 } from "react-native";
 import { useState, useEffect } from "react";
 import { Ionicons } from "@expo/vector-icons";
@@ -24,7 +23,6 @@ export default function LainnyaPage() {
   const [namaUsaha, setNamaUsaha] = useState("");
   const [bidangUsaha, setBidangUsaha] = useState("");
 
-  // Auto isi semua data saat simulasi
   useEffect(() => {
     setNamaIbu("Maria Simulasi");
     setPendidikan("S1");
@@ -105,7 +103,7 @@ export default function LainnyaPage() {
           />
         </View>
 
-        <View style={styles.content}>
+        <View style={styles.contentWithMarginBottom}>
           <DropDownField
             title="Bidang Usaha"
             placeholder="Pilih bidang usaha kamu"
@@ -161,6 +159,11 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     marginTop: 16,
+  },
+  contentWithMarginBottom: {
+    flex: 1,
+    marginTop: 16,
+    marginBottom: 16,
   },
   scrollContent: {
     paddingBottom: 100,

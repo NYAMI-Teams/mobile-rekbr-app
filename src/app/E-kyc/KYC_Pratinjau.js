@@ -66,7 +66,8 @@ export default function Pratinjau() {
 
       <ScrollView
         style={{ flex: 1 }}
-        contentContainerStyle={{ paddingBottom: 16 }}>
+        contentContainerStyle={{ paddingBottom: 16 }}
+      >
         <View style={styles.content}>
           <View style={styles.card}>
             <Text style={styles.cardTitle}>Data Diri</Text>
@@ -106,7 +107,8 @@ export default function Pratinjau() {
         <View style={styles.checkboxContainer}>
           <TouchableOpacity
             onPress={() => setIsChecked(!isChecked)}
-            style={[styles.checkbox, isChecked && styles.checkedCheckbox]}>
+            style={[styles.checkbox, isChecked && styles.checkedCheckbox]}
+          >
             {isChecked && (
               <MaterialIcons name="check" size={18} color="white" />
             )}

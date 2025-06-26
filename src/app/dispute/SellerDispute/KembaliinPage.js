@@ -1,5 +1,10 @@
-import { useLocalSearchParams, useRouter } from "expo-router";
-import { Alert, SafeAreaView, TouchableOpacity, View } from "react-native";
+import {
+  Alert,
+  SafeAreaView,
+  TouchableOpacity,
+  View,
+  StyleSheet,
+} from "react-native";
 import { ChevronLeft } from "lucide-react-native";
 import { Text } from "react-native";
 import StepProgressBar from "../../../components/ProgressBar";
@@ -18,6 +23,7 @@ import {
 import { useEffect, useState } from "react";
 import { showToast, formatCurrency } from "@/utils";
 import moment from "moment";
+import { useLocalSearchParams, useRouter } from "expo-router";
 
 const formatDateWIB = (dateTime) => {
   if (!dateTime) return "Invalid date";
@@ -42,10 +48,8 @@ export default function KembaliinPage() {
 
       const res = await getDetailSellerComplaint(id);
       setDetailComplaint(res.data);
-      setSellerRejected(res.data.seller_decision === "rejected" ? true : false);
-      setBuyerExpiredDate(
-        res.data.status === "canceled_by_buyer" ? true : false
-      );
+      setSellerRejected(res.data.seller_decision === "rejected");
+      setBuyerExpiredDate(res.data.status === "canceled_by_buyer");
       console.log("Detail Complaint:", JSON.stringify(res.data, null, 2));
     } catch (error) {
       console.error("Gagal mengambil data detail komplain:", error);
@@ -60,7 +64,7 @@ export default function KembaliinPage() {
           <>
             <InfoBanner contentBefore="Kembalikan dengan baik, kemasan aman, dan berikan bukti pengiriman kembali ! Proses maksimal 1 x 24 jam." />
             <StatusKomplain status="Menunggu Pengembalian Barang" />
-            <View className="h-2 bg-[#f5f5f5] mt-3" />
+            <View style={styles.divider} />
 
             {detailComplaint?.timeline
               ?.slice()
@@ -92,7 +96,7 @@ export default function KembaliinPage() {
           <>
             <StatusKomplain status="Menunggu Pengembalian Barang" />
             <InfoBanner contentBefore="Seller nggak kasih kabar, jadi sekarang giliran kamu buat lanjut prosesnya. Ayo upload bukti pengembalian barang!" />
-            <View className="h-2 bg-[#f5f5f5] mt-3" />
+            <View style={styles.divider} />
             <TrackDispute
               title="Seller nggak respon dalam 2x24 jam."
               dateTime={formatDateWIB(detailComplaint?.timeline[2]?.timestamp)}
@@ -103,7 +107,7 @@ export default function KembaliinPage() {
                 },
               ]}
             />
-            <View className="h-2 bg-[#f5f5f5] mt-3" />
+            <View style={styles.divider} />
           </>
         );
 
@@ -152,7 +156,7 @@ export default function KembaliinPage() {
           <>
             <InfoBanner contentBefore="Buyer akan mengembalikan barang dalam 24 jam, konfirmasi bila barang telah sampai dan diterima." />
             <StatusKomplain status="Menunggu Pengembalian Barang" />
-            <View className="h-2 bg-[#f5f5f5] mt-3" />
+            <View style={styles.divider} />
 
             {detailComplaint?.timeline
               ?.slice()
@@ -198,14 +202,15 @@ export default function KembaliinPage() {
                   : "Menunggu Pengembalian Barang"
               }
             />
-            <View className="h-2 bg-[#f5f5f5] mt-3" />
+            <View style={styles.divider} />
 
             {buyerExpiredDate === true ? (
               <>
                 <TouchableOpacity
-                  onPress={() => console.log("Hubungi kami di klik!")}>
-                  <View className="items-end px-4 mt-4">
-                    <Text className="text-[#3267E3] font-bold">
+                  onPress={() => console.log("Hubungi kami di klik!")}
+                >
+                  <View style={styles.contactUsContainer}>
+                    <Text style={styles.contactUsText}>
                       Silahkan Hubungi Kami
                     </Text>
                   </View>
@@ -256,7 +261,7 @@ export default function KembaliinPage() {
           <>
             <InfoBanner contentBefore="Konfirmasi resi udah dikirim ke buyer, segera konfirmasi ya!" />
             <StatusKomplain status="Menunggu Seller" />
-            <View className="h-2 bg-[#f5f5f5] mt-3" />
+            <View style={styles.divider} />
 
             {detailComplaint?.timeline
               ?.slice()
@@ -281,7 +286,7 @@ export default function KembaliinPage() {
                 />
               ))}
 
-            <View className="h-2 bg-[#f5f5f5] mt-3" />
+            <View style={styles.divider} />
           </>
         );
 
@@ -290,7 +295,7 @@ export default function KembaliinPage() {
           <>
             <InfoBanner contentBefore="Tunggu approval bukti dari admin, ya! Kalau bukti kamu oke, permintaan konfirmasi bakal langsung dikirim ke seller!" />
             <StatusKomplain status="Menunggu Pengembalian Barang" />
-            <View className="h-2 bg-[#f5f5f5] mt-3" />
+            <View style={styles.divider} />
 
             {detailComplaint?.timeline
               ?.slice()
@@ -315,7 +320,7 @@ export default function KembaliinPage() {
                 />
               ))}
 
-            <View className="h-2 bg-[#f5f5f5] mt-3" />
+            <View style={styles.divider} />
           </>
         );
 
@@ -324,13 +329,13 @@ export default function KembaliinPage() {
           <>
             <InfoBanner contentBefore="Halo! Barang sudah sampai. Konfirmasi dalam 24 jam, kalau nggak, dana otomatis dikembalikan ke buyer." />
             <StatusKomplain status="Menunggu Pengembalian Barang" />
-            <View className="flex-row justify-end px-4 mt-4">
-              <View className="p-2 rounded bg-[#FEF2D3]">
-                <Text className="font-bold text-black">23 : 59 : 59</Text>
+            <View style={styles.timerContainer}>
+              <View style={styles.timerBox}>
+                <Text style={styles.timerText}>23 : 59 : 59</Text>
               </View>
             </View>
 
-            <View className="h-2 bg-[#f5f5f5] mt-3" />
+            <View style={styles.divider} />
 
             <TrackDispute
               title="Pengembalian barang oleh buyer"
@@ -342,7 +347,7 @@ export default function KembaliinPage() {
                 },
               ]}
             />
-            <View className="h-2 bg-[#f5f5f5] mt-3" />
+            <View style={styles.divider} />
           </>
         );
       default:
@@ -359,7 +364,7 @@ export default function KembaliinPage() {
           text: "Kembali",
           style: "cancel",
           onPress: () => {
-            router.back();
+            // No need to router.back() here, as it would close the alert immediately
           },
         },
         {
@@ -391,13 +396,13 @@ export default function KembaliinPage() {
   };
 
   return (
-    <View className="flex-1 bg-white">
-      <View className="flex-row items-center justify-between p-4">
+    <View style={styles.container}>
+      <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()}>
           <ChevronLeft size={24} color="black" />
         </TouchableOpacity>
-        <Text className="text-base font-semibold">Detail Komplain</Text>
-        <View style={{ width: 24 }} />
+        <Text style={styles.headerTitle}>Detail Komplain</Text>
+        <View style={styles.headerSpacer} />
       </View>
 
       <StepProgressBar
@@ -407,7 +412,7 @@ export default function KembaliinPage() {
         rejectedSteps={buyerExpiredDate ? [2] : sellerRejected ? [0] : []}
       />
 
-      <ScrollView className="px-4 pb-40">
+      <ScrollView style={styles.scrollView}>
         {renderStatusSection()}
 
         {/* Data Transaksi */}
@@ -419,7 +424,7 @@ export default function KembaliinPage() {
           title="Nama Barang"
           content={detailComplaint?.transaction?.itemName}
         />
-        <View className="p-3">
+        <View style={styles.tagihanContainer}>
           <Tagihan
             caption="Tagihan Rekber"
             price={formatCurrency(detailComplaint?.transaction?.totalAmount)}
@@ -461,16 +466,14 @@ export default function KembaliinPage() {
       ) : (
         <>
           {/* Bottom Action */}
-          <View
-            className="flex-row px-4 pb-4 pt-2 mt-5 bg-white"
-            style={{ position: "absolute", bottom: 0, left: 0, right: 0 }}>
+          <View style={styles.bottomActionContainer}>
             <PrimaryButton
               title="Komplain"
               onPress={handleSubmit}
               width="48%"
               btnColor="#F9F9F9"
               textColor="#000000"
-              style={{ marginRight: 8 }}
+              style={styles.komplainButton}
             />
             <PrimaryButton
               title="Barang diterima"
@@ -483,3 +486,74 @@ export default function KembaliinPage() {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#ffffff", // bg-white
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: 16, // p-4
+  },
+  headerTitle: {
+    fontSize: 16, // text-base
+    fontWeight: "600", // font-semibold
+  },
+  headerSpacer: {
+    width: 24, // Matches ChevronLeft size for alignment
+  },
+  divider: {
+    height: 8, // h-2
+    backgroundColor: "#f5f5f5", // bg-[#f5f5f5]
+    marginTop: 12, // mt-3
+  },
+  contactUsContainer: {
+    alignItems: "flex-end", // items-end
+    paddingHorizontal: 16, // px-4
+    marginTop: 16, // mt-4
+  },
+  contactUsText: {
+    color: "#3267E3", // text-[#3267E3]
+    fontWeight: "700", // font-bold
+  },
+  timerContainer: {
+    flexDirection: "row",
+    justifyContent: "flex-end", // justify-end
+    paddingHorizontal: 16, // px-4
+    marginTop: 16, // mt-4
+  },
+  timerBox: {
+    padding: 8, // p-2
+    borderRadius: 4, // rounded
+    backgroundColor: "#FEF2D3", // bg-[#FEF2D3]
+  },
+  timerText: {
+    fontWeight: "700", // font-bold
+    color: "#000000", // text-black
+  },
+  scrollView: {
+    paddingHorizontal: 16, // px-4
+    paddingBottom: 160, // pb-40
+  },
+  tagihanContainer: {
+    padding: 12, // p-3
+  },
+  bottomActionContainer: {
+    flexDirection: "row",
+    paddingHorizontal: 16, // px-4
+    paddingBottom: 16, // pb-4
+    paddingTop: 8, // pt-2
+    marginTop: 20, // mt-5
+    backgroundColor: "#ffffff", // bg-white
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+  },
+  komplainButton: {
+    marginRight: 8, // style={{ marginRight: 8 }}
+  },
+});
