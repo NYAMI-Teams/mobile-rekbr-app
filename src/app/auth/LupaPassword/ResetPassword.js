@@ -5,8 +5,8 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
   ScrollView,
-  Image,
   Platform,
+  StyleSheet,
 } from "react-native";
 import { Feather, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useRouter, useLocalSearchParams } from "expo-router";
@@ -28,7 +28,6 @@ export default function ChangePasswordScreen() {
     isKonfirmasiKataSandiBaruVisible,
     setIsKonfirmasiKataSandiBaruVisible,
   ] = useState(false);
-
   const [showPopup, setShowPopup] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -80,32 +79,31 @@ export default function ChangePasswordScreen() {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#fff" }}>
+    <View style={styles.container}>
       {/* Header */}
-      <View className="flex-row justify-between items-center w-full px-4 pt-4">
+      <View style={styles.header}>
         <TouchableOpacity onPress={handleBackBtn}>
           <Ionicons name="chevron-back-outline" size={24} color="#000" />
         </TouchableOpacity>
-        <Text className="text-[16px] font-semibold text-black">
-          Pulihkan Akses Akun Anda
-        </Text>
+        <Text style={styles.headerTitle}>Pulihkan Akses Akun Anda</Text>
         <View style={{ width: 24 }} />
       </View>
 
       {/* Content */}
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={{ flex: 1 }}>
+        style={{ flex: 1 }}
+      >
         <ScrollView
           contentContainerStyle={{ flexGrow: 1 }}
-          className="flex-1 w-full px-4 mt-5"
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
-          hideKeyboardOnScroll={true}
-          keyboardDismissMode="on-drag">
-          <View className="mt-4 gap-4 flex-1">
+          keyboardDismissMode="on-drag"
+          style={styles.scrollContent}
+        >
+          <View style={styles.formContainer}>
             {/* Password */}
-            <View className="relative">
+            <View style={styles.relativeContainer}>
               <InputField
                 title="Kata Sandi Baru Rekbr"
                 placeholder="Masukkan kata sandi baru kamu"
@@ -115,10 +113,10 @@ export default function ChangePasswordScreen() {
                 isPassword={true}
                 inputClassName="pr-12"
               />
-
               <TouchableOpacity
-                className="absolute top-11 right-10"
-                onPress={toggleKataSandiBaruVisibility}>
+                style={styles.eyeButton}
+                onPress={toggleKataSandiBaruVisibility}
+              >
                 <MaterialIcons
                   name={
                     isKataSandiBaruVisible ? "visibility" : "visibility-off"
@@ -131,7 +129,7 @@ export default function ChangePasswordScreen() {
             </View>
 
             {/* Confirm Password */}
-            <View className="relative">
+            <View style={styles.relativeContainer}>
               <InputField
                 title="Konfirmasi Kata Sandi Baru Rekbr"
                 placeholder="Pastikan sama, ya!"
@@ -141,10 +139,10 @@ export default function ChangePasswordScreen() {
                 isPassword={true}
                 inputClassName="pr-12"
               />
-
               <TouchableOpacity
-                className="absolute top-11 right-10"
-                onPress={toggleKonfirmasiKataSandiBaruVisibility}>
+                style={styles.eyeButton}
+                onPress={toggleKonfirmasiKataSandiBaruVisibility}
+              >
                 <MaterialIcons
                   name={
                     isKonfirmasiKataSandiBaruVisible
@@ -158,7 +156,7 @@ export default function ChangePasswordScreen() {
 
               {/* Alert Validasi */}
               {konfirmasiKataSandiBaru.length > 0 && (
-                <View className="flex-row items-center mt-2 mx-5">
+                <View style={styles.alertRow}>
                   <Feather
                     name={
                       konfirmasiKataSandiBaru === kataSandiBaru
@@ -173,10 +171,16 @@ export default function ChangePasswordScreen() {
                     }
                   />
                   <Text
-                    className={`ml-2 text-sm ${konfirmasiKataSandiBaru === kataSandiBaru
-                      ? "text-green-600"
-                      : "text-red-400"
-                      }`}>
+                    style={[
+                      styles.alertText,
+                      {
+                        color:
+                          konfirmasiKataSandiBaru === kataSandiBaru
+                            ? "#4ade80"
+                            : "#f87171",
+                      },
+                    ]}
+                  >
                     {konfirmasiKataSandiBaru === kataSandiBaru
                       ? "Kata sandi sesuai"
                       : "Kata sandi tidak sesuai"}
@@ -185,8 +189,9 @@ export default function ChangePasswordScreen() {
               )}
             </View>
           </View>
+
           {/* Button */}
-          <View className="w-full pb-16">
+          <View style={styles.buttonWrapper}>
             <PrimaryButton
               title="Kirim"
               onPress={handleBtnPress}
@@ -195,7 +200,6 @@ export default function ChangePasswordScreen() {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
-
 
       {showPopup && (
         <BuyerKonfirmasi
@@ -210,3 +214,53 @@ export default function ChangePasswordScreen() {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: "#fff" },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    width: "100%",
+    paddingHorizontal: 16,
+    paddingTop: 16,
+  },
+  headerTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#000",
+  },
+  scrollContent: {
+    flex: 1,
+    width: "100%",
+    paddingHorizontal: 16,
+    marginTop: 20,
+  },
+  formContainer: {
+    marginTop: 16,
+    gap: 16,
+    flex: 1,
+  },
+  relativeContainer: {
+    position: "relative",
+  },
+  eyeButton: {
+    position: "absolute",
+    top: 44,
+    right: 40,
+  },
+  alertRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 8,
+    marginHorizontal: 20,
+  },
+  alertText: {
+    marginLeft: 8,
+    fontSize: 14,
+  },
+  buttonWrapper: {
+    width: "100%",
+    paddingBottom: 64,
+  },
+});
