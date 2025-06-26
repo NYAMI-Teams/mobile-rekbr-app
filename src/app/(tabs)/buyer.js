@@ -1,75 +1,135 @@
-import { View } from "react-native";
-import NavigationBar from "../../components/NavigationBar";
-import { useState, useEffect } from "react";
+import { View, FlatList, RefreshControl, StyleSheet } from "react-native";
+import { useState, useEffect, useRef } from "react";
 import { StatusBar } from "expo-status-bar";
-import BuyerCard from "../../components/card-transaction/BuyerCard";
-import { ScrollView, RefreshControl, ActivityIndicator } from "react-native";
 import { getBuyerTransactions } from "../../utils/api/buyer";
-import { getAccessToken, removeAccessToken } from "../../store";
-import { useRouter } from "expo-router";
 import { showToast } from "../../utils";
-import { getProfile } from "../../utils/api/auth";
+import BuyerCard from "../../components/card-transaction/BuyerCard";
 import EmptyIllustration from "@/components/Ilustration";
+import TransactionSkeleton from "@/components/skeleton/TransactionSkeleton";
 
 export default function Buyer() {
-  const router = useRouter();
-  const [isEmptyTransaction, setIsEmptyTransaction] = useState(false);
   const [transactions, setTransactions] = useState([]);
+  const [offset, setOffset] = useState(0);
+  const limit = 7;
+  const [hasMore, setHasMore] = useState(true);
+  const [isFetching, setIsFetching] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-  const [profile, setProfile] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const listRef = useRef();
 
-  useEffect(() => {
-    fetchTransactions();
-  }, []);
+  const fetchData = async (reset = false) => {
+    if (isFetching || (!hasMore && !reset)) return;
+    setIsFetching(true);
 
-  const fetchTransactions = async () => {
+    const currentOffset = reset ? 0 : offset;
+
     try {
-      const res = await getBuyerTransactions();
-      if (res.data.length > 0) {
-        setIsEmptyTransaction(false);
+      const res = await getBuyerTransactions(currentOffset, limit);
+      const newData = res?.data || [];
+
+      if (reset) {
+        setTransactions(newData);
       } else {
-        setIsEmptyTransaction(true);
+        setTransactions((prev) => [...prev, ...newData]);
       }
-      setTransactions(res.data);
+
+      setOffset(currentOffset + limit);
+      setHasMore(newData.length === limit);
     } catch (err) {
       showToast("Gagal", err?.message, "error");
+    } finally {
+      setIsFetching(false);
+      setRefreshing(false);
+      if (isInitialLoading) setIsInitialLoading(false);
     }
   };
 
-  const onRefresh = async () => {
+  useEffect(() => {
+    setIsInitialLoading(true);
+    fetchData(true);
+  }, []);
+
+  const onRefresh = () => {
     setRefreshing(true);
-    await fetchTransactions();
-    setRefreshing(false);
+    setHasMore(true);
+    setTransactions([]);
+    setIsInitialLoading(true);
+    setOffset(0);
+    fetchData(true);
   };
 
+  const renderItem = ({ item }) => <BuyerCard data={item} />;
+
+  const ListEmpty = () => {
+    if (isInitialLoading) {
+      return (
+        <View>
+          {Array.from({ length: 4 }).map((_, idx) => (
+            <TransactionSkeleton key={idx} />
+          ))}
+        </View>
+      );
+    }
+
+    return (
+      <View style={styles.emptyContainer}>
+        <EmptyIllustration
+          text={`Belum ada Rekber yang masuk.\nTunggu seller kirimkan Rekber untuk kamu`}
+        />
+      </View>
+    );
+  };
+
+  const ListFooter = () => {
+    if (isFetching && offset > 0) {
+      return (
+        <View style={styles.footerContainer}>
+          {[...Array(2)].map((_, i) => (
+            <TransactionSkeleton key={i} />
+          ))}
+        </View>
+      );
+    }
+    return null;
+  };
 
   return (
-    <View className="flex-1 bg-white">
-      {isLoading ? (
-        <View className="flex-1 justify-center items-center">
-          <ActivityIndicator size="large" color="#000" />
-        </View>
-      ) : (
-        <ScrollView
-          className="flex flex-col px-4 bg-white"
-          showsVerticalScrollIndicator={false}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }>
-          {isEmptyTransaction ? (
-            <View className="items-center mt-8">
-              <EmptyIllustration
-                text={`Belum ada Rekber yang masuk.\nTunggu seller kirimkan Rekber untuk kamu`}
-              />
-            </View>
-          ) : (
-            transactions.map((transaction) => (
-              <BuyerCard key={transaction.id} data={transaction} />
-            ))
-          )}
-        </ScrollView>
-      )}
+    <View style={styles.container}>
+      <StatusBar style='dark' />
+      <FlatList
+        ref={listRef}
+        style={styles.flatList}
+        data={transactions}
+        keyExtractor={(item) => item.id}
+        renderItem={renderItem}
+        onEndReached={() => fetchData(false)}
+        onEndReachedThreshold={0.3}
+        initialNumToRender={limit}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+        ListEmptyComponent={<ListEmpty />}
+        ListFooterComponent={<ListFooter />}
+      />
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#ffffff",
+  },
+  flatList: {
+    width: "100%",
+    paddingHorizontal: 16,
+  },
+  emptyContainer: {
+    alignItems: "center",
+    marginTop: 32,
+  },
+  footerContainer: {
+    marginVertical: 16,
+    paddingHorizontal: 16,
+  },
+});

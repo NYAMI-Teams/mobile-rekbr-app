@@ -1,125 +1,142 @@
 import {
   View,
-  ScrollView,
+  FlatList,
   RefreshControl,
-  ActivityIndicator,
   Text,
   Image,
   TouchableOpacity,
-  SafeAreaView,
+  StyleSheet,
 } from "react-native";
 import { useRouter } from "expo-router";
-import PrimaryButton from "../../components/PrimaryButton";
 import { useState, useEffect } from "react";
+import PrimaryButton from "../../components/PrimaryButton";
 import SellerCard from "../../components/card-transaction/SellerCard";
-import { getSellerTransactions } from "../../utils/api/seller";
-import { showToast } from "../../utils";
 import EmptyIllustration from "../../components/Ilustration";
+import TransactionSkeleton from "../../components/skeleton/TransactionSkeleton";
+import { showToast } from "../../utils";
+import { getSellerTransactions } from "../../utils/api/seller";
 import { getProfileStore } from "@/store";
 
 export default function Seller() {
   const router = useRouter();
   const [isKYCCompleted, setIsKYCCompleted] = useState(false);
-  const [isEmptyTransaction, setIsEmptyTransaction] = useState(true);
-  const [isLoading, setIsLoading] = useState(false);
   const [transactions, setTransactions] = useState([]);
+  const [offset, setOffset] = useState(0);
+  const limit = 7;
+  const [hasMore, setHasMore] = useState(true);
+  const [isFetching, setIsFetching] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
 
   useEffect(() => {
     getProfileStore()
       .then((profileData) => {
         if (profileData?.kycStatus === "verified") {
           setIsKYCCompleted(true);
-        }       
+        }
       })
-      .catch((error) => {
-        showToast(
-          "Gagal",
-          "Gagal mengambil data profil. Silahkan coba lagi.",
-          "error"
-        );
+      .catch(() => {
+        showToast("Gagal", "Gagal mengambil data profil", "error");
       });
-    fetchTransactions();
+
+    fetchTransactions(true);
   }, []);
 
-  const fetchTransactions = async () => {
-    setIsLoading(true);
+  const fetchTransactions = async (reset = false) => {
+    if (isFetching || (!hasMore && !reset)) return;
+    setIsFetching(true);
+
+    const currentOffset = reset ? 0 : offset;
+
     try {
-      const res = await getSellerTransactions();
-      if (res.data.length > 0) {
-        setIsEmptyTransaction(false);
+      const res = await getSellerTransactions(currentOffset, limit);
+      const newData = res.data || [];
+
+      if (reset) {
+        setTransactions(newData);
       } else {
-        setIsEmptyTransaction(true);
+        setTransactions((prev) => [...prev, ...newData]);
       }
-      setTransactions(res.data);
+
+      setOffset(currentOffset + limit);
+      setHasMore(newData.length === limit);
     } catch (err) {
-      showToast(
-        "Gagal",
-        "Gagal mengambil data transaksi. Silahkan coba lagi.",
-        "error"
-      );
+      showToast("Gagal", "Gagal mengambil data transaksi", "error");
     } finally {
-      setIsLoading(false);
+      setIsFetching(false);
+      setRefreshing(false);
+      setIsInitialLoading(false);
     }
   };
 
-  const onRefresh = async () => {
+  const onRefresh = () => {
     setRefreshing(true);
-    await fetchTransactions();
-    setRefreshing(false);
+    setOffset(0);
+    setTransactions([]);
+    setIsInitialLoading(true);
+    setHasMore(true);
+    fetchTransactions(true);
   };
 
-  return (
-    <>
-      <View className="flex-1 bg-white">
-        {isLoading ? (
-          <View className="flex-1 justify-center items-center">
-            <ActivityIndicator size="large" color="#000" />
-          </View>
-        ) : (
-          <ScrollView
-            className="flex flex-col px-4 bg-white"
-            showsVerticalScrollIndicator={false}
-            refreshControl={
-              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-            }>
-            {isEmptyTransaction ? (
-              <SellerEmptyContent isKYCCompleted={isKYCCompleted} />
-            ) : (
-              transactions.map((transaction) => (
-                <SellerCard key={transaction.id} data={transaction} />
-              ))
-            )}
-          </ScrollView>
-        )}
-        {isKYCCompleted && !isEmptyTransaction && (
-          <PrimaryButton
-            title={"+ Rekber Baru"}
-            onPress={() =>
-              router.push("/CreateTransaksi/CreateRekening/ChooseRekening")
-            }
-            btnColor="black"
-            textColor="#fff"
-            width="50%"
-            height={50}
-            style={{
-              position: "absolute",
-              bottom: 30,
-              right: 16,
-              borderRadius: 16,
-              alignItems: "center",
-              justifyContent: "center",
-              shadowColor: "#000",
-              shadowOffset: { width: 0, height: 4 },
-              shadowOpacity: 0.3,
-              shadowRadius: 5,
-              elevation: 8,
-              zIndex: 10,
-            }}
-          />
-        )}
+  const renderItem = ({ item }) => <SellerCard data={item} />;
+
+  const renderEmpty = () => {
+    if (isInitialLoading) {
+      return (
+        <View>
+          {Array.from({ length: 4 }).map((_, i) => (
+            <TransactionSkeleton key={i} />
+          ))}
+        </View>
+      );
+    }
+
+    if (!isFetching && transactions.length === 0) {
+      return <SellerEmptyContent isKYCCompleted={isKYCCompleted} />;
+    }
+
+    return null;
+  };
+
+  const renderFooter = () =>
+    isFetching && offset > 0 ? (
+      <View style={styles.footerContainer}>
+        {[...Array(2)].map((_, i) => (
+          <TransactionSkeleton key={i} />
+        ))}
       </View>
-    </>
+    ) : null;
+
+  return (
+    <View style={styles.container}>
+      <FlatList
+        style={styles.flatList}
+        data={transactions}
+        keyExtractor={(item) => item.id}
+        renderItem={renderItem}
+        onEndReached={() => fetchTransactions(false)}
+        onEndReachedThreshold={0.3}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+        ListEmptyComponent={renderEmpty}
+        ListFooterComponent={renderFooter}
+      />
+
+      {isKYCCompleted && transactions.length > 0 && (
+        <PrimaryButton
+          title={"+ Rekber Baru"}
+          onPress={() =>
+            router.push("/CreateTransaksi/CreateRekening/ChooseRekening")
+          }
+          btnColor='black'
+          textColor='#fff'
+          width='50%'
+          height={50}
+          style={styles.floatingButton}
+        />
+      )}
+    </View>
   );
 }
 
@@ -127,48 +144,112 @@ function SellerEmptyContent({ isKYCCompleted }) {
   const router = useRouter();
 
   return (
-    <View className="">
-      {/* Warning Banner (jika belum KYC) */}
+    <View>
       {!isKYCCompleted && (
-        <View className="bg-[#FFF4D9] rounded-xl py-3 px-4">
-          <View className="flex-row items-start">
+        <View style={styles.warningBox}>
+          <View style={styles.warningContent}>
             <Image
               source={require("../../assets/icon-warning.png")}
-              className="w-5 h-5 mt-[2px] mr-2"
-              resizeMode="contain"
+              style={styles.warningIcon}
+              resizeMode='contain'
             />
-            <Text className="flex-1 text-sm text-black font-normal leading-5">
+            <Text style={styles.warningText}>
               Biar bisa lanjut bikin Rekber, kamu perlu selesain KYC dulu, ya!
             </Text>
           </View>
         </View>
       )}
 
-      {/* Empty Illustration + Text */}
-      <View className="items-center mb-8">
+      <View style={styles.emptyIllustration}>
         <EmptyIllustration
           text={`Kosong banget di sini...\nBikin Rekber pertama kamu, kuy!`}
         />
       </View>
 
-      {/* CTA Button */}
-      <View className="">
-        <TouchableOpacity
-          className="w-full py-4 rounded-xl bg-black items-center justify-center"
-          onPress={() => {
-            if (!isKYCCompleted) {
-              router.push("E-kyc/KYC_Intro");
-            } else {
-              router.push("CreateTransaksi/CreateRekening/ChooseRekening");
-            }
-          }}>
-          <Text className="text-white text-base font-semibold">
-            {isKYCCompleted
-              ? "Bikin Rekber Baru"
-              : "Lengkapi KYC & Bikin Rekber"}
-          </Text>
-        </TouchableOpacity>
-      </View>
+      <TouchableOpacity
+        style={styles.ctaButton}
+        onPress={() => {
+          if (!isKYCCompleted) {
+            router.push("E-kyc/KYC_Intro");
+          } else {
+            router.push("CreateTransaksi/CreateRekening/ChooseRekening");
+          }
+        }}
+      >
+        <Text style={styles.ctaButtonText}>
+          {isKYCCompleted ? "Bikin Rekber Baru" : "Lengkapi KYC & Bikin Rekber"}
+        </Text>
+      </TouchableOpacity>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
+  flatList: {
+    flex: 1,
+    paddingHorizontal: 16,
+    backgroundColor: "#fff",
+  },
+  footerContainer: {
+    marginVertical: 16,
+    paddingHorizontal: 16,
+  },
+  warningBox: {
+    backgroundColor: "#FFF4D9",
+    borderRadius: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    marginBottom: 16,
+  },
+  warningContent: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+  },
+  warningIcon: {
+    width: 20,
+    height: 20,
+    marginTop: 2,
+    marginRight: 8,
+  },
+  warningText: {
+    flex: 1,
+    fontSize: 14,
+    color: "#000",
+    lineHeight: 20,
+  },
+  emptyIllustration: {
+    alignItems: "center",
+    marginBottom: 32,
+  },
+  ctaButton: {
+    width: "100%",
+    paddingVertical: 16,
+    borderRadius: 12,
+    backgroundColor: "#000",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  ctaButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  floatingButton: {
+    position: "absolute",
+    bottom: 30,
+    right: 16,
+    borderRadius: 16,
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 8,
+    zIndex: 10,
+  },
+});

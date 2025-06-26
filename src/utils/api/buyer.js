@@ -1,12 +1,13 @@
 import Api from "../api";
 import QueryString from "qs";
 
-export const getBuyerTransactions = async () => {
-  const params = ["pending_payment", "waiting_shipment", "shipped"];
+export const getBuyerTransactions = async (offset, limit) => {
   try {
     const res = await Api.get(`/buyer/transactions`, {
       params: {
         status: ["shipped", "pending_payment", "waiting_shipment"],
+        offset,
+        limit,
       },
       paramsSerializer: (params) => {
         return QueryString.stringify(params, { arrayFormat: "repeat" });
@@ -21,7 +22,7 @@ export const getBuyerTransactions = async () => {
 };
 
 // Get History Buyer Trx
-export const getHistoryBuyer = async () => {
+export const getHistoryBuyer = async (offset, limit) => {
   try {
     const res = await Api.get(`/buyer/transactions`, {
       params: {
