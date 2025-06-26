@@ -40,6 +40,7 @@ export default function DisputeDetail() {
   const [detailTransaction, setDetailTransaction] = useState({});
   const [reason, setReason] = useState("");
   const [isLoading, setLoading] = useState(false);
+  const [ajukanUlang, setAjukanUlang] = useState(false);
 
   // console.log("data:", data.id);
   useEffect(() => {
@@ -47,12 +48,9 @@ export default function DisputeDetail() {
       try {
         const res = await getDetailBuyerTransaction(id);
         setDetailTransaction(res.data);
+        setAjukanUlang(res.data?.Complaint?.length > 0);
       } catch (err) {
-        showToast(
-          "Gagal",
-          "Gagal mengambil data transaksi. Silahkan coba lagi.",
-          "error"
-        );
+        showToast("Gagal", err?.message, "error");
       }
     };
 
@@ -76,7 +74,7 @@ export default function DisputeDetail() {
   const handleConfirm = async () => {
     setLoading(true);
     try {
-      const problemType = "Barang rusak";
+      const problemType = "damaged";
 
       console.log("==== Komplain Dikirim ====");
       console.log("ID Transaksi:", id);
@@ -238,7 +236,10 @@ export default function DisputeDetail() {
 
       {/* Tombol Kirim */}
       <View className="mx-4 mb-8 ">
-        <PrimaryButton title="Kirim" onPress={handleSubmit} />
+        <PrimaryButton
+          title={ajukanUlang ? "Ajukan Ulang Komplain" : "Kirim"}
+          onPress={handleSubmit}
+        />
       </View>
 
       {/* Modal Konfirmasi Kirim */}

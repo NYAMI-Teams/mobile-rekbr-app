@@ -109,7 +109,7 @@ export default function TabLayout() {
           <Tabs.Screen
             name="complaint"
             options={{
-              title: "Komplain",
+              title: "Complaint",
               tabBarIcon: ({ color, focused, size }) => (
                 <DisputeIcon
                   width={16}

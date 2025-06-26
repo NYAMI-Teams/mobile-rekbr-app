@@ -11,6 +11,7 @@ import { getDetailSellerComplaint } from "../../../utils/api/complaint";
 import { useEffect, useState } from "react";
 import { showToast, formatCurrency } from "../../../utils";
 import moment from "moment";
+import { InfoBanner } from "@/components/dispute/InfoBanner";
 
 const formatDateWIB = (dateTime) => {
   if (!dateTime) return "Invalid date";
@@ -19,8 +20,10 @@ const formatDateWIB = (dateTime) => {
 
 export default function AdminPage() {
   const router = useRouter();
-  const { id, status, rejectedAdmin } = useLocalSearchParams();
+  const { id } = useLocalSearchParams();
   const [detailComplaint, setDetailComplaint] = useState({});
+  const [rejectedAdmin, setRejectedAdmin] = useState(false);
+  const [rejectedSeller, setRejectedSeller] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -32,6 +35,8 @@ export default function AdminPage() {
     try {
       const res = await getDetailSellerComplaint(id);
       setDetailComplaint(res.data);
+      setRejectedAdmin(res.data.admin_decision === "rejected" ? true : false);
+      setRejectedSeller(res.data.seller_decision === "rejected" ? true : false);
       console.log(
         "ini detail complaint as seller",
         JSON.stringify(res.data, null, 2)
@@ -57,13 +62,23 @@ export default function AdminPage() {
 
       {/* Stepper */}
       <StepProgressBar
+        key="admin-step-progress"
         currentStep={1}
         steps={["Seller", "Admin", "Kembaliin", "Refund"]}
-        rejectedSteps={rejectedAdmin === "true" ? [0, 1] : [0]}
+        rejectedSteps={rejectedAdmin ? [0, 1] : rejectedSeller ? [0] : []}
       />
 
       <ScrollView className="px-4">
-        <StatusKomplain status="Menunggu Persetujuan Admin" />
+        {/* Status Komplain */}
+        <StatusKomplain
+          status={
+            rejectedAdmin ? "Komplain Ditolak" : "Menunggu Persetujuan Admin"
+          }
+        />
+
+        {rejectedAdmin && (
+          <InfoBanner contentBefore="Setelah ditinjau, bukti belum cukup kuat. Dana diteruskan ke seller dan transaksi dianggap selesai." />
+        )}
         <View className="h-2 bg-[#f5f5f5] mt-3" />
 
         {/* Pengajuan */}
@@ -78,18 +93,18 @@ export default function AdminPage() {
                 dateTime={formatDateWIB(item.timestamp) || "null"}
                 details={[
                   {
-                    content: item?.reason,
+                    content: item?.reason || item?.message || "-",
                   },
-                  ...(item?.evidence?.length
-                    ? [
-                        {
-                          imgTitle: "Bukti foto & video",
-                          images: item.evidence.map((url) => ({
-                            uri: url,
-                          })),
-                        },
-                      ]
-                    : []),
+                  ...(item?.evidence?.length > 0 ? [
+                    {
+                      imgTitle: "Bukti foto & video",
+                      images: item.evidence.map((url, index) => ({
+                        uri: url,
+                        key: `evidence-${index}`,
+                      })),
+                      key: `evidence-section-${index}`
+                    }
+                  ] : []),
                 ]}
               />
               <View className="h-2 bg-[#f5f5f5] mt-3" />

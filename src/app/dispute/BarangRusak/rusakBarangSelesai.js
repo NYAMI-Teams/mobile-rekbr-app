@@ -13,6 +13,13 @@ import Tagihan from "../../../components/DetailRekber/Tagihan";
 import CopyField from "../../../components/dispute/copyField";
 import { useRouter } from "expo-router";
 import { getDetailBuyerComplaint } from "../../../utils/api/complaint";
+import { showToast, formatCurrency } from "../../../utils";
+import moment from "moment";
+
+const formatDateWIB = (dateTime) => {
+  if (!dateTime) return "Invalid date";
+  return moment(dateTime).utcOffset(7).format("DD MMMM YYYY, HH:mm [WIB]");
+};
 
 export default function RusakBarangSelesai() {
   const router = useRouter();
@@ -27,12 +34,9 @@ export default function RusakBarangSelesai() {
     try {
       const res = await getDetailBuyerComplaint(complaintId);
       setDetailComplaint(res.data);
+      console.log("ini detail complaint", JSON.stringify(res.data, null, 2));
     } catch (err) {
-      showToast(
-        "Gagal",
-        "Gagal mengambil data transaksi. Silahkan coba lagi.",
-        "error"
-      );
+      showToast("Gagal", err?.message, "error");
     }
   };
 
@@ -51,86 +55,85 @@ export default function RusakBarangSelesai() {
         currentStep={3}
         steps={["Seller", "Admin", "Kembaliin", "Refund"]}
       />
-      <StatusKomplain status={detailComplaint.status_label} />
+      <StatusKomplain
+        status={
+          detailComplaint.status === "completed"
+            ? "Transaksi Selesai"
+            : "Transaksi Dalam Proses"
+        }
+      />
 
       <View className="h-2 bg-[#f5f5f5] mt-3" />
 
       <ScrollView className="px-4 pt-4 pb-40">
-        <TrackDispute
-          title="Konfirmasi seller dan dana berhasil dikembalikan"
-          dateTime="22 Juni 2025, 10 : 00 WIB"
-        />
-        <View className="h-2 bg-[#f5f5f5] mt-3" />
-        <TrackDispute
-          title="Admin meneruskan permintaan konfirmasi"
-          dateTime="20 Juni 2025, 12 : 00 WIB"
-        />
-        <View className="h-2 bg-[#f5f5f5] mt-3" />
-
-        <TrackDispute
-          title="Permintaan konfirmasi buyer"
-          dateTime="Melalui resi harusnya barang sudah sampai di seller"
-          details={[
-            {
-              content: "Melalui resi harusnya barang sudah sampai di seller",
-            },
-            {
-              imgTitle: "Bukti foto & video",
-              images: [require("../../../assets/barangrusak.png")],
-            },
-          ]}
-        />
-        <View className="h-2 bg-[#f5f5f5] mt-3" />
-
-        <TrackDispute
-          title="Pengembalian barang oleh buyer"
-          dateTime="20 Juni 2025, 10 : 00 WIB"
-          details={[
-            {
-              resiNumber: "J X 3 4 7 4 1 2 4 0 1 3",
-              expedition: "J&T Express Indonesia",
-            },
-          ]}
-        />
+        {detailComplaint?.timeline
+          ?.slice()
+          .reverse()
+          .map((item, index) => (
+            <TrackDispute
+              key={index}
+              title={item.label}
+              dateTime={formatDateWIB(item.timestamp)}
+              details={[
+                {
+                  content: item?.reason || item?.message || "-",
+                },
+                item?.evidence?.length > 0 && {
+                  imgTitle: "Bukti foto & video",
+                  images: item?.evidence.map((url, key) => ({ uri: url, key })),
+                },
+              ]}
+            />
+          ))}
 
         <View className="h-2 bg-[#f5f5f5] mt-3" />
 
-        <TrackDispute
-          title="Persetujuan komplain seller"
-          dateTime="19 Juni 2025, 10 : 00 WIB"
-          details={[
-            {
-              content:
-                "Seller setuju untuk Refund dana pada barang yang bermasalah.",
-            },
-            {
-              imgTitle: "Bukti foto & video",
-              images: [require("../../../assets/barangrusak.png")],
-            },
-          ]}
+        <TextView
+          title="Seller"
+          content={detailComplaint?.transaction?.sellerEmail || "-"}
         />
-
-        <View className="h-2 bg-[#f5f5f5] mt-3" />
-
-        <TextView title="Seller" content="irgi168@gmail.com" />
-        <TextView title="Nama Barang" content="IPhone 13 Pro Max" />
+        <TextView
+          title="Nama Barang"
+          content={detailComplaint?.transaction?.itemName || "-"}
+        />
         <View className="p-3">
           <Tagihan
             caption="Tagihan Rekber"
-            price="Rp 1.000.000"
+            price={formatCurrency(
+              detailComplaint?.transaction?.totalAmount || 0
+            )}
             details={[
-              { status: "Kembaliin", price: "Rp 1.000.000" },
-              { status: "Refund", price: "Rp 1.000.000" },
+              {
+                status: "Kembaliin",
+                price: formatCurrency(
+                  detailComplaint?.transaction?.totalAmount || 0
+                ),
+              },
+              {
+                status: "Refund",
+                price: formatCurrency(
+                  detailComplaint?.transaction?.totalAmount || 0
+                ),
+              },
             ]}
           />
         </View>
 
-        <CopyField title="Nomor Resi" content="123456789" />
-        <TextView title="Ekspedisi" content="J&T Express Indonesia" />
-        <CopyField title="ID Transaksi" content="1 2 3 4 5 6 7 8 9" />
+        <CopyField
+          title="Nomor Resi"
+          content={detailComplaint?.returnShipment?.trackingNumber || "-"}
+        />
+        <TextView
+          title="Ekspedisi"
+          content={detailComplaint?.returnShipment?.courierName || "-"}
+        />
+        <CopyField
+          title="ID Transaksi"
+          content={detailComplaint?.transaction?.transactionCode || "-"}
+        />
         <CopyField
           title="Virtual Account"
-          content="8 0 8 0 1 2 3 4 5 6 7 8 9"
+          content={detailComplaint?.transaction?.virtualAccount || "-"}
         />
       </ScrollView>
     </View>

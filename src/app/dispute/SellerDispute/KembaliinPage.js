@@ -33,14 +33,19 @@ export default function KembaliinPage() {
 
   useEffect(() => {
     fetchDetailComplaint();
-  }, []);
+  }, [id]);
 
   const fetchDetailComplaint = async () => {
     try {
+      console.log("ID Complaint:", id);
+      console.log("Status Complaint:", status);
+
       const res = await getDetailSellerComplaint(id);
       setDetailComplaint(res.data);
       setSellerRejected(res.data.seller_decision === "rejected" ? true : false);
-      setBuyerExpiredDate(res.data.updated_at); // ini kurang response di DB untuk dapetin buyerExpiredDate
+      setBuyerExpiredDate(
+        res.data.status === "canceled_by_buyer" ? true : false
+      );
       console.log("Detail Complaint:", JSON.stringify(res.data, null, 2));
     } catch (error) {
       console.error("Gagal mengambil data detail komplain:", error);
@@ -56,47 +61,29 @@ export default function KembaliinPage() {
             <InfoBanner contentBefore="Kembalikan dengan baik, kemasan aman, dan berikan bukti pengiriman kembali ! Proses maksimal 1 x 24 jam." />
             <StatusKomplain status="Menunggu Pengembalian Barang" />
             <View className="h-2 bg-[#f5f5f5] mt-3" />
-            {sellerRejected ? (
-              <>
+
+            {detailComplaint?.timeline
+              ?.slice()
+              .reverse()
+              .map((item, index) => (
                 <TrackDispute
-                  title="Persetujuan komplain oleh admin"
-                  dateTime="16 Juni 2025, 16:00 WIB"
+                  key={index}
+                  title={item.label}
+                  dateTime={formatDateWIB(item.timestamp)}
                   details={[
                     {
-                      content:
-                        "Setelah tinjau bukti yang kamu kirim, komplain dinyatakan valid. Refund akan diproses meski seller menolak.",
+                      content: item?.reason || item?.message || "-",
                     },
-                  ]}
-                />
-                <View className="h-2 bg-[#f5f5f5] mt-3" />
-                <TrackDispute
-                  title="Penolakan komplain seller"
-                  dateTime="16 Juni 2025, 14:00 WIB"
-                  details={[
-                    { content: "Bukti buyer belum cukup kuat." },
-                    {
+                    item?.evidence?.length > 0 && {
                       imgTitle: "Bukti foto & video",
-                      images: [
-                        require("../../../assets/barangrusak.png"),
-                        require("../../../assets/barangrusak.png"),
-                      ],
+                      images: item?.evidence.map((url, key) => ({
+                        uri: url,
+                        key,
+                      })),
                     },
                   ]}
                 />
-                <View className="h-2 bg-[#f5f5f5] mt-3" />
-              </>
-            ) : (
-              <TrackDispute
-                title="Persetujuan komplain oleh admin"
-                dateTime="16 Juni 2025, 16:00 WIB"
-                details={[
-                  {
-                    content:
-                      "Setelah tinjau bukti, komplain dinyatakan valid. Refund akan diproses meski seller menolak.",
-                  },
-                ]}
-              />
-            )}
+              ))}
           </>
         );
 
@@ -108,7 +95,7 @@ export default function KembaliinPage() {
             <View className="h-2 bg-[#f5f5f5] mt-3" />
             <TrackDispute
               title="Seller nggak respon dalam 2x24 jam."
-              dateTime="18 Juni 2025, 10:00 WIB"
+              dateTime={formatDateWIB(detailComplaint?.timeline[2]?.timestamp)}
               details={[
                 {
                   content:
@@ -163,76 +150,57 @@ export default function KembaliinPage() {
       case "returnRequested":
         return (
           <>
-            <InfoBanner contentBefore="Tunggu konfirmasi dari seller soal barang yang kamu kembalikan, baru deh dana bakal kembali ke kamu." />
+            <InfoBanner contentBefore="Buyer akan mengembalikan barang dalam 24 jam, konfirmasi bila barang telah sampai dan diterima." />
             <StatusKomplain status="Menunggu Pengembalian Barang" />
             <View className="h-2 bg-[#f5f5f5] mt-3" />
 
-            {sellerRejected === false ? (
-              <TrackDispute
-                title="Persetujuan komplain seller"
-                dateTime="19 Juni 2025, 10:00 WIB"
-                details={[
-                  {
-                    content:
-                      "Seller mau nerima barang kembaliin agar dapat ditukar, kirim bukti Refund.",
-                  },
-                ]}
-              />
-            ) : (
-              <>
+            {detailComplaint?.timeline
+              ?.slice()
+              .reverse()
+              .map((item, index) => (
                 <TrackDispute
-                  title="Persetujuan komplain oleh admin"
-                  dateTime="16 Juni 2025, 16:00 WIB"
+                  key={index}
+                  title={item.label}
+                  dateTime={formatDateWIB(item.timestamp)}
                   details={[
                     {
-                      content:
-                        "Setelah tinjau bukti, komplain dinyatakan valid. Refund akan diproses meski seller menolak.",
+                      content: item?.reason || item?.message || "-",
                     },
-                  ]}
-                />
-                <View className="h-2 bg-[#f5f5f5] mt-3" />
-                <TrackDispute
-                  title="Penolakan komplain seller"
-                  dateTime="16 Juni 2025, 14:00 WIB"
-                  details={[
-                    { content: "Bukti buyer belum cukup kuat." },
-                    {
+                    item?.evidence?.length > 0 && {
                       imgTitle: "Bukti foto & video",
-                      images: [
-                        require("../../../assets/barangrusak.png"),
-                        require("../../../assets/barangrusak.png"),
-                      ],
+                      images: item?.evidence.map((url, key) => ({
+                        uri: url,
+                        key,
+                      })),
                     },
                   ]}
                 />
-                <View className="h-2 bg-[#f5f5f5] mt-3" />
-              </>
-            )}
+              ))}
           </>
         );
 
       case "returnInTransit":
         return (
           <>
-            {ditolak === true ? (
+            {buyerExpiredDate === true ? (
               <InfoBanner
                 contentBefore="Karena pengembalian barang sudah lewat 1 x 24 jam, komplain"
                 dateTime=" dianggap selesai dan tidak bisa diproses lagi"
               />
             ) : (
-              <InfoBanner contentBefore="Kembalikan dengan baik, kemasan aman, dan berikan bukti pengiriman kembali ! Proses maksimal 1 x 24 jam." />
+              <InfoBanner contentBefore="Konfirmasi bila barang telah sampai dan diterima ya!" />
             )}
 
             <StatusKomplain
               status={
-                ditolak === true
+                buyerExpiredDate === true
                   ? "Transaksi Selesai"
                   : "Menunggu Pengembalian Barang"
               }
             />
             <View className="h-2 bg-[#f5f5f5] mt-3" />
 
-            {ditolak === true ? (
+            {buyerExpiredDate === true ? (
               <>
                 <TouchableOpacity
                   onPress={() => console.log("Hubungi kami di klik!")}>
@@ -244,97 +212,108 @@ export default function KembaliinPage() {
                 </TouchableOpacity>
                 <TrackDispute
                   title="Status Pengembalian Barang - Lewat 1 x 24 Jam"
-                  dateTime="20 Juni 2025, 10:00 WIB"
+                  dateTime={formatDateWIB(
+                    detailComplaint?.buyer_deadline_input_shipment
+                  )}
                   titleColor="#CB3A31"
                 />
               </>
             ) : (
-              <TrackDispute
-                title="Pengembalian barang oleh buyer"
-                dateTime="20 Juni 2025, 10:00 WIB"
-                details={[
-                  {
-                    resiNumber: "J X 3 4 7 4 1 2 4 0 1 3",
-                    expedition: "J&T Express Indonesia",
-                  },
-                ]}
-              />
+              <></>
             )}
 
-            <View className="h-2 bg-[#f5f5f5] mt-3" />
-
-            {sellerRejected === false ? (
-              <TrackDispute
-                title="Persetujuan komplain seller"
-                dateTime="19 Juni 2025, 10:00 WIB"
-                details={[
-                  {
-                    content:
-                      "Seller mau nerima barang kembaliin agar dapat ditukar, kirim bukti Refund.",
-                  },
-                ]}
-              />
-            ) : (
-              <>
+            {detailComplaint?.timeline
+              ?.slice()
+              .reverse()
+              .map((item, index) => (
                 <TrackDispute
-                  title="Persetujuan komplain oleh admin"
-                  dateTime="16 Juni 2025, 16:00 WIB"
+                  key={index}
+                  title={item.label}
+                  dateTime={formatDateWIB(item.timestamp)}
                   details={[
                     {
-                      content:
-                        "Setelah tinjau bukti, komplain dinyatakan valid. Refund akan diproses meski seller menolak.",
+                      content: item?.reason || item?.message || "-",
                     },
-                  ]}
-                />
-                <View className="h-2 bg-[#f5f5f5] mt-3" />
-                <TrackDispute
-                  title="Penolakan komplain seller"
-                  dateTime="16 Juni 2025, 14:00 WIB"
-                  details={[
-                    { content: "Bukti buyer belum cukup kuat." },
-                    {
+                    item?.evidence?.length > 0 && {
                       imgTitle: "Bukti foto & video",
-                      images: [
-                        require("../../../assets/barangrusak.png"),
-                        require("../../../assets/barangrusak.png"),
-                      ],
+                      images: item?.evidence.map((url, key) => ({
+                        uri: url,
+                        key,
+                      })),
+                    },
+                    item?.trackingNumber !== null && {
+                      resiNumber: item?.trackingNumber,
+                      expedition: item?.courier,
                     },
                   ]}
                 />
-                <View className="h-2 bg-[#f5f5f5] mt-3" />
-              </>
-            )}
+              ))}
           </>
         );
 
       case "awaitingSellerConfirmation":
         return (
           <>
-            <InfoBanner contentBefore="Buyer akan mengembalikan barang dalam 24 jam, konfirmasi bila barang telah sampai dan diterima." />
+            <InfoBanner contentBefore="Konfirmasi resi udah dikirim ke buyer, segera konfirmasi ya!" />
+            <StatusKomplain status="Menunggu Seller" />
+            <View className="h-2 bg-[#f5f5f5] mt-3" />
+
+            {detailComplaint?.timeline
+              ?.slice()
+              .reverse()
+              .map((item, index) => (
+                <TrackDispute
+                  key={index}
+                  title={item.label}
+                  dateTime={formatDateWIB(item.timestamp)}
+                  details={[
+                    {
+                      content: item?.reason || item?.message || "-",
+                    },
+                    item?.evidence?.length > 0 && {
+                      imgTitle: "Bukti foto & video",
+                      images: item?.evidence.map((url, key) => ({
+                        uri: url,
+                        key,
+                      })),
+                    },
+                  ]}
+                />
+              ))}
+
+            <View className="h-2 bg-[#f5f5f5] mt-3" />
+          </>
+        );
+
+      case "awaitingAdminConfirmation":
+        return (
+          <>
+            <InfoBanner contentBefore="Tunggu approval bukti dari admin, ya! Kalau bukti kamu oke, permintaan konfirmasi bakal langsung dikirim ke seller!" />
             <StatusKomplain status="Menunggu Pengembalian Barang" />
             <View className="h-2 bg-[#f5f5f5] mt-3" />
 
-            <TrackDispute
-              title="Pengembalian barang oleh buyer"
-              dateTime="20 Juni 2025, 10:00 WIB"
-              details={[
-                {
-                  resiNumber: "J X 3 4 7 4 1 2 4 0 1 3",
-                  expedition: "J&T Express Indonesia",
-                },
-              ]}
-            />
-            <View className="h-2 bg-[#f5f5f5] mt-3" />
-            <TrackDispute
-              title="Persetujuan komplain seller"
-              dateTime="19 Juni 2025, 10:00 WIB"
-              details={[
-                {
-                  content:
-                    "Seller mau nerima barang kembaliin agar dapat ditukar, kirim bukti Refund.",
-                },
-              ]}
-            />
+            {detailComplaint?.timeline
+              ?.slice()
+              .reverse()
+              .map((item, index) => (
+                <TrackDispute
+                  key={index}
+                  title={item.label}
+                  dateTime={formatDateWIB(item.timestamp)}
+                  details={[
+                    {
+                      content: item?.reason || item?.message || "-",
+                    },
+                    item?.evidence?.length > 0 && {
+                      imgTitle: "Bukti foto & video",
+                      images: item?.evidence.map((url, key) => ({
+                        uri: url,
+                        key,
+                      })),
+                    },
+                  ]}
+                />
+              ))}
 
             <View className="h-2 bg-[#f5f5f5] mt-3" />
           </>
@@ -355,11 +334,11 @@ export default function KembaliinPage() {
 
             <TrackDispute
               title="Pengembalian barang oleh buyer"
-              dateTime="20 Juni 2025, 10:00 WIB"
+              dateTime={formatDateWIB(detailComplaint?.timeline[2]?.timestamp)}
               details={[
                 {
-                  resiNumber: "Hardcoded",
-                  expedition: "Hardcoded",
+                  resiNumber: detailComplaint?.timeline[2]?.trackingNumber,
+                  expedition: detailComplaint?.timeline[2]?.courier,
                 },
               ]}
             />
@@ -367,7 +346,7 @@ export default function KembaliinPage() {
           </>
         );
       default:
-        return null;
+        return <></>;
     }
   };
 
@@ -390,11 +369,15 @@ export default function KembaliinPage() {
             console.log("Finishing Id ===> ", id);
             postSellerConfirmReturn(id)
               .then(() => {
+                showToast(
+                  "Berhasil",
+                  "Konfirmasi barang berhasil dikirimkan",
+                  "success"
+                );
                 router.replace("../../(tabs)/complaint");
               })
               .catch((err) => {
                 showToast("Gagal", err?.message, "error");
-                console.log("Cancel error:", err);
               });
           },
         },
@@ -418,6 +401,7 @@ export default function KembaliinPage() {
       </View>
 
       <StepProgressBar
+        key={"step-seller-kembaliin"}
         currentStep={2}
         steps={["Seller", "Admin", "Kembaliin", "Refunded"]}
         rejectedSteps={buyerExpiredDate ? [2] : sellerRejected ? [0] : []}
@@ -425,36 +409,6 @@ export default function KembaliinPage() {
 
       <ScrollView className="px-4 pb-40">
         {renderStatusSection()}
-
-        {/* Pengajuan */}
-        {detailComplaint?.timeline
-          ?.slice()
-          .reverse()
-          .map((item, index) => (
-            <>
-              <TrackDispute
-                key={index}
-                title={item.label}
-                dateTime={formatDateWIB(item.timestamp) || "null"}
-                details={[
-                  {
-                    content: item?.reason,
-                  },
-                  ...(item?.evidence?.length
-                    ? [
-                        {
-                          imgTitle: "Bukti foto & video",
-                          images: item.evidence.map((url) => ({
-                            uri: url,
-                          })),
-                        },
-                      ]
-                    : []),
-                ]}
-              />
-              <View className="h-2 bg-[#f5f5f5] mt-3" />
-            </>
-          ))}
 
         {/* Data Transaksi */}
         <TextView
@@ -501,26 +455,31 @@ export default function KembaliinPage() {
           title="Virtual Account"
           content={detailComplaint?.transaction?.virtualAccount}
         />
-
-        {/* Bottom Action */}
-        <View
-          className="flex-row px-4 pb-4 pt-2 mt-5 bg-white"
-          style={{ position: "absolute", bottom: 0, left: 0, right: 0 }}>
-          <PrimaryButton
-            title="Komplain"
-            onPress={handleSubmit}
-            width="48%"
-            btnColor="#F9F9F9"
-            textColor="#000000"
-            style={{ marginRight: 8 }}
-          />
-          <PrimaryButton
-            title="Barang diterima"
-            onPress={handleSellerAccept}
-            width="48%"
-          />
-        </View>
       </ScrollView>
+      {status === "returnRequested" ? (
+        <></>
+      ) : (
+        <>
+          {/* Bottom Action */}
+          <View
+            className="flex-row px-4 pb-4 pt-2 mt-5 bg-white"
+            style={{ position: "absolute", bottom: 0, left: 0, right: 0 }}>
+            <PrimaryButton
+              title="Komplain"
+              onPress={handleSubmit}
+              width="48%"
+              btnColor="#F9F9F9"
+              textColor="#000000"
+              style={{ marginRight: 8 }}
+            />
+            <PrimaryButton
+              title="Barang diterima"
+              onPress={handleSellerAccept}
+              width="48%"
+            />
+          </View>
+        </>
+      )}
     </View>
   );
 }

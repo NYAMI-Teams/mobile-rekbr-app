@@ -30,9 +30,11 @@ export default function PengembalianForm() {
   const [courierList, setCourierList] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [image, setImage] = useState(null);
-  const [loading, isLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
+    console.log("Masuk SIni PengembalianForm");
+
     (async () => {
       const cameraStatus = await ImagePicker.requestCameraPermissionsAsync();
       setHasCameraPermission(cameraStatus.status === "granted");
@@ -79,15 +81,15 @@ export default function PengembalianForm() {
   };
 
   const handleSubmit = async () => {
-    if (loading) return;
-    isLoading(true);
+    if (isLoading) return;
+    setIsLoading(true);
     try {
       await postBuyerReturn(complaintId, courierId, resi, image);
       router.replace("../../(tabs)/complaint");
     } catch (error) {
       showToast("Gagal", error?.message, "error");
     } finally {
-      isLoading(false);
+      setIsLoading(false);
     }
   };
 
