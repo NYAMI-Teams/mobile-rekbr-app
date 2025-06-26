@@ -1,16 +1,15 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, View } from 'react-native';
-import NavigationBar from './src/components/NavigationBar';
-import AccountBalance from './src/components/AccountBalance';
-import QuickActions from './src/components/QuickActions';
+import { StatusBar } from "expo-status-bar";
+import { StyleSheet, View } from "react-native";
+import { useLocalSearchParams } from "expo-router";
+import "./global.css";
 
 export default function App() {
+  const params = useLocalSearchParams();
+  
+
   return (
     <View style={styles.container}>
-      <StatusBar style="light" />
-      <NavigationBar onMenuPress={() => console.log('Menu pressed')} />
-      <AccountBalance balance={10000000} />
-      <QuickActions />
+      <StatusBar style="dark" />
     </View>
   );
 }
@@ -18,6 +17,6 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: "#F5F5F5",
   },
 });
