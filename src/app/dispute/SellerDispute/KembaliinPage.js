@@ -306,7 +306,7 @@ export default function KembaliinPage() {
                     },
                     item?.evidence?.length > 0 && {
                       imgTitle: "Bukti foto & video",
-                      images: item?.evidence.map((url, key) => ({
+                      images: item?.evidence?.map((url, key) => ({
                         uri: url,
                         key,
                       })),

@@ -129,7 +129,8 @@ export default function DisputeScreen() {
               item?.status === "return_in_transit" ||
               item?.status === "approved_by_admin" ||
               item?.status === "completed" ||
-              item?.status === "awaiting_seller_confirmation"
+              item?.status === "awaiting_seller_confirmation" ||
+              item?.status === "awaiting_admin_confirmation"
                 ? item?.returnShipment?.trackingNumber || "-"
                 : "-"
             }
@@ -137,7 +138,8 @@ export default function DisputeScreen() {
               item?.status === "return_in_transit" ||
               item?.status === "approved_by_admin" ||
               item?.status === "completed" ||
-              item?.status === "awaiting_seller_confirmation"
+              item?.status === "awaiting_seller_confirmation" ||
+              item?.status === "awaiting_admin_confirmation"
                 ? item?.returnShipment?.courierName || "-"
                 : "-"
             }
@@ -199,7 +201,8 @@ export default function DisputeScreen() {
               item?.status === "return_in_transit" ||
               item?.status === "approved_by_admin" ||
               item?.status === "completed" ||
-              item?.status === "awaiting_seller_confirmation"
+              item?.status === "awaiting_seller_confirmation" ||
+              item?.status === "awaiting_admin_confirmation"
                 ? item?.returnShipment?.trackingNumber || "-"
                 : "-"
             }
@@ -207,7 +210,8 @@ export default function DisputeScreen() {
               item?.status === "return_in_transit" ||
               item?.status === "approved_by_admin" ||
               item?.status === "completed" ||
-              item?.status === "awaiting_seller_confirmation"
+              item?.status === "awaiting_seller_confirmation" ||
+              item?.status === "awaiting_admin_confirmation"
                 ? item?.returnShipment?.courierName || "-"
                 : "-"
             }
