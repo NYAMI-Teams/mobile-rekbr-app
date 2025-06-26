@@ -125,7 +125,7 @@ export default function RusakBarangKembaliinPage() {
                       },
                       item?.evidence?.length > 0 && {
                         imgTitle: "Bukti foto & video",
-                        images: item?.evidence.map((url, key) => ({
+                        images: item?.evidence?.map((url, key) => ({
                           uri: url,
                           key,
                         })),
@@ -158,7 +158,7 @@ export default function RusakBarangKembaliinPage() {
                       },
                       item?.evidence?.length > 0 && {
                         imgTitle: "Bukti foto & video",
-                        images: item?.evidence.map((url, key) => ({
+                        images: item?.evidence?.map((url, key) => ({
                           uri: url,
                           key,
                         })),
@@ -232,7 +232,7 @@ export default function RusakBarangKembaliinPage() {
                       },
                       item?.evidence?.length > 0 && {
                         imgTitle: "Bukti foto & video",
-                        images: item?.evidence.map((url, key) => ({
+                        images: item?.evidence?.map((url, key) => ({
                           uri: url,
                           key,
                         })),
@@ -306,7 +306,7 @@ export default function RusakBarangKembaliinPage() {
                     },
                     item?.evidence?.length > 0 && {
                       imgTitle: "Bukti foto & video",
-                      images: item?.evidence.map((url, key) => ({
+                      images: item?.evidence?.map((url, key) => ({
                         uri: url,
                         key,
                       })),
@@ -342,7 +342,7 @@ export default function RusakBarangKembaliinPage() {
                     },
                     item?.evidence?.length > 0 && {
                       imgTitle: "Bukti foto & video",
-                      images: item?.evidence.map((url, key) => ({
+                      images: item?.evidence?.map((url, key) => ({
                         uri: url,
                         key,
                       })),
@@ -376,7 +376,7 @@ export default function RusakBarangKembaliinPage() {
                     },
                     item?.evidence?.length > 0 && {
                       imgTitle: "Bukti foto & video",
-                      images: item?.evidence.map((url, key) => ({
+                      images: item?.evidence?.map((url, key) => ({
                         uri: url,
                         key,
                       })),
