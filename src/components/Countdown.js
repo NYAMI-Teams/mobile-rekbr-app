@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Text } from "react-native";
+import { Text, StyleSheet } from "react-native";
 import moment from "moment";
 
 // Helper function to safely parse dates
@@ -10,7 +10,7 @@ const parseDate = (date) => {
   const parsed = moment(date);
   if (parsed.isValid()) return parsed;
 
-  // If that fails, try other formats
+  // Try fallback formats
   const formats = [
     "YYYY-MM-DD HH:mm:ss",
     "YYYY-MM-DD",
@@ -25,13 +25,10 @@ const parseDate = (date) => {
 };
 
 const CountdownTimer = ({ deadline, fromTime }) => {
-  // Hitung selisih detik saat komponen pertama kali render
-  // Parse dates safely
   const parsedDeadline = parseDate(deadline);
   const parsedFromTime = parseDate(fromTime);
 
-  // If either date is invalid, return 0
-  if (!parsedDeadline || !parsedFromTime) return <Text>00:00:00</Text>;
+  if (!parsedDeadline || !parsedFromTime) return <Text style={styles.timerText}>00:00:00</Text>;
 
   const initialSeconds = Math.max(
     0,
@@ -56,7 +53,6 @@ const CountdownTimer = ({ deadline, fromTime }) => {
     return () => clearInterval(interval);
   }, [timeLeftInSeconds]);
 
-  // Format detik menjadi HH : MM : SS
   const formatTime = (totalSeconds) => {
     const hours = Math.floor(totalSeconds / 3600);
     const minutes = Math.floor((totalSeconds % 3600) / 60);
@@ -68,11 +64,15 @@ const CountdownTimer = ({ deadline, fromTime }) => {
     )} : ${String(seconds).padStart(2, "0")}`;
   };
 
-  return (
-    <Text className="font-poppins-semibold text-[14px] text-gray-800">
-      {formatTime(timeLeftInSeconds)}
-    </Text>
-  );
+  return <Text style={styles.timerText}>{formatTime(timeLeftInSeconds)}</Text>;
 };
+
+const styles = StyleSheet.create({
+  timerText: {
+    fontFamily: "Poppins-SemiBold", // make sure this font is loaded
+    fontSize: 14,
+    color: "#1F2937", // Tailwind gray-800
+  },
+});
 
 export default CountdownTimer;

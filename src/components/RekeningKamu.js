@@ -1,40 +1,35 @@
-import { View, Text, Image } from "react-native";
+import React from "react";
+import { View, Text, Image, StyleSheet } from "react-native";
 
 export default function RekeningKamu({ bankData }) {
   return (
-    <View className="flex flex-col items-center gap-4 py-0 relative self-stretch w-full">
+    <View style={styles.container}>
       {/* Bank Account Section */}
-      <View className="gap-2 self-stretch w-full flex flex-col items-start relative">
-        <Text className="text-[15px] text-black font-normal mb-2">
-          Rekening Kamu
-        </Text>
+      <View style={styles.section}>
+        <Text style={styles.label}>Rekening Kamu</Text>
 
-        <View className="bg-[#EDFBFA] rounded-lg px-4 py-2 flex flex-col gap-2 justify-between w-full">
-          <View className="flex flex-col items-start gap-2 w-full">
-            <Text className="text-neutral-950 text-[15px] font-medium whitespace-nowrap">
+        <View style={styles.accountBox}>
+          <View style={styles.accountNameWrapper}>
+            <Text style={styles.accountName}>
               {bankData?.accountHolderName}
             </Text>
           </View>
 
-          <View className="flex-row items-center gap-2 w-full">
+          <View style={styles.bankRow}>
             {/* Logo Bank */}
-            <View className="items-center justify-center px-2 py-2">
+            <View style={styles.bankLogoWrapper}>
               <Image
-                style={{ width: 40, height: 40, resizeMode: "contain" }}
+                style={styles.bankLogo}
                 source={{ uri: bankData?.bank?.logoUrl }}
               />
             </View>
 
             {/* Info Bank */}
-            <View className="flex-1 items-start justify-center gap-1">
-              <Text
-                className="text-neutral-950 text-[14px] font-normal"
-                numberOfLines={1}>
+            <View style={styles.bankInfo}>
+              <Text style={styles.bankText} numberOfLines={1}>
                 {bankData?.bank?.bankName || "-"}
               </Text>
-              <Text
-                className="text-neutral-950 text-[14px] font-normal"
-                numberOfLines={1}>
+              <Text style={styles.bankText} numberOfLines={1}>
                 {bankData?.accountNumber || "-"}
               </Text>
             </View>
@@ -44,3 +39,75 @@ export default function RekeningKamu({ bankData }) {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    alignItems: "center",
+    flexDirection: "column",
+    paddingVertical: 0,
+    alignSelf: "stretch",
+    width: "100%",
+  },
+  section: {
+    gap: 8,
+    alignSelf: "stretch",
+    width: "100%",
+    flexDirection: "column",
+    alignItems: "flex-start",
+  },
+  label: {
+    fontSize: 15,
+    color: "#000000",
+    fontWeight: "400",
+    marginBottom: 8,
+  },
+  accountBox: {
+    backgroundColor: "#EDFBFA",
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    justifyContent: "space-between",
+    gap: 8,
+    width: "100%",
+    flexDirection: "column",
+  },
+  accountNameWrapper: {
+    flexDirection: "column",
+    alignItems: "flex-start",
+    width: "100%",
+    gap: 8,
+  },
+  accountName: {
+    color: "#0A0A0A", // neutral-950
+    fontSize: 15,
+    fontWeight: "500",
+  },
+  bankRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    width: "100%",
+  },
+  bankLogoWrapper: {
+    paddingHorizontal: 8,
+    paddingVertical: 8,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  bankLogo: {
+    width: 40,
+    height: 40,
+    resizeMode: "contain",
+  },
+  bankInfo: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "flex-start",
+    gap: 4,
+  },
+  bankText: {
+    color: "#0A0A0A", // neutral-950
+    fontSize: 14,
+    fontWeight: "400",
+  },
+});

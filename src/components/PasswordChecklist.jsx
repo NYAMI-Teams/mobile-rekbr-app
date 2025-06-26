@@ -1,6 +1,6 @@
 import { Feather } from '@expo/vector-icons';
 import React from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 
 const PasswordChecklist = ({ password }) => {
     const criteria = [
@@ -27,15 +27,20 @@ const PasswordChecklist = ({ password }) => {
     ];
 
     return (
-        <View className="mt-3 space-y-2 mx-5 justify-between gap-1">
+        <View style={styles.container}>
             {criteria.map((item, index) => (
-                <View key={index} className="flex-row items-center space-x-2">
+                <View key={index} style={styles.itemRow}>
                     <Feather
                         name={item.isValid ? 'check-circle' : 'x-circle'}
                         size={18}
                         color={item.isValid ? '#4ade80' : '#f87171'} // green-400 / red-400
                     />
-                    <Text className={`text-sm ${item.isValid ? 'text-green-600' : 'text-red-400'}`}>
+                    <Text
+                        style={[
+                            styles.itemText,
+                            { color: item.isValid ? '#16a34a' : '#f87171' }, // green-600 / red-400
+                        ]}
+                    >
                         {item.label}
                     </Text>
                 </View>
@@ -43,5 +48,21 @@ const PasswordChecklist = ({ password }) => {
         </View>
     );
 };
+
+const styles = StyleSheet.create({
+    container: {
+        marginTop: 12,
+        marginHorizontal: 20,
+        gap: 4,
+    },
+    itemRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        columnGap: 8,
+    },
+    itemText: {
+        fontSize: 14,
+    },
+});
 
 export default PasswordChecklist;
