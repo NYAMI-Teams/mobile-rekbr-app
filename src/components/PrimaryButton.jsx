@@ -1,7 +1,7 @@
 import React from 'react';
 import { TouchableOpacity, Text, StyleSheet } from 'react-native';
 
-const PrimaryButton = ({ title, onPress, disabled = false, height = 50, width = '100%', btnColor = '#000', textColor = '#fff', style = ""}) => {
+const PrimaryButton = ({ title, onPress = () => {}, disabled = false, height = 50, width = '100%', btnColor = '#000', textColor = '#fff', style = "", fontSize = 16 }) => {
   return (
     <TouchableOpacity
       style={[
@@ -14,7 +14,7 @@ const PrimaryButton = ({ title, onPress, disabled = false, height = 50, width = 
       onPress={onPress}
       disabled={disabled}
     >
-      <Text style={[styles.buttonText, { color: disabled ? '#aaa' : textColor }]}>{title}</Text>
+      <Text style={[styles.buttonText, { color: disabled ? '#aaa' : textColor }, { fontSize: fontSize }]}>{title}</Text>
     </TouchableOpacity>
   );
 };

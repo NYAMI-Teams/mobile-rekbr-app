@@ -4,6 +4,7 @@ import {
   Text,
   TouchableOpacity,
   ScrollView,
+  RefreshControl,
 } from "react-native";
 import NavigationBar from "@/components/NavigationBar";
 import { StatusBar } from "expo-status-bar";
@@ -23,7 +24,7 @@ export default function History() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [profile, setProfile] = useState(null);
-
+  const [refreshing, setRefreshing] = useState(false);
   const [selectedTab, setSelectedTab] = useState("pembelian");
 
   const [historyBuyer, setHistoryBuyer] = useState([]);
@@ -40,6 +41,16 @@ export default function History() {
 
   const handleTabPress = (tab) => {
     setSelectedTab(tab);
+  };
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    if (selectedTab === "pembelian") {
+      await getHistoryBuyerData();
+    } else {
+      await getHistorySellerData();
+    }
+    setRefreshing(false);
   };
 
   const getHistoryBuyerData = async () => {
@@ -112,33 +123,40 @@ export default function History() {
           <View className="flex-row w-full px-4 h-10">
             <TouchableOpacity
               onPress={() => handleTabPress("pembelian")}
-              className={`flex-1 items-center justify-center h-full ${selectedTab === "pembelian"
+              className={`flex-1 items-center justify-center h-full ${
+                selectedTab === "pembelian"
                   ? "border-b-2 border-[#49DBC8]"
                   : "border-b-2 border-gray-300"
-                }`}>
+              }`}>
               <Text
-                className={`text-xs font-semibold ${selectedTab === "pembelian" ? "text-black" : "text-gray-400"
-                  }`}>
+                className={`text-xs font-semibold ${
+                  selectedTab === "pembelian" ? "text-black" : "text-gray-400"
+                }`}>
                 Pembelian
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => handleTabPress("penjualan")}
-              className={`flex-1 items-center justify-center h-full ${selectedTab === "penjualan"
+              className={`flex-1 items-center justify-center h-full ${
+                selectedTab === "penjualan"
                   ? "border-b-2 border-[#49DBC8]"
                   : "border-b-2 border-gray-300"
-                }`}>
+              }`}>
               <Text
-                className={`text-xs font-semibold ${selectedTab === "penjualan" ? "text-black" : "text-gray-400"
-                  }`}>
+                className={`text-xs font-semibold ${
+                  selectedTab === "penjualan" ? "text-black" : "text-gray-400"
+                }`}>
                 Penjualan
               </Text>
             </TouchableOpacity>
           </View>
-          <ScrollView className="w-full px-4" showsVerticalScrollIndicator={false}>
-            <View className="mb-16">
-              {renderContent()}
-            </View>
+          <ScrollView
+            className="w-full px-4"
+            showsVerticalScrollIndicator={false}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }>
+            <View className="mb-16">{renderContent()}</View>
           </ScrollView>
         </View>
       )}

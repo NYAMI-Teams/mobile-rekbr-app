@@ -16,7 +16,6 @@ export default function TabLayout() {
   const [profile, setProfile] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
-
   useEffect(() => {
     checkAuth();
   }, []);
@@ -63,7 +62,7 @@ export default function TabLayout() {
               "Notification pressed",
               "Notification pressed",
               "success"
-            )
+            );
           }}
           onLogoutPress={() => handleLogout()}
         />
@@ -78,15 +77,18 @@ export default function TabLayout() {
             tabBarItemStyle: {
               backgroundColor: "transparent",
             },
-            
-          }}
-        >
+          }}>
           <Tabs.Screen
             name="index"
             options={{
               title: "As Seller",
               tabBarIcon: ({ color, focused, size }) => (
-                <SellerIcon width={16} height={16} color={color} opacity={focused ? 1 : 0.4} />
+                <SellerIcon
+                  width={16}
+                  height={16}
+                  color={color}
+                  opacity={focused ? 1 : 0.4}
+                />
               ),
             }}
           />
@@ -95,16 +97,26 @@ export default function TabLayout() {
             options={{
               title: "As Buyer",
               tabBarIcon: ({ color, focused, size }) => (
-                <BuyerIcon width={16} height={16} color={color} opacity={focused ? 1 : 0.4} />
+                <BuyerIcon
+                  width={16}
+                  height={16}
+                  color={color}
+                  opacity={focused ? 1 : 0.4}
+                />
               ),
             }}
           />
           <Tabs.Screen
-            name="dispute"
+            name="complaint"
             options={{
               title: "Komplain",
               tabBarIcon: ({ color, focused, size }) => (
-                <DisputeIcon width={16} height={16} color={color} opacity={focused ? 1 : 0.4} />
+                <DisputeIcon
+                  width={16}
+                  height={16}
+                  color={color}
+                  opacity={focused ? 1 : 0.4}
+                />
               ),
             }}
           />
@@ -113,7 +125,12 @@ export default function TabLayout() {
             options={{
               title: "History",
               tabBarIcon: ({ color, focused, size }) => (
-                <HistoryIcon width={16} height={16} color={color} opacity={focused ? 1 : 0.4} />
+                <HistoryIcon
+                  width={16}
+                  height={16}
+                  color={color}
+                  opacity={focused ? 1 : 0.4}
+                />
               ),
             }}
           />
@@ -122,7 +139,6 @@ export default function TabLayout() {
     </>
   );
 }
-
 
 const styles = StyleSheet.create({
   tabStyle: {
@@ -140,7 +156,6 @@ const styles = StyleSheet.create({
     borderColor: "#00000000", // gray-200
     paddingHorizontal: 8,
     alignItems: "center",
-  
   },
   tabIcon: {
     fontSize: 24,

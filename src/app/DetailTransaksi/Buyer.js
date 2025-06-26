@@ -315,14 +315,11 @@ export default function DetailTransaksiBuyer() {
             onPress={handleSimulatePayment}
           />
           <View style={styles.footerRow}>
-            <Text style={styles.footerTextGray}>
-              Terdapat kendala?
-            </Text>
+            <Text style={styles.footerTextGray}>Terdapat kendala?</Text>
             <TouchableOpacity
-              onPress={() => console.log("Hubungi Kami pressed")}>
-              <Text style={styles.footerTextBlue}>
-                Silahkan Hubungi Kami
-              </Text>
+              onPress={() => console.log("Hubungi Kami pressed")}
+            >
+              <Text style={styles.footerTextBlue}>Silahkan Hubungi Kami</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -331,14 +328,9 @@ export default function DetailTransaksiBuyer() {
     if (data?.status == "waiting_shipment") {
       return (
         <View style={styles.footerRow}>
-          <Text style={styles.footerTextGray}>
-            Terdapat kendala?
-          </Text>
-          <TouchableOpacity
-            onPress={() => console.log("Hubungi Kami pressed")}>
-            <Text style={styles.footerTextBlue}>
-              Silahkan Hubungi Kami
-            </Text>
+          <Text style={styles.footerTextGray}>Terdapat kendala?</Text>
+          <TouchableOpacity onPress={() => console.log("Hubungi Kami pressed")}>
+            <Text style={styles.footerTextBlue}>Silahkan Hubungi Kami</Text>
           </TouchableOpacity>
         </View>
       );
@@ -348,7 +340,15 @@ export default function DetailTransaksiBuyer() {
         <View style={styles.footerRowGap}>
           <PrimaryButton
             title="Komplain"
-            onPress={() => Alert.alert("Komplain pressed")}
+            onPress={() =>
+              router.push({
+                pathname: "/Complaint/Index",
+                params: {
+                  transactionId: data?.id,
+                  sellerEmail: data?.sellerEmail,
+                },
+              })
+            }
             height={50}
             width={"45%"}
             btnColor="#F9F9F9"
@@ -379,9 +379,11 @@ export default function DetailTransaksiBuyer() {
     if (itemPrice >= 10000 && itemPrice <= 499999.99) {
       return 5000;
     } else if (itemPrice >= 500000 && itemPrice <= 4999999.99) {
-      return 100 * 0.01; // 1%
+      const platformFee = itemPrice * 0.01;
+      return `${platformFee} %`;
     } else if (itemPrice >= 5000000 && itemPrice <= 10000000) {
-      return 100 * 0.008; // 0.8%
+      const platformFee = itemPrice * 0.008;
+      return `${platformFee} %`;
     }
     return 0;
   };
@@ -412,51 +414,68 @@ export default function DetailTransaksiBuyer() {
         return <ProgressBar currentStep={currentStep} steps={steps} />;
       })()}
       <ScrollView>
-        {(data?.status == "pending_payment" ||
-          (data?.status == "waiting_shipment" &&
-            data?.shipment?.trackingNumber != null) ||
-          data?.status == "shipped" ||
-          data?.status == "completed") && (
+        {(data?.status === "pending_payment" ||
+          (data?.status === "waiting_shipment" &&
+            data?.shipment?.trackingNumber) ||
+          data?.status === "shipped" ||
+          data?.status === "completed") && (
           <>
-            {/* Copas Field */}
-            <View style={styles.copyBox}>
-              <Text style={styles.copyBoxTitle}>
-                {data?.status == "pending_payment"
+            <View
+              style={{
+                padding: 12,
+                marginHorizontal: 12,
+                backgroundColor: "#EDFBFA",
+                borderRadius: 12,
+              }}
+            >
+              <Text
+                style={{ fontSize: 15, marginBottom: 12, fontWeight: "500" }}
+              >
+                {data?.status === "pending_payment"
                   ? "Virtual Account"
                   : "No Resi"}
               </Text>
-              <View style={[
-                styles.copyRow,
-                (data?.status == "waiting_shipment" ||
-                  data?.status == "shipped" ||
-                  data?.status == "completed") && { marginBottom: 12 }
-              ]}>
-                <Text style={styles.copyRowText}>
-                  {data?.status == "pending_payment"
+
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  marginBottom:
+                    data?.status === "waiting_shipment" ||
+                    data?.status === "shipped" ||
+                    data?.status === "completed"
+                      ? 12
+                      : 0,
+                }}
+              >
+                <Text style={{ fontSize: 17, fontWeight: "500" }}>
+                  {data?.status === "pending_payment"
                     ? data?.virtualAccount
                     : data?.shipment?.trackingNumber}
                 </Text>
                 <TouchableOpacity
                   onPress={() =>
                     handleCopy(
-                      data?.status == "pending_payment"
+                      data?.status === "pending_payment"
                         ? data?.virtualAccount
                         : data?.shipment?.trackingNumber
                     )
-                  }>
+                  }
+                >
                   <Image
                     source={require("../../assets/copy.png")}
                     style={{ marginLeft: 4, width: 17, height: 16 }}
                   />
                 </TouchableOpacity>
               </View>
-              {(data?.status == "waiting_shipment" ||
-                data?.status == "shipped" ||
-                data?.status == "completed") && (
-                  <Text style={styles.copyBoxCourier}>
-                    {data?.shipment?.courier || "-"}
-                  </Text>
-                )}
+
+              {(data?.status === "waiting_shipment" ||
+                data?.status === "shipped" ||
+                data?.status === "completed") && (
+                <Text style={{ fontSize: 14, color: "#333" }}>
+                  {data?.shipment?.courier || "-"}
+                </Text>
+              )}
             </View>
           </>
         )}
@@ -514,17 +533,13 @@ export default function DetailTransaksiBuyer() {
         {/* Seller Section */}
         <View style={styles.sectionBox}>
           <Text style={styles.sectionLabel}>Penjual</Text>
-          <Text style={styles.sectionValue}>
-            {data?.sellerEmail || "-"}
-          </Text>
+          <Text style={styles.sectionValue}>{data?.sellerEmail || "-"}</Text>
         </View>
 
         {/* Items Name Section */}
         <View style={styles.sectionBox}>
           <Text style={styles.sectionLabel}>Nama Barang</Text>
-          <Text style={styles.sectionValue}>
-            {data?.itemName || "-"}
-          </Text>
+          <Text style={styles.sectionValue}>{data?.itemName || "-"}</Text>
         </View>
 
         {/* Items Price Section */}
@@ -544,7 +559,7 @@ export default function DetailTransaksiBuyer() {
               {
                 status: `Biaya Jasa Aplikasi (${calculatePlatformFee(
                   data?.itemPrice
-                )}%)`,
+                )})`,
                 price: formatPrice(data?.platformFee),
               },
             ]}
@@ -584,9 +599,7 @@ export default function DetailTransaksiBuyer() {
         </View>
       </ScrollView>
       {/* Footer */}
-      <View style={styles.footerContainer}>
-        {setupFooter()}
-      </View>
+      <View style={styles.footerContainer}>{setupFooter()}</View>
       {/* Modal Simulate Payment*/}
       <Modalize
         ref={modalizeRef}
@@ -607,7 +620,7 @@ export default function DetailTransaksiBuyer() {
         }}
       >
         <View style={styles.modalContent}>
-          <Pressable onPress={closeModal} >
+          <Pressable onPress={closeModal}>
             <View style={styles.modalHeader}>
               <ChevronLeftCircle size={24} color="#00C2C2" />
               <Text style={styles.modalHeaderText}>
@@ -617,15 +630,14 @@ export default function DetailTransaksiBuyer() {
           </Pressable>
 
           <View style={styles.modalIdBox}>
-            <Text style={styles.modalIdLabel}>
-              ID Transaksi
-            </Text>
+            <Text style={styles.modalIdLabel}>ID Transaksi</Text>
             <View style={styles.rowAlignCenter}>
               <Text style={styles.modalIdValue}>
                 {data?.transactionCode || "-"}
               </Text>
               <TouchableOpacity
-                onPress={() => handleCopy(data?.transactionCode)}>
+                onPress={() => handleCopy(data?.transactionCode)}
+              >
                 <Image
                   source={require("../../assets/copy.png")}
                   style={{ marginLeft: 4, width: 17, height: 16 }}
@@ -660,7 +672,8 @@ export default function DetailTransaksiBuyer() {
 
               <Pressable
                 style={styles.modalSimulateBtn}
-                onPress={updateTransaction}>
+                onPress={updateTransaction}
+              >
                 <Play size={20} color="#000" />
                 <Text style={styles.modalSimulateBtnText}>
                   Simulate Payment
@@ -684,11 +697,10 @@ export default function DetailTransaksiBuyer() {
                       style={styles.modalBuyerLogo}
                     />
                     <View style={styles.rowAlignCenter}>
-                      <Text style={styles.modalBuyerAccount}>
-                        0600604502
-                      </Text>
+                      <Text style={styles.modalBuyerAccount}>0600604502</Text>
                       <TouchableOpacity
-                        onPress={() => handleCopy("0600604502")}>
+                        onPress={() => handleCopy("0600604502")}
+                      >
                         <Image
                           source={require("../../assets/copy.png")}
                           style={{ marginLeft: 4, width: 17, height: 16 }}
@@ -702,9 +714,7 @@ export default function DetailTransaksiBuyer() {
           )}
 
           <View style={styles.modalFooterRow}>
-            <Text style={styles.modalFooterTextGray}>
-              Terdapat kendala?
-            </Text>
+            <Text style={styles.modalFooterTextGray}>Terdapat kendala?</Text>
             <Text style={styles.modalFooterTextBlue}>
               Silahkan Hubungi Kami
             </Text>
@@ -721,7 +731,6 @@ export default function DetailTransaksiBuyer() {
         btn1="Kembali"
         btn2="Konfirmasi"
       />
-
     </View>
   );
 }
