@@ -93,25 +93,22 @@ export default function CreateRekber() {
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         keyboardVerticalOffset={Platform.OS === "ios" && 60}
-        style={styles.keyboardAvoiding}
-      >
+        style={styles.keyboardAvoiding}>
         <ScrollView
           contentContainerStyle={styles.scrollViewContent}
           keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
-        >
+          showsVerticalScrollIndicator={false}>
           <View style={styles.innerContainer}>
             <View style={styles.sectionContainer}>
-              {bankData?.bankId !==
-                "484f56b2-4f2e-49e6-aec3-6050f1b8e091" && (
-                  <View style={styles.infoBox}>
-                    <Icon name="info" size={16} color="#FBBF24" />
-                    <Text style={styles.infoText}>
-                      Pilih bank selain BNI? Biaya admin akan kami potong
-                      otomatis dari pembayaran kamu, ya!
-                    </Text>
-                  </View>
-                )}
+              {bankData?.bankId !== "484f56b2-4f2e-49e6-aec3-6050f1b8e091" && (
+                <View style={styles.infoBox}>
+                  <Icon name="info" size={16} color="#FBBF24" />
+                  <Text style={styles.infoText}>
+                    Pilih bank selain BNI? Biaya admin akan kami potong otomatis
+                    dari pembayaran kamu, ya!
+                  </Text>
+                </View>
+              )}
               {/* Bank Account Section */}
               <RekeningKamu bankData={bankData} />
 
@@ -157,8 +154,7 @@ export default function CreateRekber() {
                               ? styles.textGreen
                               : styles.textYellow
                             : styles.textRed,
-                        ]}
-                      >
+                        ]}>
                         {isEmailValid()
                           ? isUserFound
                             ? "Pengguna ditemukan"
@@ -176,8 +172,7 @@ export default function CreateRekber() {
                           ? styles.searchButtonDisabled
                           : styles.searchButtonEnabled,
                       ]}
-                      disabled={!isEmailValid()}
-                    >
+                      disabled={!isEmailValid()}>
                       <Icon name="search" size={16} color="white" />
                       <Text style={styles.searchButtonText}>Cari</Text>
                     </TouchableOpacity>
@@ -237,8 +232,7 @@ export default function CreateRekber() {
                       isChecked
                         ? styles.checkboxChecked
                         : styles.checkboxUnchecked,
-                    ]}
-                  >
+                    ]}>
                     {isChecked && (
                       <Text style={styles.checkboxCheckmark}>✓</Text>
                     )}
@@ -248,8 +242,7 @@ export default function CreateRekber() {
                   </Text>
                   <TouchableOpacity
                     onPress={() => console.log("Info Asuransi")}
-                    style={styles.checkboxInfoButton}
-                  >
+                    style={styles.checkboxInfoButton}>
                     <Icon name="info" size={16} color="black" />
                   </TouchableOpacity>
                 </View>

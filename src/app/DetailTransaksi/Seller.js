@@ -81,9 +81,7 @@ export default function DetailTransaksiSeller() {
 
   const setupDetailTimestamp = () => {
     if (status == "pending_payment") {
-      return [
-        { status: "Waktu bikin Rekbr", date: data?.createdAt || "-" },
-      ];
+      return [{ status: "Waktu bikin Rekbr", date: data?.createdAt || "-" }];
     }
     if (status == "waiting_shipment") {
       return [
@@ -96,9 +94,18 @@ export default function DetailTransaksiSeller() {
         return [
           { status: "Waktu bikin Rekbr", date: data?.createdAt || "-" },
           { status: "Waktu pembeli Bayar", date: data?.paidAt || "-" },
-          { status: "Waktu penjual mengirimkan barang", date: data?.shipment.shipmentDate || "-" },
-          { status: "Waktu penjual meminta konfirmasi pembeli", date: data?.fundReleaseRequest?.requestedAt || "-" },
-          { status: "Waktu admin meneruskan permintaan konfirmasi pembeli", date: data?.fundReleaseRequest?.resolvedAt || "-" },
+          {
+            status: "Waktu penjual mengirimkan barang",
+            date: data?.shipment.shipmentDate || "-",
+          },
+          {
+            status: "Waktu penjual meminta konfirmasi pembeli",
+            date: data?.fundReleaseRequest?.requestedAt || "-",
+          },
+          {
+            status: "Waktu admin meneruskan permintaan konfirmasi pembeli",
+            date: data?.fundReleaseRequest?.resolvedAt || "-",
+          },
         ];
       } else {
         return [
@@ -112,15 +119,27 @@ export default function DetailTransaksiSeller() {
         return [
           { status: "Waktu bikin Rekbr", date: data?.createdAt || "-" },
           { status: "Waktu pembeli Bayar", date: data?.paidAt || "-" },
-          { status: "Waktu penjual mengirimkan barang", date: data?.shipment.shipmentDate || "-" },
-          { status: "Waktu penjual meminta konfirmasi pembeli", date: data?.fundReleaseRequest?.requestedAt || "-" },
-          { status: "Waktu admin meneruskan permintaan konfirmasi pembeli", date: data?.fundReleaseRequest?.resolvedAt || "-" },
+          {
+            status: "Waktu penjual mengirimkan barang",
+            date: data?.shipment.shipmentDate || "-",
+          },
+          {
+            status: "Waktu penjual meminta konfirmasi pembeli",
+            date: data?.fundReleaseRequest?.requestedAt || "-",
+          },
+          {
+            status: "Waktu admin meneruskan permintaan konfirmasi pembeli",
+            date: data?.fundReleaseRequest?.resolvedAt || "-",
+          },
         ];
       } else {
         return [
           { status: "Waktu bikin Rekbr", date: data?.createdAt || "-" },
           { status: "Waktu pembeli Bayar", date: data?.paidAt || "-" },
-          { status: "Waktu penjual mengirimkan barang", date: data?.shipment.shipmentDate || "-" },
+          {
+            status: "Waktu penjual mengirimkan barang",
+            date: data?.shipment.shipmentDate || "-",
+          },
         ];
       }
     }
@@ -183,11 +202,15 @@ export default function DetailTransaksiSeller() {
 
   const setupCaptionTimeStamp = () => {
     if (status == "pending_payment") return "Pembeli transfer sebelum";
-    if (status == "waiting_shipment") return "Penjual masukkan resi dan bukti pengiriman sebelum";
+    if (status == "waiting_shipment")
+      return "Penjual masukkan resi dan bukti pengiriman sebelum";
     if (status == "shipped") {
-      if (data?.fundReleaseRequest?.status == "pending") return "Penjual mengajukan permintaan konfirmasi penerimaan barang";
-      if (data?.fundReleaseRequest?.status == "approved") return "Penjual, tunggu respon pembeli 1 x 24 jam";
-      if (data?.fundReleaseRequest?.status == "rejected") return "Admin menolak permintaan konfirmasi penerimaan barang";
+      if (data?.fundReleaseRequest?.status == "pending")
+        return "Penjual mengajukan permintaan konfirmasi penerimaan barang";
+      if (data?.fundReleaseRequest?.status == "approved")
+        return "Penjual, tunggu respon pembeli 1 x 24 jam";
+      if (data?.fundReleaseRequest?.status == "rejected")
+        return "Admin menolak permintaan konfirmasi penerimaan barang";
       return "Penjual sudah mengirimkan barang";
     }
     if (status == "completed") return "Waktu konfirmasi pembeli diterima";
@@ -199,9 +222,12 @@ export default function DetailTransaksiSeller() {
     if (status == "pending_payment") return data?.paymentDeadline || "-";
     if (status == "waiting_shipment") return data?.shipmentDeadline || "-";
     if (status == "shipped") {
-      if (data?.fundReleaseRequest?.status == "pending") return data?.fundReleaseRequest?.requestedAt || "-";
-      if (data?.fundReleaseRequest?.status == "approved") return data?.fundReleaseRequest?.resolvedAt || "-";
-      if (data?.fundReleaseRequest?.status == "rejected") return data?.fundReleaseRequest?.resolvedAt || "-";
+      if (data?.fundReleaseRequest?.status == "pending")
+        return data?.fundReleaseRequest?.requestedAt || "-";
+      if (data?.fundReleaseRequest?.status == "approved")
+        return data?.fundReleaseRequest?.resolvedAt || "-";
+      if (data?.fundReleaseRequest?.status == "rejected")
+        return data?.fundReleaseRequest?.resolvedAt || "-";
       return data?.shipment.shipmentDate || "-";
     }
     if (status == "completed") return data?.buyerConfirmedAt || "-";
@@ -241,14 +267,10 @@ export default function DetailTransaksiSeller() {
             textColor="#000"
           />
           <View style={styles.footerRow}>
-            <Text style={styles.footerTextGray}>
-              Terdapat kendala?
-            </Text>
+            <Text style={styles.footerTextGray}>Terdapat kendala?</Text>
             <TouchableOpacity
               onPress={() => console.log("Hubungi Kami pressed")}>
-              <Text style={styles.footerTextBlue}>
-                Silahkan Hubungi Kami
-              </Text>
+              <Text style={styles.footerTextBlue}>Silahkan Hubungi Kami</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -279,14 +301,10 @@ export default function DetailTransaksiSeller() {
             />
           </View>
           <View style={styles.footerRow}>
-            <Text style={styles.footerTextGray}>
-              Terdapat kendala?
-            </Text>
+            <Text style={styles.footerTextGray}>Terdapat kendala?</Text>
             <TouchableOpacity
               onPress={() => console.log("Hubungi Kami pressed")}>
-              <Text style={styles.footerTextBlue}>
-                Silahkan Hubungi Kami
-              </Text>
+              <Text style={styles.footerTextBlue}>Silahkan Hubungi Kami</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -370,8 +388,9 @@ export default function DetailTransaksiSeller() {
         return <ProgressBar currentStep={currentStep} steps={steps} />;
       })()}
       <ScrollView>
-        {(status == "pending_payment" ||
-          (status == "waiting_shipment" && data?.shipment?.trackingNumber != null) ||
+        {status == "pending_payment" ||
+          (status == "waiting_shipment" &&
+            data?.shipment?.trackingNumber != null) ||
           status == "shipped" ||
           (status == "completed" && (
             <>
@@ -435,15 +454,12 @@ export default function DetailTransaksiSeller() {
         {data?.fundReleaseRequest?.status != null ||
           (status == "completed" && (
             <>
-              <View className="flex-row mx-3 p-3 justify-between items-center gap-3">
+              <View style={styles.adminMsgRow}>
                 <Image
                   source={require("@/assets/admin1.png")}
-                  style={{
-                    width: 20,
-                    height: 20,
-                  }}
+                  style={styles.adminMsgImg}
                 />
-                <Text className="text-sm flex-1">
+                <Text style={styles.adminMsgText}>
                   {status == "completed"
                     ? "Komplain dianggap tidak ada dan bakal selesai otomatis kalau pembeli nggak respon."
                     : data?.fundReleaseRequest?.status == "pending"
@@ -459,11 +475,11 @@ export default function DetailTransaksiSeller() {
         {/* Status Rekbr (done)*/}
         {data?.fundReleaseRequest?.status == "pending" ||
         data?.fundReleaseRequest?.status == "rejected" ? (
-          <View className="flex-col  gap-2 mx-3 p-3">
-            <View className="flex-row justify-between">
-              <Text className="text-[15px]">Status Rekbr:</Text>
-              <View className="flex-row items-center gap-2">
-                <Text className="text-[15px] font-medium">{setupStatus()}</Text>
+          <View style={styles.statusBox}>
+            <View style={styles.statusRow}>
+              <Text style={styles.statusLabel}>Status Rekbr:</Text>
+              <View style={styles.statusRowRight}>
+                <Text style={styles.statusValue}>{setupStatus()}</Text>
                 <TouchableOpacity onPress={() => setIsExpanded(!isExpanded)}>
                   <Ionicons
                     name={isExpanded ? "chevron-up" : "chevron-down"}
@@ -478,10 +494,16 @@ export default function DetailTransaksiSeller() {
                 <Text style={styles.statusExpandedLabel}>
                   Status Pengajuan:
                 </Text>
-                <Text style={[
-                  styles.statusExpandedValue,
-                  { color: data?.fundReleaseRequest?.status == "pending" ? "#FBBF24" : "#CB3A31" }
-                ]}>
+                <Text
+                  style={[
+                    styles.statusExpandedValue,
+                    {
+                      color:
+                        data?.fundReleaseRequest?.status == "pending"
+                          ? "#FBBF24"
+                          : "#CB3A31",
+                    },
+                  ]}>
                   {setupStatusFundReleaseRequest()}
                 </Text>
               </View>
@@ -507,9 +529,7 @@ export default function DetailTransaksiSeller() {
         {/* Buyer Section */}
         <View style={styles.sectionBox}>
           <Text style={styles.sectionLabel}>Pembeli</Text>
-          <Text style={styles.sectionValue}>
-            {data?.buyerEmail || "-"}
-          </Text>
+          <Text style={styles.sectionValue}>{data?.buyerEmail || "-"}</Text>
         </View>
 
         {/* Virtual Account Section */}
@@ -532,9 +552,7 @@ export default function DetailTransaksiSeller() {
         {/* Items Name Section */}
         <View style={styles.sectionBox}>
           <Text style={styles.sectionLabel}>Nama Barang</Text>
-          <Text style={styles.sectionValue}>
-            {data?.itemName || "-"}
-          </Text>
+          <Text style={styles.sectionValue}>{data?.itemName || "-"}</Text>
         </View>
 
         {/* Items Price Section */}
@@ -590,9 +608,7 @@ export default function DetailTransaksiSeller() {
         <View style={styles.sectionBox}>
           <Text style={styles.sectionLabel}>ID Transaksi</Text>
           <View style={styles.rowAlignCenter}>
-            <Text style={styles.sectionValue}>
-              {data?.transactionCode}
-            </Text>
+            <Text style={styles.sectionValue}>{data?.transactionCode}</Text>
             <TouchableOpacity
               onPress={() => handleCopy(data?.transactionCode || "-")}>
               <Image
@@ -604,9 +620,7 @@ export default function DetailTransaksiSeller() {
         </View>
       </ScrollView>
       {/* Footer */}
-      <View style={styles.footerContainer}>
-        {setupFooter()}
-      </View>
+      <View style={styles.footerContainer}>{setupFooter()}</View>
 
       {/* Modal */}
       {showPopup &&
