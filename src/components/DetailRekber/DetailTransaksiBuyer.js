@@ -44,6 +44,7 @@ export default function DetailTransaksiBuyer({ data }) {
       const res = await updateBuyerTransaction(data?.id);
       setPaymentDone(res.data);
       setIsPaymentDone(res.success);
+      router.replace("/buyer");
     } catch (error) {
       showToast("Gagal", "Gagal memperbarui transaksi", "error");
     }
@@ -60,6 +61,7 @@ export default function DetailTransaksiBuyer({ data }) {
   };
 
   const handleSimulatePayment = () => {
+    console.log("Masuk Sini");
     setModalVisible(true);
   };
 

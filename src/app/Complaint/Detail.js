@@ -19,6 +19,7 @@ import moment from "moment";
 import ComplaintStepBar from "@/components/ComplaintStepBar";
 import {
   getDetailBuyerComplaint,
+  getDetailSellerComplaint,
   postBuyerCancelComplaint,
 } from "@/utils/api/complaint";
 import { showToast } from "@/utils";
@@ -30,7 +31,7 @@ const formatDateWIB = (dateTime) => {
 };
 
 export default function ComplaintDetailScreen({ label, timestamp }) {
-  const { id } = useLocalSearchParams();
+  const { id, role } = useLocalSearchParams();
   const router = useRouter();
 
   const [complaintDetail, setComplaintDetail] = useState(null);
@@ -42,12 +43,18 @@ export default function ComplaintDetailScreen({ label, timestamp }) {
   }, [id]);
 
   const fetchComplaintDetail = async () => {
+    console.log("Ini ID ", id);
     try {
-      const res = await getDetailBuyerComplaint(id);
-      console.log(JSON.stringify(res.data, null, 2), "============>");
+      const res =
+        role === "buyer"
+          ? await getDetailBuyerComplaint(id)
+          : await getDetailSellerComplaint(id);
+      console.log(JSON.stringify(res.data, null, 2), "Ini role", role);
+
       setComplaintDetail(res.data);
     } catch (err) {
       showToast("Gagal", "Gagal mengambil detail komplain", "error");
+      console.log("ERROR ====>>", err);
     } finally {
       setLoading(false);
     }
@@ -127,9 +134,12 @@ export default function ComplaintDetailScreen({ label, timestamp }) {
   const getStatusMessage = (type, status) => {
     const messages = {
       lost: {
-        under_investigation: "Kami sedang cek pengiriman barang kamu.",
+        under_investigation:
+          "Hey, kami lagi cek pengiriman barang kamu di ekspedisi, nih. Kita bakal nilai kesalahan ini dan cari solusi terbaik!",
         approved_by_admin: "Barang hilang telah disetujui oleh admin.",
         rejected_by_seller: null,
+        completed:
+          "Tim Rekbr by BNI meminta maaf atas barang yang hilang , dan bukti kurir ekspedisi tidak memenuhi aturan SOP kami.",
       },
     };
 
@@ -150,6 +160,8 @@ export default function ComplaintDetailScreen({ label, timestamp }) {
       ].includes(status)
     ) {
       return { steps: ["Investigasi", "Ditolak"], currentStep: 1 };
+    } else if (status === "completed") {
+      return { steps: ["Investigasi", "Disetujui"], currentStep: 1 };
     } else {
       return { steps: ["Investigasi", "Menunggu"], currentStep: 0 };
     }
@@ -240,8 +252,12 @@ export default function ComplaintDetailScreen({ label, timestamp }) {
           {/* Info Transaksi */}
           <View className="space-y-3 mt-4">
             <InfoBlock
-              label="Seller"
-              value={complaintDetail?.transaction?.sellerEmail}
+              label={role === "buyer" ? "Seller" : "Buyer"}
+              value={
+                role === "buyer"
+                  ? complaintDetail?.transaction?.sellerEmail || "-"
+                  : complaintDetail?.transaction?.buyerEmail || "-"
+              }
             />
             <InfoBlock
               label="Nama Barang"
@@ -260,12 +276,20 @@ export default function ComplaintDetailScreen({ label, timestamp }) {
             />
             <InfoBlock
               label="No Resi"
-              value={complaintDetail?.transaction?.shipment?.trackingNumber}
+              value={
+                role === "buyer"
+                  ? complaintDetail?.transaction?.shipment?.trackingNumber
+                  : complaintDetail?.transaction?.trackingNumber
+              }
               copyable
             />
             <InfoBlock
               label="Ekspedisi"
-              value={complaintDetail?.transaction?.shipment?.courier}
+              value={
+                role === "buyer"
+                  ? complaintDetail?.transaction?.shipment?.courier
+                  : complaintDetail?.transaction?.courier.name
+              }
             />
           </View>
 
@@ -326,7 +350,7 @@ export default function ComplaintDetailScreen({ label, timestamp }) {
                 onPress={() => router.push("/Complaint")}
                 className="flex-1 bg-black py-3 rounded-xl justify-center items-center">
                 <Text className="text-white font-semibold text-base">
-                  Hubungi Seller
+                  Hubungi {role === "buyer" ? "Seller" : "Buyer"}
                 </Text>
               </Pressable>
             </Pressable>

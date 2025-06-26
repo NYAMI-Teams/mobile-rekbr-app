@@ -45,6 +45,8 @@ const SellerCard = ({ data }) => {
         return "Barang Diterima";
       case "canceled":
         return "Dibatalkan";
+      case "refunded":
+        return "Dikembalikan";
       default:
         return "";
     }
@@ -76,6 +78,19 @@ const SellerCard = ({ data }) => {
           { label: "Ekspedisi", value: data?.shipment.courier || "-" },
         ];
       case "canceled":
+        return [
+          { label: "Nama Produk", value: data?.itemName || "-" },
+          { label: "Pembeli", value: data?.buyerEmail || "-" },
+          {
+            label: data?.shipmentDeadline == null ? "Nomor VA" : "Nomor Resi",
+            value:
+              data?.shipmentDeadline == null
+                ? data?.virtualAccount
+                : data?.shipment?.trackingNumber || "waiting_seller",
+            copyable: true,
+          },
+        ];
+      case "refunded":
         return [
           { label: "Nama Produk", value: data?.itemName || "-" },
           { label: "Pembeli", value: data?.buyerEmail || "-" },
@@ -158,15 +173,33 @@ const SellerCard = ({ data }) => {
 
     if (status === "completed" || status === "canceled") {
       return (
-        <View>
-          <Text style={styles.badgeText}>
+        <View className="px-3 py-1 rounded-full">
+          <Text className="font-poppins-semibold text-xs text-gray-800">
+            {formatDateWIB(data?.buyerConfirmedAt || "-")}
+          </Text>
+        </View>
+      );
+    }
+
+    if (status === "canceled") {
+      return (
+        <View className="px-3 py-1 rounded-full">
+          <Text className="font-poppins-semibold text-xs text-gray-800">
             {formatDateWIB(
-              status === "completed"
-                ? data?.buyerConfirmedAt
-                : data?.shipmentDeadline == null
+              data?.shipmentDeadline == null
                 ? data?.paymentDeadline
                 : data?.shipmentDeadline || "-"
             )}
+          </Text>
+        </View>
+      );
+    }
+
+    if (status === "refunded") {
+      return (
+        <View className="px-3 py-1 rounded-full">
+          <Text className="font-poppins-semibold text-xs text-gray-800">
+            {formatDateWIB(data?.createdAt || "-")}
           </Text>
         </View>
       );
@@ -245,11 +278,11 @@ const SellerCard = ({ data }) => {
                 style={[
                   styles.statusDot,
                   status === "completed"
-                    ? { backgroundColor: "#4ade80" }
-                    : status === "canceled"
-                    ? { backgroundColor: "#f87171" }
-                    : { backgroundColor: "#facc15" },
-                ]}
+                    ? "bg-green-400"
+                    : status === "canceled" || status === "refunded"
+                    ? "bg-red-400"
+                    : "bg-yellow-400"
+                )}
               />
               <Text style={styles.statusText}>{renderStatus()}</Text>
             </View>

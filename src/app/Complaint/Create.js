@@ -12,23 +12,46 @@ import {
 import { ChevronLeft, ChevronDown, ChevronUp, Copy } from "lucide-react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import PrimaryButton from "../../components/PrimaryButton";
-import { router, useNavigation, useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import * as Clipboard from "expo-clipboard";
 import { getDetailBuyerTransaction } from "@/utils/api/buyer";
 import { postBuyerComplaint } from "@/utils/api/complaint";
 import { formatCurrency, showToast } from "../../utils";
 
 export default function CreateComplaintScreen() {
-  const navigation = useNavigation();
-  const { transactionId } = useLocalSearchParams();
+  const router = useRouter();
+  const { id } = useLocalSearchParams();
   const [showBreakdown, setShowBreakdown] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [transaction, setTransaction] = useState(null);
+  const [ajukanUlang, setAjukanUlang] = useState(false);
+
+  useEffect(() => {
+    fetchTransaction();
+  }, [id]);
 
   const handleCopy = async () => {
     await Clipboard.setStringAsync(transaction?.shipment?.trackingNumber || "");
     Alert.alert("Disalin", "Nomor resi berhasil disalin.");
+  };
+
+  const fetchTransaction = async () => {
+    try {
+      const res = await getDetailBuyerTransaction(id);
+      setTransaction(res.data);
+      setAjukanUlang(res.data?.Complaint.length > 0);
+      console.log(
+        "🚀 ~ fetchTransaction ~ res.data:",
+        JSON.stringify(res.data, null, 2)
+      );
+    } catch (err) {
+      console.log(
+        "❌ Error saat fetchTransaction:",
+        err?.response?.data || err.message || err
+      );
+      // Alert.alert("Gagal", err?.response?.data?.message || "Terjadi kesalahan");
+    }
   };
 
   const handleSubmitComplaint = async () => {
@@ -42,46 +65,31 @@ export default function CreateComplaintScreen() {
       const photo = null;
 
       console.log("🧾 Payload:", {
-        transactionId,
+        id,
         type,
         reason,
         photo,
       });
 
-      const complaint = await postBuyerComplaint(
-        transactionId,
-        type,
-        reason,
-        photo
-      );
-
-      if (!complaint?.id) throw new Error("Complaint tidak valid");
+      await postBuyerComplaint(id, type, reason, photo);
 
       showToast("Berhasil", "Komplain Berhasil dibuat", "success");
       router.replace("/(tabs)/complaint");
     } catch (err) {
-      console.log(
-        "❌ Error saat createComplaint:",
-        err?.response?.data || err.message || err
-      );
-      Alert.alert("Gagal", err?.response?.data?.message || "Terjadi kesalahan");
+      console.log("❌ Error saat createComplaint:", err.message);
+      showToast("Gagal", err?.message, "error");
     } finally {
       setIsSubmitting(false);
+      setModalVisible(false);
     }
   };
 
-  useEffect(() => {
-    if (transactionId) {
-      getDetailBuyerTransaction(transactionId)
-        .then((res) => {
-          console.log("📦 Transaction loaded:", res.data);
-          setTransaction(res.data);
-        })
-        .catch((err) => console.error("❌ Error loading transaction:", err));
-    }
-  }, [transactionId]);
-
-  if (!transaction) return null;
+  if (!transaction)
+    return (
+      <View className="flex-1 items-center justify-center">
+        <Text className="text-lg font-semibold">Error Rendered</Text>
+      </View>
+    );
 
   return (
     <View className="flex-1 bg-white">
@@ -89,7 +97,7 @@ export default function CreateComplaintScreen() {
         {/* Header */}
         <View className="relative items-center justify-center mb-4">
           <TouchableOpacity
-            onPress={() => navigation.goBack()}
+            onPress={() => router.back()}
             className="absolute left-0">
             <ChevronLeft size={24} color="black" />
           </TouchableOpacity>
@@ -235,9 +243,9 @@ export default function CreateComplaintScreen() {
       </ScrollView>
 
       {/* Tombol Kirim dan Modal */}
-      <View className="mb-6">
+      <View className="mb-6 mx-5">
         <PrimaryButton
-          title="Kirim"
+          title={ajukanUlang ? "Ajukan Ulang Komplain" : "Kirim"}
           className="mb-6"
           onPress={() => setModalVisible(true)}
         />

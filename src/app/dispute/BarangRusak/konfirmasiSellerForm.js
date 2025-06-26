@@ -1,11 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  ScrollView,
-  Alert,
-} from "react-native";
+import { View, Text, TouchableOpacity, ScrollView, Alert } from "react-native";
 import { Image } from "expo-image";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ChevronLeft } from "lucide-react-native";
@@ -15,7 +9,7 @@ import AttachmentFilled from "../../../components/AttachmentFilled";
 import PrimaryButton from "../../../components/PrimaryButton";
 import * as ImagePicker from "expo-image-picker";
 import * as ImageManipulator from "expo-image-manipulator";
-import { postBuyerReturn } from "@/utils/api/complaint";
+import { postBuyerReturnConfirm } from "@/utils/api/complaint";
 import { showToast } from "@/utils";
 
 export default function konfirmasiSellerForm() {
@@ -127,14 +121,17 @@ export default function konfirmasiSellerForm() {
 
   const handleSubmit = async () => {
     try {
-      await postBuyerReturn(complaintId, reason, image);
+      console.log("ini pengembalian", complaintId, reason, image);
+
+      await postBuyerReturnConfirm(complaintId, reason, image);
       router.replace("../../(tabs)/complaint");
+      showToast("Sukses", "Permintaan konfirmasi berhasil dikirim", "success");
     } catch (error) {
       showToast("Gagal", error?.message, "error");
+      console.log("ini error komfirmasi form", error);
     } finally {
       setShowPopup(false);
     }
-    // console.log("ini pengembalian", complaintId, courierId, resi, photoUri);
   };
 
   return (

@@ -22,9 +22,7 @@ import moment from "moment";
 
 export default function AdminPage() {
   const router = useRouter();
-  const { status, rejectedAdmin } = useLocalSearchParams();
-  const [showOptionModal, setShowOptionModal] = useState(false);
-  const [ditolak, setDitolak] = useState(rejectedAdmin === "true");
+  const [ditolak, setDitolak] = useState(false);
   const [detailComplaint, setDetailComplaint] = useState({});
   const { complaintId } = useLocalSearchParams();
 
@@ -39,6 +37,7 @@ export default function AdminPage() {
     try {
       const res = await getDetailBuyerComplaint(complaintId);
       setDetailComplaint(res.data);
+      setDitolak(res.data?.status === "awaiting_admin_approval" ? false : true);
       console.log(
         "ini detail complaint rusak barang admin",
         JSON.stringify(res.data, null, 2)
@@ -70,8 +69,9 @@ export default function AdminPage() {
 
       {/* Stepper */}
       <StepProgressBar
+        key={"admin_detail_complaint"}
         currentStep={1}
-        steps={["Seller", "Admin", "Kembaliin", "Refunded"]}
+        steps={["Seller", "Admin", "Kembaliin", "Refunded"]} //MARKING
         rejectedSteps={
           detailComplaint?.seller_decision === "approved"
             ? []
@@ -91,53 +91,29 @@ export default function AdminPage() {
           <InfoBanner contentBefore="Setelah ditinjau, bukti belum cukup kuat. Dana diteruskan ke seller dan transaksi dianggap selesai." />
         )}
 
-        {rejectedAdmin === "false" && (
-          <>
-            {detailComplaint?.timeline?.map((item, index) => (
-              <TrackDispute
-                key={index}
-                title={item?.label}
-                dateTime={formatDateWIB(item?.timestamp)}
-                details={[
-                  {
-                    content: item?.message,
-                  },
-                  {
-                    content: item?.reason || "-",
-                  },
-                  {
-                    imgTitle: "Bukti foto & video",
-                    images: item?.evidence?.map((url) => ({ uri: url })) || [],
-                  },
-                ]}
-              />
-            ))}
-          </>
-        )}
-
-        {rejectedAdmin === "true" && (
-          <>
-            {detailComplaint?.timeline?.map((item, index) => (
-              <TrackDispute
-                key={index}
-                title={item?.label}
-                dateTime={formatDateWIB(item?.timestamp)}
-                details={[
-                  {
-                    content: item?.message,
-                  },
-                  {
-                    content: item?.reason || "-",
-                  },
-                  {
-                    imgTitle: "Bukti foto & video",
-                    images: item?.evidence?.map((url) => ({ uri: url })) || [],
-                  },
-                ]}
-              />
-            ))}
-          </>
-        )}
+        {detailComplaint?.timeline
+          ?.slice()
+          .reverse()
+          .map((item, index) => (
+            <TrackDispute
+              key={index}
+              title={item?.label}
+              dateTime={formatDateWIB(item?.timestamp)}
+              details={[
+                {
+                  content: item?.reason || item?.message || "-",
+                },
+                {
+                  imgTitle: "Bukti foto & video",
+                  images:
+                    item?.evidence?.map((url, key) => ({
+                      uri: url,
+                      key,
+                    })) || [],
+                },
+              ]}
+            />
+          ))}
 
         {/* Data Seller & Transaksi */}
         <TextView

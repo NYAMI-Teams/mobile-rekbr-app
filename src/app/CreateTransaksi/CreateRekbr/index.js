@@ -195,7 +195,7 @@ export default function CreateRekber() {
 
                 {/* Amount Input */}
                 <InputField
-                  title="Nominal Barang"
+                  title="Nominal Barang (min Rp10.000)"
                   placeholder="Tuliskan harga barang yang kamu jual (Rupiah)"
                   value={amount}
                   renderValue={(amount) => {
@@ -209,8 +209,14 @@ export default function CreateRekber() {
                   }}
                   onChangeText={(text) => {
                     const cleanedText = text.replace(/[^0-9]/g, "");
-                    if (cleanedText > 10000000) {
-                      setErrorText("Maksimum nominal adalah Rp10.000.000");
+                    if (!cleanedText) {
+                      setErrorText("");
+                      setAmount("");
+                      return;
+                    }
+                    const value = parseInt(cleanedText);
+                    if (value > 10_000_000) {
+                      setErrorText("Nominal maksimum adalah Rp10.000.000");
                       return;
                     }
                     setErrorText("");
@@ -257,7 +263,13 @@ export default function CreateRekber() {
               title="Lanjut"
               onPress={handleToConfirmPage}
               disabled={
-                !isUserFound || isLoading || !itemName || !amount || !email
+                !isUserFound ||
+                isLoading ||
+                !itemName ||
+                !amount ||
+                !email ||
+                amount < 10_000 ||
+                amount > 10_000_000
               }
             />
           </View>

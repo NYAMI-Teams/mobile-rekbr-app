@@ -135,6 +135,50 @@ export default function DetailTransaksiSeller() {
         ];
       }
     }
+    if (status == "refunded") {
+      if (data?.paidAt == null) {
+        return [
+          {
+            status: "Waktu bikin Rekbr",
+            date: data?.createdAt || "-",
+          },
+        ];
+      }
+      if (data?.paidAt != null) {
+        return [
+          {
+            status: "Waktu bikin Rekbr",
+            date: data?.createdAt || "-",
+          },
+          {
+            status: "Waktu pembeli Bayar",
+            date: data?.paidAt || "-",
+          },
+        ];
+      }
+    }
+    if (status == "refunded") {
+      if (data?.paidAt == null) {
+        return [
+          {
+            status: "Waktu bikin Rekbr",
+            date: data?.createdAt || "-",
+          },
+        ];
+      }
+      if (data?.paidAt != null) {
+        return [
+          {
+            status: "Waktu bikin Rekbr",
+            date: data?.createdAt || "-",
+          },
+          {
+            status: "Waktu pembeli Bayar",
+            date: data?.paidAt || "-",
+          },
+        ];
+      }
+    }
   };
 
   const setupCaptionTimeStamp = () => {
@@ -162,8 +206,20 @@ export default function DetailTransaksiSeller() {
     }
     if (status == "completed") return data?.buyerConfirmedAt || "-";
     if (status == "canceled") {
-      if (data?.paidAt == null) return data?.createdAt || "-";
-      if (data?.paidAt != null) return data?.paidAt || "-";
+      if (data?.paidAt == null) {
+        return data?.createdAt || "-";
+      }
+      if (data?.paidAt != null) {
+        return data?.paidAt || "-";
+      }
+    }
+    if (status == "refunded") {
+      if (data?.paidAt == null) {
+        return data?.createdAt || "-";
+      }
+      if (data?.paidAt != null) {
+        return data?.paidAt || "-";
+      }
     }
   };
 
@@ -306,6 +362,7 @@ export default function DetailTransaksiSeller() {
             currentStep = 2;
             break;
           case "completed":
+          case "refunded":
             currentStep = 3;
             break;
         }
@@ -316,76 +373,97 @@ export default function DetailTransaksiSeller() {
         {(status == "pending_payment" ||
           (status == "waiting_shipment" && data?.shipment?.trackingNumber != null) ||
           status == "shipped" ||
-          status == "completed") && (
-          <>
-            {/* Copas Field */}
-            <View style={styles.copyBox}>
-              <Text style={styles.copyBoxTitle}>
-                {status == "pending_payment" ? "Virtual Account" : "No Resi"}
-              </Text>
-              <View style={[
-                styles.copyRow,
-                (status == "waiting_shipment" ||
+          (status == "completed" && (
+            <>
+              {/* Copas Field */}
+              <View
+                style={{
+                  padding: 12,
+                  marginHorizontal: 12,
+                  backgroundColor: "#EDFBFA",
+                  borderRadius: 12,
+                }}>
+                <Text
+                  style={{ fontSize: 15, marginBottom: 12, fontWeight: "500" }}>
+                  {status == "pending_payment" ? "Virtual Account" : "No Resi"}
+                </Text>
+                <View
+                  className={`flex-row items-center ${
+                    status == "waiting_shipment" ||
+                    status == "shipped" ||
+                    status == "completed"
+                      ? "mb-3"
+                      : ""
+                  }`}>
+                  <Text style={{ fontSize: 17, fontWeight: "500" }}>
+                    {status == "pending_payment"
+                      ? data?.virtualAccount || "-"
+                      : data?.shipment?.trackingNumber || "-"}
+                  </Text>
+                  <TouchableOpacity
+                    onPress={() =>
+                      handleCopy(
+                        status == "pending_payment"
+                          ? data?.virtualAccount || "-"
+                          : data?.shipment?.trackingNumber || "-"
+                      )
+                    }>
+                    <Image
+                      source={require("@/assets/copy.png")}
+                      style={{ marginLeft: 4, width: 17, height: 16 }}
+                    />
+                  </TouchableOpacity>
+                </View>
+                {status == "waiting_shipment" ||
                   status == "shipped" ||
-                  status == "completed") && { marginBottom: 12 }
-              ]}>
-                <Text style={styles.copyRowText}>
-                  {status == "pending_payment"
-                    ? data?.virtualAccount || "-"
-                    : data?.shipment?.trackingNumber || "-"}
-                </Text>
-                <TouchableOpacity
-                  onPress={() =>
-                    handleCopy(
-                      status == "pending_payment"
-                        ? data?.virtualAccount || "-"
-                        : data?.shipment?.trackingNumber || "-"
-                    )
-                  }>
-                  <Image
-                    source={require("@/assets/copy.png")}
-                    style={{ marginLeft: 4, width: 17, height: 16 }}
-                  />
-                </TouchableOpacity>
+                  (status == "completed" && (
+                    <Text
+                      style={{
+                        fontSize: 12,
+                        // marginBottom: 12,
+                        fontWeight: "400",
+                        color: "#616161",
+                      }}>
+                      {data?.shipment?.courier || "-"}
+                    </Text>
+                  ))}
               </View>
-              {(status == "waiting_shipment" ||
-                status == "shipped" ||
-                status == "completed") && (
-                <Text style={styles.copyBoxCourier}>
-                  {data?.shipment?.courier || "-"}
-                </Text>
-              )}
-            </View>
-          </>
-        )}
+            </>
+          ))}
 
-        {/* Admin Message */}
-        {(data?.fundReleaseRequest?.status != null || status == "completed") && (
-          <View style={styles.adminMsgRow}>
-            <Image
-              source={require("@/assets/admin1.png")}
-              style={styles.adminMsgImg}
-            />
-            <Text style={styles.adminMsgText}>
-              {status == "completed"
-                ? "Komplain dianggap tidak ada dan bakal selesai otomatis kalau pembeli nggak respon."
-                : data?.fundReleaseRequest?.status == "pending"
-                  ? "Tunggu approval kami, ya! Kalau bukti kamu oke, permintaan konfirmasi bakal langsung dikirim ke buyer!"
-                  : data?.fundReleaseRequest?.status == "approved"
+        {/* Admin Message (done)*/}
+        {data?.fundReleaseRequest?.status != null ||
+          (status == "completed" && (
+            <>
+              <View className="flex-row mx-3 p-3 justify-between items-center gap-3">
+                <Image
+                  source={require("@/assets/admin1.png")}
+                  style={{
+                    width: 20,
+                    height: 20,
+                  }}
+                />
+                <Text className="text-sm flex-1">
+                  {status == "completed"
+                    ? "Komplain dianggap tidak ada dan bakal selesai otomatis kalau pembeli nggak respon."
+                    : data?.fundReleaseRequest?.status == "pending"
+                    ? "Tunggu approval kami, ya! Kalau bukti kamu oke, permintaan konfirmasi bakal langsung dikirim ke buyer!"
+                    : data?.fundReleaseRequest?.status == "approved"
                     ? "Konfirmasi udah dikirim ke buyer! Sekarang tinggal tunggu respon mereka dalam 1 x 24 jam"
                     : "Permintaan konfirmasi ke buyer ditolak. Pastikan data atau bukti yang kamu kirim sudah lengkap dan sesuai"}
-            </Text>
-          </View>
-        )}
+                </Text>
+              </View>
+            </>
+          ))}
 
-        {/* Status Rekbr */}
-        {(data?.fundReleaseRequest?.status == "pending" ||
-          data?.fundReleaseRequest?.status == "rejected") ? (
-          <View style={styles.statusBox}>
-            <View style={styles.statusRow}>
-              <Text style={styles.statusLabel}>Status Rekbr:</Text>
-              <View style={styles.statusRowRight}>
-                <Text style={styles.statusValue}>{setupStatus()}</Text>
+        {/* Status Rekbr (done)*/}
+        {data?.fundReleaseRequest?.status == "pending" ||
+        data?.fundReleaseRequest?.status == "rejected" ? (
+          <View className="flex-col  gap-2 mx-3 p-3">
+            <View className="flex-row justify-between">
+              <Text className="text-[15px]">Status Rekbr:</Text>
+              <View className="flex-row items-center gap-2">
+                <Text className="text-[15px] font-medium">{setupStatus()}</Text>
                 <TouchableOpacity onPress={() => setIsExpanded(!isExpanded)}>
                   <Ionicons
                     name={isExpanded ? "chevron-up" : "chevron-down"}
