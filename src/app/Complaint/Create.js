@@ -207,6 +207,7 @@ export default function CreateComplaintScreen() {
       <View style={styles.footer}>
         <PrimaryButton
           title={ajukanUlang ? "Ajukan Ulang Komplain" : "Kirim"}
+          style={{ marginBottom: 24 }}
           onPress={() => setModalVisible(true)}
         />
         <Modal

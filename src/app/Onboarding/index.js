@@ -106,7 +106,7 @@ export default function Landing() {
           <TouchableOpacity
             style={styles.button}
             onPress={() => {
-              router.push("/auth/register");
+              router.replace("/auth/register");
             }}>
             <Text style={styles.buttonText}>Registrasi Sekarang</Text>
           </TouchableOpacity>
@@ -115,7 +115,7 @@ export default function Landing() {
             <Text style={styles.loginText}>Sudah punya akun? </Text>
             <TouchableOpacity
               onPress={() => {
-                router.push("/auth/login");
+                router.replace("/auth/login");
               }}>
               <Text style={styles.loginLink}>Silakan Masuk</Text>
             </TouchableOpacity>

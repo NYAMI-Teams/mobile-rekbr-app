@@ -22,6 +22,7 @@ import ProductCard from "../../../components/dispute/productCard";
 import { InputField } from "../../../components/dispute/InputField";
 import { UploadProve } from "../../../components/dispute/UploadProve";
 import { TrackDispute } from "../../../components/dispute/TrackDispute";
+import NavBackHeader from "@/components/NavBackHeader";
 
 export default function KomplainBatal() {
   const router = useRouter();
@@ -119,13 +120,7 @@ export default function KomplainBatal() {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()}>
-          <ChevronLeft size={24} color="black" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Detail Komplain</Text>
-        <View style={{ width: 24 }} />
-      </View>
+      <NavBackHeader title={"Detail Komplain"} />
 
       <View style={styles.separator} />
       <ScrollView contentContainerStyle={styles.contentContainer}>
@@ -315,7 +310,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: { fontSize: 16, fontWeight: "600", color: "#000" },
   separator: { height: 8, backgroundColor: "#f5f5f5", marginTop: 12 },
-  contentContainer: { paddingHorizontal: 16, paddingTop: 8, paddingBottom: 16 },
+  contentContainer: { paddingTop: 8, paddingBottom: 16 },
   solutionTitle: {
     fontSize: 14,
     fontWeight: "600",

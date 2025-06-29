@@ -24,6 +24,7 @@ import { UploadProve } from "../../../components/dispute/UploadProve";
 import { getDetailBuyerTransaction } from "../../../utils/api/buyer";
 import { postBuyerComplaint } from "../../../utils/api/complaint";
 import { showToast } from "../../../utils";
+import NavBackHeader from "@/components/NavBackHeader";
 
 export default function DisputeDetail() {
   const router = useRouter();
@@ -142,15 +143,7 @@ export default function DisputeDetail() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.headerWrapper}>
-        <TouchableOpacity
-          onPress={() => router.back()}
-          style={styles.backButton}
-        >
-          <ChevronLeft size={24} color="black" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Detail Masalah</Text>
-      </View>
+      <NavBackHeader title={"Detail Masalah"} />
 
       <ScrollView contentContainerStyle={styles.scrollView}>
         <ProblemDisplay
@@ -228,7 +221,6 @@ const styles = StyleSheet.create({
     color: "#000",
   },
   scrollView: {
-    paddingHorizontal: 16,
     paddingBottom: 40,
   },
   solutionTitle: {

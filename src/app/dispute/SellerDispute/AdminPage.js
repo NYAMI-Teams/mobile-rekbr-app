@@ -17,6 +17,7 @@ import { getDetailSellerComplaint } from "../../../utils/api/complaint";
 import { showToast, formatCurrency } from "../../../utils";
 import moment from "moment";
 import { InfoBanner } from "@/components/dispute/InfoBanner";
+import NavBackHeader from "@/components/NavBackHeader";
 
 const formatDateWIB = (dateTime) => {
   if (!dateTime) return "Invalid date";
@@ -58,13 +59,7 @@ export default function AdminPage() {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()}>
-          <ChevronLeft size={24} color="black" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Detail Komplain</Text>
-        <View style={styles.headerSpacer} />
-      </View>
+      <NavBackHeader title={"Detail Komplain"} />
 
       {/* Stepper */}
       <StepProgressBar
@@ -175,7 +170,6 @@ const styles = StyleSheet.create({
     width: 24,
   },
   scrollContent: {
-    paddingHorizontal: 16,
   },
   separator: {
     height: 8,

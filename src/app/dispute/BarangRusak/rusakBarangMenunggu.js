@@ -24,6 +24,7 @@ import {
   postBuyerCancelComplaint,
 } from "../../../utils/api/complaint";
 import moment from "moment";
+import NavBackHeader from "@/components/NavBackHeader";
 
 export default function DetailKomplain() {
   const router = useRouter();
@@ -90,13 +91,7 @@ export default function DetailKomplain() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()}>
-          <ChevronLeft size={24} color="black" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Detail Komplain</Text>
-        <View style={{ width: 24 }} />
-      </View>
+      <NavBackHeader title={"Detail Komplain"} />
 
       <View style={styles.stepperWrapper}>
         <StepProgressBar
@@ -245,7 +240,6 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   scrollViewContent: {
-    paddingHorizontal: 16,
     paddingBottom: 20,
   },
   footer: {

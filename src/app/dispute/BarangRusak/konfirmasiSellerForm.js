@@ -18,6 +18,7 @@ import * as ImagePicker from "expo-image-picker";
 import * as ImageManipulator from "expo-image-manipulator";
 import { postBuyerReturnConfirm } from "@/utils/api/complaint";
 import { showToast } from "@/utils";
+import NavBackHeader from "@/components/NavBackHeader";
 
 export default function KonfirmasiSellerForm() {
   const router = useRouter();
@@ -131,13 +132,7 @@ export default function KonfirmasiSellerForm() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()}>
-          <ChevronLeft size={24} color="black" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Permintaan Konfirmasi Seller</Text>
-        <View style={styles.headerSpacer} />
-      </View>
+      <NavBackHeader title={"Permintaan Konfirmasi Seller"} />
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <InputField
@@ -204,7 +199,6 @@ const styles = StyleSheet.create({
     width: 24,
   },
   scrollContent: {
-    paddingHorizontal: 16,
     paddingBottom: 16,
   },
   previewContainer: {

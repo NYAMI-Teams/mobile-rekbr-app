@@ -89,10 +89,10 @@ export default function Register() {
 
   return (
     <View style={styles.container}>
-      <KeyboardAvoidingView
+       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         keyboardVerticalOffset={Platform.OS === "ios" ? 60 : 0}
-        style={{ flex: 1 }}
+        style={{ flex: 1, width: "100%"}}
       >
         <ScrollView
           contentContainerStyle={{ flexGrow: 1 }}
@@ -118,7 +118,7 @@ export default function Register() {
                 keyboardType="email-address"
               />
               {/* Alert Validasi Email */}
-              <View style={styles.validationRow}>
+              {email.length > 0 && <View style={styles.validationRow}>
                 <Feather
                   name={isEmailValid() ? "check-circle" : "x-circle"}
                   size={18}
@@ -132,7 +132,7 @@ export default function Register() {
                 >
                   {isEmailValid() ? "Email valid" : "Email tidak valid"}
                 </Text>
-              </View>
+              </View>}
             </View>
 
             {/* Password */}

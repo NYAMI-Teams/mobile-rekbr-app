@@ -25,6 +25,7 @@ import {
   postBuyerCancelComplaint,
 } from "@/utils/api/complaint";
 import { showToast } from "@/utils";
+import NavBackHeader from "@/components/NavBackHeader";
 
 const formatDateWIB = (dateTime) => {
   if (!dateTime) return "Invalid date";
@@ -135,15 +136,8 @@ export default function ComplaintDetailScreen() {
 
   return (
     <View style={styles.container}>
-      <StatusBar style="dark" />
 
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()}>
-          <Ionicons name="chevron-back-outline" size={24} color="#000" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Detail Komplain</Text>
-        <View style={{ width: 24 }} />
-      </View>
+      <NavBackHeader title={"Detail Komplain"} />
 
       <View style={styles.stepContainer}>
         <ComplaintStepBar

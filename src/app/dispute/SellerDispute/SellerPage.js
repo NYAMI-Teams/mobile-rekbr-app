@@ -19,6 +19,7 @@ import { useEffect, useState } from "react";
 import { getDetailSellerComplaint } from "../../../utils/api/complaint";
 import { showToast, formatCurrency } from "../../../utils";
 import moment from "moment";
+import NavBackHeader from "@/components/NavBackHeader";
 
 const formatDateWIB = (dateTime) => {
   if (!dateTime) return "Invalid date";
@@ -65,13 +66,7 @@ export default function SellerPage() {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()}>
-          <ChevronLeft size={24} color="black" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Detail Komplain</Text>
-        <View style={{ width: 24 }} />
-      </View>
+      <NavBackHeader title={"Detail Komplain"} />
 
       {/* Stepper */}
       <StepProgressBar
@@ -193,20 +188,12 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#ffffff",
   },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingVertical: 16,
-    paddingHorizontal: 16,
-  },
   headerTitle: {
     fontSize: 16,
     fontWeight: "600",
     color: "#000000",
   },
   scrollContent: {
-    paddingHorizontal: 16,
   },
   separator: {
     height: 8,

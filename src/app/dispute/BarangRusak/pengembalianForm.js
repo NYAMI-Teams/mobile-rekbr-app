@@ -18,6 +18,7 @@ import DropDownField from "../../../components/DropDownField";
 import { getListCourier } from "../../../utils/api/seller";
 import { postBuyerReturn } from "../../../utils/api/complaint";
 import { showToast } from "../../../utils";
+import NavBackHeader from "@/components/NavBackHeader";
 
 export default function PengembalianForm() {
   const router = useRouter();
@@ -89,13 +90,7 @@ export default function PengembalianForm() {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()}>
-          <ChevronLeft size={24} color="black" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Form Pengembalian</Text>
-        <View style={{ width: 24 }} />
-      </View>
+      <NavBackHeader title={"Detail Komplain"} />
 
       {/* Form */}
       <ScrollView style={styles.formWrapper}>

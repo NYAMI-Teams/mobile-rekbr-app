@@ -104,8 +104,7 @@ export default function ChangePasswordScreen() {
         style={{ flex: 1 }}
       >
         <ScrollView
-          style={styles.scroll}
-          contentContainerStyle={{ flexGrow: 1 }}
+          contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 16, marginTop: 20 }}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
@@ -220,10 +219,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
     color: "#000",
-  },
-  scroll: {
-    paddingHorizontal: 16,
-    marginTop: 20,
   },
   form: {
     marginTop: 16,

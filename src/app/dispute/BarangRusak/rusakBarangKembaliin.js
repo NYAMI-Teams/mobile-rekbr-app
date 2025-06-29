@@ -23,6 +23,7 @@ import CopyField from "../../../components/dispute/copyField";
 import { getDetailBuyerComplaint } from "../../../utils/api/complaint";
 import moment from "moment";
 import { showToast } from "../../../utils"; // Assuming showToast is in utils
+import NavBackHeader from "@/components/NavBackHeader";
 
 export default function RusakBarangKembaliinPage() {
   const router = useRouter();
@@ -406,13 +407,7 @@ export default function RusakBarangKembaliinPage() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()}>
-          <ChevronLeft size={24} color="black" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Detail Komplain</Text>
-        <View style={styles.headerSpacer} />
-      </View>
+      <NavBackHeader title={"Detail Komplain"} />
 
       <StepProgressBar
         currentStep={2}
@@ -521,7 +516,6 @@ const styles = StyleSheet.create({
     color: "#555",
   },
   scrollView: {
-    paddingHorizontal: 16, // px-4
     paddingBottom: 160, // pb-40
   },
   divider: {

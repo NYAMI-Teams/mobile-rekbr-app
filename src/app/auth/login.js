@@ -65,7 +65,7 @@ export default function Login() {
     } catch (error) {
       showToast(
         "Gagal",
-        "Gagal mengambil data profile. Silahkan coba lagi.",
+        "Gagal mengambil data profile. Silahkan coba login kembali.",
         "error"
       );
     } finally {
@@ -78,7 +78,7 @@ export default function Login() {
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         keyboardVerticalOffset={Platform.OS === "ios" ? 60 : 0}
-        style={{ flex: 1 }}
+        style={{ flex: 1, width: "100%"}}
       >
         <ScrollView
           contentContainerStyle={{ flexGrow: 1 }}

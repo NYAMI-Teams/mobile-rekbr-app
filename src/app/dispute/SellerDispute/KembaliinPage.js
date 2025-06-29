@@ -24,6 +24,7 @@ import { useEffect, useState } from "react";
 import { showToast, formatCurrency } from "@/utils";
 import moment from "moment";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import NavBackHeader from "@/components/NavBackHeader";
 
 const formatDateWIB = (dateTime) => {
   if (!dateTime) return "Invalid date";
@@ -397,13 +398,7 @@ export default function KembaliinPage() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()}>
-          <ChevronLeft size={24} color="black" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Detail Komplain</Text>
-        <View style={styles.headerSpacer} />
-      </View>
+      <NavBackHeader title={"Detail Komplain"} />
 
       <StepProgressBar
         key={"step-seller-kembaliin"}
@@ -535,7 +530,6 @@ const styles = StyleSheet.create({
     color: "#000000", // text-black
   },
   scrollView: {
-    paddingHorizontal: 16, // px-4
     paddingBottom: 160, // pb-40
   },
   tagihanContainer: {

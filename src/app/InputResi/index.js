@@ -258,7 +258,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#FFFFFF",
-    justifyContent: "space-between",
   },
   scrollView: {
     flexGrow: 1,
@@ -282,7 +281,6 @@ const styles = StyleSheet.create({
   },
   buttonWrapper: {
     width: "100%",
-    paddingHorizontal: 16,
     paddingVertical: 16,
     marginBottom: 32,
   },

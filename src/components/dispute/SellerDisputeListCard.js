@@ -112,37 +112,40 @@ const SellerDisputeListCard = ({
   const config = statusconfig[status];
 
   return (
-    <TouchableOpacity onPress={onPress} activeOpacity={0.8}>
-      <View style={styles.card}>
-        {/* Nama Barang & Harga */}
-        <View style={styles.rowBetweenCenter}>
-          <Text style={styles.productName}>{namaBarang}</Text>
-          <Text style={styles.productName}>{harga}</Text>
-        </View>
+    <TouchableOpacity onPress={onPress} >
+      <View style={styles.cardWrapper}>
+        <View style={styles.cardContent}>
+          {/* Nama Barang & Harga */}
+          <View style={styles.rowBetweenCenter}>
+            <Text style={styles.productName}>{namaBarang}</Text>
+            <Text style={styles.productName}>{harga}</Text>
+          </View>
 
-        {/* Seller */}
-        <View style={styles.rowBetween}>
-          <Text style={styles.labelGray}>Buyer</Text>
-          <Text style={styles.labelBlack}>{buyer}</Text>
-        </View>
+          {/* Seller */}
+          <View style={styles.rowBetween}>
+            <Text style={styles.labelGray}>Buyer</Text>
+            <Text style={styles.labelBlack}>{buyer}</Text>
+          </View>
 
-        {/* No Resi */}
-        <View style={styles.rowBetweenCenter}>
-          <Text style={styles.labelGray}>No Resi</Text>
-          <View style={styles.rowIcon}>
-            <ClipboardPaste size={14} color="#9CA3AF" />
-            <Text style={styles.resiText}>{noResi}</Text>
+          {/* No Resi */}
+          <View style={styles.rowBetweenCenter}>
+            <Text style={styles.labelGray}>No Resi</Text>
+            <View style={styles.rowIcon}>
+              <ClipboardPaste size={14} color="#9CA3AF" />
+              <Text style={styles.resiText}>{noResi}</Text>
+            </View>
+          </View>
+
+          {/* Ekspedisi */}
+          <View style={styles.rowBetweenMargin}>
+            <Text style={styles.labelGray}>Ekspedisi</Text>
+            <Text style={styles.labelBlack}>{expedisi}</Text>
           </View>
         </View>
 
-        {/* Ekspedisi */}
-        <View style={styles.rowBetweenMargin}>
-          <Text style={styles.labelGray}>Ekspedisi</Text>
-          <Text style={styles.labelBlack}>{expedisi}</Text>
-        </View>
 
         {/* Status Card */}
-        <View style={styles.statusCard}>
+        <View style={styles.cardFooter}>
           <View style={styles.statusRow}>
             <Image
               source={require("../../assets/barangrusak.png")}
@@ -159,11 +162,11 @@ const SellerDisputeListCard = ({
                 source={require("../../assets/admin1.png")}
                 style={styles.adminNoteIcon}
               />
-              <View style={styles.adminNoteText}>
+              <Text style={styles.adminNoteText}>
                 <Text style={styles.adminNoteTextBold}>{config?.note}</Text>
                 <Text style={[styles.adminNoteTextBold, { fontWeight: 600 }]}>{time}</Text>
                 <Text style={styles.adminNoteTextBold}> {config?.noteafter}</Text>
-              </View>
+              </Text>
             </View>
           )}
 
@@ -209,20 +212,17 @@ const SellerDisputeListCard = ({
 };
 
 const styles = StyleSheet.create({
-  card: {
-    backgroundColor: "#fff",
+  cardWrapper: {
     borderWidth: 1,
-    borderColor: "#E5E7EB",
-    borderRadius: 20,
-    paddingHorizontal: 16,
-    paddingTop: 16,
-    paddingBottom: 12,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 2,
-    elevation: 1,
-    marginBottom: 32,
+    borderColor: "#e5e7eb",
+    borderRadius: 12,
+    marginVertical: 8,
+    backgroundColor: "#fff",
+    overflow: "hidden",
+    width: "100%",
+  },
+  cardContent: {
+    padding: 12,
   },
   rowBetweenCenter: {
     flexDirection: "row",
@@ -264,38 +264,35 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     marginLeft: 4,
   },
-  statusCard: {
-    backgroundColor: "#F5F5F5",
-    borderRadius: 16,
-    paddingHorizontal: 12,
-    paddingVertical: 12,
+  cardFooter: {
+    backgroundColor: "#f3f4f6",
+    borderTopWidth: 1,
+    borderTopColor: "#e5e7eb",
+    padding: 12,
+    gap: 12
   },
   statusRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 8,
     gap: 8,
   },
   statusIcon: {
     width: 16,
     height: 16,
-    marginRight: 12,
   },
   statusType: {
     fontSize: 12,
     fontWeight: "500",
     color: "#000",
-    marginLeft: 12,
   },
   adminNoteRow: {
     flexDirection: "row",
-    alignItems: "flex-start",
-    marginVertical: 8,
+    alignItems: "center",
+    gap: 8,
   },
   adminNoteIcon: {
     width: 20,
     height: 20,
-    marginRight: 16,
     marginTop: 2,
   },
   adminNoteText: {
@@ -312,35 +309,30 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginTop: 8,
   },
   statusDotRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 4,
+    gap: 8,
   },
   statusDot: {
     width: 8,
     height: 8,
     borderRadius: 4,
-    marginRight: 8,
   },
   statusText: {
     fontSize: 12,
     color: "#000",
-    marginLeft: 4,
   },
   statusTimeBox: {
     flexDirection: "row",
     alignItems: "center",
     padding: 4,
     borderRadius: 8,
-    marginLeft: 8,
   },
   statusTimeText: {
     fontSize: 12,
     color: "#000",
-    marginLeft: 4,
   },
 });
 

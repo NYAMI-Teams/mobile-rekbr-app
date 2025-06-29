@@ -27,6 +27,7 @@
     "plugins": [
       "expo-router"
     ],
+    "splash": {},
     "extra": {
       "router": {},
       "eas": {

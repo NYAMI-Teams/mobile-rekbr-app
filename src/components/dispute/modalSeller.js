@@ -296,7 +296,6 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     flexDirection: "column",
-    justifyContent: "center",
     padding: 16,
   },
   title: {

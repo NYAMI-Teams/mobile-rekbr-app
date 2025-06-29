@@ -17,6 +17,7 @@ import { resetPassword } from "@/utils/api/auth";
 import PrimaryButton from "@/components/PrimaryButton";
 import PasswordChecklist from "@/components/PasswordChecklist";
 import BuyerKonfirmasi from "@/components/BuyerKonfirmasi";
+import NavBackHeader from "@/components/NavBackHeader";
 
 export default function ChangePasswordScreen() {
   const router = useRouter();
@@ -81,13 +82,7 @@ export default function ChangePasswordScreen() {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={handleBackBtn}>
-          <Ionicons name="chevron-back-outline" size={24} color="#000" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Pulihkan Akses Akun Anda</Text>
-        <View style={{ width: 24 }} />
-      </View>
+      <NavBackHeader title={"Pulihkan Akses Akun Anda"} />
 
       {/* Content */}
       <KeyboardAvoidingView
@@ -95,11 +90,10 @@ export default function ChangePasswordScreen() {
         style={{ flex: 1 }}
       >
         <ScrollView
-          contentContainerStyle={{ flexGrow: 1 }}
+          contentContainerStyle={{ flexGrow: 1, width: "100%", paddingHorizontal: 16, marginTop: 20, }}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
           keyboardDismissMode="on-drag"
-          style={styles.scrollContent}
         >
           <View style={styles.formContainer}>
             {/* Password */}
@@ -186,25 +180,7 @@ export default function ChangePasswordScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#fff" },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    width: "100%",
-    paddingHorizontal: 16,
-    paddingTop: 16,
-  },
-  headerTitle: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#000",
-  },
-  scrollContent: {
-    flex: 1,
-    width: "100%",
-    paddingHorizontal: 16,
-    marginTop: 20,
-  },
+
   formContainer: {
     marginTop: 16,
     gap: 16,
