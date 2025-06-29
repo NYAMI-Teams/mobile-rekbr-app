@@ -388,11 +388,11 @@ export default function DetailTransaksiSeller() {
         return <ProgressBar currentStep={currentStep} steps={steps} />;
       })()}
       <ScrollView>
-        {status == "pending_payment" ||
+        {(status == "pending_payment" ||
           (status == "waiting_shipment" &&
             data?.shipment?.trackingNumber != null) ||
           status == "shipped" ||
-          (status == "completed" && (
+          status == "completed") && (
             <>
               {/* Copas Field */}
               <View
@@ -446,7 +446,7 @@ export default function DetailTransaksiSeller() {
                   ))}
               </View>
             </>
-          ))}
+          )}
 
         {/* Admin Message (done)*/}
         {data?.fundReleaseRequest?.status != null ||
