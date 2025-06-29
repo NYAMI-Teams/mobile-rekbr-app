@@ -109,22 +109,8 @@ export default function ChangePasswordScreen() {
                 placeholder="Masukkan kata sandi baru kamu"
                 value={kataSandiBaru}
                 onChangeText={setKataSandiBaru}
-                secureTextEntry={!isKataSandiBaruVisible}
                 isPassword={true}
-                inputClassName="pr-12"
               />
-              <TouchableOpacity
-                style={styles.eyeButton}
-                onPress={toggleKataSandiBaruVisibility}
-              >
-                <MaterialIcons
-                  name={
-                    isKataSandiBaruVisible ? "visibility" : "visibility-off"
-                  }
-                  size={22}
-                  color="#666"
-                />
-              </TouchableOpacity>
               <PasswordChecklist password={kataSandiBaru} />
             </View>
 
@@ -135,25 +121,8 @@ export default function ChangePasswordScreen() {
                 placeholder="Pastikan sama, ya!"
                 value={konfirmasiKataSandiBaru}
                 onChangeText={setKonfirmasiKataSandiBaru}
-                secureTextEntry={!isKonfirmasiKataSandiBaruVisible}
                 isPassword={true}
-                inputClassName="pr-12"
               />
-              <TouchableOpacity
-                style={styles.eyeButton}
-                onPress={toggleKonfirmasiKataSandiBaruVisibility}
-              >
-                <MaterialIcons
-                  name={
-                    isKonfirmasiKataSandiBaruVisible
-                      ? "visibility"
-                      : "visibility-off"
-                  }
-                  size={22}
-                  color="#666"
-                />
-              </TouchableOpacity>
-
               {/* Alert Validasi */}
               {konfirmasiKataSandiBaru.length > 0 && (
                 <View style={styles.alertRow}>

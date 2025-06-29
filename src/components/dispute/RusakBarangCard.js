@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, TouchableOpacity, Image } from "react-native";
+import { View, Text, TouchableOpacity, Image, StyleSheet } from "react-native";
 import { ClipboardPaste } from "lucide-react-native";
 import PrimaryButton from "../PrimaryButton";
 import moment from "moment";
@@ -171,82 +171,78 @@ const RusakBarangCard = ({
   typeDespute,
   status,
   time,
-  onPress = () => {},
-  onPressButton = () => {},
+  onPress = () => { },
+  onPressButton = () => { },
 }) => {
   const config = statusconfig[status];
 
   return (
     <TouchableOpacity onPress={onPress} activeOpacity={0.8}>
-      <View className="bg-white border border-[#E5E7EB] rounded-2xl px-4 pt-4 pb-3 shadow-sm mb-8">
+      <View style={styles.card}>
         {/* Nama Barang & Harga */}
-        <View className="flex-row justify-between items-center mb-2">
-          <Text className="text-sm font-semibold text-[#1D1D1D]">
-            {namaBarang}
-          </Text>
-          <Text className="text-sm font-semibold text-[#1D1D1D]">{harga}</Text>
+        <View style={styles.rowBetweenCenter}>
+          <Text style={styles.productName}>{namaBarang}</Text>
+          <Text style={styles.productName}>{harga}</Text>
         </View>
 
         {/* Seller */}
-        <View className="flex-row justify-between mb-2">
-          <Text className="text-xs text-[#6B7280]">Seller</Text>
-          <Text className="text-xs text-[#1D1D1D]">{seller}</Text>
+        <View style={styles.rowBetween}>
+          <Text style={styles.labelGray}>Seller</Text>
+          <Text style={styles.labelBlack}>{seller}</Text>
         </View>
 
         {/* No Resi */}
-        <View className="flex-row justify-between items-center mb-2">
-          <Text className="text-xs text-[#6B7280]">No Resi</Text>
-          <View className="flex-row items-center space-x-1">
+        <View style={styles.rowBetweenCenter}>
+          <Text style={styles.labelGray}>No Resi</Text>
+          <View style={styles.rowIcon}>
             <ClipboardPaste size={14} color="#9CA3AF" />
-            <Text className="text-xs text-[#2563EB] font-medium">{noResi}</Text>
+            <Text style={styles.resiText}>{noResi}</Text>
           </View>
         </View>
 
         {/* Ekspedisi */}
-        <View className="flex-row justify-between mb-4">
-          <Text className="text-xs text-[#6B7280]">Ekspedisi</Text>
-          <Text className="text-xs text-[#1D1D1D]">{expedisi}</Text>
+        <View style={styles.rowBetweenMargin}>
+          <Text style={styles.labelGray}>Ekspedisi</Text>
+          <Text style={styles.labelBlack}>{expedisi}</Text>
         </View>
 
         {/* Status Card */}
-        <View className="bg-[#F5F5F5] rounded-xl px-3 py-3">
-          <View className="flex-row items-center space-x-2 mb-2">
+        <View style={styles.statusCard}>
+          <View style={styles.statusRow}>
             <Image
               source={require("../../assets/barangrusak.png")}
-              className="w-4 h-4"
+              style={styles.statusIcon}
               resizeMode="contain"
             />
-            <Text className="text-xs font-medium text-black ml-3">
-              {typeDespute}
-            </Text>
+            <Text style={styles.statusType}>{typeDespute}</Text>
           </View>
 
           {/* Catatan Admin */}
           {config?.note !== "" && (
-            <View className="flex-row my-2 items-start">
+            <View style={styles.adminNoteRow}>
               <Image
                 source={require("../../assets/admin1.png")}
-                className="w-5 h-5 mr-4"
+                style={styles.adminNoteIcon}
               />
-              <Text className="flex-1 text-xs text-gray-700 leading-5">
-                <Text className="text-xs text-black">{config?.note}</Text>
+              <Text style={styles.adminNoteText}>
+                <Text style={styles.adminNoteTextBold}>{config?.note}</Text>
                 {status !== "returnInTransit" && (
-                  <Text className="text-xs text-black font-semibold">
-                    {time}
-                  </Text>
+                  <Text style={styles.adminNoteTextBold}>{time}</Text>
                 )}
-                <Text className="text-xs text-black">{config?.noteafter}</Text>
+                <Text style={styles.adminNoteTextBold}>{config?.noteafter}</Text>
               </Text>
             </View>
           )}
 
-          <View className="flex-row justify-between items-center mt-2">
-            <View className="flex-row items-center space-x-1">
+          <View style={styles.statusBottomRow}>
+            <View style={styles.statusDotRow}>
               <View
-                className="w-2 h-2 rounded-full"
-                style={{ backgroundColor: config?.color }}
+                style={[
+                  styles.statusDot,
+                  { backgroundColor: config?.color },
+                ]}
               />
-              <Text className="text-xs text-black ml-2">{config?.text}</Text>
+              <Text style={styles.statusText}>{config?.text}</Text>
             </View>
 
             {/* Optional Button */}
@@ -264,9 +260,12 @@ const RusakBarangCard = ({
 
             {config?.status && (
               <View
-                className="flex-row items-center space-x-1 p-2 rounded-lg"
-                style={{ backgroundColor: config?.statusColor }}>
-                <Text className="text-xs text-black ml-2"> {time}</Text>
+                style={[
+                  styles.statusTimeBox,
+                  { backgroundColor: config?.statusColor },
+                ]}
+              >
+                <Text style={styles.statusTimeText}> {time}</Text>
               </View>
             )}
           </View>
@@ -275,5 +274,141 @@ const RusakBarangCard = ({
     </TouchableOpacity>
   );
 };
+
+const styles = StyleSheet.create({
+  card: {
+    backgroundColor: "#fff",
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+    borderRadius: 20,
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    paddingBottom: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06,
+    shadowRadius: 2,
+    elevation: 1,
+    marginBottom: 32,
+  },
+  rowBetweenCenter: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  rowBetween: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 8,
+  },
+  rowBetweenMargin: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 16,
+  },
+  productName: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#1D1D1D",
+  },
+  labelGray: {
+    fontSize: 12,
+    color: "#6B7280",
+  },
+  labelBlack: {
+    fontSize: 12,
+    color: "#1D1D1D",
+  },
+  rowIcon: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+  resiText: {
+    fontSize: 12,
+    color: "#2563EB",
+    fontWeight: "500",
+    marginLeft: 4,
+  },
+  statusCard: {
+    backgroundColor: "#F5F5F5",
+    borderRadius: 16,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+  },
+  statusRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 8,
+    gap: 8,
+  },
+  statusIcon: {
+    width: 16,
+    height: 16,
+    marginRight: 12,
+  },
+  statusType: {
+    fontSize: 12,
+    fontWeight: "500",
+    color: "#000",
+    marginLeft: 12,
+  },
+  adminNoteRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    marginVertical: 8,
+  },
+  adminNoteIcon: {
+    width: 20,
+    height: 20,
+    marginRight: 16,
+    marginTop: 2,
+  },
+  adminNoteText: {
+    flex: 1,
+    fontSize: 12,
+    color: "#374151",
+    lineHeight: 18,
+  },
+  adminNoteTextBold: {
+    fontSize: 12,
+    color: "#000",
+  },
+  statusBottomRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 8,
+  },
+  statusDotRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+  statusDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    marginRight: 8,
+  },
+  statusText: {
+    fontSize: 12,
+    color: "#000",
+    marginLeft: 4,
+  },
+  statusTimeBox: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 4,
+    borderRadius: 8,
+    marginLeft: 8,
+  },
+  statusTimeText: {
+    fontSize: 12,
+    color: "#000",
+    marginLeft: 4,
+  },
+});
 
 export default RusakBarangCard;

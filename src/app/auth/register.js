@@ -91,7 +91,7 @@ export default function Register() {
     <View style={styles.container}>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        keyboardVerticalOffset={Platform.OS === "ios" && 60}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 60 : 0}
         style={{ flex: 1 }}
       >
         <ScrollView
@@ -116,7 +116,6 @@ export default function Register() {
                 value={email}
                 onChangeText={setEmail}
                 keyboardType="email-address"
-                inputClassName="pr-12"
               />
               {/* Alert Validasi Email */}
               <View style={styles.validationRow}>
@@ -143,20 +142,8 @@ export default function Register() {
                 placeholder="Masukkan kata sandi kamu"
                 value={password}
                 onChangeText={setPassword}
-                secureTextEntry={!isPasswordVisible}
                 isPassword={true}
-                inputClassName="pr-12"
               />
-              <TouchableOpacity
-                style={styles.passwordToggleIcon}
-                onPress={togglePasswordVisibility}
-              >
-                <MaterialIcons
-                  name={isPasswordVisible ? "visibility" : "visibility-off"}
-                  size={22}
-                  color="#666"
-                />
-              </TouchableOpacity>
               <PasswordChecklist password={password} />
             </View>
 
@@ -167,22 +154,8 @@ export default function Register() {
                 placeholder="Pastikan sama, ya!"
                 value={confirmPassword}
                 onChangeText={setConfirmPassword}
-                secureTextEntry={!isConfirmPasswordVisible}
                 isPassword={true}
-                inputClassName="pr-12"
               />
-              <TouchableOpacity
-                style={styles.passwordToggleIcon}
-                onPress={toggleConfirmPasswordVisibility}
-              >
-                <MaterialIcons
-                  name={
-                    isConfirmPasswordVisible ? "visibility" : "visibility-off"
-                  }
-                  size={22}
-                  color="#666"
-                />
-              </TouchableOpacity>
               {/* Alert Validasi */}
               {confirmPassword.length > 0 && (
                 <View style={styles.validationRow}>
@@ -227,14 +200,14 @@ export default function Register() {
                 Saya menyetujui Kebijakan Privasi yang berlaku
               </Text>
             </View>
+          </View>
 
-            <View style={styles.buttonWrapper}>
-              <PrimaryButton
-                title="Daftar"
-                onPress={handleRegister}
-                disabled={!isFormValid()}
-              />
-            </View>
+          <View style={styles.buttonWrapper}>
+            <PrimaryButton
+              title="Daftar"
+              onPress={handleRegister}
+              disabled={!isFormValid()}
+            />
           </View>
 
           {/* Footer */}
@@ -298,8 +271,7 @@ const styles = StyleSheet.create({
   validationRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginTop: 8,
-    marginHorizontal: 20,
+    marginTop: 4,
   },
   validationText: { marginLeft: 8, fontSize: 14 },
   inputRelative: { position: "relative", marginBottom: 16 },
@@ -307,8 +279,6 @@ const styles = StyleSheet.create({
   checkboxRow: {
     flexDirection: "row",
     alignItems: "flex-start",
-    marginTop: 16,
-    paddingHorizontal: 20,
   },
   checkboxBox: {
     width: 20,

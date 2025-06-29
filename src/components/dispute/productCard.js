@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, Image } from "react-native";
+import { View, Text, TouchableOpacity, Image, StyleSheet } from "react-native";
 import { ChevronLeft, ClipboardPaste, ChevronDown } from "lucide-react-native";
 import Tagihan from "../DetailRekber/Tagihan";
 
@@ -22,30 +22,30 @@ const ProductCard = ({
 }) => {
   return (
     <View>
-      <Text className="text-sm font-semibold text-black mb-2">
+      <Text style={styles.title}>
         Barang yang belum diterima
       </Text>
-      <View className="bg-[#EAFBF8] p-4 rounded-xl mb-6 space-y-2">
-        <Text className="font-semibold text-[15px] text-black">
+      <View style={styles.cardBox}>
+        <Text style={styles.productName}>
           {productName}
         </Text>
-        <Text className="text-[10px] text-gray-600 mt-2">{idx}</Text>
-        <View className="flex-row justify-between mt-2">
-          <Text className="text-[15px] text-black">Seller</Text>
-          <Text className="text-[15px] text-black">{sellerMail}</Text>
+        <Text style={styles.idx}>{idx}</Text>
+        <View style={styles.rowBetween}>
+          <Text style={styles.label}>Seller</Text>
+          <Text style={styles.label}>{sellerMail}</Text>
         </View>
-        <View className="flex-row justify-between items-center mt-2">
-          <Text className="text-[15px] text-black">No Resi</Text>
-          <View className="flex-row items-center space-x-1">
+        <View style={styles.rowBetweenCenter}>
+          <Text style={styles.label}>No Resi</Text>
+          <View style={styles.rowIcon}>
             <ClipboardPaste size={14} color="#999" />
-            <Text className="text-[15px] text-blue-600 font-medium">
+            <Text style={styles.resiText}>
               {noResi}
             </Text>
           </View>
         </View>
-        <View className="flex-row justify-between mt-2 mb-2">
-          <Text className="text-[15px] text-black">Ekspedisi</Text>
-          <Text className="text-[15px] text-black">{expedisi}</Text>
+        <View style={styles.rowBetween}>
+          <Text style={styles.label}>Ekspedisi</Text>
+          <Text style={styles.label}>{expedisi}</Text>
         </View>
         <Tagihan
           caption="Nominal Rekber"
@@ -69,5 +69,59 @@ const ProductCard = ({
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  title: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#000",
+    marginBottom: 8,
+  },
+  cardBox: {
+    backgroundColor: "#EAFBF8",
+    padding: 16,
+    borderRadius: 16,
+    marginBottom: 24,
+    gap: 0,
+  },
+  productName: {
+    fontWeight: "600",
+    fontSize: 15,
+    color: "#000",
+  },
+  idx: {
+    fontSize: 10,
+    color: "#4B5563",
+    marginTop: 8,
+  },
+  rowBetween: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 8,
+    marginBottom: 0,
+  },
+  rowBetweenCenter: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 8,
+    marginBottom: 0,
+  },
+  label: {
+    fontSize: 15,
+    color: "#000",
+  },
+  rowIcon: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+  resiText: {
+    fontSize: 15,
+    color: "#2563EB",
+    fontWeight: "500",
+    marginLeft: 4,
+  },
+});
 
 export default ProductCard;

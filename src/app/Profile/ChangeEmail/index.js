@@ -82,7 +82,7 @@ export default function ChangeEmailScreen() {
       {/* Content */}
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        keyboardVerticalOffset={Platform.OS === 'ios' && 60}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 0}
         style={{ flex: 1 }}
       >
         <ScrollView
@@ -217,8 +217,6 @@ const styles = StyleSheet.create({
   validationContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginTop: 8,
-    marginHorizontal: 20,
   },
   validationText: {
     marginLeft: 8,

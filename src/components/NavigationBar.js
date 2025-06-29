@@ -1,5 +1,4 @@
-// src/components/NavigationBar.js
-import React, { useRef, useState } from "react";
+import React, { useRef } from "react";
 import {
   View,
   Text,
@@ -22,12 +21,10 @@ export default function NavigationBar({
   const handleEdit = () => modalizeRef.current?.open();
 
   const handleChangePassword = () => {
-    // modalizeRef.current?.close();
     router.push("/Profile/ChangePassword");
   };
 
   const handleChangeEmail = () => {
-    // modalizeRef.current?.close();
     router.push("/Profile/ChangeEmail");
   };
 
@@ -97,16 +94,16 @@ export default function NavigationBar({
         }}
       >
         <View>
-          <Text className="text-lg font-bold mb-6 text-center">
+          <Text style={styles.modalTitle}>
             Atur Profile
           </Text>
-          <TouchableOpacity onPress={handleChangePassword} className="mb-4 py-4">
-            <Text className="text-base text-black font-medium">
+          <TouchableOpacity onPress={handleChangePassword} style={styles.modalButton}>
+            <Text style={styles.modalButtonText}>
               Ubah Password
             </Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={handleChangeEmail} className="mb-4 py-4">
-            <Text className="text-base text-black font-medium">
+          <TouchableOpacity onPress={handleChangeEmail} style={styles.modalButton}>
+            <Text style={styles.modalButtonText}>
               Ubah Email
             </Text>
           </TouchableOpacity>
@@ -114,16 +111,15 @@ export default function NavigationBar({
             onPress={() => {
               onLogoutPress();
             }}
-            className="mb-8 py-4"
+            style={[styles.modalButton, styles.logoutButton]}
           >
-            <Text className="text-base text-red-500 font-medium">
+            <Text style={styles.logoutButtonText}>
               Keluar
             </Text>
           </TouchableOpacity>
         </View>
       </Modalize>
     </>
-
   );
 }
 
@@ -185,6 +181,30 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: "#000",
     fontFamily: "Poppins_500Medium", // ← supaya tidak terlalu tebal
-    fontWeight: 500,
+    fontWeight: "500",
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 24,
+    textAlign: "center",
+    color: "#111",
+  },
+  modalButton: {
+    marginBottom: 16,
+    paddingVertical: 16,
+  },
+  modalButtonText: {
+    fontSize: 16,
+    color: "#111",
+    fontWeight: "500",
+  },
+  logoutButton: {
+    marginBottom: 32,
+  },
+  logoutButtonText: {
+    fontSize: 16,
+    color: "#ef4444",
+    fontWeight: "500",
   },
 });

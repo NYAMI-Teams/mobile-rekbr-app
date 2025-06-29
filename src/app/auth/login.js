@@ -23,21 +23,15 @@ export default function Login() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [error, setError] = useState(true);
   const [errorMsg, setErrorMsg] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     // development (DELETE)
-    // setEmail("danilardi8@gmail.com");
-    // setPassword("Mobilmerah123#");
-    // setIsPasswordVisible(true);
+    // setEmail("seller@gmail.com");
+    // setPassword("password");
   }, []);
-
-  const togglePasswordVisibility = () => {
-    setIsPasswordVisible(!isPasswordVisible);
-  };
 
   const handleLogin = async () => {
     setError(false);
@@ -83,7 +77,7 @@ export default function Login() {
     <View style={styles.container}>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        keyboardVerticalOffset={Platform.OS === "ios" && 60}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 60 : 0}
         style={{ flex: 1 }}
       >
         <ScrollView
@@ -122,20 +116,8 @@ export default function Login() {
                     placeholder="Masukkan kata sandi kamu"
                     value={password}
                     onChangeText={setPassword}
-                    secureTextEntry={!isPasswordVisible}
                     isPassword={true}
-                    inputClassName="pr-12"
                   />
-                  <TouchableOpacity
-                    style={styles.passwordIcon}
-                    onPress={togglePasswordVisibility}
-                  >
-                    <MaterialIcons
-                      name={isPasswordVisible ? "visibility" : "visibility-off"}
-                      size={22}
-                      color="#666"
-                    />
-                  </TouchableOpacity>
                 </View>
 
                 <TouchableOpacity
@@ -214,8 +196,6 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 16,
   },
   formContainer: { marginHorizontal: 20, gap: 16, marginTop: 24, flex: 1 },
-  passwordFieldWrapper: { position: "relative", marginBottom: 16 },
-  passwordIcon: { position: "absolute", top: 44, right: 40 },
   forgotPassword: {
     alignSelf: "flex-end",
     marginTop: 8,
