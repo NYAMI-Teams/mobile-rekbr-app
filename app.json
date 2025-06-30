@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Rekbr App",
-    "slug": "mobile-rekbr-app",
+    "slug": "rekbr-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./src/assets/icon.png",
@@ -36,12 +36,13 @@
         }
       ]
     ],
+    "splash": {},
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "3bab7677-1f5b-42c2-8f97-a1fa0fea701e"
+        "projectId": "7720054e-2089-48f0-830e-31b51b327ed2"
       }
     },
-    "owner": "farinojoshua"
+    "owner": "nyami"
   }
 }

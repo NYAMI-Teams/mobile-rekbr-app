@@ -7,6 +7,7 @@ import {
   ScrollView,
   Image,
   Platform,
+  StyleSheet,
 } from "react-native";
 import { Feather, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
@@ -17,6 +18,7 @@ import { changePassword } from "@/utils/api/auth";
 import PrimaryButton from "@/components/PrimaryButton";
 import PasswordChecklist from "@/components/PasswordChecklist";
 import BuyerKonfirmasi from "@/components/BuyerKonfirmasi";
+import NavBackHeader from "@/components/NavBackHeader";
 
 export default function ChangePasswordScreen() {
   const router = useRouter();
@@ -91,110 +93,57 @@ export default function ChangePasswordScreen() {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#fff" }}>
+    <View style={styles.container}>
       {/* Header */}
-      <View className="flex-row justify-between items-center w-full px-4 pt-4">
-        <TouchableOpacity onPress={handleBackBtn}>
-          <Ionicons name="chevron-back-outline" size={24} color="#000" />
-        </TouchableOpacity>
-        <Text className="text-[16px] font-semibold text-black">
-          Ganti Kata Sandi
-        </Text>
-        <View style={{ width: 24 }} />
-      </View>
+      <NavBackHeader title={"Ganti Kata Sandi"} />
 
       {/* Content */}
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        keyboardVerticalOffset={Platform.OS === 'ios' && 60}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 60 : 0}
         style={{ flex: 1 }}
       >
         <ScrollView
-          className="px-4 mt-5"
-          contentContainerStyle={{ flexGrow: 1 }}
+          contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 16, marginTop: 20 }}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          <View className="mt-4 flex-1">
-            <View className="relative mb-4">
+          <View style={styles.form}>
+            <View style={styles.inputWrapper}>
               <InputField
                 title="Kata Sandi Rekbr Saat Ini"
                 placeholder="Masukkan kata sandi kamu saat ini"
                 value={kataSandiSaatIni}
                 onChangeText={setKataSandiSaatIni}
-                secureTextEntry={!isKataSandiSaatIniVisible}
                 isPassword={true}
-                inputClassName="pr-12"
               />
-
-              <TouchableOpacity
-                className="absolute top-11 right-10"
-                onPress={toggleKataSandiSaatIniVisibility}>
-                <MaterialIcons
-                  name={
-                    isKataSandiSaatIniVisible ? "visibility" : "visibility-off"
-                  }
-                  size={22}
-                  color="#666"
-                />
-              </TouchableOpacity>
             </View>
 
             {/* Password */}
-            <View className="relative mb-4">
+            <View style={styles.inputWrapper}>
               <InputField
                 title="Kata Sandi Rekbr"
                 placeholder="Masukkan kata sandi kamu"
                 value={kataSandiBaru}
                 onChangeText={setKataSandiBaru}
-                secureTextEntry={!isKataSandiBaruVisible}
                 isPassword={true}
-                inputClassName="pr-12"
               />
-
-              <TouchableOpacity
-                className="absolute top-11 right-10"
-                onPress={toggleKataSandiBaruVisibility}>
-                <MaterialIcons
-                  name={
-                    isKataSandiBaruVisible ? "visibility" : "visibility-off"
-                  }
-                  size={22}
-                  color="#666"
-                />
-              </TouchableOpacity>
               <PasswordChecklist password={kataSandiBaru} />
             </View>
 
             {/* Confirm Password */}
-            <View className="relative mb-4">
+            <View style={styles.inputWrapper}>
               <InputField
                 title="Konfirmasi Kata Sandi Rekbr Kamu"
                 placeholder="Pastikan sama, ya!"
                 value={konfirmasiKataSandiBaru}
                 onChangeText={setKonfirmasiKataSandiBaru}
-                secureTextEntry={!isKonfirmasiKataSandiBaruVisible}
                 isPassword={true}
-                inputClassName="pr-12"
               />
-
-              <TouchableOpacity
-                className="absolute top-11 right-10"
-                onPress={toggleKonfirmasiKataSandiBaruVisibility}>
-                <MaterialIcons
-                  name={
-                    isKonfirmasiKataSandiBaruVisible
-                      ? "visibility"
-                      : "visibility-off"
-                  }
-                  size={22}
-                  color="#666"
-                />
-              </TouchableOpacity>
 
               {/* Alert Validasi */}
               {konfirmasiKataSandiBaru.length > 0 && (
-                <View className="flex-row items-center mt-2 mx-5">
+                <View style={styles.alertRow}>
                   <Feather
                     name={
                       konfirmasiKataSandiBaru === kataSandiBaru
@@ -209,10 +158,16 @@ export default function ChangePasswordScreen() {
                     }
                   />
                   <Text
-                    className={`ml-2 text-sm ${konfirmasiKataSandiBaru === kataSandiBaru
-                      ? "text-green-600"
-                      : "text-red-400"
-                      }`}>
+                    style={[
+                      styles.alertText,
+                      {
+                        color:
+                          konfirmasiKataSandiBaru === kataSandiBaru
+                            ? "#4ade80"
+                            : "#f87171",
+                      },
+                    ]}
+                  >
                     {konfirmasiKataSandiBaru === kataSandiBaru
                       ? "Kata sandi sesuai"
                       : "Kata sandi tidak sesuai"}
@@ -221,8 +176,9 @@ export default function ChangePasswordScreen() {
               )}
             </View>
           </View>
+
           {/* Button */}
-          <View className="w-full py-4 mb-16">
+          <View style={styles.buttonWrapper}>
             <PrimaryButton
               title="Kirim"
               onPress={handleBtnPress}
@@ -231,7 +187,6 @@ export default function ChangePasswordScreen() {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
-
 
       {showPopup && (
         <BuyerKonfirmasi
@@ -246,3 +201,49 @@ export default function ChangePasswordScreen() {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    width: "100%",
+    paddingHorizontal: 16,
+    paddingTop: 16,
+  },
+  headerTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#000",
+  },
+  form: {
+    marginTop: 16,
+    flex: 1,
+  },
+  inputWrapper: {
+    position: "relative",
+    marginBottom: 16,
+  },
+  eyeIcon: {
+    position: "absolute",
+    top: 44,
+    right: 40,
+  },
+  alertRow: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  alertText: {
+    marginLeft: 8,
+    fontSize: 14,
+  },
+  buttonWrapper: {
+    width: "100%",
+    paddingVertical: 16,
+    marginBottom: 64,
+  },
+});

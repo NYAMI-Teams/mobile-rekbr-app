@@ -8,12 +8,11 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
   Platform,
+  StyleSheet,
 } from "react-native";
 import InputField from "../../components/InputField";
 import PrimaryButton from "../../components/PrimaryButton";
-import { MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { getProfile, login, savePushToken } from "../../utils/api/auth";
 import { showToast } from "../../utils";
 import { setAccessToken, setProfileStore } from "../../store";
@@ -23,21 +22,9 @@ export default function Login() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [error, setError] = useState(true);
   const [errorMsg, setErrorMsg] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-
-  useEffect(() => {
-    // development (DELETE)
-    // setEmail("danilardi8@gmail.com");
-    // setPassword("Mobilmerah123#");
-    // setIsPasswordVisible(true);
-  }, []);
-
-  const togglePasswordVisibility = () => {
-    setIsPasswordVisible(!isPasswordVisible);
-  };
 
   const handleLogin = async () => {
     setError(false);
@@ -95,7 +82,7 @@ export default function Login() {
     } catch (error) {
       showToast(
         "Gagal",
-        "Gagal mengambil data profile. Silahkan coba lagi.",
+        "Gagal mengambil data profile. Silahkan coba login kembali.",
         "error"
       );
     } finally {
@@ -104,31 +91,31 @@ export default function Login() {
   };
 
   return (
-    <View className='bg-white flex-1'>
+    <View style={styles.container}>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        keyboardVerticalOffset={Platform.OS === "ios" && 60}
-        style={{ flex: 1 }}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 60 : 0}
+        style={{ flex: 1, width: "100%" }}
       >
         <ScrollView
           contentContainerStyle={{ flexGrow: 1 }}
           keyboardShouldPersistTaps='handled'
           showsVerticalScrollIndicator={false}
         >
-          <View className='flex-1'>
+          <View style={{ flex: 1 }}>
             {/* Header */}
-            <View className='bg-white items-center'>
+            <View style={styles.headerContainer}>
               <Image
                 source={require("../../assets/header.png")}
-                className='w-full h-[300px] rounded-b-2xl'
+                style={styles.headerImage}
                 resizeMode='cover'
               />
             </View>
 
             {/* Form */}
-            <View className='mx-5 gap-4 mt-6 flex-1'>
+            <View style={styles.formContainer}>
               {/* Email */}
-              <View className=''>
+              <View>
                 <InputField
                   title='Email Kamu, Yuk!'
                   placeholder='email@kamu.com'
@@ -139,57 +126,38 @@ export default function Login() {
               </View>
 
               {/* Password */}
-              <View className=''>
-                {/* <Text className="mb-2 text-base text-black">Kata Sandi Rekbr</Text> */}
-                <View className='relative mb-4'>
+              <View>
+                <View style={styles.passwordFieldWrapper}>
                   <InputField
                     title='Kata Sandi Rekbr'
                     placeholder='Masukkan kata sandi kamu'
                     value={password}
                     onChangeText={setPassword}
-                    secureTextEntry={!isPasswordVisible}
                     isPassword={true}
-                    inputClassName='pr-12'
                   />
-
-                  <TouchableOpacity
-                    className='absolute top-11 right-10'
-                    onPress={togglePasswordVisibility}
-                  >
-                    <MaterialIcons
-                      name={isPasswordVisible ? "visibility" : "visibility-off"}
-                      size={22}
-                      color='#666'
-                    />
-                  </TouchableOpacity>
                 </View>
 
                 <TouchableOpacity
-                  className='self-end mt-2 px-5'
+                  style={styles.forgotPassword}
                   onPress={() => router.push("/auth/LupaPassword")}
                 >
-                  <Text className='text-blue-600 text-sm'>
-                    Lupa Kata Sandi?
-                  </Text>
+                  <Text style={styles.linkText}>Lupa Kata Sandi?</Text>
                 </TouchableOpacity>
 
-                {error && (
-                  <Text className='text-red-500 text-sm text-center'>
-                    {errorMsg}
-                  </Text>
-                )}
+                {error && <Text style={styles.errorText}>{errorMsg}</Text>}
               </View>
             </View>
+
             {/* Button & Links */}
-            <View className='items-center'>
-              <View className='absolute bottom-0 left-0 right-0 h-52 rounded-b-3xl overflow-hidden z-[-1]'>
+            <View style={styles.footerContainer}>
+              <View style={styles.gradientBackground}>
                 <Image
                   source={require("../../assets/gradasi.png")}
-                  className='w-full h-full absolute'
+                  style={styles.gradientImage}
                   resizeMode='cover'
                 />
               </View>
-              <View className='px-5 py-5 w-full'>
+              <View style={styles.buttonWrapper}>
                 <PrimaryButton
                   title='Masuk'
                   onPress={handleLogin}
@@ -198,40 +166,34 @@ export default function Login() {
               </View>
 
               {/* Registrasi / Hubungi Kami */}
-              <View className='items-center mt-3'>
-                <View className='flex-row items-center justify-between mb-4'>
-                  <Text className='text-sm px-3'>Belum punya akun?</Text>
+              <View style={styles.linkSection}>
+                <View style={styles.linkRow}>
+                  <Text style={styles.linkLabel}>Belum punya akun?</Text>
                   <TouchableOpacity
                     onPress={() => router.replace("/auth/register")}
                   >
-                    <Text className='text-sm text-blue-600 font-medium'>
-                      Silakan Registrasi
-                    </Text>
+                    <Text style={styles.linkAction}>Silakan Registrasi</Text>
                   </TouchableOpacity>
                 </View>
-                <View className='flex-row items-center justify-between mb-4'>
-                  <Text className='text-sm px-3'>Terdapat kendala?</Text>
+                <View style={styles.linkRow}>
+                  <Text style={styles.linkLabel}>Terdapat kendala?</Text>
                   <TouchableOpacity
                     onPress={() => Alert.alert("Berhasil terhubung")}
                   >
-                    <Text className='text-sm text-blue-600 font-medium'>
-                      Silakan Hubungi Kami
-                    </Text>
+                    <Text style={styles.linkAction}>Silakan Hubungi Kami</Text>
                   </TouchableOpacity>
                 </View>
               </View>
 
               {/* Powered by */}
-              <View className='flex-row items-center space-x-1 mt-4 mb-5'>
-                <Text className='text-xs text-gray-600'>Powered by</Text>
+              <View style={styles.poweredByRow}>
+                <Text style={styles.poweredByText}>Powered by</Text>
                 <Image
                   source={require("../../assets/326.png")}
-                  className='w-4 h-4'
+                  style={styles.logoIcon}
                   resizeMode='contain'
                 />
-                <Text className='text-xs font-semibold text-orange-500'>
-                  ADHIKSHA TRIBIXA
-                </Text>
+                <Text style={styles.poweredByBrand}>ADHIKSHA TRIBIXA</Text>
               </View>
             </View>
           </View>
@@ -240,3 +202,66 @@ export default function Login() {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: "white" },
+  headerContainer: { backgroundColor: "white", alignItems: "center" },
+  headerImage: {
+    width: "100%",
+    height: 300,
+    borderBottomLeftRadius: 16,
+    borderBottomRightRadius: 16,
+  },
+  formContainer: { marginHorizontal: 20, gap: 16, marginTop: 24, flex: 1 },
+  forgotPassword: {
+    alignSelf: "flex-end",
+    marginTop: 8,
+    paddingHorizontal: 20,
+  },
+  linkText: { color: "#2563EB", fontSize: 14 },
+  errorText: {
+    color: "#EF4444",
+    fontSize: 14,
+    textAlign: "center",
+  },
+  footerContainer: { alignItems: "center" },
+  gradientBackground: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 208,
+    borderBottomLeftRadius: 24,
+    borderBottomRightRadius: 24,
+    overflow: "hidden",
+    zIndex: -1,
+  },
+  gradientImage: {
+    width: "100%",
+    height: "100%",
+    position: "absolute",
+  },
+  buttonWrapper: { paddingHorizontal: 20, paddingVertical: 20, width: "100%" },
+  linkSection: { alignItems: "center", marginTop: 12 },
+  linkRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 16,
+  },
+  linkLabel: { fontSize: 14, paddingHorizontal: 12 },
+  linkAction: {
+    fontSize: 14,
+    color: "#2563EB",
+    fontWeight: "500",
+  },
+  poweredByRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 16,
+    marginBottom: 20,
+  },
+  poweredByText: { fontSize: 12, color: "#4B5563" },
+  logoIcon: { width: 16, height: 16, marginHorizontal: 4 },
+  poweredByBrand: { fontSize: 12, fontWeight: "600", color: "#F97316" },
+});

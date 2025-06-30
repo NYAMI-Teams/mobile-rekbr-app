@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   ScrollView,
   Alert,
+  StyleSheet,
 } from "react-native";
 import { Image } from "expo-image";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -15,10 +16,11 @@ import AttachmentFilled from "../../../components/AttachmentFilled";
 import PrimaryButton from "../../../components/PrimaryButton";
 import * as ImagePicker from "expo-image-picker";
 import * as ImageManipulator from "expo-image-manipulator";
-import { postBuyerReturn } from "@/utils/api/complaint";
+import { postBuyerReturnConfirm } from "@/utils/api/complaint";
 import { showToast } from "@/utils";
+import NavBackHeader from "@/components/NavBackHeader";
 
-export default function konfirmasiSellerForm() {
+export default function KonfirmasiSellerForm() {
   const router = useRouter();
   const { complaintId } = useLocalSearchParams();
 
@@ -57,15 +59,11 @@ export default function konfirmasiSellerForm() {
       [
         {
           text: "Kamera",
-          onPress: async () => {
-            await pickImage("camera");
-          },
+          onPress: async () => await pickImage("camera"),
         },
         {
           text: "Galeri",
-          onPress: async () => {
-            await pickImage("gallery");
-          },
+          onPress: async () => await pickImage("gallery"),
         },
         { text: "Batal", style: "cancel" },
       ]
@@ -88,7 +86,7 @@ export default function konfirmasiSellerForm() {
       });
     }
 
-    if (!result.canceled && result.assets && result.assets.length > 0) {
+    if (!result.canceled && result.assets?.length > 0) {
       let imageAsset = result.assets[0];
       let quality = 0.7;
       let compressed = await ImageManipulator.manipulateAsync(
@@ -97,7 +95,6 @@ export default function konfirmasiSellerForm() {
         { compress: quality, format: ImageManipulator.SaveFormat.JPEG }
       );
 
-      // Loop kompresi hingga < 1MB atau quality terlalu kecil
       let blob, size;
       do {
         const response = await fetch(compressed.uri);
@@ -114,10 +111,7 @@ export default function konfirmasiSellerForm() {
         }
       } while (size > 1024 * 1024 && quality >= 0.2);
 
-      setImage({
-        ...imageAsset,
-        uri: compressed.uri,
-      });
+      setImage({ ...imageAsset, uri: compressed.uri });
       setPhotoUri(true);
     } else {
       setImage(null);
@@ -127,31 +121,20 @@ export default function konfirmasiSellerForm() {
 
   const handleSubmit = async () => {
     try {
-      await postBuyerReturn(complaintId, reason, image);
+      await postBuyerReturnConfirm(complaintId, reason, image);
       router.replace("../../(tabs)/complaint");
+      showToast("Sukses", "Permintaan konfirmasi berhasil dikirim", "success");
     } catch (error) {
       showToast("Gagal", error?.message, "error");
-    } finally {
-      setShowPopup(false);
+      console.log("ini error konfirmasi form", error);
     }
-    // console.log("ini pengembalian", complaintId, courierId, resi, photoUri);
   };
 
   return (
-    <View className="flex-1 bg-white">
-      {/* Header */}
-      <View className="flex-row items-center justify-between p-4">
-        <TouchableOpacity onPress={() => router.back()}>
-          <ChevronLeft size={24} color="black" />
-        </TouchableOpacity>
-        <Text className="text-base font-semibold">
-          Permintaan Konfirmasi Seller
-        </Text>
-        <View style={{ width: 24 }} />
-      </View>
+    <View style={styles.container}>
+      <NavBackHeader title={"Permintaan Konfirmasi Seller"} />
 
-      {/* Isi Form */}
-      <ScrollView className="flex-1 px-4">
+      <ScrollView contentContainerStyle={styles.scrollContent}>
         <InputField
           title="Alasan Permintaan Konfirmasi"
           placeholder="Contohnya, barang telah diterima Buyer sejak 2 hari kemarin"
@@ -179,30 +162,77 @@ export default function konfirmasiSellerForm() {
         />
 
         {photoUri && (
-          <View className="mt-4">
-            <Text className="text-sm font-medium mb-2">
-              Preview Foto Bukti:
-            </Text>
-            <Image
-              source={{ uri: image?.uri }}
-              style={{ width: "100%", height: 200, borderRadius: 12 }}
-            />
+          <View style={styles.previewContainer}>
+            <Text style={styles.previewLabel}>Preview Foto Bukti:</Text>
+            <Image source={{ uri: image?.uri }} style={styles.previewImage} />
           </View>
         )}
       </ScrollView>
 
-      {/* Button di bawah */}
-      <View className="px-4 py-3 border-t border-gray-200">
+      <View style={styles.footer}>
         <PrimaryButton title="Kirim" onPress={handleSubmit} />
-        <View className="flex-row items-center justify-center mt-3">
-          <Text className="text-sm text-gray-500">Terdapat kendala?</Text>
+        <View style={styles.supportContainer}>
+          <Text style={styles.supportText}>Terdapat kendala?</Text>
           <TouchableOpacity>
-            <Text className="text-sm text-blue-600 ml-1 font-bold">
-              Silahkan Hubungi Kami
-            </Text>
+            <Text style={styles.supportLink}>Silahkan Hubungi Kami</Text>
           </TouchableOpacity>
         </View>
       </View>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: "#fff" },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: 16,
+  },
+  headerTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#000",
+  },
+  headerSpacer: {
+    width: 24,
+  },
+  scrollContent: {
+    paddingBottom: 16,
+  },
+  previewContainer: {
+    marginTop: 16,
+  },
+  previewLabel: {
+    fontSize: 14,
+    fontWeight: "500",
+    marginBottom: 8,
+  },
+  previewImage: {
+    width: "100%",
+    height: 200,
+    borderRadius: 12,
+  },
+  footer: {
+    borderTopWidth: 1,
+    borderTopColor: "#E5E7EB",
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  supportContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginTop: 12,
+  },
+  supportText: {
+    fontSize: 14,
+    color: "#6B7280",
+  },
+  supportLink: {
+    fontSize: 14,
+    color: "#2563EB",
+    fontWeight: "700",
+    marginLeft: 4,
+  },
+});

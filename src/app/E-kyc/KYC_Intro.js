@@ -15,12 +15,11 @@ import { useRouter } from "expo-router";
 
 export default function KYCFirst() {
   const router = useRouter();
-
   const [isChecked, setIsChecked] = useState(false);
 
   return (
     <>
-      <View className="flex-1 bg-white">
+      <View style={styles.container}>
         <StatusBar style="dark" />
 
         {/* Header */}
@@ -33,7 +32,7 @@ export default function KYCFirst() {
         </View>
 
         {/* Content scrollable */}
-        <View style={styles.content} >
+        <View style={styles.content}>
           <Image
             source={require("../../assets/kyc-image.png")}
             style={styles.image}
@@ -80,8 +79,7 @@ export default function KYCFirst() {
               resizeMode="contain"
             />
             <Text style={styles.footerText}>
-              Proses Registrasi KYC-nya dengan perantara BNI langsung. Gak ribet &
-              pasti aman!
+              Proses Registrasi KYC-nya dengan perantara BNI langsung. Gak ribet & pasti aman!
             </Text>
           </View>
         </View>
@@ -100,10 +98,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 16,
     paddingVertical: 12,
-  },
-  backArrow: {
-    fontSize: 24,
-    color: "#000",
   },
   headerTitle: {
     flex: 1,
@@ -152,18 +146,18 @@ const styles = StyleSheet.create({
     height: 24,
     borderWidth: 2,
     borderColor: "#000",
-    borderRadius: 8, // rounded sesuai gambar
+    borderRadius: 8,
     alignItems: "center",
     justifyContent: "center",
     marginRight: 12,
-    backgroundColor: "#fff", // default background putih
+    backgroundColor: "#fff",
   },
   checkboxChecked: {
-    backgroundColor: "#3ED6C5", // hijau toska saat dicentang
-    borderColor: "#3ED6C5", // border hilang / sama dengan background
+    backgroundColor: "#3ED6C5",
+    borderColor: "#3ED6C5",
   },
   checkmark: {
-    color: "#fff", // centang putih
+    color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
     textAlign: "center",
@@ -182,18 +176,13 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginBottom: 16,
   },
-  buttonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
-  },
   footer: {
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 8,
   },
   footerLogo: {
-    width: 36, // diperbesar sesuai request
+    width: 36,
     height: 36,
     marginRight: 8,
   },

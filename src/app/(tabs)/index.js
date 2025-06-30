@@ -15,7 +15,8 @@ import EmptyIllustration from "../../components/Ilustration";
 import TransactionSkeleton from "../../components/skeleton/TransactionSkeleton";
 import { showToast } from "../../utils";
 import { getSellerTransactions } from "../../utils/api/seller";
-import { getProfileStore } from "@/store";
+import { getProfileStore, setProfileStore } from "@/store";
+import { getProfile } from "@/utils/api/auth";
 
 export default function Seller() {
   const router = useRouter();
@@ -29,18 +30,28 @@ export default function Seller() {
   const [isInitialLoading, setIsInitialLoading] = useState(true);
 
   useEffect(() => {
-    getProfileStore()
-      .then((profileData) => {
-        if (profileData?.kycStatus === "verified") {
-          setIsKYCCompleted(true);
-        }
-      })
-      .catch(() => {
-        showToast("Gagal", "Gagal mengambil data profil", "error");
-      });
-
+    getUserProfile();
     fetchTransactions(true);
   }, []);
+
+  const getUserProfile = async () => {
+    try {
+      setIsInitialLoading(true);
+      const res = await getProfile();
+      if (res?.data?.kycStatus === "verified") {
+        setIsKYCCompleted(true);
+      }
+      await setProfileStore(res?.data);
+    } catch (error) {
+      showToast(
+        "Gagal",
+        "Gagal mengambil data profile. Silahkan coba kembali.",
+        "error"
+      );
+    } finally {
+      setIsInitialLoading(false);
+    }
+  };
 
   const fetchTransactions = async (reset = false) => {
     if (isFetching || (!hasMore && !reset)) return;
@@ -51,8 +62,6 @@ export default function Seller() {
     try {
       const res = await getSellerTransactions(currentOffset, limit);
       const newData = res.data || [];
-
-      await new Promise((resolve) => setTimeout(resolve, 800));
 
       if (reset) {
         setTransactions(newData);
@@ -77,6 +86,7 @@ export default function Seller() {
     setTransactions([]);
     setIsInitialLoading(true);
     setHasMore(true);
+    getUserProfile();
     fetchTransactions(true);
   };
 

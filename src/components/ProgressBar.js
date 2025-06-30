@@ -4,7 +4,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 
 const StepProgressBar = ({ currentStep, steps, rejectedSteps = [] }) => {
   return (
-    <View className="flex-row items-start justify-center px-4 my-5 mb-4 mx-4">
+    <View style={styles.container}>
       {steps.map((label, index) => {
         const isCompleted = index < currentStep;
         const isActive = index === currentStep;
@@ -20,9 +20,9 @@ const StepProgressBar = ({ currentStep, steps, rejectedSteps = [] }) => {
                   isRejectedStep && styles.rejectedCircle,
                   isCompleted && styles.completedCircle,
                   isActive &&
-                    !isFinalStep &&
-                    !isRejectedStep &&
-                    styles.activeCircle,
+                  !isFinalStep &&
+                  !isRejectedStep &&
+                  styles.activeCircle,
                   isFinalStep && styles.finalCircle,
                 ]}
               >
@@ -70,12 +70,12 @@ const StepProgressBar = ({ currentStep, steps, rejectedSteps = [] }) => {
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 10,
-    marginVertical: 20,
+    alignItems: "flex-start",
+    justifyContent: "center",
+    paddingHorizontal: 16,
+    marginTop: 20,
     marginBottom: 16,
     marginHorizontal: 16,
-    justifyContent: "space-between",
   },
   stepContainer: {
     alignItems: "center",

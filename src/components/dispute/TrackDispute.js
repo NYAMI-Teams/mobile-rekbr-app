@@ -1,4 +1,4 @@
-import { View, Text, Image, TouchableOpacity } from "react-native";
+import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
 import * as Clipboard from "expo-clipboard";
 import Toast from "react-native-toast-message";
 
@@ -33,30 +33,30 @@ const TrackDetail = ({
   expedition,
 }) => {
   return (
-    <View className="px-2 py-2.5 mx-1 mb-1 rounded-md bg-white">
+    <View style={styles.detailContainer}>
       {/* Content text */}
       {content ? (
         <>
-          <Text className="text-[14px] font-normal text-black">{content}</Text>
-          <View className="h-0.5 mt-2 bg-white" />
+          <Text style={styles.detailContent}>{content}</Text>
+          <View style={styles.detailDivider} />
         </>
       ) : null}
 
       {/* Image section */}
       {images.length > 0 && (
-        <View className={content ? "mt-2" : ""}>
+        <View style={[content ? styles.mt2 : null]}>
           {imgTitle ? (
-            <Text className="text-[12px] font-medium text-gray-800 mb-1">
+            <Text style={styles.imgTitle}>
               {imgTitle}
             </Text>
           ) : null}
 
-          <View className="flex flex-wrap flex-row gap-2">
+          <View style={styles.imgRow}>
             {images.map((imgSource, index) => (
               <Image
                 key={index}
                 source={imgSource}
-                className="w-[100px] h-[100px] rounded-lg mx-3"
+                style={styles.img}
                 resizeMode="cover"
               />
             ))}
@@ -66,27 +66,25 @@ const TrackDetail = ({
 
       {/* Resi & Ekspedisi section */}
       {(resiNumber || expedition) && (
-        <View className="">
+        <View>
           {resiNumber && (
-            <View className="flex-row justify-between items-center mt-2">
-              <Text className="text-[15px] text-black">No Resi : </Text>
-              <View className="flex-row items-center space-x-1">
-                <TouchableOpacity onPress={() => handleCopy(content)}>
+            <View style={styles.resiRow}>
+              <Text style={styles.resiLabel}>No Resi : </Text>
+              <View style={styles.resiValueRow}>
+                <TouchableOpacity onPress={() => handleCopy(resiNumber)}>
                   <Image
                     source={require("../../assets/copy.png")}
-                    style={{ marginLeft: 4, width: 17, height: 16 }}
+                    style={styles.copyIcon}
                   />
                 </TouchableOpacity>
-                <Text className="text-[15px] text-blue-600 font-medium">
-                  {resiNumber}
-                </Text>
+                <Text style={styles.resiValue}>{resiNumber}</Text>
               </View>
             </View>
           )}
           {expedition && (
-            <View className="flex-row justify-between items-center mt-2">
-              <Text className="text-[15px] text-black">Ekspedisi:</Text>
-              <Text className="text-[15px] text-black">{expedition}</Text>
+            <View style={styles.resiRow}>
+              <Text style={styles.resiLabel}>Ekspedisi:</Text>
+              <Text style={styles.resiLabel}>{expedition}</Text>
             </View>
           )}
         </View>
@@ -103,15 +101,15 @@ export const TrackDispute = ({
   titleColor = "black",
 }) => {
   return (
-    <View className="px-4 mt-6">
-      <Text className="text-[15px] font-semibold" style={{ color: titleColor }}>
+    <View style={styles.container}>
+      <Text style={[styles.title, { color: titleColor }]}>
         {title}
       </Text>
       {dateTime ? (
-        <Text className="text-[10px] text-gray-500 mt-1">{dateTime}</Text>
+        <Text style={styles.dateTime}>{dateTime}</Text>
       ) : null}
 
-      <View className="mt-2 bg-[#F9F9F9] rounded-xl ">
+      <View style={styles.detailWrapper}>
         {details.map((item, index) => (
           <TrackDetail
             key={index}
@@ -127,19 +125,89 @@ export const TrackDispute = ({
   );
 };
 
-// cara panggil
-// <TrackDispute
-//    title="Riwayat Dispute"
-//    dateTime="18 Juni 2025, 10:00 WIB"
-//    details={[
-//       { content: "Seller sudah kirim bukti." },
-//       { content: "Buyer setuju refund." },
-//       {
-//       imgTitle: "Bukti Barang & Transfer",
-//       images: [
-//       require("../../assets/barangrusak.png"),
-//       require("../../assets/barangrusak.png"),
-//        ],
-//        },
-//    ]}
-///>
+const styles = StyleSheet.create({
+  container: {
+    paddingHorizontal: 16,
+    marginTop: 24,
+  },
+  title: {
+    fontSize: 15,
+    fontWeight: "600",
+  },
+  dateTime: {
+    fontSize: 10,
+    color: "#6B7280",
+    marginTop: 4,
+  },
+  detailWrapper: {
+    marginTop: 8,
+    backgroundColor: "#F9F9F9",
+    borderRadius: 16,
+    overflow: "hidden",
+  },
+  detailContainer: {
+    paddingHorizontal: 8,
+    paddingVertical: 10,
+    marginHorizontal: 4,
+    marginBottom: 4,
+    borderRadius: 8,
+    backgroundColor: "#fff",
+  },
+  detailContent: {
+    fontSize: 14,
+    color: "#000",
+    fontWeight: "400",
+  },
+  detailDivider: {
+    height: 2,
+    marginTop: 8,
+    backgroundColor: "#fff",
+  },
+  mt2: {
+    marginTop: 8,
+  },
+  imgTitle: {
+    fontSize: 12,
+    fontWeight: "500",
+    color: "#374151",
+    marginBottom: 4,
+  },
+  imgRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+  },
+  img: {
+    width: 100,
+    height: 100,
+    borderRadius: 12,
+    marginRight: 8,
+    marginBottom: 8,
+  },
+  resiRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 8,
+  },
+  resiLabel: {
+    fontSize: 15,
+    color: "#000",
+  },
+  resiValueRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginLeft: 4,
+  },
+  copyIcon: {
+    marginLeft: 4,
+    width: 17,
+    height: 16,
+  },
+  resiValue: {
+    fontSize: 15,
+    color: "#2563EB",
+    fontWeight: "500",
+    marginLeft: 4,
+  },
+});

@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, TouchableOpacity, Image } from "react-native";
+import { View, Text, TouchableOpacity, Image, StyleSheet } from "react-native";
 import { ClipboardPaste } from "lucide-react-native";
 import PrimaryButton from "../PrimaryButton";
 
@@ -8,17 +8,15 @@ const statusconfig = {
     color: "#FBBF24",
     text: "Persetujuan Seller",
     note: "Jika kamu nggak respon sampai ",
-    notebold: "  18 Juni 2025, 10:00 WIB,",
     noteafter: " pengajuan ini bakal otomatis disetujui, ya!",
-    status: "18 Juni 2025, 10 : 00 WIB",
     statusColor: "#FEF2D3",
   },
   returnRequested: {
     color: "#FBBF24",
     text: "Menunggu Pengembalian",
-    note: "Kembalikan dengan baik, kemasan aman, dan berikan bukti pengiriman kembali!",
-    notebold: " Proses maksimal 1 x 24 jam.",
-    button: "Bukti Pengembalian",
+    note: "Buyer akan mengembalikan barang dalam 24 jam, konfirmasi bila barang telah sampai dan diterima.",
+    notebold: null,
+    button: null,
   },
   Completed: {
     color: "#06B217",
@@ -35,8 +33,8 @@ const statusconfig = {
   returnInTransit: {
     color: "#FBBF24",
     text: "Menunggu Pengembalian",
-    note: "Cek no resi berkala, kalau seller nggak konfirmasi, minta konfirmasi seller lewat admin. ",
-    button: "Minta Konfirmasi",
+    note: "Konfirmasi bila barang telah sampai dan diterima ya!",
+    button: null,
   },
   awaitingAdminApproval: {
     color: "#CB3A31",
@@ -70,7 +68,14 @@ const statusconfig = {
   underInvestigation: {
     color: "#FBBF24",
     text: "Investigasi Pengiriman",
-    note: "",
+    note: "Hey, kami lagi cek pengiriman barang kamu di ekspedisi, nih. Kita bakal nilai kesalahan ini dan cari solusi terbaik!",
+    button: null,
+  },
+
+  canceledByBuyer: {
+    color: "#CB3A31",
+    text: "Komplain Dibatalkan",
+    note: "Komplain dibatalkan oleh buyer dan riwayat komplain hanya tersedia untuk buyer",
     button: null,
   },
 
@@ -80,6 +85,15 @@ const statusconfig = {
     text: "Menunggu Pengembalian",
     note: "Buyer akan mengembalikan barang dalam 24 jam, konfirmasi bila barang telah sampai dan diterima.",
     button: "Barang Diterima",
+  },
+
+  awaitingAdminConfirmation: {
+    color: "#FBBF24",
+    text: "Menunggu Pengembalian",
+    note: "Tunggu approval kami, ya! Kalau bukti kamu oke, permintaan konfirmasi bakal langsung dikirim ke seller!",
+    button: "Permintaan Ditinjau",
+    btnColor: "#FEF2D3",
+    btnTextColor: "black",
   },
 };
 
@@ -92,78 +106,79 @@ const SellerDisputeListCard = ({
   typeDespute,
   status,
   time,
-  onPress = () => {},
-  onPressButton = () => {},
+  onPress = () => { },
+  onPressButton = () => { },
 }) => {
   const config = statusconfig[status];
 
   return (
-    <TouchableOpacity onPress={onPress} activeOpacity={0.8}>
-      <View className="bg-white border border-[#E5E7EB] rounded-2xl px-4 pt-4 pb-3 shadow-sm mb-8">
-        {/* Nama Barang & Harga */}
-        <View className="flex-row justify-between items-center mb-2">
-          <Text className="text-sm font-semibold text-[#1D1D1D]">
-            {namaBarang}
-          </Text>
-          <Text className="text-sm font-semibold text-[#1D1D1D]">{harga}</Text>
-        </View>
+    <TouchableOpacity onPress={onPress} >
+      <View style={styles.cardWrapper}>
+        <View style={styles.cardContent}>
+          {/* Nama Barang & Harga */}
+          <View style={styles.rowBetweenCenter}>
+            <Text style={styles.productName}>{namaBarang}</Text>
+            <Text style={styles.productName}>{harga}</Text>
+          </View>
 
-        {/* Seller */}
-        <View className="flex-row justify-between mb-2">
-          <Text className="text-xs text-[#6B7280]">Buyer</Text>
-          <Text className="text-xs text-[#1D1D1D]">{buyer}</Text>
-        </View>
+          {/* Seller */}
+          <View style={styles.rowBetween}>
+            <Text style={styles.labelGray}>Buyer</Text>
+            <Text style={styles.labelBlack}>{buyer}</Text>
+          </View>
 
-        {/* No Resi */}
-        <View className="flex-row justify-between items-center mb-2">
-          <Text className="text-xs text-[#6B7280]">No Resi</Text>
-          <View className="flex-row items-center space-x-1">
-            <ClipboardPaste size={14} color="#9CA3AF" />
-            <Text className="text-xs text-[#2563EB] font-medium">{noResi}</Text>
+          {/* No Resi */}
+          <View style={styles.rowBetweenCenter}>
+            <Text style={styles.labelGray}>No Resi</Text>
+            <View style={styles.rowIcon}>
+              <ClipboardPaste size={14} color="#9CA3AF" />
+              <Text style={styles.resiText}>{noResi}</Text>
+            </View>
+          </View>
+
+          {/* Ekspedisi */}
+          <View style={styles.rowBetweenMargin}>
+            <Text style={styles.labelGray}>Ekspedisi</Text>
+            <Text style={styles.labelBlack}>{expedisi}</Text>
           </View>
         </View>
 
-        {/* Ekspedisi */}
-        <View className="flex-row justify-between mb-4">
-          <Text className="text-xs text-[#6B7280]">Ekspedisi</Text>
-          <Text className="text-xs text-[#1D1D1D]">{expedisi}</Text>
-        </View>
 
         {/* Status Card */}
-        <View className="bg-[#F5F5F5] rounded-xl px-3 py-3">
-          <View className="flex-row items-center space-x-2 mb-2">
+        <View style={styles.cardFooter}>
+          <View style={styles.statusRow}>
             <Image
               source={require("../../assets/barangrusak.png")}
-              className="w-4 h-4"
+              style={styles.statusIcon}
               resizeMode="contain"
             />
-            <Text className="text-xs font-medium text-black ml-3">
-              {typeDespute}
-            </Text>
+            <Text style={styles.statusType}>{typeDespute}</Text>
           </View>
 
           {/* Catatan Admin */}
           {config?.note !== "" && (
-            <View className="flex-row my-2 items-start">
+            <View style={styles.adminNoteRow}>
               <Image
                 source={require("../../assets/admin1.png")}
-                className="w-5 h-5 mr-4"
+                style={styles.adminNoteIcon}
               />
-              <Text className="flex-1 text-xs text-gray-700 leading-5">
-                <Text className="text-xs text-black">{config?.note}</Text>
-                <Text className="text-xs text-black font-semibold">{time}</Text>
-                <Text className="text-xs text-black">{config?.noteafter}</Text>
+              <Text style={styles.adminNoteText}>
+                <Text style={styles.adminNoteTextBold}>{config?.note}</Text>
+                <Text style={[styles.adminNoteTextBold, { fontWeight: 600 }]}>{time}</Text>
+                <Text style={styles.adminNoteTextBold}> {config?.noteafter}</Text>
               </Text>
             </View>
           )}
 
-          <View className="flex-row justify-between items-center mt-2">
-            <View className="flex-row items-center space-x-1">
+          <View style={styles.statusBottomRow}>
+            <View style={styles.statusDotRow}>
               <View
-                className="w-2 h-2 rounded-full"
-                style={{ backgroundColor: config?.color }}
+                style={[
+                  styles.statusDot,
+                  { backgroundColor: config?.color },
+                ]}
               />
-              <Text className="text-xs text-black ml-2">{config?.text}</Text>
+              <Text style={styles.statusText}>{config?.text}</Text>
             </View>
 
             {/* Optional Button */}
@@ -181,9 +196,12 @@ const SellerDisputeListCard = ({
 
             {config?.status && (
               <View
-                className="flex-row items-center space-x-1 p-2 rounded-lg"
-                style={{ backgroundColor: config?.statusColor }}>
-                <Text className="text-xs text-black ml-2">{time}</Text>
+                style={[
+                  styles.statusTimeBox,
+                  { backgroundColor: config?.statusColor },
+                ]}
+              >
+                <Text style={styles.statusTimeText}>{time}</Text>
               </View>
             )}
           </View>
@@ -192,5 +210,130 @@ const SellerDisputeListCard = ({
     </TouchableOpacity>
   );
 };
+
+const styles = StyleSheet.create({
+  cardWrapper: {
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
+    borderRadius: 12,
+    marginVertical: 8,
+    backgroundColor: "#fff",
+    overflow: "hidden",
+    width: "100%",
+  },
+  cardContent: {
+    padding: 12,
+  },
+  rowBetweenCenter: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  rowBetween: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 8,
+  },
+  rowBetweenMargin: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 16,
+  },
+  productName: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#1D1D1D",
+  },
+  labelGray: {
+    fontSize: 12,
+    color: "#6B7280",
+  },
+  labelBlack: {
+    fontSize: 12,
+    color: "#1D1D1D",
+  },
+  rowIcon: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+  resiText: {
+    fontSize: 12,
+    color: "#2563EB",
+    fontWeight: "500",
+    marginLeft: 4,
+  },
+  cardFooter: {
+    backgroundColor: "#f3f4f6",
+    borderTopWidth: 1,
+    borderTopColor: "#e5e7eb",
+    padding: 12,
+    gap: 12
+  },
+  statusRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  statusIcon: {
+    width: 16,
+    height: 16,
+  },
+  statusType: {
+    fontSize: 12,
+    fontWeight: "500",
+    color: "#000",
+  },
+  adminNoteRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  adminNoteIcon: {
+    width: 20,
+    height: 20,
+    marginTop: 2,
+  },
+  adminNoteText: {
+    flex: 1,
+    fontSize: 12,
+    color: "#374151",
+    lineHeight: 18,
+  },
+  adminNoteTextBold: {
+    fontSize: 12,
+    color: "#000",
+  },
+  statusBottomRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  statusDotRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  statusDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+  },
+  statusText: {
+    fontSize: 12,
+    color: "#000",
+  },
+  statusTimeBox: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 4,
+    borderRadius: 8,
+  },
+  statusTimeText: {
+    fontSize: 12,
+    color: "#000",
+  },
+});
 
 export default SellerDisputeListCard;

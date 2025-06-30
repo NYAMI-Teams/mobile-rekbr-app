@@ -106,7 +106,6 @@ export default function Landing() {
           <TouchableOpacity
             style={styles.button}
             onPress={() => {
-              // TODO: Implement registration navigation
               router.replace("/auth/register");
             }}>
             <Text style={styles.buttonText}>Registrasi Sekarang</Text>

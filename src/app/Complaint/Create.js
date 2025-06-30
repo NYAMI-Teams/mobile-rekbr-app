@@ -8,27 +8,46 @@ import {
   Modal,
   Pressable,
   Alert,
+  StyleSheet,
 } from "react-native";
 import { ChevronLeft, ChevronDown, ChevronUp, Copy } from "lucide-react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import PrimaryButton from "../../components/PrimaryButton";
-import { router, useNavigation, useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import * as Clipboard from "expo-clipboard";
 import { getDetailBuyerTransaction } from "@/utils/api/buyer";
 import { postBuyerComplaint } from "@/utils/api/complaint";
 import { formatCurrency, showToast } from "../../utils";
 
 export default function CreateComplaintScreen() {
-  const navigation = useNavigation();
-  const { transactionId } = useLocalSearchParams();
+  const router = useRouter();
+  const { id } = useLocalSearchParams();
   const [showBreakdown, setShowBreakdown] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [transaction, setTransaction] = useState(null);
+  const [ajukanUlang, setAjukanUlang] = useState(false);
+
+  useEffect(() => {
+    fetchTransaction();
+  }, [id]);
 
   const handleCopy = async () => {
     await Clipboard.setStringAsync(transaction?.shipment?.trackingNumber || "");
     Alert.alert("Disalin", "Nomor resi berhasil disalin.");
+  };
+
+  const fetchTransaction = async () => {
+    try {
+      const res = await getDetailBuyerTransaction(id);
+      setTransaction(res.data);
+      setAjukanUlang(res.data?.Complaint.length > 0);
+    } catch (err) {
+      console.log(
+        "❌ Error saat fetchTransaction:",
+        err?.response?.data || err.message || err
+      );
+    }
   };
 
   const handleSubmitComplaint = async () => {
@@ -41,190 +60,141 @@ export default function CreateComplaintScreen() {
       const reason = "Barang belum sampai atau kesasar";
       const photo = null;
 
-      console.log("🧾 Payload:", {
-        transactionId,
-        type,
-        reason,
-        photo,
-      });
-
-      const complaint = await postBuyerComplaint(
-        transactionId,
-        type,
-        reason,
-        photo
-      );
-
-      if (!complaint?.id) throw new Error("Complaint tidak valid");
+      await postBuyerComplaint(id, type, reason, photo);
 
       showToast("Berhasil", "Komplain Berhasil dibuat", "success");
       router.replace("/(tabs)/complaint");
     } catch (err) {
-      console.log(
-        "❌ Error saat createComplaint:",
-        err?.response?.data || err.message || err
-      );
-      Alert.alert("Gagal", err?.response?.data?.message || "Terjadi kesalahan");
+      console.log("❌ Error saat createComplaint:", err.message);
+      showToast("Gagal", err?.message, "error");
     } finally {
       setIsSubmitting(false);
+      setModalVisible(false);
     }
   };
 
-  useEffect(() => {
-    if (transactionId) {
-      getDetailBuyerTransaction(transactionId)
-        .then((res) => {
-          console.log("📦 Transaction loaded:", res.data);
-          setTransaction(res.data);
-        })
-        .catch((err) => console.error("❌ Error loading transaction:", err));
-    }
-  }, [transactionId]);
-
-  if (!transaction) return null;
+  if (!transaction)
+    return (
+      <View style={styles.centeredContainer}>
+        <Text style={styles.errorText}>Error Rendered</Text>
+      </View>
+    );
 
   return (
-    <View className="flex-1 bg-white">
-      <ScrollView className="px-4 pt-4">
-        {/* Header */}
-        <View className="relative items-center justify-center mb-4">
+    <View style={styles.container}>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <View style={styles.headerContainer}>
           <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            className="absolute left-0">
+            onPress={() => router.back()}
+            style={styles.backButton}
+          >
             <ChevronLeft size={24} color="black" />
           </TouchableOpacity>
-          <Text className="text-lg font-semibold text-center">
-            Detail Masalah
-          </Text>
+          <Text style={styles.headerText}>Detail Masalah</Text>
         </View>
 
-        {/* Info SOP */}
-        <View className="flex-row items-start bg-white p-4 rounded-xl mb-4 border border-gray-100 space-x-3">
+        <View style={styles.infoBox}>
           <Image
             source={require("../../assets/admin1.png")}
-            className="w-10 h-10 rounded-full"
+            style={styles.avatar}
             resizeMode="contain"
           />
-          <Text className="text-sm text-gray-700 flex-1">
+          <Text style={styles.infoText}>
             FYI dulu nih! Pengiriman udah ada SOP jelas dengan dimana kurir
             wajib foto penerima + titik koordinat.
           </Text>
         </View>
 
-        {/* Box Investigasi */}
-        <View className="bg-white border border-gray-100 p-4 rounded-xl mb-4">
-          <Text className="font-semibold text-sm mb-1">
+        <View style={styles.investigationBox}>
+          <Text style={styles.investigationTitle}>
             Minta Rekbr by BNI Care Investigasi Pengiriman
           </Text>
-          <Text className="text-sm text-gray-700">
+          <Text style={styles.investigationText}>
             Rekbr by BNI akan menghubungi pihak kurir. Dana bermasalah akan
             dikembalikan setelah komplainmu disetujui.
           </Text>
         </View>
 
-        {/* Masalah yang dipilih */}
-        <Text className="text-sm font-semibold mb-2">Masalah yang dipilih</Text>
-        <View className="flex-row items-start bg-white p-4 rounded-xl mb-4 border border-gray-100 space-x-3">
+        <Text style={styles.sectionTitle}>Masalah yang dipilih</Text>
+        <View style={styles.infoBox}>
           <Image
             source={require("../../assets/belumsampai.png")}
-            className="w-10 h-10 rounded-full"
+            style={styles.avatar}
             resizeMode="contain"
           />
-          <Text className="text-sm text-gray-700 flex-1">
-            Barang belum sampai atau kesasar
-          </Text>
+          <Text style={styles.infoText}>Barang belum sampai atau kesasar</Text>
         </View>
 
-        {/* Info Barang */}
-        <Text className="text-base font-semibold mb-2">
-          Barang yang belum diterima
-        </Text>
-        <View className="bg-[#E5F7F9] rounded-xl p-4 border border-[#D6F0F3]">
-          <Text className="font-semibold text-base mb-2">
-            {transaction.itemName}
-          </Text>
-          <Text className="text-base text-gray-500 mb-3">
-            {transaction.transactionCode}
-          </Text>
+        <Text style={styles.sectionHeader}>Barang yang belum diterima</Text>
+        <View style={styles.itemBox}>
+          <Text style={styles.itemTitle}>{transaction.itemName}</Text>
+          <Text style={styles.itemCode}>{transaction.transactionCode}</Text>
 
-          <View className="space-y-2">
-            <View className="flex-row justify-between mb-2">
-              <Text className="text-base text-gray-600">Seller</Text>
-              <Text className="text-base text-black">
-                {transaction.sellerEmail}
-              </Text>
+          <View style={styles.detailsList}>
+            <View style={styles.rowBetween}>
+              <Text style={styles.label}>Seller</Text>
+              <Text style={styles.value}>{transaction.sellerEmail}</Text>
             </View>
 
-            <View className="flex-row justify-between items-center mb-4">
-              <Text className="text-base text-black">No Resi</Text>
-              <Pressable
-                onPress={handleCopy}
-                className="flex-row items-center space-x-1">
+            <View style={styles.rowBetween}>
+              <Text style={styles.label}>No Resi</Text>
+              <Pressable onPress={handleCopy} style={styles.copyButton}>
                 <Copy size={16} color="#999" />
-                <Text className="text-base text-blue-500 font-semibold">
+                <Text style={styles.copyText}>
                   {transaction.shipment?.trackingNumber || "-"}
                 </Text>
               </Pressable>
             </View>
 
-            <View className="flex-row justify-between mb-2">
-              <Text className="text-base text-gray-600">Ekspedisi</Text>
-              <Text className="text-base text-black">
+            <View style={styles.rowBetween}>
+              <Text style={styles.label}>Ekspedisi</Text>
+              <Text style={styles.value}>
                 {transaction.shipment?.courier || "-"}
               </Text>
             </View>
 
-            {/* Nominal Rekber */}
             <Pressable
               onPress={() => setShowBreakdown(!showBreakdown)}
-              className="pt-2 border-t border-gray-200">
-              <View className="flex-row justify-between items-center mb-1">
-                <Text className="text-sm font-semibold text-black">
-                  Nominal Rekber
-                </Text>
+              style={styles.breakdownToggle}
+            >
+              <View style={styles.rowBetween}>
+                <Text style={styles.breakdownLabel}>Nominal Rekber</Text>
                 {showBreakdown ? (
                   <ChevronUp size={16} color="black" />
                 ) : (
                   <ChevronDown size={16} color="black" />
                 )}
               </View>
-              {showBreakdown && (
-                <View className="space-y-1">
-                  <View className="flex-row justify-between mb-1">
-                    <Text className="text-base text-gray-600">
-                      Nominal Barang
-                    </Text>
-                    <Text className="text-base text-black">
+              {showBreakdown ? (
+                <View style={styles.breakdownContent}>
+                  <View style={styles.rowBetween}>
+                    <Text style={styles.label}>Nominal Barang</Text>
+                    <Text style={styles.value}>
                       {formatCurrency(transaction.itemPrice)}
                     </Text>
                   </View>
-                  <View className="flex-row justify-between mb-1">
-                    <Text className="text-base text-gray-600">
-                      Asuransi BNI Life
-                    </Text>
-                    <Text className="text-base text-black">
+                  <View style={styles.rowBetween}>
+                    <Text style={styles.label}>Asuransi BNI Life</Text>
+                    <Text style={styles.value}>
                       {formatCurrency(transaction.insuranceFee)}
                     </Text>
                   </View>
-                  <View className="flex-row justify-between mb-1">
-                    <Text className="text-base text-gray-600">
-                      Biaya Aplikasi
-                    </Text>
-                    <Text className="text-base text-black">
+                  <View style={styles.rowBetween}>
+                    <Text style={styles.label}>Biaya Aplikasi</Text>
+                    <Text style={styles.value}>
                       {formatCurrency(transaction.platformFee)}
                     </Text>
                   </View>
-                  <View className="flex-row justify-between pt-1 border-t border-gray-200 mt-1">
-                    <Text className="text-lg font-bold text-black">Total</Text>
-                    <Text className="text-lg font-bold text-black">
+                  <View style={styles.rowBetween}>
+                    <Text style={styles.totalLabel}>Total</Text>
+                    <Text style={styles.totalLabel}>
                       {formatCurrency(transaction.totalAmount)}
                     </Text>
                   </View>
                 </View>
-              )}
-              {!showBreakdown && (
-                <View className="flex-row justify-between">
-                  <Text className="text-sm text-black font-semibold">
+              ) : (
+                <View style={styles.rowBetween}>
+                  <Text style={styles.breakdownLabel}>
                     {formatCurrency(transaction.totalAmount)}
                   </Text>
                 </View>
@@ -234,42 +204,40 @@ export default function CreateComplaintScreen() {
         </View>
       </ScrollView>
 
-      {/* Tombol Kirim dan Modal */}
-      <View className="mb-6">
+      <View style={styles.footer}>
         <PrimaryButton
-          title="Kirim"
-          className="mb-6"
+          title={ajukanUlang ? "Ajukan Ulang Komplain" : "Kirim"}
+          style={{ marginBottom: 24 }}
           onPress={() => setModalVisible(true)}
         />
         <Modal
           transparent
           visible={modalVisible}
           animationType="fade"
-          onRequestClose={() => setModalVisible(false)}>
-          <View className="absolute inset-0 z-50 justify-center items-center bg-black/30">
-            <View className="w-[90%] bg-white rounded-xl shadow-md p-5 border border-gray-200">
-              <View className="flex-row items-start space-x-3 mb-6">
-                <View className="w-6 h-6 rounded-full bg-blue-500 items-center justify-center">
-                  <Text className="text-white font-bold text-xs">i</Text>
+          onRequestClose={() => setModalVisible(false)}
+        >
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContent}>
+              <View style={styles.modalHeader}>
+                <View style={styles.modalIcon}>
+                  <Text style={styles.modalIconText}>i</Text>
                 </View>
-                <Text className="flex-1 text-lg font-medium text-black">
+                <Text style={styles.modalTitle}>
                   Apakah kamu sudah yakin untuk ringkasan komplain ini?
                 </Text>
               </View>
-
-              <View className="flex-row justify-between">
+              <View style={styles.modalActions}>
                 <Pressable
                   onPress={() => setModalVisible(false)}
-                  className="flex-1 py-3 rounded-lg bg-gray-100 mr-2">
-                  <Text className="text-center text-black font-semibold text-base">
-                    Kembali
-                  </Text>
+                  style={styles.cancelButton}
+                >
+                  <Text style={styles.cancelText}>Kembali</Text>
                 </Pressable>
-
                 <Pressable
                   onPress={handleSubmitComplaint}
-                  className="flex-1 py-3 rounded-lg bg-blue-100 ml-2">
-                  <Text className="text-center text-black font-semibold text-base">
+                  style={styles.confirmButton}
+                >
+                  <Text style={styles.confirmText}>
                     {isSubmitting ? "Mengirim..." : "Konfirmasi"}
                   </Text>
                 </Pressable>
@@ -281,3 +249,129 @@ export default function CreateComplaintScreen() {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: "white" },
+  scrollContent: { paddingHorizontal: 16, paddingTop: 16 },
+  centeredContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  errorText: { fontSize: 18, fontWeight: "600" },
+  headerContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 16,
+    position: "relative",
+  },
+  backButton: { position: "absolute", left: 0 },
+  headerText: { fontSize: 18, fontWeight: "600", textAlign: "center" },
+  infoBox: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    backgroundColor: "#fff",
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 16,
+    borderColor: "#e5e7eb",
+    borderWidth: 1,
+    gap: 12,
+  },
+  avatar: { width: 40, height: 40, borderRadius: 9999 },
+  infoText: { fontSize: 14, color: "#374151", flex: 1 },
+  investigationBox: {
+    backgroundColor: "#fff",
+    borderColor: "#e5e7eb",
+    borderWidth: 1,
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 16,
+  },
+  investigationTitle: { fontSize: 14, fontWeight: "600", marginBottom: 4 },
+  investigationText: { fontSize: 14, color: "#374151" },
+  sectionTitle: { fontSize: 14, fontWeight: "600", marginBottom: 8 },
+  sectionHeader: { fontSize: 16, fontWeight: "600", marginBottom: 8 },
+  itemBox: {
+    backgroundColor: "#E5F7F9",
+    borderRadius: 12,
+    padding: 16,
+    borderColor: "#D6F0F3",
+    borderWidth: 1,
+  },
+  itemTitle: { fontSize: 16, fontWeight: "600", marginBottom: 8 },
+  itemCode: { fontSize: 16, color: "#6b7280", marginBottom: 12 },
+  detailsList: { gap: 12 },
+  rowBetween: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  label: { fontSize: 16, color: "#6b7280" },
+  value: { fontSize: 16, color: "#000" },
+  copyButton: { flexDirection: "row", alignItems: "center", gap: 4 },
+  copyText: { fontSize: 16, fontWeight: "600", color: "#3b82f6" },
+  breakdownToggle: { paddingTop: 8, borderTopWidth: 1, borderColor: "#e5e7eb" },
+  breakdownLabel: { fontSize: 14, fontWeight: "600", color: "#000" },
+  breakdownContent: { gap: 4, marginTop: 4 },
+  totalLabel: { fontSize: 18, fontWeight: "700", color: "#000" },
+  footer: { marginBottom: 24, marginHorizontal: 20 },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.3)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContent: {
+    width: "90%",
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    padding: 20,
+    borderColor: "#e5e7eb",
+    borderWidth: 1,
+  },
+  modalHeader: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 12,
+    marginBottom: 24,
+  },
+  modalIcon: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: "#3b82f6",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalIconText: { color: "#fff", fontWeight: "700", fontSize: 12 },
+  modalTitle: { flex: 1, fontSize: 18, fontWeight: "500", color: "#000" },
+  modalActions: { flexDirection: "row", justifyContent: "space-between" },
+  cancelButton: {
+    flex: 1,
+    paddingVertical: 12,
+    backgroundColor: "#f3f4f6",
+    borderRadius: 8,
+    marginRight: 8,
+  },
+  cancelText: {
+    textAlign: "center",
+    fontWeight: "600",
+    fontSize: 16,
+    color: "#000",
+  },
+  confirmButton: {
+    flex: 1,
+    paddingVertical: 12,
+    backgroundColor: "#dbeafe",
+    borderRadius: 8,
+    marginLeft: 8,
+  },
+  confirmText: {
+    textAlign: "center",
+    fontWeight: "600",
+    fontSize: 16,
+    color: "#000",
+  },
+});

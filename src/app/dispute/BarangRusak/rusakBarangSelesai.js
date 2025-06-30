@@ -1,8 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, TouchableOpacity, ScrollView } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  StyleSheet,
+} from "react-native";
 import { ChevronLeft } from "lucide-react-native";
-import { useLocalSearchParams, useNavigation } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import PrimaryButton from "../../../components/PrimaryButton";
 import { InfoBanner } from "../../../components/dispute/InfoBanner";
 import StepProgressBar from "../../../components/ProgressBar";
@@ -11,8 +16,15 @@ import { TrackDispute } from "../../../components/dispute/TrackDispute";
 import TextView from "../../../components/dispute/textView";
 import Tagihan from "../../../components/DetailRekber/Tagihan";
 import CopyField from "../../../components/dispute/copyField";
-import { useRouter } from "expo-router";
 import { getDetailBuyerComplaint } from "../../../utils/api/complaint";
+import { showToast, formatCurrency } from "../../../utils";
+import moment from "moment";
+import NavBackHeader from "@/components/NavBackHeader";
+
+const formatDateWIB = (dateTime) => {
+  if (!dateTime) return "Invalid date";
+  return moment(dateTime).utcOffset(7).format("DD MMMM YYYY, HH:mm [WIB]");
+};
 
 export default function RusakBarangSelesai() {
   const router = useRouter();
@@ -27,112 +39,137 @@ export default function RusakBarangSelesai() {
     try {
       const res = await getDetailBuyerComplaint(complaintId);
       setDetailComplaint(res.data);
+      console.log("ini detail complaint", JSON.stringify(res.data, null, 2));
     } catch (err) {
-      showToast(
-        "Gagal",
-        "Gagal mengambil data transaksi. Silahkan coba lagi.",
-        "error"
-      );
+      showToast("Gagal", err?.message, "error");
     }
   };
 
   return (
-    <View className="flex-1 bg-white">
+    <View style={styles.container}>
       {/* Header */}
-      <View className="flex-row items-center justify-between p-4">
-        <TouchableOpacity onPress={() => router.back()}>
-          <ChevronLeft size={24} color="black" />
-        </TouchableOpacity>
-        <Text className="text-base font-semibold">Detail Komplain</Text>
-        <View style={{ width: 24 }} />
-      </View>
+      <NavBackHeader title={"Detail Komplain"} />
 
       <StepProgressBar
         currentStep={3}
         steps={["Seller", "Admin", "Kembaliin", "Refund"]}
       />
-      <StatusKomplain status={detailComplaint.status_label} />
 
-      <View className="h-2 bg-[#f5f5f5] mt-3" />
+      <StatusKomplain
+        status={
+          detailComplaint.status === "completed"
+            ? "Transaksi Selesai"
+            : "Transaksi Dalam Proses"
+        }
+      />
 
-      <ScrollView className="px-4 pt-4 pb-40">
-        <TrackDispute
-          title="Konfirmasi seller dan dana berhasil dikembalikan"
-          dateTime="22 Juni 2025, 10 : 00 WIB"
+      <View style={styles.separator} />
+
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        {detailComplaint?.timeline
+          ?.slice()
+          .reverse()
+          .map((item, index) => (
+            <TrackDispute
+              key={index}
+              title={item.label}
+              dateTime={formatDateWIB(item.timestamp)}
+              details={[
+                {
+                  content: item?.reason || item?.message || "-",
+                },
+                item?.evidence?.length > 0 && {
+                  imgTitle: "Bukti foto & video",
+                  images: item?.evidence.map((url, key) => ({ uri: url, key })),
+                },
+              ]}
+            />
+          ))}
+
+        <View style={styles.separator} />
+
+        <TextView
+          title="Seller"
+          content={detailComplaint?.transaction?.sellerEmail || "-"}
         />
-        <View className="h-2 bg-[#f5f5f5] mt-3" />
-        <TrackDispute
-          title="Admin meneruskan permintaan konfirmasi"
-          dateTime="20 Juni 2025, 12 : 00 WIB"
-        />
-        <View className="h-2 bg-[#f5f5f5] mt-3" />
-
-        <TrackDispute
-          title="Permintaan konfirmasi buyer"
-          dateTime="Melalui resi harusnya barang sudah sampai di seller"
-          details={[
-            {
-              content: "Melalui resi harusnya barang sudah sampai di seller",
-            },
-            {
-              imgTitle: "Bukti foto & video",
-              images: [require("../../../assets/barangrusak.png")],
-            },
-          ]}
-        />
-        <View className="h-2 bg-[#f5f5f5] mt-3" />
-
-        <TrackDispute
-          title="Pengembalian barang oleh buyer"
-          dateTime="20 Juni 2025, 10 : 00 WIB"
-          details={[
-            {
-              resiNumber: "J X 3 4 7 4 1 2 4 0 1 3",
-              expedition: "J&T Express Indonesia",
-            },
-          ]}
-        />
-
-        <View className="h-2 bg-[#f5f5f5] mt-3" />
-
-        <TrackDispute
-          title="Persetujuan komplain seller"
-          dateTime="19 Juni 2025, 10 : 00 WIB"
-          details={[
-            {
-              content:
-                "Seller setuju untuk Refund dana pada barang yang bermasalah.",
-            },
-            {
-              imgTitle: "Bukti foto & video",
-              images: [require("../../../assets/barangrusak.png")],
-            },
-          ]}
+        <TextView
+          title="Nama Barang"
+          content={detailComplaint?.transaction?.itemName || "-"}
         />
 
-        <View className="h-2 bg-[#f5f5f5] mt-3" />
-
-        <TextView title="Seller" content="irgi168@gmail.com" />
-        <TextView title="Nama Barang" content="IPhone 13 Pro Max" />
-        <View className="p-3">
+        <View style={styles.tagihanContainer}>
           <Tagihan
             caption="Tagihan Rekber"
-            price="Rp 1.000.000"
+            price={formatCurrency(
+              detailComplaint?.transaction?.totalAmount || 0
+            )}
             details={[
-              { status: "Kembaliin", price: "Rp 1.000.000" },
-              { status: "Refund", price: "Rp 1.000.000" },
+              {
+                status: "Kembaliin",
+                price: formatCurrency(
+                  detailComplaint?.transaction?.totalAmount || 0
+                ),
+              },
+              {
+                status: "Refund",
+                price: formatCurrency(
+                  detailComplaint?.transaction?.totalAmount || 0
+                ),
+              },
             ]}
           />
         </View>
 
-        <CopyField title="Nomor Resi" content="123456789" />
-        <TextView title="Ekspedisi" content="J&T Express Indonesia" />
-        <CopyField title="ID Transaksi" content="1 2 3 4 5 6 7 8 9" />
+        <CopyField
+          title="Nomor Resi"
+          content={detailComplaint?.returnShipment?.trackingNumber || "-"}
+        />
+        <TextView
+          title="Ekspedisi"
+          content={detailComplaint?.returnShipment?.courierName || "-"}
+        />
+        <CopyField
+          title="ID Transaksi"
+          content={detailComplaint?.transaction?.transactionCode || "-"}
+        />
         <CopyField
           title="Virtual Account"
-          content="8 0 8 0 1 2 3 4 5 6 7 8 9"
+          content={detailComplaint?.transaction?.virtualAccount || "-"}
         />
       </ScrollView>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#ffffff",
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: 16,
+  },
+  headerTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#000",
+  },
+  headerSpacer: {
+    width: 24,
+  },
+  separator: {
+    height: 8,
+    backgroundColor: "#f5f5f5",
+    marginTop: 12,
+  },
+  scrollContent: {
+    paddingTop: 16,
+    paddingBottom: 80,
+  },
+  tagihanContainer: {
+    padding: 12,
+  },
+});

@@ -6,8 +6,8 @@ import {
   ScrollView,
   Image,
   Modal,
+  StyleSheet,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { ChevronLeft, ChevronLeftCircle } from "lucide-react-native";
 import * as ImagePicker from "expo-image-picker";
 import { InputField } from "../../../components/dispute/InputField";
@@ -18,6 +18,7 @@ import DropDownField from "../../../components/DropDownField";
 import { getListCourier } from "../../../utils/api/seller";
 import { postBuyerReturn } from "../../../utils/api/complaint";
 import { showToast } from "../../../utils";
+import NavBackHeader from "@/components/NavBackHeader";
 
 export default function PengembalianForm() {
   const router = useRouter();
@@ -30,12 +31,12 @@ export default function PengembalianForm() {
   const [courierList, setCourierList] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [image, setImage] = useState(null);
-  const [loading, isLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     (async () => {
       const cameraStatus = await ImagePicker.requestCameraPermissionsAsync();
-      setHasCameraPermission(cameraStatus.status === "granted");
+      // can be stored if needed
     })();
     getCourier();
   }, []);
@@ -43,18 +44,13 @@ export default function PengembalianForm() {
   const getCourier = async () => {
     try {
       const res = await getListCourier();
-      if (res) {
-        setCourierList(res.data);
-      }
+      if (res) setCourierList(res.data);
     } catch (error) {
       showToast("Gagal", "Gagal mengambil data ekspedisi", "error");
     }
   };
 
-  const handleModal = () => {
-    setModalVisible(true);
-  };
-
+  const handleModal = () => setModalVisible(true);
   const closeModal = () => {
     setModalVisible(false);
     setCourier("");
@@ -79,36 +75,33 @@ export default function PengembalianForm() {
   };
 
   const handleSubmit = async () => {
-    if (loading) return;
-    isLoading(true);
+    if (isLoading) return;
+    setIsLoading(true);
     try {
       await postBuyerReturn(complaintId, courierId, resi, image);
       router.replace("../../(tabs)/complaint");
     } catch (error) {
       showToast("Gagal", error?.message, "error");
     } finally {
-      isLoading(false);
+      setIsLoading(false);
     }
   };
 
   return (
-    <View className="flex-1 bg-white">
-      <View className="flex-row items-center justify-between p-4">
-        <TouchableOpacity onPress={() => router.back()}>
-          <ChevronLeft size={24} color="black" />
-        </TouchableOpacity>
-        <Text className="text-base font-semibold">Form Pengembalian</Text>
-        <View style={{ width: 24 }} />
-      </View>
+    <View style={styles.container}>
+      {/* Header */}
+      <NavBackHeader title={"Detail Komplain"} />
 
-      <ScrollView className="flex-1 px-4">
+      {/* Form */}
+      <ScrollView style={styles.formWrapper}>
         <InputField
           title="Input Nomor Resi"
           placeholder="Masukkan nomor resi dengan benar"
           value={resi}
           onChangeText={setResi}
         />
-        <TouchableOpacity className="mt-4 mb-4" onPress={handleModal}>
+
+        <TouchableOpacity style={styles.dropdownWrapper} onPress={handleModal}>
           <DropDownField
             title="Pilih Ekspedisi"
             placeholder="Pilih Ekspedisi pengiriman kamu"
@@ -136,75 +129,169 @@ export default function PengembalianForm() {
         />
 
         {photoUri && (
-          <View className="mt-4">
-            <Text className="text-sm font-medium mb-2">Preview Foto Resi:</Text>
+          <View style={styles.previewWrapper}>
+            <Text style={styles.previewLabel}>Preview Foto Resi:</Text>
             <Image
               source={{ uri: photoUri }}
-              style={{ width: "100%", height: 200, borderRadius: 12 }}
+              style={styles.previewImage}
+              resizeMode="cover"
             />
           </View>
         )}
       </ScrollView>
 
-      <View className="px-4 py-3 border-t border-gray-200">
+      {/* Bottom Button */}
+      <View style={styles.buttonWrapper}>
         <PrimaryButton
           title={isLoading ? "Mengirim..." : "Kirim"}
           onPress={handleSubmit}
           disabled={isLoading}
         />
-        <View className="flex-row items-center justify-center mt-3">
-          <Text className="text-sm text-gray-500">Terdapat kendala?</Text>
+        <View style={styles.helpWrapper}>
+          <Text style={styles.helpText}>Terdapat kendala?</Text>
           <TouchableOpacity disabled={isLoading}>
-            <Text className="text-sm text-blue-600 ml-1 font-bold">
-              Silahkan Hubungi Kami
-            </Text>
+            <Text style={styles.helpLink}>Silahkan Hubungi Kami</Text>
           </TouchableOpacity>
         </View>
       </View>
 
-      {/* Bottom Sheet Modal */}
+      {/* Modal */}
       <Modal
         animationType="slide"
         transparent={true}
         visible={modalVisible}
-        onRequestClose={() => {
-          closeModal();
-        }}>
-        <TouchableOpacity
-          className="flex-1 bg-black/50 justify-end"
-          onPress={closeModal}>
-          <View className="bg-white rounded-t-lg h-[55%]">
-            <View className="flex-row justify-start p-4 ">
+        onRequestClose={closeModal}
+      >
+        <TouchableOpacity style={styles.modalOverlay} onPress={closeModal}>
+          <View style={styles.modalContainer}>
+            <View style={styles.modalHeader}>
               <TouchableOpacity
                 onPress={closeModal}
-                className="flex-row items-center mb-6">
+                style={styles.modalBackBtn}
+              >
                 <ChevronLeftCircle size={24} color="#00C2C2" />
-                <Text className="text-lg font-normal text-gray-800 ml-2">
-                  Pilih Ekspedisi
-                </Text>
+                <Text style={styles.modalTitle}>Pilih Ekspedisi</Text>
               </TouchableOpacity>
             </View>
 
-            {/* Modal Content */}
-            <View className="justify-between flex-1">
-              <ScrollView className="my-2" showsVerticalScrollIndicator={false}>
-                <View className="flex-col gap-4 bg-slate-100/50 m-5 p-5 rounded-lg border border-gray-300">
-                  {courierList.map((courier, index) => (
-                    <TouchableOpacity
-                      key={index}
-                      className="p-5 border-b-2 border-gray-300/50 mb-4"
-                      onPress={() => handleSelectCourier(courier)}>
-                      <Text className="text-[15px] font-semibold">
-                        {courier.name}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              </ScrollView>
-            </View>
+            <ScrollView style={styles.modalList}>
+              <View style={styles.courierListBox}>
+                {courierList.map((courier, index) => (
+                  <TouchableOpacity
+                    key={index}
+                    style={styles.courierItem}
+                    onPress={() => handleSelectCourier(courier)}
+                  >
+                    <Text style={styles.courierText}>{courier.name}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </ScrollView>
           </View>
         </TouchableOpacity>
       </Modal>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: "white" },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: 16,
+  },
+  headerTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#000",
+  },
+  formWrapper: {
+    flex: 1,
+    paddingHorizontal: 16,
+  },
+  dropdownWrapper: {
+    marginTop: 16,
+    marginBottom: 16,
+  },
+  previewWrapper: {
+    marginTop: 16,
+  },
+  previewLabel: {
+    fontSize: 14,
+    fontWeight: "500",
+    marginBottom: 8,
+  },
+  previewImage: {
+    width: "100%",
+    height: 200,
+    borderRadius: 12,
+  },
+  buttonWrapper: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderTopWidth: 1,
+    borderTopColor: "#E5E7EB",
+  },
+  helpWrapper: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginTop: 12,
+  },
+  helpText: {
+    fontSize: 14,
+    color: "#6B7280",
+  },
+  helpLink: {
+    fontSize: 14,
+    color: "#2563EB",
+    fontWeight: "700",
+    marginLeft: 4,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "flex-end",
+  },
+  modalContainer: {
+    backgroundColor: "white",
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+    height: "55%",
+  },
+  modalHeader: {
+    flexDirection: "row",
+    padding: 16,
+  },
+  modalBackBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  modalTitle: {
+    fontSize: 18,
+    marginLeft: 8,
+    fontWeight: "500",
+    color: "#111827",
+  },
+  modalList: {
+    paddingHorizontal: 16,
+  },
+  courierListBox: {
+    backgroundColor: "#F1F5F9",
+    padding: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#D1D5DB",
+    marginBottom: 20,
+  },
+  courierItem: {
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "rgba(209,213,219,0.5)",
+  },
+  courierText: {
+    fontSize: 15,
+    fontWeight: "600",
+  },
+});

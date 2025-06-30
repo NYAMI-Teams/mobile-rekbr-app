@@ -6,6 +6,7 @@ import {
   ActivityIndicator,
   RefreshControl,
   TouchableOpacity,
+  StyleSheet, // Import StyleSheet
 } from "react-native";
 import { useRouter } from "expo-router";
 
@@ -50,8 +51,6 @@ export default function DisputeScreen() {
       } else {
         setIsEmptyBuyerComplaints(true);
       }
-      // console.log("ini complaints", res.data);r
-
       setBuyerComplaints(res.data);
       console.log("Complaints as Buyer:", JSON.stringify(res.data, null, 2));
     } catch (err) {
@@ -74,8 +73,6 @@ export default function DisputeScreen() {
       } else {
         setIsEmptySellerComplaints(true);
       }
-      // console.log("ini complaints", res.data);r
-
       setSellerComplaints(res.data);
       console.log("Complaints as Seller:", JSON.stringify(res.data, null, 2));
     } catch (err) {
@@ -103,7 +100,7 @@ export default function DisputeScreen() {
     if (selectedTab === "pembelian") {
       if (isEmptyBuyerComplaints) {
         return (
-          <View className="justify-center items-center">
+          <View style={styles.emptyIllustrationContainer}>
             <EmptyIllustration
               text={
                 "Belum ada dispute, semua transaksi rekber kamu aman, mulus, dan lancar jaya!"
@@ -127,26 +124,38 @@ export default function DisputeScreen() {
             seller={item?.transaction?.sellerEmail}
             noResi={
               item?.status === "return_in_transit" ||
-              item?.status === "approved_by_admin"
+              item?.status === "approved_by_admin" ||
+              item?.status === "completed" ||
+              item?.status === "awaiting_seller_confirmation" ||
+              item?.status === "awaiting_admin_confirmation"
                 ? item?.returnShipment?.trackingNumber || "-"
                 : "-"
             }
             expedisi={
               item?.status === "return_in_transit" ||
-              item?.status === "approved_by_admin"
+              item?.status === "approved_by_admin" ||
+              item?.status === "completed" ||
+              item?.status === "awaiting_seller_confirmation" ||
+              item?.status === "awaiting_admin_confirmation"
                 ? item?.returnShipment?.courierName || "-"
                 : "-"
             }
-            time={item?.sellerConfirmDeadline} // ini perlu dibuat function base on status, karena timenya beda beda
+            typeDespute={disputeTypeLabel(item?.type)}
+            time={dateShow(mappedStatus, item)}
             status={mappedStatus}
             onPress={() => handleBuyerComplaintPress(item, mappedStatus)}
             onPressButton={
               mappedStatus === "returnRequested"
-                ? () =>
+                ? () => {
+                    console.log("Masuk Sini");
+
                     router.push({
                       pathname: "/dispute/BarangRusak/pengembalianForm",
                       params: { complaintId: item?.id },
-                    })
+                    });
+
+                    console.log("Beres Masuk Sini");
+                  }
                 : mappedStatus === "returnInTransit"
                 ? () =>
                     router.push({
@@ -163,7 +172,7 @@ export default function DisputeScreen() {
         console.log("Masuk seller");
 
         return (
-          <View className="justify-center items-center">
+          <View style={styles.emptyIllustrationContainer}>
             <EmptyIllustration
               text={
                 "Belum ada dispute. Semua transaksi rekber kamu aman, mulus, dan lancar jaya!"
@@ -187,40 +196,27 @@ export default function DisputeScreen() {
             buyer={item?.transaction?.buyerEmail || ""}
             noResi={
               item?.status === "return_in_transit" ||
-              item?.status === "approved_by_admin"
+              item?.status === "approved_by_admin" ||
+              item?.status === "completed" ||
+              item?.status === "awaiting_seller_confirmation" ||
+              item?.status === "awaiting_admin_confirmation"
                 ? item?.returnShipment?.trackingNumber || "-"
                 : "-"
             }
             expedisi={
               item?.status === "return_in_transit" ||
-              item?.status === "approved_by_admin"
+              item?.status === "approved_by_admin" ||
+              item?.status === "completed" ||
+              item?.status === "awaiting_seller_confirmation" ||
+              item?.status === "awaiting_admin_confirmation"
                 ? item?.returnShipment?.courierName || "-"
                 : "-"
             }
             typeDespute={disputeTypeLabel(item?.type)}
-            time={formatDateWIB(item?.sellerConfirmDeadline)}
+            time={dateShow(mappedStatus, item)}
             status={mappedStatus}
             onPress={() => handleSellerComplaintPress(item, mappedStatus)}
-            onPressButton={
-              mappedStatus === "returnRequested"
-                ? () => {
-                    console.log("ini status dari seller", mappedStatus);
-                    router.push({
-                      pathname: "/dispute/BarangRusak/pengembalianForm",
-                      params: { complaintId: item?.id },
-                    });
-                  }
-                : mappedStatus === "returnInTransit"
-                ? () => {
-                    router.push({
-                      pathname: "/dispute/BarangRusak/konfirmasiSellerForm",
-                      params: { complaintId: item?.id },
-                    });
-                  }
-                : () => {
-                    console.log("Null", mappedStatus);
-                  } // Default empty function
-            }
+            onPressButton={() => {}}
           />
         );
       });
@@ -247,6 +243,7 @@ export default function DisputeScreen() {
     completed: "Completed",
     rejected_by_admin: "rejectedByAdmin",
     canceled_by_buyer: "canceledByBuyer",
+    awaiting_admin_confirmation: "awaitingAdminConfirmation",
     awaiting_seller_confirmation: "awaitingSellerConfirmation",
   };
 
@@ -258,24 +255,43 @@ export default function DisputeScreen() {
     awaiting_admin_approval: "awaitingAdminApproval",
     approved_by_seller: "approvedBySeller",
     approved_by_admin: "approvedByAdmin",
-    under_investigtion: "underInvestigation",
+    under_investigation: "underInvestigation",
     awaiting_seller_confirmation: "awaitingSellerConfirmation",
     completed: "Completed",
     rejected_by_admin: "rejectedByAdmin",
     canceled_by_buyer: "canceledByBuyer",
+    awaiting_admin_confirmation: "awaitingAdminConfirmation",
   };
 
-  const hiddenStatusesBuyer = [
-    "completed", //kalo seller masuk ke status map
-    "rejected_by_admin",
-    "canceled_by_buyer",
-    "awaiting_seller_confirmation", // kalo seller masuk ke status map
-  ];
+  const dateShow = (status, data) => {
+    console.log("ini status dari Complain awal", status);
 
-  const hiddenStatusesSeller = ["rejected_by_admin", "canceled_by_buyer"];
+    switch (status) {
+      case "waitingSellerApproval":
+        return formatDateWIB(data?.sellerResponseDeadline) || "Invalid date";
+      case "returnRequested":
+        return ` Proses maksimal 1 x 24 jam atau ${formatDateWIB(
+          data?.buyerDeadlineInputShipment
+        )}`;
+      case "sellerRejected":
+      case "returnInTransit":
+      case "awaitingAdminApproval":
+      case "approvedBySeller":
+      case "approvedByAdmin":
+      case "underInvestigation":
+      case "awaitingSellerConfirmation":
+      case "Completed":
+      case "rejectedByAdmin":
+      case "canceledByBuyer":
+      case "awaitingAdminConfirmation":
+        return "";
+      default:
+        return "Invalid status";
+    }
+  };
 
   const disputeTypeLabel = (type) => {
-    if (type === "Barang rusak") return "Barang Rusak";
+    if (type === "damaged") return "Barang Rusak";
     if (type === "lost") return "Barang Hilang";
     return "-";
   };
@@ -297,18 +313,24 @@ export default function DisputeScreen() {
           },
         });
       },
-      Completed: () =>
-        router.push({
-          pathname: "/dispute/BarangRusak/rusakBarangSelesai",
-          params: { complaintId: item?.id },
-        }),
+      Completed: () => {
+        if (item?.type == "damaged") {
+          router.push({
+            pathname: "/dispute/BarangRusak/rusakBarangSelesai",
+            params: { complaintId: item?.id },
+          });
+        } else {
+          router.push({
+            pathname: "/Complaint/Detail",
+            params: { id: item?.id, role: "buyer" },
+          });
+        }
+      },
       sellerRejected: () =>
         router.push({
           pathname: "/dispute/BarangRusak/rusakBarangAdmin",
           params: {
             complaintId: item?.id,
-            status: "sellerRejected",
-            rejectedAdmin: false,
           },
         }),
       returnInTransit: () =>
@@ -336,11 +358,19 @@ export default function DisputeScreen() {
             status: "awaitingAdminApproval",
           },
         }),
-      rejectedByAdmin: () =>
-        router.push({
-          pathname: "/dispute/BarangRusak/rusakBarangAdmin",
-          params: { complaintId: item?.id, rejectedAdmin: true },
-        }),
+      rejectedByAdmin: () => {
+        if (item?.type == "damaged") {
+          router.push({
+            pathname: "/dispute/BarangRusak/rusakBarangAdmin",
+            params: { complaintId: item?.id, rejectedAdmin: true },
+          });
+        } else {
+          router.push({
+            pathname: "/Complaint/Detail",
+            params: { id: item?.id, role: "buyer" },
+          });
+        }
+      },
       awaitingSellerConfirmation: () =>
         //marking
         router.push({
@@ -348,6 +378,14 @@ export default function DisputeScreen() {
           params: {
             complaintId: item?.id,
             status: "awaitingSellerConfirmation",
+          },
+        }),
+      awaitingAdminConfirmation: () =>
+        router.push({
+          pathname: "/dispute/BarangRusak/rusakBarangKembaliin",
+          params: {
+            complaintId: item?.id,
+            status: "awaitingAdminConfirmation",
           },
         }),
       approvedBySeller: () =>
@@ -365,11 +403,28 @@ export default function DisputeScreen() {
           },
         });
       },
+      canceledByBuyer: () => {
+        if (item?.type === "damaged") {
+          router.push({
+            pathname: "/dispute/BarangRusak/pilihKomplain",
+            params: {
+              id: item?.transaction?.id,
+            },
+          });
+        } else {
+          router.push({
+            pathname: "/Complaint/Create",
+            params: {
+              id: item?.transaction?.id,
+            },
+          });
+        }
+      },
       underInvestigation: () =>
         //marking
         router.push({
           pathname: "/Complaint/Detail",
-          params: { id: item?.id },
+          params: { id: item?.id, role: "buyer" },
         }),
     };
 
@@ -391,30 +446,36 @@ export default function DisputeScreen() {
           pathname: "/dispute/SellerDispute/AdminPage",
           params: {
             id: item?.id,
-            rejectedAdmin: false,
-            status: "awaitingAdminApproval",
           },
         }),
       returnRequested: () => {
         router.push({
           pathname: "/dispute/SellerDispute/KembaliinPage",
           params: {
-            complaintId: item?.id,
+            id: item?.id,
             status: "returnRequested",
           },
         });
       },
-      Completed: () =>
-        router.push({
-          pathname: "/dispute/SellerDispute/SelesaiPage",
-          params: { complaintId: item?.id },
-        }),
+      Completed: () => {
+        if (item?.type == "damaged") {
+          router.push({
+            pathname: "/dispute/SellerDispute/SelesaiPage",
+            params: { complaintId: item?.id },
+          });
+        } else {
+          router.push({
+            pathname: "/Complaint/Detail",
+            params: { id: item?.id, role: "seller" },
+          });
+        }
+      },
       sellerRejected: () => {},
       returnInTransit: () =>
         router.push({
           pathname: "/dispute/SellerDispute/KembaliinPage",
           params: {
-            complaintId: item?.id,
+            id: item?.id,
             status: "returnInTransit",
           },
         }),
@@ -422,29 +483,46 @@ export default function DisputeScreen() {
         router.push({
           pathname: "/dispute/SellerDispute/KembaliinPage",
           params: {
-            complaintId: item?.id,
+            id: item?.id,
             status: "disputeProved",
           },
         }),
-      rejectedByAdmin: () =>
-        router.push({
-          pathname: "/dispute/SellerDispute/SellerPage",
-          params: { complaintId: item?.id, rejectedAdmin: true },
-        }),
+      rejectedByAdmin: () => {
+        if (item?.type == "damaged") {
+          router.push({
+            pathname: "/dispute/SellerDispute/AdminPage",
+            params: { id: item?.id },
+          });
+        } else {
+          router.push({
+            pathname: "/Complaint/Detail",
+            params: { id: item?.id, role: "seller" },
+          });
+        }
+      },
+
       awaitingSellerConfirmation: () =>
         //marking
         router.push({
           pathname: "/dispute/SellerDispute/KembaliinPage",
           params: {
-            complaintId: item?.id,
+            id: item?.id,
             status: "awaitingSellerConfirmation",
+          },
+        }),
+      awaitingAdminConfirmation: () =>
+        router.push({
+          pathname: "/dispute/SellerDispute/KembaliinPage",
+          params: {
+            id: item?.id,
+            status: "awaitingAdminConfirmation",
           },
         }),
       approvedBySeller: () =>
         //marking
         router.push({
           pathname: "/dispute/SellerDispute/KembaliinPage",
-          params: { complaintId: item?.id, status: "approvedBySeller" },
+          params: { id: item?.id, status: "approvedBySeller" },
         }),
       approvedByAdmin: () => {
         router.push({
@@ -459,7 +537,7 @@ export default function DisputeScreen() {
         //marking
         router.push({
           pathname: "/Complaint/Detail",
-          params: { id: item?.id },
+          params: { id: item?.id, role: "seller" },
         }),
     };
 
@@ -470,50 +548,62 @@ export default function DisputeScreen() {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#fff" }}>
-      {/* <View className="flex-1 bg-white"> */}
-      <View className="flex-row w-full px-4 h-10">
+    <View style={styles.container}>
+      <View style={styles.tabContainer}>
         <TouchableOpacity
           onPress={() => handleTabPress("pembelian")}
-          className={`flex-1 items-center justify-center h-full ${
+          style={[
+            styles.tabButton,
             selectedTab === "pembelian"
-              ? "border-b-2 border-[#49DBC8]"
-              : "border-b-2 border-gray-300"
-          }`}>
+              ? styles.tabButtonActive
+              : styles.tabButtonInactive,
+          ]}
+        >
           <Text
-            className={`text-xs font-semibold ${
-              selectedTab === "pembelian" ? "text-black" : "text-gray-400"
-            }`}>
+            style={[
+              styles.tabText,
+              selectedTab === "pembelian"
+                ? styles.tabTextActive
+                : styles.tabTextInactive,
+            ]}
+          >
             Pembelian
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => handleTabPress("penjualan")}
-          className={`flex-1 items-center justify-center h-full ${
+          style={[
+            styles.tabButton,
             selectedTab === "penjualan"
-              ? "border-b-2 border-[#49DBC8]"
-              : "border-b-2 border-gray-300"
-          }`}>
+              ? styles.tabButtonActive
+              : styles.tabButtonInactive,
+          ]}
+        >
           <Text
-            className={`text-xs font-semibold ${
-              selectedTab === "penjualan" ? "text-black" : "text-gray-400"
-            }`}>
+            style={[
+              styles.tabText,
+              selectedTab === "penjualan"
+                ? styles.tabTextActive
+                : styles.tabTextInactive,
+            ]}
+          >
             Penjualan
           </Text>
         </TouchableOpacity>
       </View>
       {isLoading ? (
-        <View className="flex-1 items-center mt-5">
+        <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#000" />
         </View>
       ) : (
-        <View className="bg-white">
+        <View style={styles.contentContainer}>
           <ScrollView
-            className="px-4 my-3"
+            style={styles.scrollView}
             showsVerticalScrollIndicator={false}
             refreshControl={
               <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-            }>
+            }
+          >
             {renderContent()}
           </ScrollView>
         </View>
@@ -521,3 +611,56 @@ export default function DisputeScreen() {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
+  tabContainer: {
+    flexDirection: "row",
+    width: "100%",
+    paddingHorizontal: 16, // px-4
+    height: 40, // h-10
+  },
+  tabButton: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    height: "100%",
+  },
+  tabButtonActive: {
+    borderBottomWidth: 2,
+    borderBottomColor: "#49DBC8",
+  },
+  tabButtonInactive: {
+    borderBottomWidth: 2,
+    borderBottomColor: "#D1D5DB", // gray-300
+  },
+  tabText: {
+    fontSize: 12, // text-xs
+    fontWeight: "600", // font-semibold
+  },
+  tabTextActive: {
+    color: "#000", // text-black
+  },
+  tabTextInactive: {
+    color: "#9CA3AF", // gray-400
+  },
+  loadingContainer: {
+    flex: 1,
+    alignItems: "center",
+    marginTop: 20, // mt-5
+  },
+  contentContainer: {
+    backgroundColor: "#fff",
+  },
+  scrollView: {
+    paddingHorizontal: 16, // px-4
+    marginVertical: 12, // my-3
+  },
+  emptyIllustrationContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+  },
+});

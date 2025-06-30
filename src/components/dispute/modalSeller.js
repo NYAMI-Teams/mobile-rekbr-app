@@ -8,45 +8,43 @@ import {
   KeyboardAvoidingView,
   ScrollView,
   Platform,
+  StyleSheet,
+  Pressable,
+  Alert,
 } from "react-native";
 import Modal from "react-native-modal";
 import { useState, useEffect } from "react";
-import { Pressable } from "react-native";
-import { Alert } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import * as ImageManipulator from "expo-image-manipulator";
-import { Feather } from "lucide-react-native";
 import { postSellerResponse } from "../../utils/api/complaint";
 import PrimaryButton from "../PrimaryButton";
 import { showToast } from "../../utils";
 import { useRouter } from "expo-router";
+import { Feather } from "@expo/vector-icons";
 
-export default function ModalSeller({ showPopup, setShowPopup, id }) {
+export default function ModalSeller({ showPopup, setShowPopup, id, isTolak }) {
   const router = useRouter();
   const [tanggapanSeller, setTanggapanSeller] = useState("");
   const [isInputValid, setIsInputValid] = useState(false);
   const [arrPhoto, setArrPhoto] = useState([]);
   const [isUploaded, setIsUploaded] = useState(false);
   const [hasCameraPermission, setHasCameraPermission] = useState(null);
-  const status = "approved";
 
   useEffect(() => {
     (async () => {
       const cameraStatus = await ImagePicker.requestCameraPermissionsAsync();
       setHasCameraPermission(cameraStatus.status === "granted");
     })();
+    console.log("ini isTolak", isTolak);
   }, []);
 
   const handleUpload = async () => {
-    console.log("Masuk Sini (awal)");
-
     if (arrPhoto.length >= 5) {
       Alert.alert(
         "Limit Mencapai",
         "Anda sudah mencapai batas maksimal 5 foto",
         [{ text: "OK" }]
       );
-      console.log("Masuk Sini (limit)");
       return;
     }
 
@@ -55,7 +53,6 @@ export default function ModalSeller({ showPopup, setShowPopup, id }) {
         "Izin Kamera Diperlukan",
         "Aplikasi memerlukan akses kamera untuk mengambil foto. Mohon berikan izin di pengaturan perangkat Anda."
       );
-      console.log("Masuk Sini (izin)");
       return;
     }
 
@@ -64,7 +61,6 @@ export default function ModalSeller({ showPopup, setShowPopup, id }) {
         "Meminta Izin",
         "Aplikasi sedang meminta izin kamera. Mohon tunggu sebentar."
       );
-      console.log("Masuk Sini (izin null)");
       return;
     }
 
@@ -87,7 +83,6 @@ export default function ModalSeller({ showPopup, setShowPopup, id }) {
         { text: "Batal", style: "cancel" },
       ]
     );
-    console.log("Masuk Sini (akhir)");
   };
 
   const pickImage = async (source) => {
@@ -115,7 +110,6 @@ export default function ModalSeller({ showPopup, setShowPopup, id }) {
         { compress: quality, format: ImageManipulator.SaveFormat.JPEG }
       );
 
-      // Loop kompresi hingga < 1MB atau quality terlalu kecil
       let blob, size;
       do {
         const response = await fetch(compressed.uri);
@@ -141,21 +135,28 @@ export default function ModalSeller({ showPopup, setShowPopup, id }) {
   };
 
   const handleSellerResponse = async () => {
-    setShowPopup(false);
-    // hitted API
     try {
+      if (!isInputValid) {
+        showToast("Error", "Tanggapan harus minimal 25 karakter", "error");
+        return;
+      }
+
+      let status = isTolak ? "rejected" : "return_requested";
       const res = await postSellerResponse(
         id,
         status,
         tanggapanSeller,
         arrPhoto
       );
+
       showToast("Berhasil", res?.message, "success");
-      console.log("ini res", res);
-      router.replace("../../(tabs)/dispute");
+      router.replace("/(tabs)/complaint");
+      setShowPopup(false);
     } catch (err) {
       console.log("Gagal cok ===> ", err.message);
       showToast("Gagal", err?.message, "error");
+      // Re-enable the button on error
+      // Tidak perlu document.querySelector di React Native
     }
   };
 
@@ -167,41 +168,31 @@ export default function ModalSeller({ showPopup, setShowPopup, id }) {
       onRequestClose={() => setShowPopup(false)}
       style={{ margin: 0, padding: 0 }}>
       <Pressable
-        className="flex-1 bg-black/40 justify-end"
+        style={styles.overlay}
         onPress={() => setShowPopup(false)}>
         <Pressable
-          className="bg-white rounded-t-2xl px-2"
-          style={{
-            height: "55%",
-            width: "100%",
-            position: "absolute",
-            bottom: 0,
-            left: 0,
-            right: 0,
-          }}
+          style={styles.modalContainer}
           onPress={() => {}}>
-          <View className="flex-col justify-center p-4">
-            <Text className="text-lg font-semibold mb-4">
+          <View style={styles.contentContainer}>
+            <Text style={styles.title}>
               Form Konfirmasi Seller
             </Text>
-            {/* form tanggapan seller */}
             <ScrollView
               contentContainerStyle={{ flexGrow: 1 }}
               keyboardShouldPersistTaps="handled"
               showsVerticalScrollIndicator={false}
-              hideKeyboardOnScroll={true}
               keyboardDismissMode="on-drag">
               <KeyboardAvoidingView
                 behavior={Platform.OS === "ios" ? "padding" : "height"}
                 style={{ flex: 1 }}>
-                <View className="mb-4">
-                  <Text className="text-black text-base font-medium mb-2">
+                <View style={styles.inputSection}>
+                  <Text style={styles.label}>
                     Tanggapan Seller (Min. 25 karakter)
                   </Text>
                   <TextInput
                     placeholder="Berikan tanggapan kamu"
                     placeholderTextColor="#888"
-                    className="border border-gray-300 rounded-lg p-2 h-28"
+                    style={styles.textInput}
                     multiline
                     numberOfLines={4}
                     value={tanggapanSeller}
@@ -211,53 +202,43 @@ export default function ModalSeller({ showPopup, setShowPopup, id }) {
                     }}
                   />
                   {tanggapanSeller.length > 0 && (
-                    <Text className="text-xs text-gray-500 mt-1">
+                    <Text style={styles.counterText}>
                       {tanggapanSeller.length}/200 karakter
                     </Text>
                   )}
                   {!isInputValid && tanggapanSeller.length > 0 && (
-                    <Text className="text-xs text-red-500 mt-1">
+                    <Text style={styles.errorText}>
                       {tanggapanSeller.length < 25
                         ? "Minimal 25 karakter"
                         : "Maksimal 200 karakter"}
                     </Text>
                   )}
                 </View>
-                <View className="mb-2">
-                  <Text className="text-black text-base font-medium mb-2">
+                <View style={styles.inputSection}>
+                  <Text style={styles.label}>
                     Bukti foto & video (opsional)
                   </Text>
-                  <Text
-                    style={{
-                      color: "black",
-                      fontSize: 12,
-                      fontWeight: "300",
-                      marginBottom: 8,
-                    }}>
+                  <Text style={styles.infoText}>
                     Unggah maksimal
-                    <Text style={{ fontWeight: "500" }}> 5 foto</Text> atau
-                    <Text style={{ fontWeight: "500" }}> 4 foto + 1 video</Text>
+                    <Text style={styles.boldText}> 5 foto</Text> atau
+                    <Text style={styles.boldText}> 4 foto + 1 video</Text>
                     . Format: .jpg, .png, .mp4, .mov. Maks. 10 MB (foto), 60 MB
                     (video).
                   </Text>
-                  <View className="flex-row flex-wrap gap-2 mt-2">
-                    <TouchableOpacity onPress={handleUpload} className="mb-2">
+                  <View style={styles.photoRow}>
+                    <TouchableOpacity onPress={handleUpload} style={styles.addPhotoBtn}>
                       <Image
                         source={require("../../assets/addImg.png")}
-                        style={{ width: 50, height: 50 }}
+                        style={styles.photoThumb}
                       />
                     </TouchableOpacity>
                     {arrPhoto.length > 0 && (
-                      <View className="flex-row flex-wrap gap-2">
+                      <View style={styles.photoRow}>
                         {arrPhoto.map((photo, index) => (
-                          <View key={index} className="relative">
+                          <View key={index} style={styles.photoWrapper}>
                             <Image
                               source={{ uri: photo.uri }}
-                              style={{
-                                width: 50,
-                                height: 50,
-                                borderRadius: 8,
-                              }}
+                              style={styles.photoThumb}
                             />
                             <TouchableOpacity
                               onPress={() => {
@@ -265,7 +246,7 @@ export default function ModalSeller({ showPopup, setShowPopup, id }) {
                                 newPhotos.splice(index, 1);
                                 setArrPhoto(newPhotos);
                               }}
-                              className="absolute -top-2 -right-2 bg-red-500 rounded-full p-1">
+                              style={styles.removeBtn}>
                               <Feather name="x" size={16} color="white" />
                             </TouchableOpacity>
                           </View>
@@ -274,12 +255,12 @@ export default function ModalSeller({ showPopup, setShowPopup, id }) {
                     )}
                   </View>
                   {arrPhoto.length > 0 && (
-                    <Text className="text-xs text-gray-500 mt-1">
+                    <Text style={styles.counterText}>
                       {arrPhoto.length}/5 foto
                     </Text>
                   )}
                 </View>
-                <View className="mb-4">
+                <View style={styles.buttonSection}>
                   <PrimaryButton
                     title="Kirim"
                     onPress={handleSellerResponse}
@@ -294,3 +275,104 @@ export default function ModalSeller({ showPopup, setShowPopup, id }) {
     </Modal>
   );
 }
+
+const styles = StyleSheet.create({
+  overlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.4)",
+    justifyContent: "flex-end",
+  },
+  modalContainer: {
+    backgroundColor: "#fff",
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    paddingHorizontal: 8,
+    height: "55%",
+    width: "100%",
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+  },
+  contentContainer: {
+    flexDirection: "column",
+    padding: 16,
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: "600",
+    marginBottom: 16,
+  },
+  inputSection: {
+    marginBottom: 16,
+  },
+  label: {
+    color: "#000",
+    fontSize: 16,
+    fontWeight: "500",
+    marginBottom: 8,
+  },
+  textInput: {
+    borderWidth: 1,
+    borderColor: "#d1d5db",
+    borderRadius: 8,
+    padding: 8,
+    height: 112,
+    color: "#000",
+    textAlignVertical: "top",
+    backgroundColor: "#fff",
+  },
+  counterText: {
+    fontSize: 12,
+    color: "#6b7280",
+    marginTop: 4,
+  },
+  errorText: {
+    fontSize: 12,
+    color: "#ef4444",
+    marginTop: 4,
+  },
+  infoText: {
+    color: "#000",
+    fontSize: 12,
+    fontWeight: "300",
+    marginBottom: 8,
+  },
+  boldText: {
+    fontWeight: "500",
+  },
+  photoRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    alignItems: "center",
+    gap: 8,
+    marginTop: 8,
+  },
+  addPhotoBtn: {
+    marginBottom: 8,
+    marginRight: 8,
+  },
+  photoWrapper: {
+    position: "relative",
+    marginRight: 8,
+    marginBottom: 8,
+  },
+  photoThumb: {
+    width: 50,
+    height: 50,
+    borderRadius: 8,
+  },
+  removeBtn: {
+    position: "absolute",
+    top: -8,
+    right: -8,
+    backgroundColor: "#ef4444",
+    borderRadius: 999,
+    padding: 4,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  buttonSection: {
+    marginBottom: 16,
+  },
+});

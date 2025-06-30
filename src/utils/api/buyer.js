@@ -26,7 +26,7 @@ export const getHistoryBuyer = async (offset, limit) => {
   try {
     const res = await Api.get(`/buyer/transactions`, {
       params: {
-        status: ["completed", "canceled"],
+        status: ["completed", "canceled", "refunded"],
         offset,
         limit,
       },

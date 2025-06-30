@@ -48,6 +48,10 @@ export default function DetailTransaksiBuyer() {
       try {
         const res = await getDetailBuyerTransaction(id);
         setData(res.data);
+        console.log(
+          "Ini Detail Buyer Transaction",
+          JSON.stringify(res.data, null, 2)
+        );
       } catch (err) {
         showToast(
           "Gagal",
@@ -65,6 +69,7 @@ export default function DetailTransaksiBuyer() {
       const res = await updateBuyerTransaction(data?.id);
       setPaymentDone(res.data);
       setIsPaymentDone(res.success);
+      modalizeRef.current?.close();
     } catch (error) {
       showToast("Gagal", "Gagal memperbarui transaksi", "error");
     }
@@ -74,6 +79,7 @@ export default function DetailTransaksiBuyer() {
     try {
       const res = await buyerConfirmReceivedTransaction(data?.id);
       setShowPopup(false);
+      modalizeRef.current?.close();
       router.replace("/buyer");
     } catch (error) {
       showToast("Gagal", "Gagal memperbarui transaksi", "error");
@@ -81,7 +87,6 @@ export default function DetailTransaksiBuyer() {
   };
 
   const handleSimulatePayment = () => {
-    // setModalVisible(true);
     modalizeRef.current?.open();
   };
 
@@ -95,7 +100,6 @@ export default function DetailTransaksiBuyer() {
   };
 
   const handleCopy = async (text) => {
-    // belum bisa jalan toastnya
     if (!text) return;
     try {
       await Clipboard.setStringAsync(text);
@@ -247,6 +251,28 @@ export default function DetailTransaksiBuyer() {
         ];
       }
     }
+    if (data?.status == "refunded") {
+      if (data?.paidAt == null) {
+        return [
+          {
+            status: "Waktu bikin Rekbr",
+            date: data?.createdAt || "-",
+          },
+        ];
+      }
+      if (data?.paidAt != null) {
+        return [
+          {
+            status: "Waktu bikin Rekbr",
+            date: data?.createdAt || "-",
+          },
+          {
+            status: "Waktu pembeli Bayar",
+            date: data?.paidAt || "-",
+          },
+        ];
+      }
+    }
   };
 
   const setupCaptionTimeStamp = () => {
@@ -299,6 +325,14 @@ export default function DetailTransaksiBuyer() {
         return data?.paidAt || "-";
       }
     }
+    if (data?.status == "refunded") {
+      if (data?.paidAt == null) {
+        return data?.createdAt || "-";
+      }
+      if (data?.paidAt != null) {
+        return data?.paidAt || "-";
+      }
+    }
   };
 
   const formatPrice = (price) => {
@@ -311,21 +345,17 @@ export default function DetailTransaksiBuyer() {
   const setupFooter = () => {
     if (data?.status == "pending_payment") {
       return (
-        <View className="flex-col gap-4 w-full items-center">
+        <View style={styles.footerCol}>
           <PrimaryButton
             title="Cek Status Transaksi"
             onPress={handleSimulatePayment}
-            // disabled={!isFormValid}
           />
-          <View className="flex-row items-center px-3 gap-3">
-            <Text className="text-sm items-start justify-start text-[#616161]">
-              Terdapat kendala?
-            </Text>
+          <View style={styles.footerRow}>
+            <Text style={styles.footerTextGray}>Terdapat kendala?</Text>
             <TouchableOpacity
-              onPress={() => console.log("Hubungi Kami pressed")}>
-              <Text className="text-sm items-end justify-end text-[#3267E3]">
-                Silahkan Hubungi Kami
-              </Text>
+              onPress={() => console.log("Hubungi Kami pressed")}
+            >
+              <Text style={styles.footerTextBlue}>Silahkan Hubungi Kami</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -333,21 +363,17 @@ export default function DetailTransaksiBuyer() {
     }
     if (data?.status == "waiting_shipment") {
       return (
-        <View className="flex-row items-center px-3 gap-3">
-          <Text className="text-sm items-start justify-start text-[#616161]">
-            Terdapat kendala?
-          </Text>
+        <View style={styles.footerRow}>
+          <Text style={styles.footerTextGray}>Terdapat kendala?</Text>
           <TouchableOpacity onPress={() => console.log("Hubungi Kami pressed")}>
-            <Text className="text-sm items-end justify-end text-[#3267E3]">
-              Silahkan Hubungi Kami
-            </Text>
+            <Text style={styles.footerTextBlue}>Silahkan Hubungi Kami</Text>
           </TouchableOpacity>
         </View>
       );
     }
     if (data?.status == "shipped") {
       return (
-        <View className="flex flex-row items-center gap-4">
+        <View style={styles.footerRowGap}>
           <PrimaryButton
             title="Komplain"
             onPress={() =>
@@ -367,7 +393,6 @@ export default function DetailTransaksiBuyer() {
           <PrimaryButton
             title="Barang Diterima"
             onPress={() => setShowPopup(true)}
-            // disabled={!isFormValid}
             height={50}
             width={"45%"}
           />
@@ -379,7 +404,6 @@ export default function DetailTransaksiBuyer() {
         <PrimaryButton
           title="Berikan Ulasan"
           onPress={() => Alert.alert("Berikan Ulasan pressed")}
-          // disabled={true}
           btnColor="#F9F9F9"
           textColor="#000"
         />
@@ -419,6 +443,7 @@ export default function DetailTransaksiBuyer() {
             currentStep = 2;
             break;
           case "completed":
+          case "refunded":
             currentStep = 3;
             break;
         }
@@ -426,101 +451,98 @@ export default function DetailTransaksiBuyer() {
         return <ProgressBar currentStep={currentStep} steps={steps} />;
       })()}
       <ScrollView>
-        {data?.status == "pending_payment" ||
-          (data?.status == "waiting_shipment" &&
-            data?.shipment?.trackingNumber != null) ||
-          data?.status == "shipped" ||
-          (data?.status == "completed" && (
-            <>
-              {/* Copas Field */}
+        {(data?.status === "pending_payment" ||
+          (data?.status === "waiting_shipment" &&
+            data?.shipment?.trackingNumber) ||
+          data?.status === "shipped" ||
+          data?.status === "completed") && (
+          <>
+            <View
+              style={{
+                padding: 12,
+                marginHorizontal: 12,
+                backgroundColor: "#EDFBFA",
+                borderRadius: 12,
+              }}
+            >
+              <Text
+                style={{ fontSize: 15, marginBottom: 12, fontWeight: "500" }}
+              >
+                {data?.status === "pending_payment"
+                  ? "Virtual Account"
+                  : "No Resi"}
+              </Text>
+
               <View
                 style={{
-                  padding: 12,
-                  marginHorizontal: 12,
-                  backgroundColor: "#EDFBFA",
-                  borderRadius: 12,
-                }}>
-                <Text
-                  style={{ fontSize: 15, marginBottom: 12, fontWeight: "500" }}>
-                  {data?.status == "pending_payment"
-                    ? "Virtual Account"
-                    : "No Resi"}
+                  flexDirection: "row",
+                  alignItems: "center",
+                  marginBottom:
+                    data?.status === "waiting_shipment" ||
+                    data?.status === "shipped" ||
+                    data?.status === "completed"
+                      ? 12
+                      : 0,
+                }}
+              >
+                <Text style={{ fontSize: 17, fontWeight: "500" }}>
+                  {data?.status === "pending_payment"
+                    ? data?.virtualAccount
+                    : data?.shipment?.trackingNumber}
                 </Text>
-                <View
-                  className={`flex-row items-center ${
-                    data?.status == "waiting_shipment" ||
-                    data?.status == "shipped" ||
-                    data?.status == "completed"
-                      ? "mb-3"
-                      : ""
-                  }`}>
-                  <Text style={{ fontSize: 17, fontWeight: "500" }}>
-                    {data?.status == "pending_payment"
-                      ? data?.virtualAccount
-                      : data?.shipment?.trackingNumber}
-                  </Text>
-                  <TouchableOpacity
-                    onPress={() =>
-                      handleCopy(
-                        data?.status == "pending_payment"
-                          ? data?.virtualAccount
-                          : data?.shipment?.trackingNumber
-                      )
-                    }>
-                    <Image
-                      source={require("../../assets/copy.png")}
-                      style={{ marginLeft: 4, width: 17, height: 16 }}
-                    />
-                  </TouchableOpacity>
-                </View>
-                {data?.status == "waiting_shipment" ||
-                  data?.status == "shipped" ||
-                  (data?.status == "completed" && (
-                    <Text
-                      style={{
-                        fontSize: 12,
-                        // marginBottom: 12,
-                        fontWeight: "400",
-                        color: "#616161",
-                      }}>
-                      {data?.shipment?.courier || "-"}
-                    </Text>
-                  ))}
+                <TouchableOpacity
+                  onPress={() =>
+                    handleCopy(
+                      data?.status === "pending_payment"
+                        ? data?.virtualAccount
+                        : data?.shipment?.trackingNumber
+                    )
+                  }
+                >
+                  <Image
+                    source={require("../../assets/copy.png")}
+                    style={{ marginLeft: 4, width: 17, height: 16 }}
+                  />
+                </TouchableOpacity>
               </View>
-            </>
-          ))}
+
+              {(data?.status === "waiting_shipment" ||
+                data?.status === "shipped" ||
+                data?.status === "completed") && (
+                <Text style={{ fontSize: 14, color: "#333" }}>
+                  {data?.shipment?.courier || "-"}
+                </Text>
+              )}
+            </View>
+          </>
+        )}
 
         {/* Admin Message */}
-        {data?.fundReleaseRequest?.status == "approved" ||
-          (data?.status == "completed" && (
-            <>
-              <View className="flex-row mx-3 p-3 justify-between items-center gap-3">
-                <Image
-                  source={require("../../assets/admin1.png")}
-                  style={{
-                    width: 20,
-                    height: 20,
-                  }}
-                />
-                <Text className="text-sm flex-1">
-                  {data?.status == "completed"
-                    ? "Komplain dianggap tidak ada dan bakal selesai otomatis kalau pembeli nggak respon."
-                    : "Halo! Barang udah sampai. Cek dan konfirmasi, biar dana langsung ke penjual via BNI!"}
-                </Text>
-              </View>
-            </>
-          ))}
+        {(data?.fundReleaseRequest?.status == "approved" ||
+          data?.status == "completed") && (
+          <View style={styles.adminMsgRow}>
+            <Image
+              source={require("../../assets/admin1.png")}
+              style={styles.adminMsgImg}
+            />
+            <Text style={styles.adminMsgText}>
+              {data?.status == "completed"
+                ? "Komplain dianggap tidak ada dan bakal selesai otomatis kalau pembeli nggak respon."
+                : "Halo! Barang udah sampai. Cek dan konfirmasi, biar dana langsung ke penjual via BNI!"}
+            </Text>
+          </View>
+        )}
 
         {/* Warning Message */}
         {data?.status == "shipped" && (
-          <View className="my-2">
-            <View className="flex-row items-center bg-yellow-200 gap-2 px-4 py-3 w-full">
+          <View style={{ marginVertical: 8 }}>
+            <View style={styles.warningRow}>
               <Image
                 source={require("../../assets/icon-warning.png")}
-                className="w-5 h-5"
+                style={styles.warningIcon}
                 resizeMode="contain"
               />
-              <Text className="text-xs text-black font-medium flex-1">
+              <Text style={styles.warningText}>
                 {data.status === "completed"
                   ? "Komplain dianggap tidak ada dan bakal selesai otomatis kalau pembeli nggak respon."
                   : "Biar aman, pastikan kamu videoin proses buka paket ya! Ini penting banget sebagai bukti kalau mau komplain nanti."}
@@ -530,13 +552,13 @@ export default function DetailTransaksiBuyer() {
         )}
 
         {/* Status Rekbr */}
-        <View className="flex-row justify-between gap-2 mx-3 p-3">
-          <Text className="text-[15px]">Status Rekbr:</Text>
-          <Text className="text-[15px] font-medium">{setupStatus()}</Text>
+        <View style={styles.statusRow}>
+          <Text style={styles.statusLabel}>Status Rekbr:</Text>
+          <Text style={styles.statusValue}>{setupStatus()}</Text>
         </View>
 
         {/* Timestamp */}
-        <View className="mx-3 p-3">
+        <View style={styles.sectionBox}>
           <Timestamp
             data={data}
             caption={setupCaptionTimeStamp()}
@@ -546,27 +568,19 @@ export default function DetailTransaksiBuyer() {
         </View>
 
         {/* Seller Section */}
-        <View className="flex-col justify-center gap-2 mx-3 p-3">
-          <Text className="text-[15px]">Penjual</Text>
-          <Text className="text-[15px] font-medium">
-            {data?.sellerEmail || "-"}
-          </Text>
+        <View style={styles.sectionBox}>
+          <Text style={styles.sectionLabel}>Penjual</Text>
+          <Text style={styles.sectionValue}>{data?.sellerEmail || "-"}</Text>
         </View>
 
         {/* Items Name Section */}
-        <View className="flex-col justify-center gap-2 mx-3 p-3">
-          <Text className="text-[15px]">Nama Barang</Text>
-          <Text className="text-[15px] font-medium">
-            {data?.itemName || "-"}
-          </Text>
+        <View style={styles.sectionBox}>
+          <Text style={styles.sectionLabel}>Nama Barang</Text>
+          <Text style={styles.sectionValue}>{data?.itemName || "-"}</Text>
         </View>
 
         {/* Items Price Section */}
-        <View className="flex-col justify-center gap-2 mx-3 p-3">
-          {/* <Text className="text-[15px]">Harga Barang</Text>
-          <Text className="text-[15px] font-medium">
-            {formatPrice(data?.itemPrice)}
-          </Text> */}
+        <View style={styles.sectionBox}>
           <Tagihan
             caption="Harga Barang"
             price={formatPrice(data?.totalAmount)}
@@ -590,10 +604,10 @@ export default function DetailTransaksiBuyer() {
         </View>
 
         {/* ID Transaction Section */}
-        <View className="flex-col justify-center gap-2 mx-3 p-3">
-          <Text className="text-[15px]">ID Transaksi</Text>
-          <View className="flex-row items-center">
-            <Text className="text-[15px] font-medium">
+        <View style={styles.sectionBox}>
+          <Text style={styles.sectionLabel}>ID Transaksi</Text>
+          <View style={styles.rowAlignCenter}>
+            <Text style={styles.sectionValue}>
               {data?.transactionCode || "-"}
             </Text>
             <TouchableOpacity onPress={() => handleCopy(data?.transactionCode)}>
@@ -606,10 +620,10 @@ export default function DetailTransaksiBuyer() {
         </View>
 
         {/* Virtual Account Section */}
-        <View className="flex-col justify-center gap-2 mx-3 p-3">
-          <Text className="text-[15px]">Virtual Account</Text>
-          <View className="flex-row items-center">
-            <Text className="text-[15px] font-medium">
+        <View style={styles.sectionBox}>
+          <Text style={styles.sectionLabel}>Virtual Account</Text>
+          <View style={styles.rowAlignCenter}>
+            <Text style={styles.sectionValue}>
               {data?.virtualAccount || "-"}
             </Text>
             <TouchableOpacity onPress={() => handleCopy(data?.virtualAccount)}>
@@ -622,9 +636,7 @@ export default function DetailTransaksiBuyer() {
         </View>
       </ScrollView>
       {/* Footer */}
-      <View className="p-3 border-t-2 rounded-t-3xl border-x-2 border-gray-200 drop-shadow-xl items-center mb-6">
-        {setupFooter()}
-      </View>
+      <View style={styles.footerContainer}>{setupFooter()}</View>
       {/* Modal Simulate Payment*/}
       <Modalize
         ref={modalizeRef}
@@ -642,27 +654,27 @@ export default function DetailTransaksiBuyer() {
           paddingTop: 32,
           paddingBottom: 32,
           backgroundColor: "#fff",
-        }}>
-        <View className="bg-white pb-8">
+        }}
+      >
+        <View style={styles.modalContent}>
           <Pressable onPress={closeModal}>
-            <View className="flex-row items-center mb-6">
+            <View style={styles.modalHeader}>
               <ChevronLeftCircle size={24} color="#00C2C2" />
-              <Text className="text-lg font-semibold text-gray-800 ml-2">
+              <Text style={styles.modalHeaderText}>
                 {isPaymentDone ? "Uang Kamu Kami Terima" : "Mengecek..."}
               </Text>
             </View>
           </Pressable>
 
-          <View className="bg-green-100 flex-row items-center justify-between rounded-xl p-3 mb-4">
-            <Text className="text-base font-semibold text-gray-500">
-              ID Transaksi
-            </Text>
-            <View className="flex-row items-center">
-              <Text className="text-base font-semibold tracking-wider mt-1 ml-5">
+          <View style={styles.modalIdBox}>
+            <Text style={styles.modalIdLabel}>ID Transaksi</Text>
+            <View style={styles.rowAlignCenter}>
+              <Text style={styles.modalIdValue}>
                 {data?.transactionCode || "-"}
               </Text>
               <TouchableOpacity
-                onPress={() => handleCopy(data?.transactionCode)}>
+                onPress={() => handleCopy(data?.transactionCode)}
+              >
                 <Image
                   source={require("../../assets/copy.png")}
                   style={{ marginLeft: 4, width: 17, height: 16 }}
@@ -671,7 +683,7 @@ export default function DetailTransaksiBuyer() {
             </View>
           </View>
 
-          <View className="items-center px-4">
+          <View style={styles.modalStepBar}>
             <StepSuccesBar
               currentStep={isPaymentDone ? 1 : 0}
               steps={["Mengecek", "Diterima"]}
@@ -680,53 +692,52 @@ export default function DetailTransaksiBuyer() {
 
           {!isPaymentDone ? (
             <>
-              <Text className="text-center text-gray-600 mt-6 mb-3">
+              <Text style={styles.modalDeadlineLabel}>
                 Kamu sebaiknya transfer sebelum :
               </Text>
-              <View className="items-center mb-3">
-                <Text className="text-2xl font-bold bg-yellow-100 px-4 py-1 rounded-lg text-yellow-800">
+              <View style={styles.modalDeadlineBox}>
+                <Text style={styles.modalDeadlineTime}>
                   <CountdownTimer
                     deadline={data?.paymentDeadline || "-"}
                     fromTime={data?.currentTimestamp || "-"}
                   />
                 </Text>
               </View>
-              <Text className="text-center text-gray-600 mb-5">
+              <Text style={styles.modalDeadlineDate}>
                 {formatDateWIB(data?.paymentDeadline || "-")}
               </Text>
 
               <Pressable
-                className="bg-gray-100 py-3 rounded-xl flex-row justify-center items-center mb-5"
-                onPress={updateTransaction}>
+                style={styles.modalSimulateBtn}
+                onPress={updateTransaction}
+              >
                 <Play size={20} color="#000" />
-                <Text className="ml-2 font-semibold text-gray-800">
+                <Text style={styles.modalSimulateBtnText}>
                   Simulate Payment
                 </Text>
               </Pressable>
             </>
           ) : (
             <>
-              <Text className="text-xl font-bold text-center mt-6 mb-1">
+              <Text style={styles.modalSuccessTitle}>
                 Transaksi Berhasil Diproses
               </Text>
-              <Text className="text-center text-gray-600 mb-5">
+              <Text style={styles.modalSuccessDate}>
                 {formatDateWIB(paymentDone?.paidAt || "-")}
               </Text>
-              <View className="flex-row justify-center items-center mb-5">
-                <View className="flex-row items-center justify-between w-full">
-                  <Text className="text-lg font-medium ml-7">Pembeli</Text>
-                  <View className="flex-row items-center gap-3">
+              <View style={styles.modalBuyerRow}>
+                <View style={styles.modalBuyerRowInner}>
+                  <Text style={styles.modalBuyerLabel}>Pembeli</Text>
+                  <View style={styles.modalBuyerInfo}>
                     <Image
                       source={require("../../assets/logo-bni.png")}
-                      className="w-20 h-12"
-                      style={{ objectFit: "cover" }}
+                      style={styles.modalBuyerLogo}
                     />
-                    <View className="flex-row items-center">
-                      <Text className="text-lg font-medium tracking-wider">
-                        0600604502
-                      </Text>
+                    <View style={styles.rowAlignCenter}>
+                      <Text style={styles.modalBuyerAccount}>0600604502</Text>
                       <TouchableOpacity
-                        onPress={() => handleCopy("0600604502")}>
+                        onPress={() => handleCopy("0600604502")}
+                      >
                         <Image
                           source={require("../../assets/copy.png")}
                           style={{ marginLeft: 4, width: 17, height: 16 }}
@@ -739,9 +750,9 @@ export default function DetailTransaksiBuyer() {
             </>
           )}
 
-          <View className="flex-row justify-center items-center gap-5">
-            <Text className="text-center text-gray-500">Terdapat kendala?</Text>
-            <Text className="text-blue-500 font-medium">
+          <View style={styles.modalFooterRow}>
+            <Text style={styles.modalFooterTextGray}>Terdapat kendala?</Text>
+            <Text style={styles.modalFooterTextBlue}>
               Silahkan Hubungi Kami
             </Text>
           </View>
@@ -767,21 +778,282 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     width: "100%",
   },
-  header: {
+  copyBox: {
+    padding: 12,
+    marginHorizontal: 12,
+    backgroundColor: "#EDFBFA",
+    borderRadius: 12,
+  },
+  copyBoxTitle: {
+    fontSize: 15,
+    marginBottom: 12,
+    fontWeight: "500",
+  },
+  copyRow: {
     flexDirection: "row",
     alignItems: "center",
+  },
+  copyRowText: {
+    fontSize: 17,
+    fontWeight: "500",
+  },
+  copyBoxCourier: {
+    fontSize: 12,
+    fontWeight: "400",
+    color: "#616161",
+  },
+  adminMsgRow: {
+    flexDirection: "row",
+    marginHorizontal: 12,
+    padding: 12,
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: 12,
+  },
+  adminMsgImg: {
+    width: 20,
+    height: 20,
+  },
+  adminMsgText: {
+    fontSize: 14,
+    flex: 1,
+  },
+  warningRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FEF08A",
+    gap: 8,
     paddingHorizontal: 16,
     paddingVertical: 12,
+    width: "100%",
+    borderRadius: 8,
   },
-  backArrow: {
-    fontSize: 24,
+  warningIcon: {
+    width: 20,
+    height: 20,
+  },
+  warningText: {
+    fontSize: 12,
     color: "#000",
-  },
-  headerTitle: {
+    fontWeight: "500",
     flex: 1,
-    textAlign: "center",
+  },
+  statusRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    gap: 8,
+    marginHorizontal: 12,
+    padding: 12,
+  },
+  statusLabel: {
+    fontSize: 15,
+  },
+  statusValue: {
+    fontSize: 15,
+    fontWeight: "500",
+  },
+  sectionBox: {
+    flexDirection: "column",
+    justifyContent: "center",
+    gap: 8,
+    marginHorizontal: 12,
+    padding: 12,
+  },
+  sectionLabel: {
+    fontSize: 15,
+  },
+  sectionValue: {
+    fontSize: 15,
+    fontWeight: "500",
+  },
+  rowAlignCenter: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  footerContainer: {
+    padding: 12,
+    borderTopWidth: 2,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    borderColor: "#E5E7EB",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    alignItems: "center",
+    marginBottom: 24,
+    backgroundColor: "#fff",
+  },
+  footerCol: {
+    flexDirection: "column",
+    gap: 16,
+    width: "100%",
+    alignItems: "center",
+  },
+  footerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 12,
+    gap: 12,
+    width: "100%",
+    justifyContent: "center",
+  },
+  footerRowGap: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 16,
+    width: "100%",
+    justifyContent: "center",
+  },
+  footerTextGray: {
+    fontSize: 14,
+    color: "#616161",
+  },
+  footerTextBlue: {
+    fontSize: 14,
+    color: "#3267E3",
+    fontWeight: "500",
+  },
+  modalContent: {
+    backgroundColor: "#fff",
+    paddingBottom: 32,
+  },
+  modalHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 24,
+  },
+  modalHeaderText: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#1F2937",
+    marginLeft: 8,
+  },
+  modalIdBox: {
+    backgroundColor: "#D1FAE5",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    borderRadius: 16,
+    padding: 12,
+    marginBottom: 16,
+  },
+  modalIdLabel: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#000",
+    color: "#6B7280",
+  },
+  modalIdValue: {
+    fontSize: 16,
+    fontWeight: "600",
+    letterSpacing: 1,
+    marginTop: 2,
+    marginLeft: 16,
+  },
+  modalStepBar: {
+    alignItems: "center",
+    paddingHorizontal: 16,
+  },
+  modalDeadlineLabel: {
+    textAlign: "center",
+    color: "#4B5563",
+    marginTop: 24,
+    marginBottom: 12,
+    fontSize: 15,
+  },
+  modalDeadlineBox: {
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  modalDeadlineTime: {
+    fontSize: 22,
+    fontWeight: "700",
+    backgroundColor: "#FEF08A",
+    paddingHorizontal: 16,
+    paddingVertical: 4,
+    borderRadius: 8,
+    color: "#B45309",
+  },
+  modalDeadlineDate: {
+    textAlign: "center",
+    color: "#4B5563",
+    marginBottom: 20,
+    fontSize: 15,
+  },
+  modalSimulateBtn: {
+    backgroundColor: "#F3F4F6",
+    paddingVertical: 12,
+    borderRadius: 16,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  modalSimulateBtnText: {
+    marginLeft: 8,
+    fontWeight: "600",
+    color: "#1F2937",
+    fontSize: 16,
+  },
+  modalSuccessTitle: {
+    fontSize: 20,
+    fontWeight: "700",
+    textAlign: "center",
+    marginTop: 24,
+    marginBottom: 8,
+  },
+  modalSuccessDate: {
+    textAlign: "center",
+    color: "#4B5563",
+    marginBottom: 20,
+    fontSize: 15,
+  },
+  modalBuyerRow: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  modalBuyerRowInner: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    width: "100%",
+  },
+  modalBuyerLabel: {
+    fontSize: 18,
+    fontWeight: "600",
+    marginLeft: 24,
+  },
+  modalBuyerInfo: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  modalBuyerLogo: {
+    width: 80,
+    height: 48,
+    resizeMode: "cover",
+  },
+  modalBuyerAccount: {
+    fontSize: 18,
+    fontWeight: "600",
+    letterSpacing: 1,
+  },
+  modalFooterRow: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 20,
+  },
+  modalFooterTextGray: {
+    textAlign: "center",
+    color: "#6B7280",
+    fontSize: 15,
+  },
+  modalFooterTextBlue: {
+    color: "#2563EB",
+    fontWeight: "600",
+    fontSize: 15,
   },
 });

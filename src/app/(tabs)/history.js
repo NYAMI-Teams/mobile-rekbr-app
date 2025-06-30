@@ -39,8 +39,6 @@ export default function History() {
       const res = await fetchFn(currentOffset, limit);
       const newData = res?.data || [];
 
-      await new Promise((resolve) => setTimeout(resolve, 800));
-
       if (reset) {
         setData(newData);
       } else {
@@ -110,23 +108,21 @@ export default function History() {
 
   return (
     <View style={styles.container}>
-      <StatusBar style='dark' />
+      <StatusBar style="dark" />
       <View style={styles.tabContainer}>
         <TouchableOpacity
           onPress={() => setSelectedTab("pembelian")}
           style={[
             styles.tabButton,
             selectedTab === "pembelian" ? styles.tabActive : styles.tabInactive,
-          ]}
-        >
+          ]}>
           <Text
             style={[
               styles.tabText,
               selectedTab === "pembelian"
                 ? styles.tabTextActive
                 : styles.tabTextInactive,
-            ]}
-          >
+            ]}>
             Pembelian
           </Text>
         </TouchableOpacity>
@@ -135,16 +131,14 @@ export default function History() {
           style={[
             styles.tabButton,
             selectedTab === "penjualan" ? styles.tabActive : styles.tabInactive,
-          ]}
-        >
+          ]}>
           <Text
             style={[
               styles.tabText,
               selectedTab === "penjualan"
                 ? styles.tabTextActive
                 : styles.tabTextInactive,
-            ]}
-          >
+            ]}>
             Penjualan
           </Text>
         </TouchableOpacity>
@@ -214,6 +208,7 @@ const styles = StyleSheet.create({
   flatList: {
     width: "100%",
     paddingHorizontal: 16,
+    marginTop: 16,
   },
   emptyContainer: {
     marginTop: 32,

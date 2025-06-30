@@ -45,8 +45,8 @@ export default function TabLayout() {
   const handleLogout = async () => {
     try {
       await removeAccessToken();
-      router.replace("Onboarding");
       showToast("Logout Berhasil", "Anda telah berhasil logout.", "success");
+      router.replace("Onboarding");
     } catch (err) {
       showToast("Logout Gagal", "Gagal logout. Silahkan coba lagi.", "error");
     }
@@ -109,7 +109,7 @@ export default function TabLayout() {
           <Tabs.Screen
             name="complaint"
             options={{
-              title: "Komplain",
+              title: "Complaint",
               tabBarIcon: ({ color, focused, size }) => (
                 <DisputeIcon
                   width={16}

@@ -1,49 +1,70 @@
-import React from 'react';
-import { View, TextInput, Text } from 'react-native';
-import clsx from 'clsx';
-import { StyleSheet } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
+import React, { useState } from 'react';
+import { TouchableOpacity } from 'react-native';
+import { View, TextInput, Text, StyleSheet } from 'react-native';
 
 export default function InputField({
   title,
   placeholder,
   value,
   onChangeText,
-  secureTextEntry = false,
   editable = true,
   keyboardType = 'default',
-  className = '',
   errorText = '',
   autoCapitalize = 'none',
   inputMode = 'text',
   renderValue,
+  isPassword = false,
 }) {
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+
   return (
-    <View className={clsx("flex-col", className)}>
-      <Text className="text-[15px] text-black font-normal mb-2">{title}</Text>
+    <View style={styles.container}>
+      <Text style={styles.title}>{title}</Text>
       <View style={styles.card}>
-          <TextInput
-            style={styles.input}
-            placeholder={placeholder}
-            placeholderTextColor="#999"
-            value={renderValue ? renderValue(value) : value}
-            onChangeText={onChangeText}
-            editable={editable}
-            secureTextEntry={secureTextEntry}
-            keyboardType={keyboardType}
-            autoCapitalize={autoCapitalize}
-            inputMode={inputMode}
-          />
+        <TextInput
+          style={styles.input}
+          placeholder={placeholder}
+          placeholderTextColor="#999"
+          value={renderValue ? renderValue(value) : value}
+          onChangeText={onChangeText}
+          editable={editable}
+          secureTextEntry={isPassword && !isPasswordVisible}
+          keyboardType={keyboardType}
+          autoCapitalize={autoCapitalize}
+          inputMode={inputMode}
+        />
+        {isPassword && (
+          <TouchableOpacity
+            style={styles.passwordIcon}
+            onPress={() => setIsPasswordVisible(!isPasswordVisible)}
+          >
+            <MaterialIcons
+              name={isPasswordVisible ? "visibility" : "visibility-off"}
+              size={22}
+              color="#666"
+            />
+          </TouchableOpacity>
+        )}
       </View>
-      {errorText && (
+      {errorText ? (
         <Text style={styles.errorText}>{errorText}</Text>
-      )}
+      ) : null}
     </View>
   );
 }
 
-
 const styles = StyleSheet.create({
-
+  container: {
+    flexDirection: 'column',
+    marginBottom: 12,
+  },
+  title: {
+    fontSize: 15,
+    color: '#000',
+    fontWeight: '400',
+    marginBottom: 8,
+  },
   card: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -61,9 +82,8 @@ const styles = StyleSheet.create({
     height: 50,
     fontSize: 12,
     color: '#333',
-
   },
-  errorText: { 
+  errorText: {
     fontSize: 12,
     color: 'red',
     marginTop: 4,
