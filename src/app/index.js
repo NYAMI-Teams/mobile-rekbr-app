@@ -12,10 +12,11 @@ export default function Index() {
   const [appIsReady, setAppIsReady] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(null);
   const { hasBooted, setHasBooted } = useAppBoot();
-  const params = useLocalSearchParams();
+  const { data } = useLocalSearchParams();
 
   useEffect(() => {
     // jika sudah pernah boot, redirect langsung
+    console.log("params from index page", JSON.parse(data || "{}"));
     if (hasBooted) {
       router.replace("/(tabs)");
       return;
@@ -34,7 +35,6 @@ export default function Index() {
         const res = await getProfile();
         setProfileStore(res.data);
         setIsLoggedIn(true);
-        console.log(params, "params from index page");
       } catch (e) {
         setIsLoggedIn(false);
       } finally {

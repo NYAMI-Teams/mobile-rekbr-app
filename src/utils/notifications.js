@@ -1,6 +1,7 @@
 import * as Notifications from "expo-notifications";
 import * as Device from "expo-device";
 import { Platform, Alert } from "react-native";
+import { router } from "expo-router";
 
 // Handler agar notifikasi muncul saat app aktif
 export const configureNotificationHandler = () => {
@@ -59,8 +60,14 @@ export const setupNotificationListeners = () => {
 
   const responseListener =
     Notifications.addNotificationResponseReceivedListener((response) => {
-      console.log("Notifikasi diklik:", response);
-      Alert.alert("Notifikasi dibuka", "Kamu membuka notifikasi");
+      console.log("Notifikasi diklik -----------:", response);
+      const data = response.notification.request.content.data;
+      console.log("Data notifikasi:", data);
+      console.log("Navigasi ke halaman:", data?.pathname || "/");
+      router.replace({
+        pathname: "",
+        params: { data: JSON.stringify(data) },
+      });
     });
 
   return () => {
