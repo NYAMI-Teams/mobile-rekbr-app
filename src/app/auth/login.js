@@ -12,12 +12,11 @@ import {
 } from "react-native";
 import InputField from "../../components/InputField";
 import PrimaryButton from "../../components/PrimaryButton";
-import { MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { getProfile, login } from "../../utils/api/auth";
+import { getProfile, login, savePushToken } from "../../utils/api/auth";
 import { showToast } from "../../utils";
 import { setAccessToken, setProfileStore } from "../../store";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { registerForPushNotificationsAsync } from "@/utils/notifications";
 
 export default function Login() {
   const router = useRouter();
@@ -27,12 +26,6 @@ export default function Login() {
   const [errorMsg, setErrorMsg] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    // development (DELETE)
-    // setEmail("seller@gmail.com");
-    // setPassword("password");
-  }, []);
-
   const handleLogin = async () => {
     setError(false);
     if (!email.trim() || !password.trim()) {
@@ -40,6 +33,7 @@ export default function Login() {
       return;
     }
     setIsLoading(true);
+
     try {
       const res = await login(email, password);
       showToast(
@@ -48,11 +42,34 @@ export default function Login() {
         "success"
       );
       await setAccessToken(res?.data?.accessToken);
-      getUserProfile();
     } catch (err) {
       setError(true);
       setErrorMsg("Email atau kata sandi salah");
       showToast("Login Gagal", "Silahkan coba lagi", "error");
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const pushToken = await registerForPushNotificationsAsync();
+
+      // ✅ Tambahkan validasi format token di sini
+      if (!pushToken || !pushToken.startsWith("ExponentPushToken")) {
+        console.warn("Push token tidak valid:", pushToken);
+      } else {
+        await savePushToken(pushToken);
+        console.log("Push token saved:", pushToken);
+      }
+    } catch (err) {
+      console.warn("Gagal simpan push token:", err);
+    }
+
+    try {
+      await getUserProfile();
+    } catch (err) {
+      console.warn("Gagal ambil profil:", err);
+      showToast("Gagal", "Gagal mengambil data profile", "error");
+    } finally {
       setIsLoading(false);
     }
   };
@@ -78,11 +95,11 @@ export default function Login() {
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         keyboardVerticalOffset={Platform.OS === "ios" ? 60 : 0}
-        style={{ flex: 1, width: "100%"}}
+        style={{ flex: 1, width: "100%" }}
       >
         <ScrollView
           contentContainerStyle={{ flexGrow: 1 }}
-          keyboardShouldPersistTaps="handled"
+          keyboardShouldPersistTaps='handled'
           showsVerticalScrollIndicator={false}
         >
           <View style={{ flex: 1 }}>
@@ -91,7 +108,7 @@ export default function Login() {
               <Image
                 source={require("../../assets/header.png")}
                 style={styles.headerImage}
-                resizeMode="cover"
+                resizeMode='cover'
               />
             </View>
 
@@ -100,11 +117,11 @@ export default function Login() {
               {/* Email */}
               <View>
                 <InputField
-                  title="Email Kamu, Yuk!"
-                  placeholder="email@kamu.com"
+                  title='Email Kamu, Yuk!'
+                  placeholder='email@kamu.com'
                   value={email}
                   onChangeText={setEmail}
-                  keyboardType="email-address"
+                  keyboardType='email-address'
                 />
               </View>
 
@@ -112,8 +129,8 @@ export default function Login() {
               <View>
                 <View style={styles.passwordFieldWrapper}>
                   <InputField
-                    title="Kata Sandi Rekbr"
-                    placeholder="Masukkan kata sandi kamu"
+                    title='Kata Sandi Rekbr'
+                    placeholder='Masukkan kata sandi kamu'
                     value={password}
                     onChangeText={setPassword}
                     isPassword={true}
@@ -137,12 +154,12 @@ export default function Login() {
                 <Image
                   source={require("../../assets/gradasi.png")}
                   style={styles.gradientImage}
-                  resizeMode="cover"
+                  resizeMode='cover'
                 />
               </View>
               <View style={styles.buttonWrapper}>
                 <PrimaryButton
-                  title="Masuk"
+                  title='Masuk'
                   onPress={handleLogin}
                   disabled={isLoading || !email || !password}
                 />
@@ -174,7 +191,7 @@ export default function Login() {
                 <Image
                   source={require("../../assets/326.png")}
                   style={styles.logoIcon}
-                  resizeMode="contain"
+                  resizeMode='contain'
                 />
                 <Text style={styles.poweredByBrand}>ADHIKSHA TRIBIXA</Text>
               </View>

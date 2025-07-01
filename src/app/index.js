@@ -1,7 +1,7 @@
 // app/index.js
 import { useEffect, useState } from "react";
 import { View, Image } from "react-native";
-import { Redirect, useRouter } from "expo-router";
+import { Redirect, useLocalSearchParams, useRouter } from "expo-router";
 import { getAccessToken, setProfileStore } from "@/store";
 import { getProfile } from "@/utils/api/auth";
 import { useAppBoot } from "@/context/AppBootContext";
@@ -12,13 +12,15 @@ export default function Index() {
   const [appIsReady, setAppIsReady] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(null);
   const { hasBooted, setHasBooted } = useAppBoot();
+  const { data } = useLocalSearchParams();
 
   useEffect(() => {
     // jika sudah pernah boot, redirect langsung
+    console.log("params from index page", JSON.parse(data || "{}"));
     if (hasBooted) {
-        router.replace("/(tabs)");
-        return;
-    };
+      router.replace("/(tabs)");
+      return;
+    }
 
     const prepareApp = async () => {
       try {
@@ -55,5 +57,9 @@ export default function Index() {
     );
   }
 
-  return isLoggedIn ? <Redirect href="/(tabs)" /> : <Redirect href="/Onboarding" />;
+  return isLoggedIn ? (
+    <Redirect href='/(tabs)' />
+  ) : (
+    <Redirect href='/Onboarding' />
+  );
 }
