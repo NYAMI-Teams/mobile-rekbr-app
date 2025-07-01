@@ -15,7 +15,7 @@ import EmptyIllustration from "../../components/Ilustration";
 import TransactionSkeleton from "../../components/skeleton/TransactionSkeleton";
 import { showToast } from "../../utils";
 import { getSellerTransactions } from "../../utils/api/seller";
-import { getProfileStore, setProfileStore } from "@/store";
+import { getDataNotification, getProfileStore, setProfileStore } from "@/store";
 import { getProfile } from "@/utils/api/auth";
 
 export default function Seller() {
@@ -30,6 +30,36 @@ export default function Seller() {
   const [isInitialLoading, setIsInitialLoading] = useState(true);
 
   useEffect(() => {
+    getDataNotification().then((data) => {
+      switch (data?.screen) {
+        case "transaction/buyer":
+          router.push({
+            pathname: "/DetailTransaksi/Buyer",
+            params: { id: data?.transactionId },
+          });
+          break;
+        case "transaction/seller":
+          router.push({
+            pathname: "/DetailTransaksi/Seller",
+            params: { id: data?.transactionId },
+          });
+          break;
+        case "complaint/buyer":
+          router.push({
+            pathname: "/(tabs)/complaint",
+            params: { type: "buyer" },
+          });
+          break;
+        case "complaint/seller":
+          router.push({
+            pathname: "/(tabs)/complaint",
+            params: { type: "seller" },
+          });
+          break;
+        default:
+          break;
+      }
+    })
     getUserProfile();
     fetchTransactions(true);
   }, []);

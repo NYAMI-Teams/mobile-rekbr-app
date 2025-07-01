@@ -15,7 +15,7 @@ import PrimaryButton from "../../components/PrimaryButton";
 import { useRouter } from "expo-router";
 import { getProfile, login, savePushToken } from "../../utils/api/auth";
 import { showToast } from "../../utils";
-import { setAccessToken, setProfileStore } from "../../store";
+import { getDataNotification, setAccessToken, setProfileStore } from "../../store";
 import { registerForPushNotificationsAsync } from "@/utils/notifications";
 
 export default function Login() {
