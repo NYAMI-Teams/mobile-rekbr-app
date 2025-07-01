@@ -19,6 +19,7 @@ import CopyField from "../../../components/dispute/copyField";
 import { getDetailBuyerComplaint } from "../../../utils/api/complaint";
 import { showToast, formatCurrency } from "../../../utils";
 import moment from "moment";
+import NavBackHeader from "@/components/NavBackHeader";
 
 const formatDateWIB = (dateTime) => {
   if (!dateTime) return "Invalid date";
@@ -38,7 +39,7 @@ export default function RusakBarangSelesai() {
     try {
       const res = await getDetailBuyerComplaint(complaintId);
       setDetailComplaint(res.data);
-      console.log("ini detail complaint", JSON.stringify(res.data, null, 2));
+      // console.log("ini detail complaint", JSON.stringify(res.data, null, 2));
     } catch (err) {
       showToast("Gagal", err?.message, "error");
     }
@@ -47,13 +48,7 @@ export default function RusakBarangSelesai() {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()}>
-          <ChevronLeft size={24} color="black" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Detail Komplain</Text>
-        <View style={styles.headerSpacer} />
-      </View>
+      <NavBackHeader title={"Detail Komplain"} />
 
       <StepProgressBar
         currentStep={3}
@@ -171,7 +166,6 @@ const styles = StyleSheet.create({
     marginTop: 12,
   },
   scrollContent: {
-    paddingHorizontal: 16,
     paddingTop: 16,
     paddingBottom: 80,
   },

@@ -25,6 +25,7 @@ export const getSellerTransactions = async (offset, limit) => {
         return QueryString.stringify(params, { arrayFormat: "repeat" });
       },
     });
+    // console.log(res);
     if (res) {
       return res;
     }
@@ -39,6 +40,8 @@ export const getHistorySeller = async (offset, limit) => {
     const res = await Api.get(`/seller/transactions`, {
       params: {
         status: ["completed", "canceled", "refunded"],
+        offset,
+        limit,
       },
       paramsSerializer: (params) => {
         return QueryString.stringify(params, { arrayFormat: "repeat" });
@@ -81,17 +84,29 @@ export const postResi = async (id, courier_id, tracking_number, photo) => {
     const file = {
       uri: photo.uri,
       name: photo.fileName || photo.uri.split("/").pop(),
-      type: photo.type || "image/jpeg", // default jika tidak ada type
+      type:
+        photo.type && photo.type.startsWith("image/")
+          ? photo.type
+          : "image/jpeg", // fallback
     };
     const formData = new FormData();
     formData.append("photo", file);
     formData.append("courier_id", courier_id);
     formData.append("tracking_number", tracking_number);
-    const res = await Api.post(`/seller/transactions/${id}/shipping`, formData);
+    const res = await Api.post(
+      `/seller/transactions/${id}/shipping`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
     if (res) {
       return res;
     }
   } catch (error) {
+    // console.log(error);
     throw error;
   }
 };
@@ -102,20 +117,30 @@ export const postFundRelease = async (id, evidence, reason) => {
     const file = {
       uri: evidence.uri,
       name: evidence.fileName || evidence.uri.split("/").pop(),
-      type: evidence.type || "image/jpeg", // default jika tidak ada type
+      type:
+        evidence.type && evidence.type.startsWith("image/")
+          ? evidence.type
+          : "image/jpeg", // fallback
     };
+
     const formData = new FormData();
-    formData.append("evidence", file);
     formData.append("reason", reason);
+    formData.append("evidence", file);
 
     const res = await Api.post(
       `/seller/transaction/${id}/request-confirmation-shipment`,
-      formData
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
     );
     if (res) {
       return res;
     }
   } catch (error) {
+    // console.log("Error posting fund release:", error);
     throw error;
   }
 };

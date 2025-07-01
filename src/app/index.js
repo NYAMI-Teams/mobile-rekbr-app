@@ -1,8 +1,8 @@
 // app/index.js
 import { useEffect, useState } from "react";
 import { View, Image } from "react-native";
-import { Redirect, useRouter } from "expo-router";
-import { getAccessToken, setProfileStore } from "@/store";
+import { Redirect, useLocalSearchParams, useRouter } from "expo-router";
+import { getAccessToken, getDataNotification, setDataNotification, setProfileStore } from "@/store";
 import { getProfile } from "@/utils/api/auth";
 import { useAppBoot } from "@/context/AppBootContext";
 import SplashScreen from "@/assets/splash.png";
@@ -12,13 +12,14 @@ export default function Index() {
   const [appIsReady, setAppIsReady] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(null);
   const { hasBooted, setHasBooted } = useAppBoot();
+  const { data } = useLocalSearchParams();
 
   useEffect(() => {
     // jika sudah pernah boot, redirect langsung
     if (hasBooted) {
-        router.replace("/(tabs)");
-        return;
-    };
+      router.replace("/(tabs)");
+      return;
+    }
 
     const prepareApp = async () => {
       try {
@@ -35,6 +36,7 @@ export default function Index() {
         setIsLoggedIn(true);
       } catch (e) {
         setIsLoggedIn(false);
+        setDataNotification(null)
       } finally {
         setAppIsReady(true);
         setHasBooted(true);
@@ -55,5 +57,9 @@ export default function Index() {
     );
   }
 
-  return isLoggedIn ? <Redirect href="/(tabs)" /> : <Redirect href="/Onboarding" />;
+  return isLoggedIn ? (
+    <Redirect href="/(tabs)" />
+  ) : (
+    <Redirect href="/Onboarding" />
+  );
 }

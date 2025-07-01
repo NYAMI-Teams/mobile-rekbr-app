@@ -17,6 +17,7 @@ import { InfoBanner } from "../../../components/dispute/InfoBanner";
 import { StatusKomplain } from "../../../components/dispute/statusKomplain";
 import StepProgressBar from "../../../components/ProgressBar";
 import { TrackDispute } from "../../../components/dispute/TrackDispute";
+import NavBackHeader from "@/components/NavBackHeader";
 
 export default function AdminPage() {
   const router = useRouter();
@@ -52,13 +53,7 @@ export default function AdminPage() {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()}>
-          <ChevronLeft size={24} color="black" />
-        </TouchableOpacity>
-        <Text style={styles.headerText}>Detail Komplain</Text>
-        <View style={{ width: 24 }} />
-      </View>
+      <NavBackHeader title={"Detail Komplain"} />
 
       {/* Stepper */}
       <StepProgressBar
@@ -160,7 +155,6 @@ const styles = StyleSheet.create({
     color: "black",
   },
   scrollView: {
-    paddingHorizontal: 16,
     paddingBottom: 20,
   },
 });

@@ -14,6 +14,7 @@ import { InfoBanner } from "../../../components/dispute/InfoBanner";
 import { StatusKomplain } from "../../../components/dispute/statusKomplain";
 import StepProgressBar from "../../../components/ProgressBar";
 import { TrackDispute } from "../../../components/dispute/TrackDispute";
+import NavBackHeader from "@/components/NavBackHeader";
 
 export default function DetailKomplain() {
   const [showOptionModal, setShowOptionModal] = useState(false);
@@ -22,13 +23,7 @@ export default function DetailKomplain() {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity>
-          <ChevronLeft size={24} color="black" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Detail Komplain</Text>
-        <View style={{ width: 24 }} />
-      </View>
+      <NavBackHeader title={"Detail Komplain"} />
 
       {/* Stepper */}
       <StepProgressBar
@@ -137,7 +132,6 @@ const styles = StyleSheet.create({
     color: "black",
   },
   scrollContent: {
-    paddingHorizontal: 16,
     paddingBottom: 16,
   },
 });

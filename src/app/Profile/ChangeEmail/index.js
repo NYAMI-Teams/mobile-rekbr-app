@@ -14,6 +14,7 @@ import { useState } from "react";
 import PrimaryButton from "@/components/PrimaryButton";
 import { getProfile, resendVerifyEmail } from "@/utils/api/auth";
 import { showToast } from "@/utils";
+import NavBackHeader from "@/components/NavBackHeader";
 
 export default function ChangeEmailScreen() {
   const router = useRouter();
@@ -21,10 +22,6 @@ export default function ChangeEmailScreen() {
   const [emailBaru, setEmailBaru] = useState("");
   const [emailSaatIniValid, setEmailSaatIniValid] = useState(false);
   const [checkEmailSaatIniBtn, setCheckEmailSaatIniBtn] = useState(false);
-
-  const handleBackBtn = () => {
-    router.back();
-  };
 
   const handleBtnPress = () => {
     if (checkEmailSaatIniBtn) {
@@ -63,7 +60,7 @@ export default function ChangeEmailScreen() {
         params: { email: res.data.email, isFromLogin: false },
       });
     } catch (err) {
-      console.log(err);
+      // console.log(err);
       showToast("Gagal", "Silahkan coba lagi", "error");
     }
   };
@@ -71,25 +68,17 @@ export default function ChangeEmailScreen() {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={handleBackBtn}>
-          <Ionicons name="chevron-back-outline" size={24} color="#000" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Ganti Email</Text>
-        <View style={{ width: 24 }} />
-      </View>
+      <NavBackHeader title={"Ganti Email"} />
 
       {/* Content */}
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        keyboardVerticalOffset={Platform.OS === 'ios' && 60}
-        style={{ flex: 1 }}
-      >
+        keyboardVerticalOffset={Platform.OS === "ios" ? 60 : 0}
+        style={{ flex: 1 }}>
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
-        >
+          showsVerticalScrollIndicator={false}>
           <View style={{ flex: 1 }}>
             {/* Email Saat Ini */}
             <View style={styles.inputGroup}>
@@ -130,8 +119,7 @@ export default function ChangeEmailScreen() {
                           : "#fbbf24"
                         : "#f87171",
                     },
-                  ]}
-                >
+                  ]}>
                   {isEmailValid(emailSaatIni)
                     ? emailSaatIniValid
                       ? "Email Ditemukan"
@@ -161,9 +149,10 @@ export default function ChangeEmailScreen() {
                   <Text
                     style={[
                       styles.validationText,
-                      { color: isEmailValid(emailBaru) ? "#4ade80" : "#f87171" },
-                    ]}
-                  >
+                      {
+                        color: isEmailValid(emailBaru) ? "#4ade80" : "#f87171",
+                      },
+                    ]}>
                     {isEmailValid(emailBaru)
                       ? "Email valid"
                       : "Email tidak valid"}
@@ -193,19 +182,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
   },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    width: "100%",
-    paddingHorizontal: 16,
-    paddingTop: 16,
-  },
-  headerTitle: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#000",
-  },
   scrollContent: {
     flexGrow: 1,
     paddingHorizontal: 16,
@@ -217,8 +193,6 @@ const styles = StyleSheet.create({
   validationContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginTop: 8,
-    marginHorizontal: 20,
   },
   validationText: {
     marginLeft: 8,

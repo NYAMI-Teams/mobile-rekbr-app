@@ -24,6 +24,7 @@ import {
   postBuyerCancelComplaint,
 } from "../../../utils/api/complaint";
 import moment from "moment";
+import NavBackHeader from "@/components/NavBackHeader";
 
 export default function DetailKomplain() {
   const router = useRouter();
@@ -48,10 +49,10 @@ export default function DetailKomplain() {
     try {
       const res = await getDetailBuyerComplaint(complaintId);
       setDetailComplaint(res.data);
-      console.log(
-        "ini detail complaint as buyer",
-        JSON.stringify(res.data, null, 2)
-      );
+      // console.log(
+      //   "ini detail complaint as buyer",
+      //   JSON.stringify(res.data, null, 2)
+      // );
     } catch (err) {
       showToast(
         "Gagal",
@@ -79,7 +80,7 @@ export default function DetailKomplain() {
                   "Gagal membatalkan komplain. Coba lagi.",
                   "error"
                 );
-                console.log("Cancel error:", err);
+                // console.log("Cancel error:", err);
               });
           },
         },
@@ -90,13 +91,7 @@ export default function DetailKomplain() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()}>
-          <ChevronLeft size={24} color="black" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Detail Komplain</Text>
-        <View style={{ width: 24 }} />
-      </View>
+      <NavBackHeader title={"Detail Komplain"} />
 
       <View style={styles.stepperWrapper}>
         <StepProgressBar
@@ -117,7 +112,7 @@ export default function DetailKomplain() {
           dateTime={
             formatDateWIB(detailComplaint?.seller_response_deadline) || "null"
           }
-          contentAfter=" pengajuanmu bakal otomatis disetujui ya!"
+          contentAfter=" pengajuanmu bakal otomatis diteruskan ke admin"
         />
 
         <StatusKomplain status="Menunggu Persetujuan Seller" />
@@ -175,15 +170,13 @@ export default function DetailKomplain() {
       <View style={styles.footer}>
         <TouchableOpacity
           onPress={() => setShowOptionModal(true)}
-          style={styles.moreButton}
-        >
+          style={styles.moreButton}>
           <Text style={styles.moreButtonText}>⋯</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           style={styles.emailButton}
-          onPress={() => router.push("../../(tabs)/complaint")}
-        >
+          onPress={() => router.push("../../(tabs)/complaint")}>
           <Text style={styles.emailButtonText}>Kirim Seller Email</Text>
         </TouchableOpacity>
       </View>
@@ -192,8 +185,7 @@ export default function DetailKomplain() {
         visible={showOptionModal}
         transparent
         animationType="slide"
-        onRequestClose={() => setShowOptionModal(false)}
-      >
+        onRequestClose={() => setShowOptionModal(false)}>
         <TouchableWithoutFeedback onPress={() => setShowOptionModal(false)}>
           <View style={styles.modalOverlay} />
         </TouchableWithoutFeedback>
@@ -204,22 +196,21 @@ export default function DetailKomplain() {
 
           <TouchableOpacity
             style={styles.modalItem}
-            onPress={() => router.replace("/dispute/BarangRusak/pilihKomplain")}
-          >
+            onPress={() =>
+              router.replace("/dispute/BarangRusak/pilihKomplain")
+            }>
             <Text style={styles.modalItemText}>Ubah Detail Komplain</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             onPress={handleCancelComplaint}
-            style={styles.modalItem}
-          >
+            style={styles.modalItem}>
             <Text style={styles.modalItemText}>Batalkan Komplain</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             onPress={() => console.log("Simulate pressed")}
-            style={styles.modalItem}
-          >
+            style={styles.modalItem}>
             <Text style={styles.modalItemText}>Simulate reject</Text>
           </TouchableOpacity>
         </View>
@@ -245,7 +236,6 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   scrollViewContent: {
-    paddingHorizontal: 16,
     paddingBottom: 20,
   },
   footer: {

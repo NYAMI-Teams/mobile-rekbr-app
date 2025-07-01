@@ -17,6 +17,7 @@ import { resetPassword } from "@/utils/api/auth";
 import PrimaryButton from "@/components/PrimaryButton";
 import PasswordChecklist from "@/components/PasswordChecklist";
 import BuyerKonfirmasi from "@/components/BuyerKonfirmasi";
+import NavBackHeader from "@/components/NavBackHeader";
 
 export default function ChangePasswordScreen() {
   const router = useRouter();
@@ -81,25 +82,18 @@ export default function ChangePasswordScreen() {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={handleBackBtn}>
-          <Ionicons name="chevron-back-outline" size={24} color="#000" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Pulihkan Akses Akun Anda</Text>
-        <View style={{ width: 24 }} />
-      </View>
+      <NavBackHeader title={"Pulihkan Akses Akun Anda"} />
 
       {/* Content */}
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={{ flex: 1 }}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 60 : 0}
+        style={{ flex: 1, width: "100%" }}
       >
         <ScrollView
-          contentContainerStyle={{ flexGrow: 1 }}
-          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={{ flexGrow: 1, width: "100%", paddingHorizontal: 16, marginTop: 20, }}
+          keyboardShouldPersistTaps='handled'
           showsVerticalScrollIndicator={false}
-          keyboardDismissMode="on-drag"
-          style={styles.scrollContent}
         >
           <View style={styles.formContainer}>
             {/* Password */}
@@ -109,22 +103,8 @@ export default function ChangePasswordScreen() {
                 placeholder="Masukkan kata sandi baru kamu"
                 value={kataSandiBaru}
                 onChangeText={setKataSandiBaru}
-                secureTextEntry={!isKataSandiBaruVisible}
                 isPassword={true}
-                inputClassName="pr-12"
               />
-              <TouchableOpacity
-                style={styles.eyeButton}
-                onPress={toggleKataSandiBaruVisibility}
-              >
-                <MaterialIcons
-                  name={
-                    isKataSandiBaruVisible ? "visibility" : "visibility-off"
-                  }
-                  size={22}
-                  color="#666"
-                />
-              </TouchableOpacity>
               <PasswordChecklist password={kataSandiBaru} />
             </View>
 
@@ -135,25 +115,8 @@ export default function ChangePasswordScreen() {
                 placeholder="Pastikan sama, ya!"
                 value={konfirmasiKataSandiBaru}
                 onChangeText={setKonfirmasiKataSandiBaru}
-                secureTextEntry={!isKonfirmasiKataSandiBaruVisible}
                 isPassword={true}
-                inputClassName="pr-12"
               />
-              <TouchableOpacity
-                style={styles.eyeButton}
-                onPress={toggleKonfirmasiKataSandiBaruVisibility}
-              >
-                <MaterialIcons
-                  name={
-                    isKonfirmasiKataSandiBaruVisible
-                      ? "visibility"
-                      : "visibility-off"
-                  }
-                  size={22}
-                  color="#666"
-                />
-              </TouchableOpacity>
-
               {/* Alert Validasi */}
               {konfirmasiKataSandiBaru.length > 0 && (
                 <View style={styles.alertRow}>
@@ -201,43 +164,26 @@ export default function ChangePasswordScreen() {
         </ScrollView>
       </KeyboardAvoidingView>
 
-      {showPopup && (
-        <BuyerKonfirmasi
-          onClose={() => setShowPopup(false)}
-          onBtn2={handleChangePassword}
-          onBtn1={() => setShowPopup(false)}
-          title="Pastikan semuanya sudah benar yaa sebelum kamu kirim!"
-          btn1="Kembali"
-          btn2="Kirim"
-        />
-      )}
-    </View>
+      {
+        showPopup && (
+          <BuyerKonfirmasi
+            onClose={() => setShowPopup(false)}
+            onBtn2={handleChangePassword}
+            onBtn1={() => setShowPopup(false)}
+            title="Pastikan semuanya sudah benar yaa sebelum kamu kirim!"
+            btn1="Kembali"
+            btn2="Kirim"
+          />
+        )
+      }
+    </View >
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#fff" },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    width: "100%",
-    paddingHorizontal: 16,
-    paddingTop: 16,
-  },
-  headerTitle: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#000",
-  },
-  scrollContent: {
-    flex: 1,
-    width: "100%",
-    paddingHorizontal: 16,
-    marginTop: 20,
-  },
+
   formContainer: {
-    marginTop: 16,
     gap: 16,
     flex: 1,
   },

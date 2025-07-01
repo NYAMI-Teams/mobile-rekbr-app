@@ -8,18 +8,21 @@ import {
   KeyboardAvoidingView,
   ScrollView,
   Platform,
+  StyleSheet,
+  Pressable,
+  Alert,
 } from "react-native";
 import Modal from "react-native-modal";
 import { useState, useEffect } from "react";
-import { Pressable } from "react-native";
-import { Alert } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import * as ImageManipulator from "expo-image-manipulator";
+import * as FileSystem from "expo-file-system";
 import { postSellerResponse } from "../../utils/api/complaint";
 import PrimaryButton from "../PrimaryButton";
 import { showToast } from "../../utils";
 import { useRouter } from "expo-router";
 import { Feather } from "@expo/vector-icons";
+import { Video } from "expo-av";
 
 export default function ModalSeller({ showPopup, setShowPopup, id, isTolak }) {
   const router = useRouter();
@@ -34,114 +37,156 @@ export default function ModalSeller({ showPopup, setShowPopup, id, isTolak }) {
       const cameraStatus = await ImagePicker.requestCameraPermissionsAsync();
       setHasCameraPermission(cameraStatus.status === "granted");
     })();
-    console.log("ini isTolak", isTolak);
+    // console.log("ini isTolak", isTolak);
   }, []);
 
   const handleUpload = async () => {
-    console.log("Masuk Sini (awal)");
-
-    if (arrPhoto.length >= 5) {
-      Alert.alert(
-        "Limit Mencapai",
-        "Anda sudah mencapai batas maksimal 5 foto",
-        [{ text: "OK" }]
-      );
-      console.log("Masuk Sini (limit)");
-      return;
-    }
-
     if (hasCameraPermission === false) {
       Alert.alert(
         "Izin Kamera Diperlukan",
-        "Aplikasi memerlukan akses kamera untuk mengambil foto. Mohon berikan izin di pengaturan perangkat Anda."
+        "Aplikasi memerlukan akses kamera."
       );
-      console.log("Masuk Sini (izin)");
       return;
     }
 
     if (hasCameraPermission === null) {
-      Alert.alert(
-        "Meminta Izin",
-        "Aplikasi sedang meminta izin kamera. Mohon tunggu sebentar."
-      );
-      console.log("Masuk Sini (izin null)");
+      Alert.alert("Meminta Izin", "Mohon tunggu sebentar.");
       return;
     }
 
     Alert.alert(
-      "Pilih Sumber Gambar",
-      "Ambil foto baru atau pilih dari galeri?",
+      "Pilih Jenis Media",
+      "Pilih jenis media yang ingin Anda tambahkan",
       [
-        {
-          text: "Kamera",
-          onPress: async () => {
-            await pickImage("camera");
-          },
-        },
-        {
-          text: "Galeri",
-          onPress: async () => {
-            await pickImage("gallery");
-          },
-        },
+        { text: "Foto", onPress: () => handlePickMedia("Images") },
+        { text: "Video", onPress: () => handlePickMedia("Videos") },
         { text: "Batal", style: "cancel" },
       ]
     );
-    console.log("Masuk Sini (akhir)");
   };
 
-  const pickImage = async (source) => {
-    let result;
-    if (source === "camera") {
-      result = await ImagePicker.launchCameraAsync({
-        mediaTypes: "Images",
-        allowsEditing: true,
-        quality: 1,
-      });
-    } else {
-      result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: "Images",
-        allowsEditing: true,
-        quality: 1,
-      });
-    }
+  const handlePickMedia = async (type) => {
+    Alert.alert(
+      "Pilih Sumber Media",
+      "Ambil media baru atau pilih dari galeri?",
+      [
+        { text: "Kamera", onPress: () => pickImage("camera", type) },
+        { text: "Galeri", onPress: () => pickImage("gallery", type) },
+        { text: "Batal", style: "cancel" },
+      ]
+    );
+  };
 
-    if (!result.canceled && result.assets && result.assets.length > 0) {
-      let imageAsset = result.assets[0];
-      let quality = 0.7;
-      let compressed = await ImageManipulator.manipulateAsync(
-        imageAsset.uri,
-        [],
-        { compress: quality, format: ImageManipulator.SaveFormat.JPEG }
-      );
+  const pickImage = async (source, type) => {
+    let result =
+      source === "camera"
+        ? await ImagePicker.launchCameraAsync({
+            mediaTypes: type,
+            allowsEditing: true,
+            quality: 1,
+          })
+        : await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: type,
+            allowsEditing: true,
+            quality: 1,
+          });
 
-      // Loop kompresi hingga < 1MB atau quality terlalu kecil
-      let blob, size;
-      do {
-        const response = await fetch(compressed.uri);
-        blob = await response.blob();
-        size = blob.size;
-        if (size > 1024 * 1024) {
-          quality -= 0.2;
-          if (quality < 0.2) break;
-          compressed = await ImageManipulator.manipulateAsync(
-            imageAsset.uri,
-            [],
-            { compress: quality, format: ImageManipulator.SaveFormat.JPEG }
-          );
+    if (!result.canceled && result.assets?.length > 0) {
+      const selected = result.assets[0];
+      const uri = selected.uri;
+      const type = selected.type;
+      const extension = uri.split(".").pop().toLowerCase();
+      const sizeMB = (await FileSystem.getInfoAsync(uri)).size / (1024 * 1024);
+      console.log("masuk sini");
+
+      const allowedImages = ["jpg", "jpeg", "png"];
+      const allowedVideos = ["mp4", "mov"];
+
+      if (type === "image" && !allowedImages.includes(extension)) {
+        alert("Format foto tidak didukung. Gunakan .jpg atau .png");
+        return;
+      }
+
+      if (type === "video" && !allowedVideos.includes(extension)) {
+        alert("Format video tidak didukung. Gunakan .mp4 atau .mov");
+        return;
+      }
+
+      // Compress image
+      if (type === "image") {
+        try {
+          let quality = 0.7;
+          let compressed = await ImageManipulator.manipulateAsync(uri, [], {
+            compress: quality,
+            format: ImageManipulator.SaveFormat.JPEG,
+          });
+
+          let blob, size;
+          do {
+            const response = await fetch(compressed.uri);
+            blob = await response.blob();
+            size = blob.size;
+            if (size > 1024 * 1024) {
+              quality -= 0.2;
+              if (quality < 0.2) break;
+              compressed = await ImageManipulator.manipulateAsync(
+                compressed.uri,
+                [],
+                { compress: quality, format: ImageManipulator.SaveFormat.JPEG }
+              );
+            }
+          } while (size > 1024 * 1024 && quality >= 0.2);
+
+          const compressedSizeMB =
+            (await FileSystem.getInfoAsync(compressed.uri)).size /
+            (1024 * 1024);
+
+          if (compressedSizeMB > 1.5) {
+            alert("Ukuran foto melebihi 1.5MB setelah kompresi");
+            return;
+          }
+          selected.uri = compressed.uri;
+        } catch (error) {
+          console.error("Error compressing image:", error);
+          alert("Gagal mengkompres foto");
+          return;
         }
-      } while (size > 1024 * 1024 && quality >= 0.2);
+      }
 
-      setArrPhoto((prev) => [...prev, compressed]);
-      setIsUploaded(true);
-    } else {
-      setArrPhoto([]);
-      setIsUploaded(false);
+      if (type === "video") {
+        try {
+          const compressedSizeMB = sizeMB;
+          console.log("compressedSizeMB", compressedSizeMB);
+
+          if (compressedSizeMB > 90) {
+            alert("Ukuran video melebihi 90MB");
+            return;
+          }
+        } catch (error) {
+          console.error("Error checking video size:", error);
+          alert("Gagal memeriksa ukuran video");
+          return;
+        }
+      }
+
+      const photoCount = arrPhoto.filter((m) => m?.type === "image").length;
+      const videoCount = arrPhoto.filter((m) => m?.type === "video").length;
+
+      if (
+        (type === "image" && arrPhoto.length >= 5) ||
+        (type === "video" && (videoCount >= 1 || photoCount > 4))
+      ) {
+        alert("Maksimal 5 file atau 4 foto + 1 video.");
+        return;
+      }
+
+      setArrPhoto([...arrPhoto, selected]);
     }
   };
 
   const handleSellerResponse = async () => {
     try {
+      setIsUploaded(true);
       if (!isInputValid) {
         showToast("Error", "Tanggapan harus minimal 25 karakter", "error");
         return;
@@ -156,17 +201,15 @@ export default function ModalSeller({ showPopup, setShowPopup, id, isTolak }) {
       );
 
       showToast("Berhasil", res?.message, "success");
-      console.log("ini res", res);
       router.replace("/(tabs)/complaint");
       setShowPopup(false);
     } catch (err) {
-      console.log("Gagal cok ===> ", err.message);
+      // console.log("Gagal cok ===> ", err.message);
       showToast("Gagal", err?.message, "error");
       // Re-enable the button on error
-      const button = document.querySelector("button[title='Kirim']");
-      if (button) {
-        button.disabled = false;
-      }
+      // Tidak perlu document.querySelector di React Native
+    } finally {
+      setIsUploaded(false);
     }
   };
 
@@ -177,42 +220,26 @@ export default function ModalSeller({ showPopup, setShowPopup, id, isTolak }) {
       animationType="slide"
       onRequestClose={() => setShowPopup(false)}
       style={{ margin: 0, padding: 0 }}>
-      <Pressable
-        className="flex-1 bg-black/40 justify-end"
-        onPress={() => setShowPopup(false)}>
-        <Pressable
-          className="bg-white rounded-t-2xl px-2"
-          style={{
-            height: "55%",
-            width: "100%",
-            position: "absolute",
-            bottom: 0,
-            left: 0,
-            right: 0,
-          }}
-          onPress={() => {}}>
-          <View className="flex-col justify-center p-4">
-            <Text className="text-lg font-semibold mb-4">
-              Form Konfirmasi Seller
-            </Text>
-            {/* form tanggapan seller */}
+      <Pressable style={styles.overlay} onPress={() => setShowPopup(false)}>
+        <Pressable style={styles.modalContainer} onPress={() => {}}>
+          <View style={styles.contentContainer}>
+            <Text style={styles.title}>Form Konfirmasi Seller</Text>
             <ScrollView
               contentContainerStyle={{ flexGrow: 1 }}
               keyboardShouldPersistTaps="handled"
               showsVerticalScrollIndicator={false}
-              hideKeyboardOnScroll={true}
               keyboardDismissMode="on-drag">
               <KeyboardAvoidingView
                 behavior={Platform.OS === "ios" ? "padding" : "height"}
                 style={{ flex: 1 }}>
-                <View className="mb-4">
-                  <Text className="text-black text-base font-medium mb-2">
+                <View style={styles.inputSection}>
+                  <Text style={styles.label}>
                     Tanggapan Seller (Min. 25 karakter)
                   </Text>
                   <TextInput
                     placeholder="Berikan tanggapan kamu"
                     placeholderTextColor="#888"
-                    className="border border-gray-300 rounded-lg p-2 h-28"
+                    style={styles.textInput}
                     multiline
                     numberOfLines={4}
                     value={tanggapanSeller}
@@ -222,79 +249,96 @@ export default function ModalSeller({ showPopup, setShowPopup, id, isTolak }) {
                     }}
                   />
                   {tanggapanSeller.length > 0 && (
-                    <Text className="text-xs text-gray-500 mt-1">
+                    <Text style={styles.counterText}>
                       {tanggapanSeller.length}/200 karakter
                     </Text>
                   )}
                   {!isInputValid && tanggapanSeller.length > 0 && (
-                    <Text className="text-xs text-red-500 mt-1">
+                    <Text style={styles.errorText}>
                       {tanggapanSeller.length < 25
                         ? "Minimal 25 karakter"
                         : "Maksimal 200 karakter"}
                     </Text>
                   )}
                 </View>
-                <View className="mb-2">
-                  <Text className="text-black text-base font-medium mb-2">
+                <View style={styles.inputSection}>
+                  <Text style={styles.label}>
                     Bukti foto & video (opsional)
                   </Text>
-                  <Text
-                    style={{
-                      color: "black",
-                      fontSize: 12,
-                      fontWeight: "300",
-                      marginBottom: 8,
-                    }}>
+                  <Text style={styles.infoText}>
                     Unggah maksimal
-                    <Text style={{ fontWeight: "500" }}> 5 foto</Text> atau
-                    <Text style={{ fontWeight: "500" }}> 4 foto + 1 video</Text>
-                    . Format: .jpg, .png, .mp4, .mov. Maks. 10 MB (foto), 60 MB
+                    <Text style={styles.boldText}> 5 foto</Text> atau
+                    <Text style={styles.boldText}> 4 foto + 1 video</Text>.
+                    Format: .jpg, .png, .mp4, .mov. Maks. 10 MB (foto), 60 MB
                     (video).
                   </Text>
-                  <View className="flex-row flex-wrap gap-2 mt-2">
-                    <TouchableOpacity onPress={handleUpload} className="mb-2">
+                  <View style={styles.photoRow}>
+                    <TouchableOpacity
+                      onPress={handleUpload}
+                      style={styles.addPhotoBtn}>
                       <Image
                         source={require("../../assets/addImg.png")}
-                        style={{ width: 50, height: 50 }}
+                        style={styles.photoThumb}
                       />
                     </TouchableOpacity>
                     {arrPhoto.length > 0 && (
-                      <View className="flex-row flex-wrap gap-2">
-                        {arrPhoto.map((photo, index) => (
-                          <View key={index} className="relative">
-                            <Image
-                              source={{ uri: photo.uri }}
-                              style={{
-                                width: 50,
-                                height: 50,
-                                borderRadius: 8,
-                              }}
-                            />
-                            <TouchableOpacity
-                              onPress={() => {
-                                const newPhotos = [...arrPhoto];
-                                newPhotos.splice(index, 1);
-                                setArrPhoto(newPhotos);
-                              }}
-                              className="absolute -top-2 -right-2 bg-red-500 rounded-full p-1">
-                              <Feather name="x" size={16} color="white" />
-                            </TouchableOpacity>
+                      <View style={styles.mediaWrap}>
+                        {arrPhoto.map((item, idx) => (
+                          <View key={idx} style={styles.mediaBox}>
+                            {item.type === "image" ? (
+                              <>
+                                <Image
+                                  source={{ uri: item.uri }}
+                                  style={styles.mediaImg}
+                                />
+                                <TouchableOpacity
+                                  onPress={() => {
+                                    const newPhotos = [...arrPhoto];
+                                    newPhotos.splice(idx, 1);
+                                    setArrPhoto(newPhotos);
+                                  }}
+                                  style={styles.removeBtn}>
+                                  <Feather name="x" size={12} color="white" />
+                                </TouchableOpacity>
+                              </>
+                            ) : (
+                              <View style={styles.videoBox}>
+                                <Video
+                                  source={{ uri: item.uri }}
+                                  style={styles.mediaImg}
+                                  resizeMode="cover"
+                                  shouldPlay={false}
+                                  isLooping={false}
+                                  useNativeControls
+                                />
+                                <TouchableOpacity
+                                  onPress={() => {
+                                    const newPhotos = [...arrPhoto];
+                                    newPhotos.splice(idx, 1);
+                                    setArrPhoto(newPhotos);
+                                  }}
+                                  style={styles.removeBtn}>
+                                  <Feather name="x" size={12} color="white" />
+                                </TouchableOpacity>
+                                <Text style={styles.videoText}>Video</Text>
+                              </View>
+                            )}
                           </View>
                         ))}
                       </View>
                     )}
                   </View>
                   {arrPhoto.length > 0 && (
-                    <Text className="text-xs text-gray-500 mt-1">
+                    <Text style={styles.counterText}>
                       {arrPhoto.length}/5 foto
                     </Text>
                   )}
                 </View>
-                <View className="mb-4">
+                <View style={styles.buttonSection}>
                   <PrimaryButton
-                    title="Kirim"
+                    title={isUploaded ? "Loading..." : "Kirim"}
                     onPress={handleSellerResponse}
-                    disabled={!isInputValid}
+                    disabled={!isInputValid || isUploaded}
                   />
                 </View>
               </KeyboardAvoidingView>
@@ -305,3 +349,135 @@ export default function ModalSeller({ showPopup, setShowPopup, id, isTolak }) {
     </Modal>
   );
 }
+
+const styles = StyleSheet.create({
+  overlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.4)",
+    justifyContent: "flex-end",
+  },
+  modalContainer: {
+    backgroundColor: "#fff",
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    paddingHorizontal: 8,
+    height: "60%",
+    width: "100%",
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+  },
+  contentContainer: {
+    flexDirection: "column",
+    padding: 16,
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: "600",
+    marginBottom: 16,
+  },
+  inputSection: {
+    marginBottom: 16,
+  },
+  label: {
+    color: "#000",
+    fontSize: 16,
+    fontWeight: "500",
+    marginBottom: 8,
+  },
+  textInput: {
+    borderWidth: 1,
+    borderColor: "#d1d5db",
+    borderRadius: 8,
+    padding: 8,
+    height: 112,
+    color: "#000",
+    textAlignVertical: "top",
+    backgroundColor: "#fff",
+  },
+  counterText: {
+    fontSize: 12,
+    color: "#6b7280",
+    marginTop: 4,
+  },
+  errorText: {
+    fontSize: 12,
+    color: "#ef4444",
+    marginTop: 4,
+  },
+  infoText: {
+    color: "#000",
+    fontSize: 12,
+    fontWeight: "300",
+    marginBottom: 8,
+  },
+  boldText: {
+    fontWeight: "500",
+  },
+  photoRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    alignItems: "center",
+    gap: 8,
+    marginTop: 8,
+  },
+  addPhotoBtn: {
+    marginBottom: 8,
+    marginRight: 8,
+  },
+  photoWrapper: {
+    position: "relative",
+    marginRight: 8,
+    marginBottom: 8,
+  },
+  photoThumb: {
+    width: 50,
+    height: 50,
+    borderRadius: 8,
+  },
+  removeBtn: {
+    position: "absolute",
+    top: 0,
+    right: 0,
+    backgroundColor: "#ef4444",
+    borderRadius: 999,
+    padding: 4,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  buttonSection: {
+    marginBottom: 16,
+  },
+  mediaWrap: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 12,
+  },
+  mediaBox: {
+    width: 50,
+    height: 50,
+    backgroundColor: "#E5E7EB",
+    borderRadius: 12,
+    overflow: "hidden",
+    // marginRight: 12,
+    // marginBottom: 12,
+  },
+  mediaImg: {
+    width: "100%",
+    height: "100%",
+    resizeMode: "cover",
+  },
+  videoBox: {
+    width: "100%",
+    height: "100%",
+    position: "relative",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  videoText: {
+    fontSize: 12,
+    color: "#fff",
+    position: "absolute",
+  },
+});

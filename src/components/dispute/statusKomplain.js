@@ -1,10 +1,29 @@
-import { View, Text, Image } from "react-native";
+import { View, Text, Image, StyleSheet } from "react-native";
 
-export const StatusKomplain = ({ status}) => {
+export const StatusKomplain = ({ status }) => {
   return (
-    <View className="flex-row justify-between px-4 mt-6">
-      <Text className="text-black text-[15px]">Status Komplain : </Text>
-      <Text className="text-black font-bold">{status}</Text>
+    <View style={styles.container}>
+      <Text style={styles.label}>Status Komplain : </Text>
+      <Text style={styles.status}>{status}</Text>
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingHorizontal: 16,
+    marginTop: 24,
+    alignItems: "center",
+  },
+  label: {
+    color: "#000",
+    fontSize: 15,
+  },
+  status: {
+    color: "#000",
+    fontWeight: "bold",
+    fontSize: 15,
+  },
+});

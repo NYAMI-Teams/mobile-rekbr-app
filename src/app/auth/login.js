@@ -12,32 +12,19 @@ import {
 } from "react-native";
 import InputField from "../../components/InputField";
 import PrimaryButton from "../../components/PrimaryButton";
-import { MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { getProfile, login } from "../../utils/api/auth";
+import { getProfile, login, savePushToken } from "../../utils/api/auth";
 import { showToast } from "../../utils";
-import { setAccessToken, setProfileStore } from "../../store";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { getDataNotification, setAccessToken, setProfileStore } from "../../store";
+import { registerForPushNotificationsAsync } from "@/utils/notifications";
 
 export default function Login() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [error, setError] = useState(true);
   const [errorMsg, setErrorMsg] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-
-  useEffect(() => {
-    // development (DELETE)
-    // setEmail("danilardi8@gmail.com");
-    // setPassword("Mobilmerah123#");
-    // setIsPasswordVisible(true);
-  }, []);
-
-  const togglePasswordVisibility = () => {
-    setIsPasswordVisible(!isPasswordVisible);
-  };
 
   const handleLogin = async () => {
     setError(false);
@@ -46,6 +33,7 @@ export default function Login() {
       return;
     }
     setIsLoading(true);
+
     try {
       const res = await login(email, password);
       showToast(
@@ -54,11 +42,34 @@ export default function Login() {
         "success"
       );
       await setAccessToken(res?.data?.accessToken);
-      getUserProfile();
     } catch (err) {
       setError(true);
       setErrorMsg("Email atau kata sandi salah");
       showToast("Login Gagal", "Silahkan coba lagi", "error");
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const pushToken = await registerForPushNotificationsAsync();
+
+      // ✅ Tambahkan validasi format token di sini
+      if (!pushToken || !pushToken.startsWith("ExponentPushToken")) {
+        console.warn("Push token tidak valid:", pushToken);
+      } else {
+        await savePushToken(pushToken);
+        // console.log("Push token saved:", pushToken);
+      }
+    } catch (err) {
+      console.warn("Gagal simpan push token:", err);
+    }
+
+    try {
+      await getUserProfile();
+    } catch (err) {
+      console.warn("Gagal ambil profil:", err);
+      showToast("Gagal", "Gagal mengambil data profile", "error");
+    } finally {
       setIsLoading(false);
     }
   };
@@ -71,7 +82,7 @@ export default function Login() {
     } catch (error) {
       showToast(
         "Gagal",
-        "Gagal mengambil data profile. Silahkan coba lagi.",
+        "Gagal mengambil data profile. Silahkan coba login kembali.",
         "error"
       );
     } finally {
@@ -83,14 +94,12 @@ export default function Login() {
     <View style={styles.container}>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        keyboardVerticalOffset={Platform.OS === "ios" && 60}
-        style={{ flex: 1 }}
-      >
+        keyboardVerticalOffset={Platform.OS === "ios" ? 60 : 0}
+        style={{ flex: 1, width: "100%" }}>
         <ScrollView
           contentContainerStyle={{ flexGrow: 1 }}
           keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
-        >
+          showsVerticalScrollIndicator={false}>
           <View style={{ flex: 1 }}>
             {/* Header */}
             <View style={styles.headerContainer}>
@@ -122,26 +131,13 @@ export default function Login() {
                     placeholder="Masukkan kata sandi kamu"
                     value={password}
                     onChangeText={setPassword}
-                    secureTextEntry={!isPasswordVisible}
                     isPassword={true}
-                    inputClassName="pr-12"
                   />
-                  <TouchableOpacity
-                    style={styles.passwordIcon}
-                    onPress={togglePasswordVisibility}
-                  >
-                    <MaterialIcons
-                      name={isPasswordVisible ? "visibility" : "visibility-off"}
-                      size={22}
-                      color="#666"
-                    />
-                  </TouchableOpacity>
                 </View>
 
                 <TouchableOpacity
                   style={styles.forgotPassword}
-                  onPress={() => router.push("/auth/LupaPassword")}
-                >
+                  onPress={() => router.push("/auth/LupaPassword")}>
                   <Text style={styles.linkText}>Lupa Kata Sandi?</Text>
                 </TouchableOpacity>
 
@@ -171,16 +167,14 @@ export default function Login() {
                 <View style={styles.linkRow}>
                   <Text style={styles.linkLabel}>Belum punya akun?</Text>
                   <TouchableOpacity
-                    onPress={() => router.replace("/auth/register")}
-                  >
+                    onPress={() => router.replace("/auth/register")}>
                     <Text style={styles.linkAction}>Silakan Registrasi</Text>
                   </TouchableOpacity>
                 </View>
                 <View style={styles.linkRow}>
                   <Text style={styles.linkLabel}>Terdapat kendala?</Text>
                   <TouchableOpacity
-                    onPress={() => Alert.alert("Berhasil terhubung")}
-                  >
+                    onPress={() => Alert.alert("Berhasil terhubung")}>
                     <Text style={styles.linkAction}>Silakan Hubungi Kami</Text>
                   </TouchableOpacity>
                 </View>
@@ -214,8 +208,6 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 16,
   },
   formContainer: { marginHorizontal: 20, gap: 16, marginTop: 24, flex: 1 },
-  passwordFieldWrapper: { position: "relative", marginBottom: 16 },
-  passwordIcon: { position: "absolute", top: 44, right: 40 },
   forgotPassword: {
     alignSelf: "flex-end",
     marginTop: 8,

@@ -15,12 +15,14 @@ import InputField from "@/components/InputField";
 import { showToast } from "@/utils";
 import { checkUser } from "@/utils/api/transaction";
 import { forgotPassword } from "@/utils/api/auth";
+import NavBackHeader from "@/components/NavBackHeader";
 
 export default function MasukkanEmailScreen() {
   const router = useRouter();
 
   const [email, setEmail] = useState("");
   const [emailFound, setEmailFound] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleBackBtn = () => {
     router.back();
@@ -31,6 +33,7 @@ export default function MasukkanEmailScreen() {
   };
 
   const handleBtnPress = async () => {
+    setIsLoading(true);
     try {
       const resCheckUser = await checkUser(email);
       if (resCheckUser.data) {
@@ -45,25 +48,20 @@ export default function MasukkanEmailScreen() {
     } catch (err) {
       setEmailFound(false);
       showToast("Gagal", err.message, "error");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <View style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={handleBackBtn}>
-          <Ionicons name="chevron-back-outline" size={24} color="#000" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>
-          Pulihkan Akses Akun Anda
-        </Text>
-        <View style={{ width: 24 }} />
-      </View>
+      <NavBackHeader title={"Pulihkan Akses Akun Anda"} />
 
       {/* Content */}
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 60 : 0}
         style={{ flex: 1 }}
       >
         <ScrollView
@@ -128,7 +126,7 @@ export default function MasukkanEmailScreen() {
             <PrimaryButton
               title="Kirim"
               onPress={handleBtnPress}
-              disabled={!isEmailValid()}
+              disabled={!isEmailValid() || isLoading}
             />
           </View>
         </ScrollView>
@@ -158,17 +156,13 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     paddingHorizontal: 16,
-    paddingTop: 16,
   },
   formWrapper: {
     flex: 1,
-    marginBottom: 16,
   },
   alertRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginTop: 8,
-    marginHorizontal: 20,
   },
   alertText: {
     marginLeft: 8,

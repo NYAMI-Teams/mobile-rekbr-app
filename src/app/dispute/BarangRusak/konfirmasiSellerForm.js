@@ -18,6 +18,7 @@ import * as ImagePicker from "expo-image-picker";
 import * as ImageManipulator from "expo-image-manipulator";
 import { postBuyerReturnConfirm } from "@/utils/api/complaint";
 import { showToast } from "@/utils";
+import NavBackHeader from "@/components/NavBackHeader";
 
 export default function KonfirmasiSellerForm() {
   const router = useRouter();
@@ -29,13 +30,26 @@ export default function KonfirmasiSellerForm() {
   const [hasCameraPermission, setHasCameraPermission] = useState(null);
 
   useEffect(() => {
-    (async () => {
+    const checkCameraPermission = async () => {
       const cameraStatus = await ImagePicker.requestCameraPermissionsAsync();
       setHasCameraPermission(cameraStatus.status === "granted");
-    })();
+
+      // Show alert if permission is denied
+      if (cameraStatus.status === "denied") {
+        Alert.alert(
+          "Izin Kamera Diperlukan",
+          "Aplikasi memerlukan akses kamera untuk mengambil foto. Mohon berikan izin di pengaturan perangkat Anda."
+        );
+      }
+    };
+
+    checkCameraPermission();
   }, []);
 
   const handleUpload = async () => {
+    if (!hasCameraPermission) {
+      return;
+    }
     if (hasCameraPermission === false) {
       Alert.alert(
         "Izin Kamera Diperlukan",
@@ -125,19 +139,13 @@ export default function KonfirmasiSellerForm() {
       showToast("Sukses", "Permintaan konfirmasi berhasil dikirim", "success");
     } catch (error) {
       showToast("Gagal", error?.message, "error");
-      console.log("ini error konfirmasi form", error);
+      // console.log("ini error konfirmasi form", error);
     }
   };
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()}>
-          <ChevronLeft size={24} color="black" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Permintaan Konfirmasi Seller</Text>
-        <View style={styles.headerSpacer} />
-      </View>
+      <NavBackHeader title={"Permintaan Konfirmasi Seller"} />
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <InputField
@@ -188,7 +196,7 @@ export default function KonfirmasiSellerForm() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff" },
+  container: { flex: 1, backgroundColor: "#fff", marginHorizontal: 16 },
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -204,7 +212,6 @@ const styles = StyleSheet.create({
     width: 24,
   },
   scrollContent: {
-    paddingHorizontal: 16,
     paddingBottom: 16,
   },
   previewContainer: {

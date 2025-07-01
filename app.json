@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Rekbr App",
-    "slug": "mobile-rekbr-app",
+    "slug": "rekbr-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./src/assets/icon.png",
@@ -18,21 +18,31 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.nyamiteams.rekbrapp"
+      "package": "com.nyamiteams.rekbrapp",
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "favicon": "./src/assets/favicon.png",
       "bundler": "metro"
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      [
+        "expo-notifications",
+        {
+          "android": {
+            "googleServicesFile": "./google-services.json"
+          }
+        }
+      ]
     ],
+    "splash": {},
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "05fa522e-54e0-4168-b260-5abb3e7db0a2"
+        "projectId": "7720054e-2089-48f0-830e-31b51b327ed2"
       }
     },
-    "owner": "danilardi"
+    "owner": "nyami"
   }
 }

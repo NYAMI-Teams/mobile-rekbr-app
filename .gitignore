@@ -123,3 +123,7 @@ expo-env.d.ts
 # TypeScript
 # =============================
 *.tsbuildinfo
+
+# Firebase credentials & sensitive files
+google-services.json
+rekbr-app-firebase-adminsdk-fbsvc-9235179ac9.json

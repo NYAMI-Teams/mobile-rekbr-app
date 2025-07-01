@@ -17,6 +17,7 @@ import { getDetailBuyerTransaction } from "../../../utils/api/buyer";
 import { postBuyerComplaint } from "../../../utils/api/complaint";
 import PrimaryButton from "../../../components/PrimaryButton";
 import { showToast } from "../../../utils";
+import NavBackHeader from "@/components/NavBackHeader";
 
 export default function HilangBarang() {
   const router = useRouter();
@@ -73,15 +74,7 @@ export default function HilangBarang() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => router.back()}
-          style={styles.backButton}
-        >
-          <ChevronLeft size={24} color="black" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Detail Masalah</Text>
-      </View>
+      <NavBackHeader title={"Detail Masalah"} />
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.infoBox}>
@@ -236,7 +229,7 @@ const styles = StyleSheet.create({
   header: { position: "relative", alignItems: "center", marginBottom: 16 },
   backButton: { position: "absolute", left: 0 },
   headerTitle: { fontSize: 18, fontWeight: "600", textAlign: "center" },
-  scrollContent: { paddingHorizontal: 16, paddingTop: 16, paddingBottom: 160 },
+  scrollContent: { paddingTop: 16, paddingBottom: 160 },
   infoBox: {
     flexDirection: "row",
     backgroundColor: "white",

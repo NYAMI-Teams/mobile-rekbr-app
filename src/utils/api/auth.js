@@ -14,6 +14,15 @@ export const login = async (email, password) => {
   }
 };
 
+export const savePushToken = async (token) => {
+  try {
+    const res = await Api.post(`/push-token`, { token });
+    return res;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const register = async (email, password) => {
   try {
     const res = await Api.post(`/user/register`, {
@@ -106,7 +115,7 @@ export const forgotPassword = async (email) => {
 
 export const resetPasswordOTP = async (email, otpCode) => {
   try {
-    const res = await Api.post(`/user/verify-reset-otp`, {
+    const res = await Api.post(`/user/verify-otp-reset-password`, {
       email,
       otpCode,
     });
@@ -134,12 +143,12 @@ export const resetPassword = async (email, newPassword) => {
 
 export const changeEmail = async (email) => {
   try {
-    const res = await Api.post(`/user/change-email`, {
-      email,
-    });
-    if (res) {
-      return res;
-    }
+    // const res = await Api.post(`/user/change-email`, {
+    //   email,
+    // });
+    // if (res) {
+    //   return res;
+    // }
   } catch (error) {
     throw error;
   }

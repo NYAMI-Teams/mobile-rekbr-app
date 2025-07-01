@@ -17,6 +17,7 @@ import { getDetailSellerComplaint } from "../../../utils/api/complaint";
 import { showToast, formatCurrency } from "../../../utils";
 import moment from "moment";
 import { InfoBanner } from "@/components/dispute/InfoBanner";
+import NavBackHeader from "@/components/NavBackHeader";
 
 const formatDateWIB = (dateTime) => {
   if (!dateTime) return "Invalid date";
@@ -42,10 +43,10 @@ export default function AdminPage() {
       setDetailComplaint(res.data);
       setRejectedAdmin(res.data.admin_decision === "rejected");
       setRejectedSeller(res.data.seller_decision === "rejected");
-      console.log(
-        "ini detail complaint as seller",
-        JSON.stringify(res.data, null, 2)
-      );
+      // // console.log(
+      //   "ini detail complaint as seller",
+      //   JSON.stringify(res.data, null, 2)
+      // );
     } catch (err) {
       showToast(
         "Gagal",
@@ -58,13 +59,7 @@ export default function AdminPage() {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()}>
-          <ChevronLeft size={24} color="black" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Detail Komplain</Text>
-        <View style={styles.headerSpacer} />
-      </View>
+      <NavBackHeader title={"Detail Komplain"} />
 
       {/* Stepper */}
       <StepProgressBar
@@ -76,8 +71,7 @@ export default function AdminPage() {
 
       <ScrollView
         contentContainerStyle={styles.scrollContent}
-        key="admin-scroll-view"
-      >
+        key="admin-scroll-view">
         <StatusKomplain
           status={
             rejectedAdmin ? "Komplain Ditolak" : "Menunggu Persetujuan Admin"
@@ -174,9 +168,7 @@ const styles = StyleSheet.create({
   headerSpacer: {
     width: 24,
   },
-  scrollContent: {
-    paddingHorizontal: 16,
-  },
+  scrollContent: {},
   separator: {
     height: 8,
     backgroundColor: "#f5f5f5",

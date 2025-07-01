@@ -80,16 +80,17 @@ const ComplaintStepBar = ({ currentStep = 0, steps = [], status }) => {
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 10,
-    marginVertical: 20,
+    alignItems: "flex-start",
+    justifyContent: "center",
+    paddingHorizontal: 16,
+    marginTop: 20,
     marginBottom: 16,
-    marginHorizontal: 16,
+    marginHorizontal: 50,
   },
   stepContainer: {
     alignItems: "center",
   },
-  circle: {
+ circle: {
     width: 24,
     height: 24,
     borderRadius: 12,
@@ -98,6 +99,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "white",
+    zIndex: 1,
   },
   completedCircle: {
     backgroundColor: "#EDFBFA",
@@ -125,10 +127,12 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   line: {
-    flex: 1,
+    width: "100%",
     height: 2,
     backgroundColor: "#ccc",
-    marginHorizontal: 8,
+    marginHorizontal: -20,
+    marginTop: 12,
+    zIndex: 0,
   },
   completedLine: {
     backgroundColor: "#4CD7D0",

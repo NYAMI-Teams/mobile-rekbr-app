@@ -9,6 +9,7 @@ import {
   Pressable,
   Alert,
   StyleSheet,
+  ActivityIndicator,
 } from "react-native";
 import { ChevronLeft, ChevronDown, ChevronUp, Copy } from "lucide-react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -40,13 +41,13 @@ export default function CreateComplaintScreen() {
   const fetchTransaction = async () => {
     try {
       const res = await getDetailBuyerTransaction(id);
-      setTransaction(res.data);
-      setAjukanUlang(res.data?.Complaint.length > 0);
+      setTransaction(res?.data);
+      setAjukanUlang(res?.data?.Complaint?.length > 0);
     } catch (err) {
-      console.log(
-        "❌ Error saat fetchTransaction:",
-        err?.response?.data || err.message || err
-      );
+      // console.log(
+      //   "❌ Error saat fetchTransaction:",
+      //   err?.response?.data || err.message || err
+      // );
     }
   };
 
@@ -65,7 +66,7 @@ export default function CreateComplaintScreen() {
       showToast("Berhasil", "Komplain Berhasil dibuat", "success");
       router.replace("/(tabs)/complaint");
     } catch (err) {
-      console.log("❌ Error saat createComplaint:", err.message);
+      // console.log("❌ Error saat createComplaint:", err?.message);
       showToast("Gagal", err?.message, "error");
     } finally {
       setIsSubmitting(false);
@@ -74,9 +75,10 @@ export default function CreateComplaintScreen() {
   };
 
   if (!transaction)
+    // Loading state with activity indicator
     return (
-      <View style={styles.centeredContainer}>
-        <Text style={styles.errorText}>Error Rendered</Text>
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#000" />
       </View>
     );
 
@@ -86,8 +88,7 @@ export default function CreateComplaintScreen() {
         <View style={styles.headerContainer}>
           <TouchableOpacity
             onPress={() => router.back()}
-            style={styles.backButton}
-          >
+            style={styles.backButton}>
             <ChevronLeft size={24} color="black" />
           </TouchableOpacity>
           <Text style={styles.headerText}>Detail Masalah</Text>
@@ -155,8 +156,7 @@ export default function CreateComplaintScreen() {
 
             <Pressable
               onPress={() => setShowBreakdown(!showBreakdown)}
-              style={styles.breakdownToggle}
-            >
+              style={styles.breakdownToggle}>
               <View style={styles.rowBetween}>
                 <Text style={styles.breakdownLabel}>Nominal Rekber</Text>
                 {showBreakdown ? (
@@ -207,36 +207,36 @@ export default function CreateComplaintScreen() {
       <View style={styles.footer}>
         <PrimaryButton
           title={ajukanUlang ? "Ajukan Ulang Komplain" : "Kirim"}
+          style={{ marginBottom: 24 }}
           onPress={() => setModalVisible(true)}
         />
         <Modal
           transparent
           visible={modalVisible}
           animationType="fade"
-          onRequestClose={() => setModalVisible(false)}
-        >
+          onRequestClose={() => setModalVisible(false)}>
           <View style={styles.modalOverlay}>
-            <View style={styles.modalContent}>
+            <View style={styles.modalContainer}>
               <View style={styles.modalHeader}>
-                <View style={styles.modalIcon}>
+                <View style={styles.modalIconCircle}>
                   <Text style={styles.modalIconText}>i</Text>
                 </View>
-                <Text style={styles.modalTitle}>
+                <Text style={styles.modalTitleText}>
                   Apakah kamu sudah yakin untuk ringkasan komplain ini?
                 </Text>
               </View>
-              <View style={styles.modalActions}>
+
+              <View style={styles.modalButtonRow}>
                 <Pressable
                   onPress={() => setModalVisible(false)}
-                  style={styles.cancelButton}
-                >
-                  <Text style={styles.cancelText}>Kembali</Text>
+                  style={[styles.modalButton, styles.modalCancelButton]}>
+                  <Text style={styles.modalButtonText}>Kembali</Text>
                 </Pressable>
+
                 <Pressable
                   onPress={handleSubmitComplaint}
-                  style={styles.confirmButton}
-                >
-                  <Text style={styles.confirmText}>
+                  style={[styles.modalButton, styles.modalConfirmButton]}>
+                  <Text style={styles.modalButtonText}>
                     {isSubmitting ? "Mengirim..." : "Konfirmasi"}
                   </Text>
                 </Pressable>
@@ -316,61 +316,80 @@ const styles = StyleSheet.create({
   breakdownContent: { gap: 4, marginTop: 4 },
   totalLabel: { fontSize: 18, fontWeight: "700", color: "#000" },
   footer: { marginBottom: 24, marginHorizontal: 20 },
+
   modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.3)",
+    position: "absolute",
+    inset: 0,
+    zIndex: 50,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.3)",
   },
-  modalContent: {
+  modalContainer: {
     width: "90%",
-    backgroundColor: "#fff",
-    borderRadius: 12,
+    backgroundColor: "#ffffff",
+    borderRadius: 16,
     padding: 20,
-    borderColor: "#e5e7eb",
     borderWidth: 1,
+    borderColor: "#e5e7eb", // gray-200
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 3,
   },
   modalHeader: {
     flexDirection: "row",
     alignItems: "flex-start",
-    gap: 12,
     marginBottom: 24,
   },
-  modalIcon: {
+  modalIconCircle: {
     width: 24,
     height: 24,
     borderRadius: 12,
-    backgroundColor: "#3b82f6",
-    justifyContent: "center",
+    backgroundColor: "#3b82f6", // blue-500
     alignItems: "center",
+    justifyContent: "center",
+    marginRight: 12,
   },
-  modalIconText: { color: "#fff", fontWeight: "700", fontSize: 12 },
-  modalTitle: { flex: 1, fontSize: 18, fontWeight: "500", color: "#000" },
-  modalActions: { flexDirection: "row", justifyContent: "space-between" },
-  cancelButton: {
+  modalIconText: {
+    color: "#ffffff",
+    fontWeight: "bold",
+    fontSize: 12,
+  },
+  modalTitleText: {
+    flex: 1,
+    fontSize: 18,
+    fontWeight: "500",
+    color: "#000000",
+  },
+  modalButtonRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  modalButton: {
     flex: 1,
     paddingVertical: 12,
-    backgroundColor: "#f3f4f6",
     borderRadius: 8,
+  },
+  modalCancelButton: {
+    backgroundColor: "#f3f4f6", // gray-100
     marginRight: 8,
   },
-  cancelText: {
-    textAlign: "center",
-    fontWeight: "600",
-    fontSize: 16,
-    color: "#000",
-  },
-  confirmButton: {
-    flex: 1,
-    paddingVertical: 12,
-    backgroundColor: "#dbeafe",
-    borderRadius: 8,
+  modalConfirmButton: {
+    backgroundColor: "#dbeafe", // blue-100
     marginLeft: 8,
   },
-  confirmText: {
+  modalButtonText: {
     textAlign: "center",
     fontWeight: "600",
     fontSize: 16,
-    color: "#000",
+    color: "#000000",
+  },
+
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 20, // mt-5
   },
 });

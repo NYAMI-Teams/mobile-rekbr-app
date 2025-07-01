@@ -25,6 +25,7 @@ import {
   postBuyerCancelComplaint,
 } from "@/utils/api/complaint";
 import { showToast } from "@/utils";
+import NavBackHeader from "@/components/NavBackHeader";
 
 const formatDateWIB = (dateTime) => {
   if (!dateTime) return "Invalid date";
@@ -37,6 +38,7 @@ export default function ComplaintDetailScreen() {
 
   const [complaintDetail, setComplaintDetail] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [showActionModal, setShowActionModal] = useState(false);
 
   useEffect(() => {
@@ -51,7 +53,7 @@ export default function ComplaintDetailScreen() {
           : await getDetailSellerComplaint(id);
       setComplaintDetail(res.data);
     } catch (err) {
-      showToast("Gagal", "Gagal mengambil detail komplain", "error");
+      showToast("Gagal", err?.message, "error");
     } finally {
       setLoading(false);
     }
@@ -63,6 +65,7 @@ export default function ComplaintDetailScreen() {
   const handleCancelComplaint = async () => {
     if (!complaintDetail?.id) return;
     try {
+      setIsSubmitting(true);
       await postBuyerCancelComplaint(complaintDetail.id);
       showToast("Berhasil", "Komplain berhasil dibatalkan", "success");
       router.replace("/(tabs)/complaint");
@@ -72,11 +75,31 @@ export default function ComplaintDetailScreen() {
         err?.response?.data?.message || "Terjadi kesalahan",
         "error"
       );
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handleUpdateComplaint = () => {
     router.push({ pathname: "/Complaint/HilangKomplain", params: { id } });
+  };
+
+  const getStatusLabel = (status) => {
+    // console.log("status", status);
+    switch (status) {
+      case "under_investigation":
+        return "Dalam Investigasi";
+      case "approved_by_admin":
+        return "Tim Rekbr by BNI meminta maaf atas barang yang hilang , dan bukti kurir ekspedisi tidak memenuhi aturan SOP kami.";
+      case "rejected_by_admin":
+        return "Komplain Ditolak";
+      case "canceled":
+        return "Komplain Dibatalkan";
+      case "completed":
+        return "Selesai";
+      default:
+        return "-";
+    }
   };
 
   const getStatus = (status) => {
@@ -86,6 +109,7 @@ export default function ComplaintDetailScreen() {
       case "approved_by_admin":
         return "Komplain disetujui";
       case "rejected_by_seller":
+        return "Komplain Ditolak";
       case "rejected_by_admin":
         return "Komplain Ditolak";
       case "canceled":
@@ -101,28 +125,41 @@ export default function ComplaintDetailScreen() {
     const messages = {
       lost: {
         under_investigation:
-          "Hey, kami lagi cek pengiriman barang kamu di ekspedisi, nih...",
+          "Hey, kami lagi cek pengiriman barang kamu di ekspedisi, nih. Kita bakal nilai kesalahan ini dan cari solusi terbaik!",
         approved_by_admin: "Barang hilang telah disetujui oleh admin.",
-        completed: "Tim Rekbr by BNI meminta maaf...",
+        rejected_by_seller: null,
+        completed:
+          "Tim Rekbr by BNI meminta maaf atas barang yang hilang , dan bukti kurir ekspedisi tidak memenuhi aturan SOP kami.",
       },
     };
+
     return (
-      messages[type]?.[status] || "Kami sedang mengevaluasi komplain kamu."
+      messages[type]?.[status] ?? "Kami sedang mengevaluasi komplain kamu."
     );
   };
 
   const getStepStatus = (status) => {
-    if (status === "approved_by_admin" || status === "completed")
+    if (status === "approved_by_admin") {
       return { steps: ["Investigasi", "Disetujui"], currentStep: 1 };
-    if (
-      ["rejected_by_seller", "rejected_by_admin", "canceled"].includes(status)
-    )
+    } else if (
+      [
+        "rejected_by_seller",
+        "rejected",
+        "canceled",
+        "rejected_by_admin",
+      ].includes(status)
+    ) {
       return { steps: ["Investigasi", "Ditolak"], currentStep: 1 };
-    return { steps: ["Investigasi", "Menunggu"], currentStep: 0 };
+    } else if (status === "completed") {
+      return { steps: ["Investigasi", "Disetujui"], currentStep: 1 };
+    } else {
+      return { steps: ["Investigasi", "Menunggu"], currentStep: 0 };
+    }
   };
 
   const { steps, currentStep } = getStepStatus(status);
   const message = getStatusMessage(type, status);
+  const shouldShowActions = status === "under_investigation";
 
   if (loading) {
     return (
@@ -134,103 +171,153 @@ export default function ComplaintDetailScreen() {
   }
 
   return (
-    <View style={styles.container}>
-      <StatusBar style="dark" />
+    <>
+      <View style={styles.container}>
+        <NavBackHeader title={"Detail Komplain"} />
 
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()}>
-          <Ionicons name="chevron-back-outline" size={24} color="#000" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Detail Komplain</Text>
-        <View style={{ width: 24 }} />
-      </View>
-
-      <View style={styles.stepContainer}>
         <ComplaintStepBar
           currentStep={currentStep}
           steps={steps}
           status={status}
         />
-      </View>
-
-      <ScrollView
-        style={styles.scroll}
-        contentContainerStyle={{ paddingBottom: 80 }}
-      >
-        {message && (
-          <View style={styles.messageBox}>
-            {!status?.includes("rejected") && (
-              <Image
-                source={require("../../assets/admin1.png")}
-                style={styles.avatar}
-              />
+        <View style={{ flex: 1 }}>
+          <ScrollView
+            style={styles.scroll}
+            contentContainerStyle={{ paddingBottom: 40 }}
+            showsVerticalScrollIndicator={false}>
+            {message && (
+              <View style={styles.messageBox}>
+                {!status?.includes("rejected") && (
+                  <Image
+                    source={require("../../assets/admin1.png")}
+                    style={styles.avatar}
+                    resizeMode="contain"
+                  />
+                )}
+                <View style={styles.messageContent}>
+                  {!status?.includes("rejected") && (
+                    <Text style={styles.messageTitle}>
+                      {getStatusLabel(status)}
+                    </Text>
+                  )}
+                  <Text style={styles.messageText}>{message}</Text>
+                </View>
+              </View>
             )}
-            <View style={styles.messageContent}>
-              {!status?.includes("rejected") && (
-                <Text style={styles.messageTitle}>{getStatus(status)}</Text>
-              )}
-              <Text style={styles.messageText}>{message}</Text>
+
+            <View style={styles.infoRow}>
+              <Text style={styles.infoLabel}>Status Komplain :</Text>
+              <Text style={styles.infoValue}>
+                {getStatus(complaintDetail?.status)}
+              </Text>
             </View>
+
+            <ComplaintTimeline
+              timeline={complaintDetail?.timeline}
+              message={complaintDetail?.messsage}
+              status={complaintDetail?.status}
+            />
+
+            <View style={{ padding: 16 }}>
+              <InfoBlock
+                label={role === "buyer" ? "Seller" : "Buyer"}
+                value={
+                  role === "buyer"
+                    ? complaintDetail?.transaction?.sellerEmail
+                    : complaintDetail?.transaction?.buyerEmail
+                }
+              />
+              <InfoBlock
+                label="Nama Barang"
+                value={complaintDetail?.transaction?.itemName}
+              />
+              <InfoBlock
+                label="Tagihan Rekber"
+                value={`Rp. ${Number(
+                  complaintDetail?.transaction?.totalAmount || 0
+                ).toLocaleString("id-ID")},00`}
+              />
+              <InfoBlock
+                label="ID Transaksi"
+                value={complaintDetail?.transaction?.transactionCode}
+                copyable
+              />
+              <InfoBlock
+                label="No Resi"
+                value={
+                  role === "buyer"
+                    ? complaintDetail?.transaction?.shipment?.trackingNumber
+                    : complaintDetail?.transaction?.trackingNumber
+                }
+                copyable
+              />
+              <InfoBlock
+                label="Ekspedisi"
+                value={
+                  role === "buyer"
+                    ? complaintDetail?.transaction?.shipment?.courier
+                    : complaintDetail?.transaction?.courier?.name
+                }
+              />
+            </View>
+          </ScrollView>
+          {/* Tombol Aksi */}
+          {shouldShowActions && (
+            <>
+              <View style={[styles.actionContainer]}>
+                <Pressable style={[styles.actionRow]}>
+                  {/* Tombol Batalkan Komplain */}
+                  {role === "buyer" && (
+                    <TouchableOpacity
+                      onPress={() => setShowActionModal(true)}
+                      style={styles.contactButton}>
+                      <Text style={styles.contactButtonText}>
+                        Batalkan Komplain
+                      </Text>
+                    </TouchableOpacity>
+                  )}
+                </Pressable>
+              </View>
+            </>
+          )}
+        </View>
+      </View>
+      <Modal
+        transparent
+        visible={showActionModal}
+        animationType="fade"
+        onRequestClose={() => setShowActionModal(false)}
+        statusBarTranslucent
+        style={styles.modalOverlay}
+        hardwareAccelerated>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalHeader}>
+            <View style={styles.modalIconCircle}>
+              <Text style={styles.modalIconText}>i</Text>
+            </View>
+            <Text style={styles.modalTitleText}>
+              Apakah kamu sudah yakin untuk membatalkan komplain ini?
+            </Text>
           </View>
-        )}
 
-        <View style={styles.infoRow}>
-          <Text style={styles.infoLabel}>Status Komplain :</Text>
-          <Text style={styles.infoValue}>
-            {getStatus(complaintDetail?.status)}
-          </Text>
+          <View style={styles.modalButtonRow}>
+            <Pressable
+              onPress={() => setShowActionModal(false)}
+              style={[styles.modalButton, styles.modalCancelButton]}>
+              <Text style={styles.modalButtonText}>Kembali</Text>
+            </Pressable>
+
+            <Pressable
+              onPress={handleCancelComplaint}
+              style={[styles.modalButton, styles.modalConfirmButton]}>
+              <Text style={styles.modalButtonText}>
+                {isSubmitting ? "Mengirim..." : "Konfirmasi"}
+              </Text>
+            </Pressable>
+          </View>
         </View>
-
-        <ComplaintTimeline
-          timeline={complaintDetail?.timeline}
-          message={complaintDetail?.messsage}
-          status={complaintDetail?.status}
-        />
-
-        <View style={{ marginTop: 16 }}>
-          <InfoBlock
-            label={role === "buyer" ? "Seller" : "Buyer"}
-            value={
-              role === "buyer"
-                ? complaintDetail?.transaction?.sellerEmail
-                : complaintDetail?.transaction?.buyerEmail
-            }
-          />
-          <InfoBlock
-            label="Nama Barang"
-            value={complaintDetail?.transaction?.itemName}
-          />
-          <InfoBlock
-            label="Tagihan Rekber"
-            value={`Rp. ${Number(
-              complaintDetail?.transaction?.totalAmount || 0
-            ).toLocaleString("id-ID")},00`}
-          />
-          <InfoBlock
-            label="ID Transaksi"
-            value={complaintDetail?.transaction?.transactionCode}
-            copyable
-          />
-          <InfoBlock
-            label="No Resi"
-            value={
-              role === "buyer"
-                ? complaintDetail?.transaction?.shipment?.trackingNumber
-                : complaintDetail?.transaction?.trackingNumber
-            }
-            copyable
-          />
-          <InfoBlock
-            label="Ekspedisi"
-            value={
-              role === "buyer"
-                ? complaintDetail?.transaction?.shipment?.courier
-                : complaintDetail?.transaction?.courier?.name
-            }
-          />
-        </View>
-      </ScrollView>
-    </View>
+      </Modal>
+    </>
   );
 }
 
@@ -249,8 +336,7 @@ function InfoBlock({ label, value, copyable = false }) {
             onPress={() => {
               Clipboard.setStringAsync(value);
               Alert.alert("Disalin", `${label} berhasil disalin.`);
-            }}
-          >
+            }}>
             <Copy size={20} color="#999" style={{ marginLeft: 8 }} />
           </Pressable>
         )}
@@ -272,7 +358,7 @@ function ComplaintTimeline({ timeline, status }) {
   }
 
   return (
-    <View style={{ marginTop: 24 }}>
+    <View style={{}}>
       {timeline
         .slice()
         .reverse()
@@ -293,19 +379,17 @@ function TimelineItem({ label, timestamp, message, isRejected }) {
   return (
     <View
       style={{
-        marginBottom: 20,
+        marginBottom: 0,
         borderBottomWidth: 1,
         borderBottomColor: "#E5E7EB",
-        paddingBottom: 12,
-      }}
-    >
+        padding: 16,
+      }}>
       <Text
         style={{
           fontSize: 16,
           fontWeight: "600",
           color: isRejected ? "#DC2626" : "#000",
-        }}
-      >
+        }}>
         {label}
       </Text>
       {message && (
@@ -315,8 +399,7 @@ function TimelineItem({ label, timestamp, message, isRejected }) {
             padding: 12,
             borderRadius: 12,
             marginTop: 8,
-          }}
-        >
+          }}>
           <Text style={{ fontSize: 14, color: "#000" }}>{message}</Text>
         </View>
       )}
@@ -356,13 +439,13 @@ const styles = StyleSheet.create({
     color: "#000",
   },
   stepContainer: { alignItems: "center", paddingHorizontal: 16 },
-  scroll: { paddingHorizontal: 16, paddingTop: 16 },
+  scroll: {},
   messageBox: {
     flexDirection: "row",
     backgroundColor: "#fff",
     padding: 16,
     borderRadius: 12,
-    marginBottom: 16,
+    marginHorizontal: 16,
     borderWidth: 1,
     borderColor: "#F3F4F6",
   },
@@ -379,4 +462,151 @@ const styles = StyleSheet.create({
   },
   infoLabel: { color: "#6B7280", fontSize: 14 },
   infoValue: { color: "#000", fontSize: 14, fontWeight: "600" },
+  actionContainer: {
+    paddingBottom: 24,
+    margin: 20,
+  },
+  actionRow: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  moreButtonContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  moreButton: {
+    width: 44,
+    height: 44,
+    borderWidth: 1,
+    borderColor: "#D1D5DB",
+    borderRadius: 12,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#fff",
+    marginRight: 12,
+  },
+  moreButtonText: {
+    color: "#000",
+    fontSize: 22,
+  },
+  modalActionContent: {
+    backgroundColor: "#fff",
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    paddingTop: 8,
+    paddingBottom: 24,
+    paddingHorizontal: 16,
+  },
+  modalActionBarContainer: {
+    alignItems: "center",
+  },
+  modalActionBar: {
+    width: 48,
+    height: 6,
+    backgroundColor: "#D1D5DB",
+    borderRadius: 8,
+    marginBottom: 16,
+  },
+  modalActionTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    marginBottom: 32,
+    textAlign: "center",
+  },
+  modalActionBtn: {
+    marginBottom: 8,
+  },
+  modalActionBtnText: {
+    color: "#000",
+    fontSize: 16,
+    fontWeight: "500",
+    marginBottom: 24,
+  },
+  contactButton: {
+    flex: 1,
+    backgroundColor: "#000",
+    paddingVertical: 12,
+    borderRadius: 12,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  contactButtonText: {
+    color: "#fff",
+    fontWeight: "600",
+    fontSize: 16,
+  },
+
+  modalOverlay: {
+    position: "absolute",
+    inset: 0,
+    zIndex: 50,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.3)",
+    width: "100%",
+    height: "100%",
+    flex: 1,
+    padding: 0,
+    margin: 0,
+  },
+  modalContainer: {
+    width: "90%",
+    backgroundColor: "#ffffff",
+    borderRadius: 16,
+    padding: 20,
+    borderWidth: 1,
+    borderColor: "#e5e7eb", // gray-200
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 3,
+  },
+  modalHeader: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    marginBottom: 24,
+  },
+  modalIconCircle: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: "#3b82f6", // blue-500
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 12,
+  },
+  modalIconText: {
+    color: "#ffffff",
+    fontWeight: "bold",
+    fontSize: 12,
+  },
+  modalTitleText: {
+    flex: 1,
+    fontSize: 18,
+    fontWeight: "500",
+    color: "#000000",
+  },
+  modalButtonRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  modalButton: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 8,
+  },
+  modalCancelButton: {
+    backgroundColor: "#f3f4f6", // gray-100
+    marginRight: 8,
+  },
+  modalConfirmButton: {
+    backgroundColor: "#dbeafe", // blue-100
+    marginLeft: 8,
+  },
+  modalButtonText: {
+    textAlign: "center",
+    fontWeight: "600",
+    fontSize: 16,
+    color: "#000000",
+  },
 });

@@ -92,7 +92,7 @@ export default function CreateRekber() {
 
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        keyboardVerticalOffset={Platform.OS === "ios" && 60}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 60 : 0}
         style={styles.keyboardAvoiding}>
         <ScrollView
           contentContainerStyle={styles.scrollViewContent}
@@ -278,7 +278,6 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
     alignItems: "center",
-    justifyContent: "space-between",
     backgroundColor: "#fff",
   },
   keyboardAvoiding: {
@@ -334,8 +333,6 @@ const styles = StyleSheet.create({
   emailValidationRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginTop: 8,
-    marginHorizontal: 20,
     width: "100%",
     marginBottom: 8,
   },

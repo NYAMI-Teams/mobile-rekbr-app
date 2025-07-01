@@ -18,6 +18,7 @@ import { changePassword } from "@/utils/api/auth";
 import PrimaryButton from "@/components/PrimaryButton";
 import PasswordChecklist from "@/components/PasswordChecklist";
 import BuyerKonfirmasi from "@/components/BuyerKonfirmasi";
+import NavBackHeader from "@/components/NavBackHeader";
 
 export default function ChangePasswordScreen() {
   const router = useRouter();
@@ -94,13 +95,7 @@ export default function ChangePasswordScreen() {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={handleBackBtn}>
-          <Ionicons name="chevron-back-outline" size={24} color="#000" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Ganti Kata Sandi</Text>
-        <View style={{ width: 24 }} />
-      </View>
+      <NavBackHeader title={"Ganti Kata Sandi"} />
 
       {/* Content */}
       <KeyboardAvoidingView
@@ -109,8 +104,7 @@ export default function ChangePasswordScreen() {
         style={{ flex: 1 }}
       >
         <ScrollView
-          style={styles.scroll}
-          contentContainerStyle={{ flexGrow: 1 }}
+          contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 16, marginTop: 20 }}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
@@ -121,22 +115,8 @@ export default function ChangePasswordScreen() {
                 placeholder="Masukkan kata sandi kamu saat ini"
                 value={kataSandiSaatIni}
                 onChangeText={setKataSandiSaatIni}
-                secureTextEntry={!isKataSandiSaatIniVisible}
                 isPassword={true}
-                inputClassName="pr-12"
               />
-              <TouchableOpacity
-                style={styles.eyeIcon}
-                onPress={toggleKataSandiSaatIniVisibility}
-              >
-                <MaterialIcons
-                  name={
-                    isKataSandiSaatIniVisible ? "visibility" : "visibility-off"
-                  }
-                  size={22}
-                  color="#666"
-                />
-              </TouchableOpacity>
             </View>
 
             {/* Password */}
@@ -146,22 +126,8 @@ export default function ChangePasswordScreen() {
                 placeholder="Masukkan kata sandi kamu"
                 value={kataSandiBaru}
                 onChangeText={setKataSandiBaru}
-                secureTextEntry={!isKataSandiBaruVisible}
                 isPassword={true}
-                inputClassName="pr-12"
               />
-              <TouchableOpacity
-                style={styles.eyeIcon}
-                onPress={toggleKataSandiBaruVisibility}
-              >
-                <MaterialIcons
-                  name={
-                    isKataSandiBaruVisible ? "visibility" : "visibility-off"
-                  }
-                  size={22}
-                  color="#666"
-                />
-              </TouchableOpacity>
               <PasswordChecklist password={kataSandiBaru} />
             </View>
 
@@ -172,24 +138,8 @@ export default function ChangePasswordScreen() {
                 placeholder="Pastikan sama, ya!"
                 value={konfirmasiKataSandiBaru}
                 onChangeText={setKonfirmasiKataSandiBaru}
-                secureTextEntry={!isKonfirmasiKataSandiBaruVisible}
                 isPassword={true}
-                inputClassName="pr-12"
               />
-              <TouchableOpacity
-                style={styles.eyeIcon}
-                onPress={toggleKonfirmasiKataSandiBaruVisibility}
-              >
-                <MaterialIcons
-                  name={
-                    isKonfirmasiKataSandiBaruVisible
-                      ? "visibility"
-                      : "visibility-off"
-                  }
-                  size={22}
-                  color="#666"
-                />
-              </TouchableOpacity>
 
               {/* Alert Validasi */}
               {konfirmasiKataSandiBaru.length > 0 && (
@@ -270,10 +220,6 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: "#000",
   },
-  scroll: {
-    paddingHorizontal: 16,
-    marginTop: 20,
-  },
   form: {
     marginTop: 16,
     flex: 1,
@@ -290,8 +236,6 @@ const styles = StyleSheet.create({
   alertRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginTop: 8,
-    marginLeft: 20,
   },
   alertText: {
     marginLeft: 8,

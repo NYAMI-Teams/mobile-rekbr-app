@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   StyleSheet, // Import StyleSheet
 } from "react-native";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 
 import RusakBarangCard from "@/components/dispute/RusakBarangCard";
 import { getBuyerComplaints, getSellerComplaints } from "@/utils/api/complaint";
@@ -32,11 +32,21 @@ export default function DisputeScreen() {
   const [SellerComplaints, setSellerComplaints] = useState([]);
   const [isEmptyBuyerComplaints, setIsEmptyBuyerComplaints] = useState(false);
   const [isEmptySellerComplaints, setIsEmptySellerComplaints] = useState(false);
+  const { type } = useLocalSearchParams();
 
   useEffect(() => {
     fetchBuyerComplaints();
     fetchSellerComplaints();
   }, []);
+
+  useEffect(() => {
+    console.log("Type:", type);
+    if (type === "seller") {
+      setSelectedTab("penjualan");
+    } else {
+      setSelectedTab("pembelian");
+    }
+  }, [type]);
 
   const handleTabPress = (tab) => {
     setSelectedTab(tab);
@@ -52,7 +62,6 @@ export default function DisputeScreen() {
         setIsEmptyBuyerComplaints(true);
       }
       setBuyerComplaints(res.data);
-      console.log("Complaints as Buyer:", JSON.stringify(res.data, null, 2));
     } catch (err) {
       showToast(
         "Gagal",
@@ -74,7 +83,6 @@ export default function DisputeScreen() {
         setIsEmptySellerComplaints(true);
       }
       setSellerComplaints(res.data);
-      console.log("Complaints as Seller:", JSON.stringify(res.data, null, 2));
     } catch (err) {
       showToast(
         "Gagal",
@@ -103,7 +111,7 @@ export default function DisputeScreen() {
           <View style={styles.emptyIllustrationContainer}>
             <EmptyIllustration
               text={
-                "Belum ada dispute, semua transaksi rekber kamu aman, mulus, dan lancar jaya!"
+                "Pembelian belum ada komplain. Semua transaksi rekber kamu aman, mulus, dan lancar jaya!"
               }
             />
           </View>
@@ -124,19 +132,19 @@ export default function DisputeScreen() {
             seller={item?.transaction?.sellerEmail}
             noResi={
               item?.status === "return_in_transit" ||
-              item?.status === "approved_by_admin" ||
-              item?.status === "completed" ||
-              item?.status === "awaiting_seller_confirmation" ||
-              item?.status === "awaiting_admin_confirmation"
+                item?.status === "approved_by_admin" ||
+                item?.status === "completed" ||
+                item?.status === "awaiting_seller_confirmation" ||
+                item?.status === "awaiting_admin_confirmation"
                 ? item?.returnShipment?.trackingNumber || "-"
                 : "-"
             }
             expedisi={
               item?.status === "return_in_transit" ||
-              item?.status === "approved_by_admin" ||
-              item?.status === "completed" ||
-              item?.status === "awaiting_seller_confirmation" ||
-              item?.status === "awaiting_admin_confirmation"
+                item?.status === "approved_by_admin" ||
+                item?.status === "completed" ||
+                item?.status === "awaiting_seller_confirmation" ||
+                item?.status === "awaiting_admin_confirmation"
                 ? item?.returnShipment?.courierName || "-"
                 : "-"
             }
@@ -147,35 +155,29 @@ export default function DisputeScreen() {
             onPressButton={
               mappedStatus === "returnRequested"
                 ? () => {
-                    console.log("Masuk Sini");
-
-                    router.push({
-                      pathname: "/dispute/BarangRusak/pengembalianForm",
-                      params: { complaintId: item?.id },
-                    });
-
-                    console.log("Beres Masuk Sini");
-                  }
+                  router.push({
+                    pathname: "/dispute/BarangRusak/pengembalianForm",
+                    params: { complaintId: item?.id },
+                  });
+                }
                 : mappedStatus === "returnInTransit"
-                ? () =>
+                  ? () =>
                     router.push({
                       pathname: "/dispute/BarangRusak/konfirmasiSellerForm",
                       params: { complaintId: item?.id },
                     })
-                : () => {}
+                  : () => { }
             }
           />
         );
       });
     } else {
       if (isEmptySellerComplaints) {
-        console.log("Masuk seller");
-
         return (
           <View style={styles.emptyIllustrationContainer}>
             <EmptyIllustration
               text={
-                "Belum ada dispute. Semua transaksi rekber kamu aman, mulus, dan lancar jaya!"
+                "Penjualan belum ada komplain. Semua transaksi rekber kamu aman, mulus, dan lancar jaya!"
               }
             />
           </View>
@@ -196,19 +198,19 @@ export default function DisputeScreen() {
             buyer={item?.transaction?.buyerEmail || ""}
             noResi={
               item?.status === "return_in_transit" ||
-              item?.status === "approved_by_admin" ||
-              item?.status === "completed" ||
-              item?.status === "awaiting_seller_confirmation" ||
-              item?.status === "awaiting_admin_confirmation"
+                item?.status === "approved_by_admin" ||
+                item?.status === "completed" ||
+                item?.status === "awaiting_seller_confirmation" ||
+                item?.status === "awaiting_admin_confirmation"
                 ? item?.returnShipment?.trackingNumber || "-"
                 : "-"
             }
             expedisi={
               item?.status === "return_in_transit" ||
-              item?.status === "approved_by_admin" ||
-              item?.status === "completed" ||
-              item?.status === "awaiting_seller_confirmation" ||
-              item?.status === "awaiting_admin_confirmation"
+                item?.status === "approved_by_admin" ||
+                item?.status === "completed" ||
+                item?.status === "awaiting_seller_confirmation" ||
+                item?.status === "awaiting_admin_confirmation"
                 ? item?.returnShipment?.courierName || "-"
                 : "-"
             }
@@ -216,7 +218,7 @@ export default function DisputeScreen() {
             time={dateShow(mappedStatus, item)}
             status={mappedStatus}
             onPress={() => handleSellerComplaintPress(item, mappedStatus)}
-            onPressButton={() => {}}
+            onPressButton={() => { }}
           />
         );
       });
@@ -264,8 +266,6 @@ export default function DisputeScreen() {
   };
 
   const dateShow = (status, data) => {
-    console.log("ini status dari Complain awal", status);
-
     switch (status) {
       case "waitingSellerApproval":
         return formatDateWIB(data?.sellerResponseDeadline) || "Invalid date";
@@ -470,7 +470,7 @@ export default function DisputeScreen() {
           });
         }
       },
-      sellerRejected: () => {},
+      sellerRejected: () => { },
       returnInTransit: () =>
         router.push({
           pathname: "/dispute/SellerDispute/KembaliinPage",
@@ -557,16 +557,14 @@ export default function DisputeScreen() {
             selectedTab === "pembelian"
               ? styles.tabButtonActive
               : styles.tabButtonInactive,
-          ]}
-        >
+          ]}>
           <Text
             style={[
               styles.tabText,
               selectedTab === "pembelian"
                 ? styles.tabTextActive
                 : styles.tabTextInactive,
-            ]}
-          >
+            ]}>
             Pembelian
           </Text>
         </TouchableOpacity>
@@ -577,16 +575,14 @@ export default function DisputeScreen() {
             selectedTab === "penjualan"
               ? styles.tabButtonActive
               : styles.tabButtonInactive,
-          ]}
-        >
+          ]}>
           <Text
             style={[
               styles.tabText,
               selectedTab === "penjualan"
                 ? styles.tabTextActive
                 : styles.tabTextInactive,
-            ]}
-          >
+            ]}>
             Penjualan
           </Text>
         </TouchableOpacity>
@@ -602,8 +598,7 @@ export default function DisputeScreen() {
             showsVerticalScrollIndicator={false}
             refreshControl={
               <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-            }
-          >
+            }>
             {renderContent()}
           </ScrollView>
         </View>

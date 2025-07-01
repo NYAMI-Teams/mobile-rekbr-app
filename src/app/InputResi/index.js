@@ -65,7 +65,10 @@ export default function InputResi() {
 
   const handleUpload = async () => {
     if (hasCameraPermission === false) {
-      Alert.alert("Izin Kamera Diperlukan", "Aplikasi memerlukan akses kamera.");
+      Alert.alert(
+        "Izin Kamera Diperlukan",
+        "Aplikasi memerlukan akses kamera."
+      );
       return;
     }
 
@@ -74,26 +77,42 @@ export default function InputResi() {
       return;
     }
 
-    Alert.alert("Pilih Sumber Gambar", "Ambil foto baru atau pilih dari galeri?", [
-      { text: "Kamera", onPress: () => pickImage("camera") },
-      { text: "Galeri", onPress: () => pickImage("gallery") },
-      { text: "Batal", style: "cancel" },
-    ]);
+    Alert.alert(
+      "Pilih Sumber Gambar",
+      "Ambil foto baru atau pilih dari galeri?",
+      [
+        { text: "Kamera", onPress: () => pickImage("camera") },
+        { text: "Galeri", onPress: () => pickImage("gallery") },
+        { text: "Batal", style: "cancel" },
+      ]
+    );
   };
 
   const pickImage = async (source) => {
     let result =
       source === "camera"
-        ? await ImagePicker.launchCameraAsync({ mediaTypes: "Images", allowsEditing: true, quality: 1 })
-        : await ImagePicker.launchImageLibraryAsync({ mediaTypes: "Images", allowsEditing: true, quality: 1 });
+        ? await ImagePicker.launchCameraAsync({
+            mediaTypes: "Images",
+            allowsEditing: true,
+            quality: 1,
+          })
+        : await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: "Images",
+            allowsEditing: true,
+            quality: 1,
+          });
 
     if (!result.canceled && result.assets?.length > 0) {
       let imageAsset = result.assets[0];
       let quality = 0.7;
-      let compressed = await ImageManipulator.manipulateAsync(imageAsset.uri, [], {
-        compress: quality,
-        format: ImageManipulator.SaveFormat.JPEG,
-      });
+      let compressed = await ImageManipulator.manipulateAsync(
+        imageAsset.uri,
+        [],
+        {
+          compress: quality,
+          format: ImageManipulator.SaveFormat.JPEG,
+        }
+      );
 
       let blob, size;
       do {
@@ -103,10 +122,14 @@ export default function InputResi() {
         if (size > 1024 * 1024) {
           quality -= 0.2;
           if (quality < 0.2) break;
-          compressed = await ImageManipulator.manipulateAsync(imageAsset.uri, [], {
-            compress: quality,
-            format: ImageManipulator.SaveFormat.JPEG,
-          });
+          compressed = await ImageManipulator.manipulateAsync(
+            imageAsset.uri,
+            [],
+            {
+              compress: quality,
+              format: ImageManipulator.SaveFormat.JPEG,
+            }
+          );
         }
       } while (size > 1024 * 1024 && quality >= 0.2);
 
@@ -161,13 +184,11 @@ export default function InputResi() {
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         keyboardVerticalOffset={Platform.OS === "ios" ? 60 : 0}
-        style={{ flex: 1 }}
-      >
+        style={{ flex: 1 }}>
         <ScrollView
           contentContainerStyle={styles.scrollView}
           keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
-        >
+          showsVerticalScrollIndicator={false}>
           <View style={styles.inner}>
             <InputField
               title="Masukkan Nomor Resi"
@@ -190,7 +211,11 @@ export default function InputResi() {
             <TouchableOpacity onPress={handleUpload} style={styles.mt4}>
               <AttachmentFilled
                 title="Unggah Bukti"
-                caption={isUploaded ? image?.uri?.split("/").pop() : "Berikan bukti berupa screenshot cek resi"}
+                caption={
+                  isUploaded
+                    ? image?.uri?.split("/").pop()
+                    : "Berikan bukti berupa screenshot cek resi"
+                }
                 captionColor={isUploaded ? "#08B20F" : "#9E9E9E"}
                 iconName="camera"
                 boxColor={isUploaded ? "#F9F9F9" : "#49DBC8"}
@@ -204,7 +229,10 @@ export default function InputResi() {
             </TouchableOpacity>
             {image && (
               <View style={styles.imagePreview}>
-                <Image source={{ uri: image.uri }} style={styles.uploadedImage} />
+                <Image
+                  source={{ uri: image.uri }}
+                  style={styles.uploadedImage}
+                />
               </View>
             )}
           </View>
@@ -225,11 +253,17 @@ export default function InputResi() {
         />
       )}
 
-      <Modal animationType="slide" transparent visible={modalVisible} onRequestClose={closeModal}>
+      <Modal
+        animationType="slide"
+        transparent
+        visible={modalVisible}
+        onRequestClose={closeModal}>
         <TouchableOpacity style={styles.modalOverlay} onPress={closeModal}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <TouchableOpacity onPress={closeModal} style={styles.modalHeaderBtn}>
+              <TouchableOpacity
+                onPress={closeModal}
+                style={styles.modalHeaderBtn}>
                 <ChevronLeftCircle size={24} color="#00C2C2" />
                 <Text style={styles.modalHeaderText}>Pilih Ekspedisi</Text>
               </TouchableOpacity>
@@ -240,8 +274,7 @@ export default function InputResi() {
                   <TouchableOpacity
                     key={index}
                     style={styles.courierItem}
-                    onPress={() => handleSelectCourier(courier)}
-                  >
+                    onPress={() => handleSelectCourier(courier)}>
                     <Text style={styles.courierText}>{courier.name}</Text>
                   </TouchableOpacity>
                 ))}
@@ -258,7 +291,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#FFFFFF",
-    justifyContent: "space-between",
   },
   scrollView: {
     flexGrow: 1,
@@ -282,7 +314,6 @@ const styles = StyleSheet.create({
   },
   buttonWrapper: {
     width: "100%",
-    paddingHorizontal: 16,
     paddingVertical: 16,
     marginBottom: 32,
   },

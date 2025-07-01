@@ -23,6 +23,7 @@ import CopyField from "../../../components/dispute/copyField";
 import { getDetailBuyerComplaint } from "../../../utils/api/complaint";
 import moment from "moment";
 import { showToast } from "../../../utils"; // Assuming showToast is in utils
+import NavBackHeader from "@/components/NavBackHeader";
 
 export default function RusakBarangKembaliinPage() {
   const router = useRouter();
@@ -41,14 +42,14 @@ export default function RusakBarangKembaliinPage() {
     try {
       const res = await getDetailBuyerComplaint(complaintId);
       setDetailComplaint(res.data);
-      console.log(
-        "ini detail complaint barang kembaliin",
-        JSON.stringify(res.data, null, 2)
-      );
-      console.log(
-        detailComplaint?.buyer_deadline_input_shipment <
-          detailComplaint?.updated_at
-      );
+      // console.log(
+      //   "ini detail complaint barang kembaliin",
+      //   JSON.stringify(res.data, null, 2)
+      // );
+      // console.log(
+      //   detailComplaint?.buyer_deadline_input_shipment <
+      //     detailComplaint?.updated_at
+      // );
     } catch (err) {
       showToast(
         "Gagal",
@@ -125,7 +126,7 @@ export default function RusakBarangKembaliinPage() {
                       },
                       item?.evidence?.length > 0 && {
                         imgTitle: "Bukti foto & video",
-                        images: item?.evidence.map((url, key) => ({
+                        images: item?.evidence?.map((url, key) => ({
                           uri: url,
                           key,
                         })),
@@ -158,7 +159,7 @@ export default function RusakBarangKembaliinPage() {
                       },
                       item?.evidence?.length > 0 && {
                         imgTitle: "Bukti foto & video",
-                        images: item?.evidence.map((url, key) => ({
+                        images: item?.evidence?.map((url, key) => ({
                           uri: url,
                           key,
                         })),
@@ -232,7 +233,7 @@ export default function RusakBarangKembaliinPage() {
                       },
                       item?.evidence?.length > 0 && {
                         imgTitle: "Bukti foto & video",
-                        images: item?.evidence.map((url, key) => ({
+                        images: item?.evidence?.map((url, key) => ({
                           uri: url,
                           key,
                         })),
@@ -272,8 +273,7 @@ export default function RusakBarangKembaliinPage() {
             detailComplaint?.updated_at ? (
               <>
                 <TouchableOpacity
-                  onPress={() => console.log("Hubungi kami di klik!")}
-                >
+                  onPress={() => console.log("Hubungi kami di klik!")}>
                   <View style={styles.contactUsContainer}>
                     <Text style={styles.contactUsText}>
                       Silahkan Hubungi Kami
@@ -306,7 +306,7 @@ export default function RusakBarangKembaliinPage() {
                     },
                     item?.evidence?.length > 0 && {
                       imgTitle: "Bukti foto & video",
-                      images: item?.evidence.map((url, key) => ({
+                      images: item?.evidence?.map((url, key) => ({
                         uri: url,
                         key,
                       })),
@@ -342,7 +342,7 @@ export default function RusakBarangKembaliinPage() {
                     },
                     item?.evidence?.length > 0 && {
                       imgTitle: "Bukti foto & video",
-                      images: item?.evidence.map((url, key) => ({
+                      images: item?.evidence?.map((url, key) => ({
                         uri: url,
                         key,
                       })),
@@ -376,7 +376,7 @@ export default function RusakBarangKembaliinPage() {
                     },
                     item?.evidence?.length > 0 && {
                       imgTitle: "Bukti foto & video",
-                      images: item?.evidence.map((url, key) => ({
+                      images: item?.evidence?.map((url, key) => ({
                         uri: url,
                         key,
                       })),
@@ -406,13 +406,7 @@ export default function RusakBarangKembaliinPage() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()}>
-          <ChevronLeft size={24} color="black" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Detail Komplain</Text>
-        <View style={styles.headerSpacer} />
-      </View>
+      <NavBackHeader title={"Detail Komplain"} />
 
       <StepProgressBar
         currentStep={2}
@@ -521,7 +515,6 @@ const styles = StyleSheet.create({
     color: "#555",
   },
   scrollView: {
-    paddingHorizontal: 16, // px-4
     paddingBottom: 160, // pb-40
   },
   divider: {

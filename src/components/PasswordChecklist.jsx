@@ -51,8 +51,7 @@ const PasswordChecklist = ({ password }) => {
 
 const styles = StyleSheet.create({
     container: {
-        marginTop: 12,
-        marginHorizontal: 20,
+        marginTop: 4,
         gap: 4,
     },
     itemRow: {
