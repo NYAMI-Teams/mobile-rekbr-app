@@ -60,18 +60,33 @@ export const setupNotificationListeners = () => {
 
   const responseListener =
     Notifications.addNotificationResponseReceivedListener((response) => {
-      console.log("Notifikasi diklik -----------:", response);
       const data = response.notification.request.content.data;
       console.log("Data notifikasi:", data);
-      console.log("Navigasi ke halaman:", data?.pathname || "/");
-      router.replace({
-        pathname: "",
-        params: { data: JSON.stringify(data) },
-      });
+
+      switch (data?.screen) {
+        case "transaction/buyer":
+          router.push({
+            pathname: "/DetailTransaksi/Buyer",
+            params: { id: data?.transactionId },
+          });
+          break;
+        case "transaction/seller":
+          router.push({
+            pathname: "/DetailTransaksi/Seller",
+            params: { id: data?.transactionId },
+          });
+          break;
+        case "complaint/buyer":
+          router.push("/(tabs)/complaint");
+        case "complaint/seller":
+          router.push("/(tabs)/complaint");
+        default:
+          break;
+      }
     });
 
   return () => {
-    Notifications.removeNotificationSubscription(notificationListener);
-    Notifications.removeNotificationSubscription(responseListener);
+    notificationListener.remove();
+    responseListener.remove();
   };
 };
