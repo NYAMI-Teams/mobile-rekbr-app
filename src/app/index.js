@@ -16,7 +16,7 @@ export default function Index() {
 
   useEffect(() => {
     // jika sudah pernah boot, redirect langsung
-    console.log("params from index page", JSON.parse(data || "{}"));
+    // console.log("params from index page", JSON.parse(data || "{}"));
     if (hasBooted) {
       router.replace("/(tabs)");
       return;
@@ -58,8 +58,8 @@ export default function Index() {
   }
 
   return isLoggedIn ? (
-    <Redirect href='/(tabs)' />
+    <Redirect href="/(tabs)" />
   ) : (
-    <Redirect href='/Onboarding' />
+    <Redirect href="/Onboarding" />
   );
 }

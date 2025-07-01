@@ -35,6 +35,10 @@ export default function DetailTransaksiSeller() {
         const res = await getDetailSellerTransaction(id);
         setData(res.data);
         setStatus(res.data.status);
+        // // console.log(
+        //   "Ini Data Detail Seller",
+        //   JSON.stringify(res.data, null, 2)
+        // );
       } catch (err) {
         showToast(
           "Gagal",
@@ -343,11 +347,9 @@ export default function DetailTransaksiSeller() {
     if (itemPrice >= 10000 && itemPrice <= 499999.99) {
       return 5000;
     } else if (itemPrice >= 500000 && itemPrice <= 4999999.99) {
-      const platformFee = itemPrice * 0.01;
-      return `${platformFee} %`;
+      return `1 %`;
     } else if (itemPrice >= 5000000 && itemPrice <= 10000000) {
-      const platformFee = itemPrice * 0.008;
-      return `${platformFee} %`;
+      return `0.8 %`;
     }
     return 0;
   };
@@ -393,60 +395,61 @@ export default function DetailTransaksiSeller() {
             data?.shipment?.trackingNumber != null) ||
           status == "shipped" ||
           status == "completed") && (
-            <>
-              {/* Copas Field */}
+          <>
+            {/* Copas Field */}
+            <View
+              style={{
+                padding: 12,
+                marginHorizontal: 12,
+                backgroundColor: "#EDFBFA",
+                borderRadius: 12,
+              }}>
+              <Text
+                style={{ fontSize: 15, marginBottom: 12, fontWeight: "500" }}>
+                {status == "pending_payment" ? "Virtual Account" : "No Resi"}
+              </Text>
               <View
-                style={{
-                  padding: 12,
-                  marginHorizontal: 12,
-                  backgroundColor: "#EDFBFA",
-                  borderRadius: 12,
-                }}>
-                <Text
-                  style={{ fontSize: 15, marginBottom: 12, fontWeight: "500" }}>
-                  {status == "pending_payment" ? "Virtual Account" : "No Resi"}
+                style={[
+                  { flexDirection: "row", alignItems: "center" },
+                  (status === "waiting_shipment" ||
+                    status === "shipped" ||
+                    status === "completed") && { marginBottom: 12 }, // mb-3 = 12px
+                ]}>
+                <Text style={{ fontSize: 17, fontWeight: "500" }}>
+                  {status == "pending_payment"
+                    ? data?.virtualAccount || "-"
+                    : data?.shipment?.trackingNumber || "-"}
                 </Text>
-                <View
-                  style={[
-                    { flexDirection: "row", alignItems: "center" },
-                    (status === "waiting_shipment" || status === "shipped" || status === "completed") && { marginBottom: 12 } // mb-3 = 12px
-                  ]}
-                >
-                  <Text style={{ fontSize: 17, fontWeight: "500" }}>
-                    {status == "pending_payment"
-                      ? data?.virtualAccount || "-"
-                      : data?.shipment?.trackingNumber || "-"}
-                  </Text>
-                  <TouchableOpacity
-                    onPress={() =>
-                      handleCopy(
-                        status == "pending_payment"
-                          ? data?.virtualAccount || "-"
-                          : data?.shipment?.trackingNumber || "-"
-                      )
-                    }>
-                    <Image
-                      source={require("@/assets/copy.png")}
-                      style={{ marginLeft: 4, width: 17, height: 16 }}
-                    />
-                  </TouchableOpacity>
-                </View>
-                {status == "waiting_shipment" ||
-                  status == "shipped" ||
-                  (status == "completed" && (
-                    <Text
-                      style={{
-                        fontSize: 12,
-                        // marginBottom: 12,
-                        fontWeight: "400",
-                        color: "#616161",
-                      }}>
-                      {data?.shipment?.courier || "-"}
-                    </Text>
-                  ))}
+                <TouchableOpacity
+                  onPress={() =>
+                    handleCopy(
+                      status == "pending_payment"
+                        ? data?.virtualAccount || "-"
+                        : data?.shipment?.trackingNumber || "-"
+                    )
+                  }>
+                  <Image
+                    source={require("@/assets/copy.png")}
+                    style={{ marginLeft: 4, width: 17, height: 16 }}
+                  />
+                </TouchableOpacity>
               </View>
-            </>
-          )}
+              {status == "waiting_shipment" ||
+                status == "shipped" ||
+                (status == "completed" && (
+                  <Text
+                    style={{
+                      fontSize: 12,
+                      // marginBottom: 12,
+                      fontWeight: "400",
+                      color: "#616161",
+                    }}>
+                    {data?.shipment?.courier || "-"}
+                  </Text>
+                ))}
+            </View>
+          </>
+        )}
 
         {/* Admin Message (done)*/}
         {data?.fundReleaseRequest?.status != null ||
@@ -461,10 +464,10 @@ export default function DetailTransaksiSeller() {
                   {status == "completed"
                     ? "Komplain dianggap tidak ada dan bakal selesai otomatis kalau pembeli nggak respon."
                     : data?.fundReleaseRequest?.status == "pending"
-                      ? "Tunggu approval kami, ya! Kalau bukti kamu oke, permintaan konfirmasi bakal langsung dikirim ke buyer!"
-                      : data?.fundReleaseRequest?.status == "approved"
-                        ? "Konfirmasi udah dikirim ke buyer! Sekarang tinggal tunggu respon mereka dalam 1 x 24 jam"
-                        : "Permintaan konfirmasi ke buyer ditolak. Pastikan data atau bukti yang kamu kirim sudah lengkap dan sesuai"}
+                    ? "Tunggu approval kami, ya! Kalau bukti kamu oke, permintaan konfirmasi bakal langsung dikirim ke buyer!"
+                    : data?.fundReleaseRequest?.status == "approved"
+                    ? "Konfirmasi udah dikirim ke buyer! Sekarang tinggal tunggu respon mereka dalam 1 x 24 jam"
+                    : "Permintaan konfirmasi ke buyer ditolak. Pastikan data atau bukti yang kamu kirim sudah lengkap dan sesuai"}
                 </Text>
               </View>
             </>
@@ -472,7 +475,7 @@ export default function DetailTransaksiSeller() {
 
         {/* Status Rekbr (done)*/}
         {data?.fundReleaseRequest?.status == "pending" ||
-          data?.fundReleaseRequest?.status == "rejected" ? (
+        data?.fundReleaseRequest?.status == "rejected" ? (
           <View style={styles.statusBox}>
             <View style={styles.statusRow}>
               <Text style={styles.statusLabel}>Status Rekbr:</Text>
@@ -557,21 +560,21 @@ export default function DetailTransaksiSeller() {
         <View style={styles.sectionBox}>
           <Tagihan
             caption="Harga Barang"
-            price={formatPrice(data?.totalAmount || "-")}
+            price={formatPrice(data?.totalAmount) || "-"}
             details={[
               {
                 status: "Nominal Barang",
-                price: formatPrice(data?.itemPrice || "-"),
+                price: formatPrice(data?.itemPrice) || "-",
               },
               {
                 status: "Asuransi Pengiriman BNI Life (0.2%)",
-                price: formatPrice(data?.insuranceFee || "-"),
+                price: formatPrice(data?.insuranceFee) || "-",
               },
               {
                 status: `Biaya Jasa Aplikasi (${calculatePlatformFee(
                   data?.itemPrice
                 )})`,
-                price: formatPrice(data?.platformFee || "-"),
+                price: formatPrice(data?.platformFee) || "-",
               },
             ]}
           />

@@ -60,7 +60,7 @@ export default function ChangeEmailScreen() {
         params: { email: res.data.email, isFromLogin: false },
       });
     } catch (err) {
-      console.log(err);
+      // console.log(err);
       showToast("Gagal", "Silahkan coba lagi", "error");
     }
   };
@@ -73,14 +73,12 @@ export default function ChangeEmailScreen() {
       {/* Content */}
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 0}
-        style={{ flex: 1 }}
-      >
+        keyboardVerticalOffset={Platform.OS === "ios" ? 60 : 0}
+        style={{ flex: 1 }}>
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
-        >
+          showsVerticalScrollIndicator={false}>
           <View style={{ flex: 1 }}>
             {/* Email Saat Ini */}
             <View style={styles.inputGroup}>
@@ -121,8 +119,7 @@ export default function ChangeEmailScreen() {
                           : "#fbbf24"
                         : "#f87171",
                     },
-                  ]}
-                >
+                  ]}>
                   {isEmailValid(emailSaatIni)
                     ? emailSaatIniValid
                       ? "Email Ditemukan"
@@ -152,9 +149,10 @@ export default function ChangeEmailScreen() {
                   <Text
                     style={[
                       styles.validationText,
-                      { color: isEmailValid(emailBaru) ? "#4ade80" : "#f87171" },
-                    ]}
-                  >
+                      {
+                        color: isEmailValid(emailBaru) ? "#4ade80" : "#f87171",
+                      },
+                    ]}>
                     {isEmailValid(emailBaru)
                       ? "Email valid"
                       : "Email tidak valid"}

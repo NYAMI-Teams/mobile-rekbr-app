@@ -14,22 +14,19 @@ const AttachmentFilled = ({
   alertColor = "#C2C2C2",
   alertIconName = "alert-circle",
   alertIconColor = "#C2C2C2",
-  onPress,
+  onPress = () => {},
   iconsColor,
 }) => {
   return (
-    <View style={styles.container}>
+    <TouchableOpacity style={styles.container} onPress={onPress}>
       <Text style={styles.title}>{title}</Text>
 
-      <TouchableOpacity
-        style={[styles.card, { backgroundColor: cardColor }]}
-        onPress={onPress}
-        activeOpacity={0.8}>
+      <View style={[styles.card, { backgroundColor: cardColor }]}>
         <Text style={[styles.caption, { color: captionColor }]}>{caption}</Text>
         <View style={[styles.iconWrapper, { backgroundColor: boxColor }]}>
           <Ionicons name={iconName} size={20} color={iconsColor} />
         </View>
-      </TouchableOpacity>
+      </View>
 
       <View style={styles.alertContainer}>
         <Ionicons name={alertIconName} size={20} color={alertIconColor} />
@@ -37,7 +34,7 @@ const AttachmentFilled = ({
           {alertText}
         </Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 
@@ -64,6 +61,8 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.08,
     shadowRadius: 2,
     elevation: 2,
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
   },
   caption: {
     fontSize: 14,

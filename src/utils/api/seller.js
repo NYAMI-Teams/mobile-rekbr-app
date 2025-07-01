@@ -1,7 +1,6 @@
 import QueryString from "qs";
 import Api from "../api";
 
-
 // export const createTransaction = async (data) => {
 //   try {
 //     const res = await Api.post(`/transaction`, data);
@@ -26,7 +25,7 @@ export const getSellerTransactions = async (offset, limit) => {
         return QueryString.stringify(params, { arrayFormat: "repeat" });
       },
     });
-    console.log(res);
+    // console.log(res);
     if (res) {
       return res;
     }
@@ -85,9 +84,10 @@ export const postResi = async (id, courier_id, tracking_number, photo) => {
     const file = {
       uri: photo.uri,
       name: photo.fileName || photo.uri.split("/").pop(),
-      type: photo.type && photo.type.startsWith("image/")
-        ? photo.type
-        : "image/jpeg", // fallback
+      type:
+        photo.type && photo.type.startsWith("image/")
+          ? photo.type
+          : "image/jpeg", // fallback
     };
     const formData = new FormData();
     formData.append("photo", file);
@@ -106,7 +106,7 @@ export const postResi = async (id, courier_id, tracking_number, photo) => {
       return res;
     }
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     throw error;
   }
 };
@@ -117,9 +117,10 @@ export const postFundRelease = async (id, evidence, reason) => {
     const file = {
       uri: evidence.uri,
       name: evidence.fileName || evidence.uri.split("/").pop(),
-      type: evidence.type && evidence.type.startsWith("image/")
-        ? evidence.type
-        : "image/jpeg", // fallback
+      type:
+        evidence.type && evidence.type.startsWith("image/")
+          ? evidence.type
+          : "image/jpeg", // fallback
     };
 
     const formData = new FormData();
@@ -139,7 +140,7 @@ export const postFundRelease = async (id, evidence, reason) => {
       return res;
     }
   } catch (error) {
-    console.log("Error posting fund release:", error);
+    // console.log("Error posting fund release:", error);
     throw error;
   }
 };

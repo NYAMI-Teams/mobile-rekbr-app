@@ -52,7 +52,7 @@ export default function DisputeScreen() {
         setIsEmptyBuyerComplaints(true);
       }
       setBuyerComplaints(res.data);
-      console.log("Complaints as Buyer:", JSON.stringify(res.data, null, 2));
+      // // console.log("Complaints as Buyer:", JSON.stringify(res.data, null, 2));
     } catch (err) {
       showToast(
         "Gagal",
@@ -74,7 +74,7 @@ export default function DisputeScreen() {
         setIsEmptySellerComplaints(true);
       }
       setSellerComplaints(res.data);
-      console.log("Complaints as Seller:", JSON.stringify(res.data, null, 2));
+      // // console.log("Complaints as Seller:", JSON.stringify(res.data, null, 2));
     } catch (err) {
       showToast(
         "Gagal",
@@ -147,14 +147,14 @@ export default function DisputeScreen() {
             onPressButton={
               mappedStatus === "returnRequested"
                 ? () => {
-                    console.log("Masuk Sini");
+                    // console.log("Masuk Sini");
 
                     router.push({
                       pathname: "/dispute/BarangRusak/pengembalianForm",
                       params: { complaintId: item?.id },
                     });
 
-                    console.log("Beres Masuk Sini");
+                    // console.log("Beres Masuk Sini");
                   }
                 : mappedStatus === "returnInTransit"
                 ? () =>
@@ -169,7 +169,7 @@ export default function DisputeScreen() {
       });
     } else {
       if (isEmptySellerComplaints) {
-        console.log("Masuk seller");
+        // console.log("Masuk seller");
 
         return (
           <View style={styles.emptyIllustrationContainer}>
@@ -264,7 +264,6 @@ export default function DisputeScreen() {
   };
 
   const dateShow = (status, data) => {
-
     switch (status) {
       case "waitingSellerApproval":
         return formatDateWIB(data?.sellerResponseDeadline) || "Invalid date";
@@ -556,16 +555,14 @@ export default function DisputeScreen() {
             selectedTab === "pembelian"
               ? styles.tabButtonActive
               : styles.tabButtonInactive,
-          ]}
-        >
+          ]}>
           <Text
             style={[
               styles.tabText,
               selectedTab === "pembelian"
                 ? styles.tabTextActive
                 : styles.tabTextInactive,
-            ]}
-          >
+            ]}>
             Pembelian
           </Text>
         </TouchableOpacity>
@@ -576,16 +573,14 @@ export default function DisputeScreen() {
             selectedTab === "penjualan"
               ? styles.tabButtonActive
               : styles.tabButtonInactive,
-          ]}
-        >
+          ]}>
           <Text
             style={[
               styles.tabText,
               selectedTab === "penjualan"
                 ? styles.tabTextActive
                 : styles.tabTextInactive,
-            ]}
-          >
+            ]}>
             Penjualan
           </Text>
         </TouchableOpacity>
@@ -601,8 +596,7 @@ export default function DisputeScreen() {
             showsVerticalScrollIndicator={false}
             refreshControl={
               <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-            }
-          >
+            }>
             {renderContent()}
           </ScrollView>
         </View>

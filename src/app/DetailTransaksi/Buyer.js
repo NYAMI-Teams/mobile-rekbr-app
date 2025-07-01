@@ -48,10 +48,10 @@ export default function DetailTransaksiBuyer() {
       try {
         const res = await getDetailBuyerTransaction(id);
         setData(res.data);
-        console.log(
-          "Ini Detail Buyer Transaction",
-          JSON.stringify(res.data, null, 2)
-        );
+        // // console.log(
+        //   "Ini Detail Buyer Transaction",
+        //   JSON.stringify(res.data, null, 2)
+        // );
       } catch (err) {
         showToast(
           "Gagal",
@@ -353,8 +353,7 @@ export default function DetailTransaksiBuyer() {
           <View style={styles.footerRow}>
             <Text style={styles.footerTextGray}>Terdapat kendala?</Text>
             <TouchableOpacity
-              onPress={() => console.log("Hubungi Kami pressed")}
-            >
+              onPress={() => console.log("Hubungi Kami pressed")}>
               <Text style={styles.footerTextBlue}>Silahkan Hubungi Kami</Text>
             </TouchableOpacity>
           </View>
@@ -415,11 +414,9 @@ export default function DetailTransaksiBuyer() {
     if (itemPrice >= 10000 && itemPrice <= 499999.99) {
       return 5000;
     } else if (itemPrice >= 500000 && itemPrice <= 4999999.99) {
-      const platformFee = itemPrice * 0.01;
-      return `${platformFee} %`;
+      return `1 %`;
     } else if (itemPrice >= 5000000 && itemPrice <= 10000000) {
-      const platformFee = itemPrice * 0.008;
-      return `${platformFee} %`;
+      return `0.8 %`;
     }
     return 0;
   };
@@ -463,11 +460,9 @@ export default function DetailTransaksiBuyer() {
                 marginHorizontal: 12,
                 backgroundColor: "#EDFBFA",
                 borderRadius: 12,
-              }}
-            >
+              }}>
               <Text
-                style={{ fontSize: 15, marginBottom: 12, fontWeight: "500" }}
-              >
+                style={{ fontSize: 15, marginBottom: 12, fontWeight: "500" }}>
                 {data?.status === "pending_payment"
                   ? "Virtual Account"
                   : "No Resi"}
@@ -483,8 +478,7 @@ export default function DetailTransaksiBuyer() {
                     data?.status === "completed"
                       ? 12
                       : 0,
-                }}
-              >
+                }}>
                 <Text style={{ fontSize: 17, fontWeight: "500" }}>
                   {data?.status === "pending_payment"
                     ? data?.virtualAccount
@@ -497,8 +491,7 @@ export default function DetailTransaksiBuyer() {
                         ? data?.virtualAccount
                         : data?.shipment?.trackingNumber
                     )
-                  }
-                >
+                  }>
                   <Image
                     source={require("../../assets/copy.png")}
                     style={{ marginLeft: 4, width: 17, height: 16 }}
@@ -654,8 +647,7 @@ export default function DetailTransaksiBuyer() {
           paddingTop: 32,
           paddingBottom: 32,
           backgroundColor: "#fff",
-        }}
-      >
+        }}>
         <View style={styles.modalContent}>
           <Pressable onPress={closeModal}>
             <View style={styles.modalHeader}>
@@ -673,8 +665,7 @@ export default function DetailTransaksiBuyer() {
                 {data?.transactionCode || "-"}
               </Text>
               <TouchableOpacity
-                onPress={() => handleCopy(data?.transactionCode)}
-              >
+                onPress={() => handleCopy(data?.transactionCode)}>
                 <Image
                   source={require("../../assets/copy.png")}
                   style={{ marginLeft: 4, width: 17, height: 16 }}
@@ -709,8 +700,7 @@ export default function DetailTransaksiBuyer() {
 
               <Pressable
                 style={styles.modalSimulateBtn}
-                onPress={updateTransaction}
-              >
+                onPress={updateTransaction}>
                 <Play size={20} color="#000" />
                 <Text style={styles.modalSimulateBtnText}>
                   Simulate Payment
@@ -736,8 +726,7 @@ export default function DetailTransaksiBuyer() {
                     <View style={styles.rowAlignCenter}>
                       <Text style={styles.modalBuyerAccount}>0600604502</Text>
                       <TouchableOpacity
-                        onPress={() => handleCopy("0600604502")}
-                      >
+                        onPress={() => handleCopy("0600604502")}>
                         <Image
                           source={require("../../assets/copy.png")}
                           style={{ marginLeft: 4, width: 17, height: 16 }}

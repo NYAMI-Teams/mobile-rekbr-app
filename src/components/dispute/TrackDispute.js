@@ -13,7 +13,7 @@ const handleCopy = async (text) => {
       text2: "Disalin ke clipboard",
       position: "bottom",
     });
-    console.log("Copied to clipboard:", text);
+    // console.log("Copied to clipboard:", text);
   } catch (error) {
     Toast.show({
       type: "error",
@@ -21,7 +21,7 @@ const handleCopy = async (text) => {
       text2: "Tidak dapat menyalin",
       position: "bottom",
     });
-    console.log("Failed to copy to clipboard:", error);
+    // console.log("Failed to copy to clipboard:", error);
   }
 };
 
@@ -45,11 +45,7 @@ const TrackDetail = ({
       {/* Image section */}
       {images.length > 0 && (
         <View style={[content ? styles.mt2 : null]}>
-          {imgTitle ? (
-            <Text style={styles.imgTitle}>
-              {imgTitle}
-            </Text>
-          ) : null}
+          {imgTitle ? <Text style={styles.imgTitle}>{imgTitle}</Text> : null}
 
           <View style={styles.imgRow}>
             {images.map((imgSource, index) => (
@@ -102,12 +98,8 @@ export const TrackDispute = ({
 }) => {
   return (
     <View style={styles.container}>
-      <Text style={[styles.title, { color: titleColor }]}>
-        {title}
-      </Text>
-      {dateTime ? (
-        <Text style={styles.dateTime}>{dateTime}</Text>
-      ) : null}
+      <Text style={[styles.title, { color: titleColor }]}>{title}</Text>
+      {dateTime ? <Text style={styles.dateTime}>{dateTime}</Text> : null}
 
       <View style={styles.detailWrapper}>
         {details.map((item, index) => (

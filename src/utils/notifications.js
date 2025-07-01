@@ -54,14 +54,14 @@ export const registerForPushNotificationsAsync = async () => {
 export const setupNotificationListeners = () => {
   const notificationListener = Notifications.addNotificationReceivedListener(
     (notification) => {
-      console.log("Notifikasi diterima:", notification);
+      // console.log("Notifikasi diterima:", notification);
     }
   );
 
   const responseListener =
     Notifications.addNotificationResponseReceivedListener((response) => {
       const data = response.notification.request.content.data;
-      console.log("Data notifikasi:", data);
+      // console.log("Data notifikasi:", data);
 
       switch (data?.screen) {
         case "transaction/buyer":

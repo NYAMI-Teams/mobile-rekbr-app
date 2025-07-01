@@ -30,13 +30,26 @@ export default function KonfirmasiSellerForm() {
   const [hasCameraPermission, setHasCameraPermission] = useState(null);
 
   useEffect(() => {
-    (async () => {
+    const checkCameraPermission = async () => {
       const cameraStatus = await ImagePicker.requestCameraPermissionsAsync();
       setHasCameraPermission(cameraStatus.status === "granted");
-    })();
+
+      // Show alert if permission is denied
+      if (cameraStatus.status === "denied") {
+        Alert.alert(
+          "Izin Kamera Diperlukan",
+          "Aplikasi memerlukan akses kamera untuk mengambil foto. Mohon berikan izin di pengaturan perangkat Anda."
+        );
+      }
+    };
+
+    checkCameraPermission();
   }, []);
 
   const handleUpload = async () => {
+    if (!hasCameraPermission) {
+      return;
+    }
     if (hasCameraPermission === false) {
       Alert.alert(
         "Izin Kamera Diperlukan",
@@ -126,7 +139,7 @@ export default function KonfirmasiSellerForm() {
       showToast("Sukses", "Permintaan konfirmasi berhasil dikirim", "success");
     } catch (error) {
       showToast("Gagal", error?.message, "error");
-      console.log("ini error konfirmasi form", error);
+      // console.log("ini error konfirmasi form", error);
     }
   };
 
@@ -183,7 +196,7 @@ export default function KonfirmasiSellerForm() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff" },
+  container: { flex: 1, backgroundColor: "#fff", marginHorizontal: 16 },
   header: {
     flexDirection: "row",
     alignItems: "center",
