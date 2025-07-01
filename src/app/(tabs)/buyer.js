@@ -40,7 +40,7 @@ export default function Buyer() {
     } finally {
       setIsFetching(false);
       setRefreshing(false);
-      if (isInitialLoading) setIsInitialLoading(false);
+      setIsInitialLoading(false);
     }
   };
 

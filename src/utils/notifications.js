@@ -2,12 +2,14 @@ import * as Notifications from "expo-notifications";
 import * as Device from "expo-device";
 import { Platform, Alert } from "react-native";
 import { router } from "expo-router";
+import { setDataNotification } from "@/store";
 
 // Handler agar notifikasi muncul saat app aktif
 export const configureNotificationHandler = () => {
   Notifications.setNotificationHandler({
     handleNotification: async () => ({
-      shouldShowAlert: true,
+      shouldShowBanner: true,
+      shouldShowList: true,
       shouldPlaySound: true,
       shouldSetBadge: false,
     }),
@@ -54,15 +56,15 @@ export const registerForPushNotificationsAsync = async () => {
 export const setupNotificationListeners = () => {
   const notificationListener = Notifications.addNotificationReceivedListener(
     (notification) => {
-      console.log("Notifikasi diterima:", notification);
+      // console.log("Notifikasi diterima:", notification);
     }
   );
 
   const responseListener =
     Notifications.addNotificationResponseReceivedListener((response) => {
       const data = response.notification.request.content.data;
-      console.log("Data notifikasi:", data);
-
+      console.log("Respons notifikasi:", data);
+      setDataNotification(data);
       switch (data?.screen) {
         case "transaction/buyer":
           router.push({
@@ -77,9 +79,17 @@ export const setupNotificationListeners = () => {
           });
           break;
         case "complaint/buyer":
-          router.push("/(tabs)/complaint");
+          router.push({
+            pathname: "/(tabs)/complaint",
+            params: { type: "buyer" },
+          });
+          break;
         case "complaint/seller":
-          router.push("/(tabs)/complaint");
+          router.push({
+            pathname: "/(tabs)/complaint",
+            params: { type: "seller" },
+          });
+          break;
         default:
           break;
       }

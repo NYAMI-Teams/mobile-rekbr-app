@@ -6,6 +6,7 @@ import {
   Image,
   ScrollView,
   StyleSheet,
+  Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import PrimaryButton from "../../components/PrimaryButton";
@@ -46,8 +47,7 @@ export default function HomeDispute() {
         <View style={styles.headerContainer}>
           <TouchableOpacity
             onPress={() => router.back()}
-            style={styles.backBtn}
-          >
+            style={styles.backBtn}>
             <ChevronLeft size={24} color="black" />
           </TouchableOpacity>
           <Text style={styles.headerText}>Permintaan Komplain Buyer</Text>
@@ -94,12 +94,15 @@ export default function HomeDispute() {
               key={index}
               style={styles.optionCard}
               onPress={() => {
-                router.push({
-                  pathname: `${item.route}`,
-                  params: { id: transactionId },
-                });
-              }}
-            >
+                if (item.route) {
+                  router.push({
+                    pathname: `${item.route}`,
+                    params: { id: transactionId },
+                  });
+                } else {
+                  Alert.alert("Maaf", "Fitur sedang dalam perbaikan");
+                }
+              }}>
               <Image
                 source={item.icon}
                 style={styles.optionImage}

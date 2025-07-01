@@ -20,7 +20,7 @@ const statusconfig = {
   },
   Completed: {
     color: "#06B217",
-    text: "Tranasksi Selesai",
+    text: "Transaksi Selesai",
     note: "",
     status: "22 Juni 2025, 10 : 00 WIB",
   },
@@ -106,13 +106,13 @@ const SellerDisputeListCard = ({
   typeDespute,
   status,
   time,
-  onPress = () => { },
-  onPressButton = () => { },
+  onPress = () => {},
+  onPressButton = () => {},
 }) => {
   const config = statusconfig[status];
 
   return (
-    <TouchableOpacity onPress={onPress} >
+    <TouchableOpacity onPress={onPress}>
       <View style={styles.cardWrapper}>
         <View style={styles.cardContent}>
           {/* Nama Barang & Harga */}
@@ -163,8 +163,13 @@ const SellerDisputeListCard = ({
               />
               <Text style={styles.adminNoteText}>
                 <Text style={styles.adminNoteTextBold}>{config?.note}</Text>
-                <Text style={[styles.adminNoteTextBold, { fontWeight: 600 }]}>{time}</Text>
-                <Text style={styles.adminNoteTextBold}> {config?.noteafter}</Text>
+                <Text style={[styles.adminNoteTextBold, { fontWeight: 600 }]}>
+                  {time}
+                </Text>
+                <Text style={styles.adminNoteTextBold}>
+                  {" "}
+                  {config?.noteafter}
+                </Text>
               </Text>
             </View>
           )}
@@ -172,10 +177,7 @@ const SellerDisputeListCard = ({
           <View style={styles.statusBottomRow}>
             <View style={styles.statusDotRow}>
               <View
-                style={[
-                  styles.statusDot,
-                  { backgroundColor: config?.color },
-                ]}
+                style={[styles.statusDot, { backgroundColor: config?.color }]}
               />
               <Text style={styles.statusText}>{config?.text}</Text>
             </View>
@@ -198,8 +200,7 @@ const SellerDisputeListCard = ({
                 style={[
                   styles.statusTimeBox,
                   { backgroundColor: config?.statusColor },
-                ]}
-              >
+                ]}>
                 <Text style={styles.statusTimeText}>{time}</Text>
               </View>
             )}
@@ -268,7 +269,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: "#e5e7eb",
     padding: 12,
-    gap: 12
+    gap: 12,
   },
   statusRow: {
     flexDirection: "row",

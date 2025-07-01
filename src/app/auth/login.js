@@ -15,7 +15,7 @@ import PrimaryButton from "../../components/PrimaryButton";
 import { useRouter } from "expo-router";
 import { getProfile, login, savePushToken } from "../../utils/api/auth";
 import { showToast } from "../../utils";
-import { setAccessToken, setProfileStore } from "../../store";
+import { getDataNotification, setAccessToken, setProfileStore } from "../../store";
 import { registerForPushNotificationsAsync } from "@/utils/notifications";
 
 export default function Login() {
@@ -58,7 +58,7 @@ export default function Login() {
         console.warn("Push token tidak valid:", pushToken);
       } else {
         await savePushToken(pushToken);
-        console.log("Push token saved:", pushToken);
+        // console.log("Push token saved:", pushToken);
       }
     } catch (err) {
       console.warn("Gagal simpan push token:", err);
@@ -95,20 +95,18 @@ export default function Login() {
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         keyboardVerticalOffset={Platform.OS === "ios" ? 60 : 0}
-        style={{ flex: 1, width: "100%" }}
-      >
+        style={{ flex: 1, width: "100%" }}>
         <ScrollView
           contentContainerStyle={{ flexGrow: 1 }}
-          keyboardShouldPersistTaps='handled'
-          showsVerticalScrollIndicator={false}
-        >
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}>
           <View style={{ flex: 1 }}>
             {/* Header */}
             <View style={styles.headerContainer}>
               <Image
                 source={require("../../assets/header.png")}
                 style={styles.headerImage}
-                resizeMode='cover'
+                resizeMode="cover"
               />
             </View>
 
@@ -117,11 +115,11 @@ export default function Login() {
               {/* Email */}
               <View>
                 <InputField
-                  title='Email Kamu, Yuk!'
-                  placeholder='email@kamu.com'
+                  title="Email Kamu, Yuk!"
+                  placeholder="email@kamu.com"
                   value={email}
                   onChangeText={setEmail}
-                  keyboardType='email-address'
+                  keyboardType="email-address"
                 />
               </View>
 
@@ -129,8 +127,8 @@ export default function Login() {
               <View>
                 <View style={styles.passwordFieldWrapper}>
                   <InputField
-                    title='Kata Sandi Rekbr'
-                    placeholder='Masukkan kata sandi kamu'
+                    title="Kata Sandi Rekbr"
+                    placeholder="Masukkan kata sandi kamu"
                     value={password}
                     onChangeText={setPassword}
                     isPassword={true}
@@ -139,8 +137,7 @@ export default function Login() {
 
                 <TouchableOpacity
                   style={styles.forgotPassword}
-                  onPress={() => router.push("/auth/LupaPassword")}
-                >
+                  onPress={() => router.push("/auth/LupaPassword")}>
                   <Text style={styles.linkText}>Lupa Kata Sandi?</Text>
                 </TouchableOpacity>
 
@@ -154,12 +151,12 @@ export default function Login() {
                 <Image
                   source={require("../../assets/gradasi.png")}
                   style={styles.gradientImage}
-                  resizeMode='cover'
+                  resizeMode="cover"
                 />
               </View>
               <View style={styles.buttonWrapper}>
                 <PrimaryButton
-                  title='Masuk'
+                  title="Masuk"
                   onPress={handleLogin}
                   disabled={isLoading || !email || !password}
                 />
@@ -170,16 +167,14 @@ export default function Login() {
                 <View style={styles.linkRow}>
                   <Text style={styles.linkLabel}>Belum punya akun?</Text>
                   <TouchableOpacity
-                    onPress={() => router.replace("/auth/register")}
-                  >
+                    onPress={() => router.replace("/auth/register")}>
                     <Text style={styles.linkAction}>Silakan Registrasi</Text>
                   </TouchableOpacity>
                 </View>
                 <View style={styles.linkRow}>
                   <Text style={styles.linkLabel}>Terdapat kendala?</Text>
                   <TouchableOpacity
-                    onPress={() => Alert.alert("Berhasil terhubung")}
-                  >
+                    onPress={() => Alert.alert("Berhasil terhubung")}>
                     <Text style={styles.linkAction}>Silakan Hubungi Kami</Text>
                   </TouchableOpacity>
                 </View>
@@ -191,7 +186,7 @@ export default function Login() {
                 <Image
                   source={require("../../assets/326.png")}
                   style={styles.logoIcon}
-                  resizeMode='contain'
+                  resizeMode="contain"
                 />
                 <Text style={styles.poweredByBrand}>ADHIKSHA TRIBIXA</Text>
               </View>

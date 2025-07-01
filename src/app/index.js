@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { View, Image } from "react-native";
 import { Redirect, useLocalSearchParams, useRouter } from "expo-router";
-import { getAccessToken, setProfileStore } from "@/store";
+import { getAccessToken, getDataNotification, setDataNotification, setProfileStore } from "@/store";
 import { getProfile } from "@/utils/api/auth";
 import { useAppBoot } from "@/context/AppBootContext";
 import SplashScreen from "@/assets/splash.png";
@@ -16,7 +16,6 @@ export default function Index() {
 
   useEffect(() => {
     // jika sudah pernah boot, redirect langsung
-    console.log("params from index page", JSON.parse(data || "{}"));
     if (hasBooted) {
       router.replace("/(tabs)");
       return;
@@ -37,6 +36,7 @@ export default function Index() {
         setIsLoggedIn(true);
       } catch (e) {
         setIsLoggedIn(false);
+        setDataNotification(null)
       } finally {
         setAppIsReady(true);
         setHasBooted(true);
@@ -58,8 +58,8 @@ export default function Index() {
   }
 
   return isLoggedIn ? (
-    <Redirect href='/(tabs)' />
+    <Redirect href="/(tabs)" />
   ) : (
-    <Redirect href='/Onboarding' />
+    <Redirect href="/Onboarding" />
   );
 }

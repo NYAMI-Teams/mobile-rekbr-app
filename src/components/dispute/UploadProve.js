@@ -1,44 +1,69 @@
-import { View, Text, TouchableOpacity, Image, StyleSheet } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
+import { Video } from "expo-av";
 
 export const UploadProve = ({
   media,
   pickMedia,
+  setMedia,
   setShowTipsModal,
 }) => {
   return (
     <View>
-      <Text style={styles.title}>
-        Bukti foto & video
-      </Text>
+      <Text style={styles.title}>Bukti foto & video</Text>
       <Text style={styles.desc}>
         Unggah maksimal <Text style={styles.bold}>5 foto</Text> atau{" "}
-        <Text style={styles.bold}>4 foto + 1 video</Text>. Format: .jpg,
-        .png, .mp4, .mov. Maks. 10 MB (foto), 50 MB (video).
+        <Text style={styles.bold}>4 foto + 1 video</Text>. Format: .jpg, .png,
+        .mp4, .mov. Maks. 10 MB (foto), 50 MB (video).
       </Text>
       <TouchableOpacity onPress={() => setShowTipsModal(true)}>
         <Text style={styles.learn}>Pelajari</Text>
       </TouchableOpacity>
-      <TouchableOpacity
-        onPress={pickMedia}
-        style={styles.uploadBtn}
-      >
+      <TouchableOpacity onPress={pickMedia} style={styles.uploadBtn}>
         <Text style={styles.plus}>＋</Text>
       </TouchableOpacity>
       <View style={styles.mediaWrap}>
-        {media.map((item, idx) => (
-          <View
-            key={idx}
-            style={styles.mediaBox}
-          >
-            {item.type === "image" ? (
-              <Image source={{ uri: item.uri }} style={styles.mediaImg} />
-            ) : (
-              <View style={styles.videoBox}>
-                <Text style={styles.videoText}>🎥 Video</Text>
-              </View>
-            )}
-          </View>
-        ))}
+        {media.map((item, idx) => {
+          // // console.log("item", item);
+          return (
+            <View key={idx} style={styles.mediaBox}>
+              {item.type === "image" ? (
+                <>
+                  <Image source={{ uri: item.uri }} style={styles.mediaImg} />
+                  <TouchableOpacity
+                    onPress={() => {
+                      const newPhotos = [...media];
+                      newPhotos.splice(idx, 1);
+                      setMedia(newPhotos);
+                    }}
+                    style={styles.removeBtn}>
+                    <Feather name="x" size={12} color="white" />
+                  </TouchableOpacity>
+                </>
+              ) : (
+                <View style={styles.videoBox}>
+                  <Video
+                    source={{ uri: item.uri }}
+                    style={styles.mediaImg}
+                    resizeMode="cover"
+                    shouldPlay={false}
+                    isLooping={false}
+                    useNativeControls
+                  />
+                  <TouchableOpacity
+                    onPress={() => {
+                      const newPhotos = [...media];
+                      newPhotos.splice(idx, 1);
+                      setMedia(newPhotos);
+                    }}
+                    style={styles.removeBtn}>
+                    <Feather name="x" size={12} color="white" />
+                  </TouchableOpacity>
+                  <Text style={styles.videoText}>Video</Text>
+                </View>
+              )}
+            </View>
+          );
+        })}
       </View>
     </View>
   );
@@ -102,12 +127,23 @@ const styles = StyleSheet.create({
   videoBox: {
     width: "100%",
     height: "100%",
-    backgroundColor: "#000",
+    position: "relative",
     justifyContent: "center",
     alignItems: "center",
   },
   videoText: {
     fontSize: 12,
     color: "#fff",
+    position: "absolute",
+  },
+  removeBtn: {
+    position: "absolute",
+    top: 0,
+    right: 0,
+    backgroundColor: "#ef4444",
+    borderRadius: 999,
+    padding: 4,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
