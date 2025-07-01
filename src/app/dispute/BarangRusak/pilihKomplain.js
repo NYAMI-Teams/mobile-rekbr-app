@@ -10,6 +10,7 @@ import {
   Modal,
   TouchableWithoutFeedback,
   StyleSheet,
+  Pressable,
 } from "react-native";
 import { ChevronLeft, ChevronDown } from "lucide-react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -76,7 +77,7 @@ export default function DisputeDetail() {
       setShowConfirmModal(false);
       router.push("../../(tabs)/complaint");
     } catch (error) {
-      showToast("Gagal", "Komplain gagal dikirim", "error");
+      showToast("Gagal", error?.message, "error");
     } finally {
       setLoading(false);
     }
@@ -200,50 +201,51 @@ export default function DisputeDetail() {
         </TouchableOpacity>
       </ScrollView>
 
-      <View style={styles.buttonContainer}>
+      <View style={styles.footer}>
         <PrimaryButton
           title={ajukanUlang ? "Ajukan Ulang Komplain" : "Kirim"}
-          onPress={handleSubmit}
+          style={{ marginBottom: 24 }}
+          onPress={() => handleSubmit()}
         />
-      </View>
-      {/* Modal Konfirmasi Kirim */}
-      <Modal visible={showConfirmModal} transparent animationType="fade">
-        <View className="flex-1 justify-center items-center bg-black/40 px-6">
-          <View className="bg-white rounded-2xl w-full px-6 pt-5 pb-5">
-            <View className="flex-row items-start space-x-3 mb-7">
-              <Image
-                source={require("../../../assets/icon-info-blue.png")}
-                className="w-5 h-5 mt-1"
-                resizeMode="contain"
-              />
-              <Text className="text-[17px] text-black font-semibold leading-[22px] flex-1">
-                Apakah kamu sudah yakin untuk ringkasan komplain ini?
-              </Text>
-            </View>
-            <View className="flex-row justify-between">
-              <TouchableOpacity
-                onPress={() => setShowConfirmModal(false)}
-                disabled={isLoading}
-                className={`w-[48%] py-[14px] border border-gray-300 rounded-xl items-center ${isLoading ? "opacity-50" : ""
-                  }`}>
-                <Text className="text-[16px] font-semibold text-black">
-                  Kembali
+        <Modal
+          transparent
+          visible={showConfirmModal}
+          animationType="fade"
+          onRequestClose={() => setShowConfirmModal(false)}
+        >
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContainer}>
+              <View style={styles.modalHeader}>
+                <View style={styles.modalIconCircle}>
+                  <Text style={styles.modalIconText}>i</Text>
+                </View>
+                <Text style={styles.modalTitleText}>
+                  Apakah kamu sudah yakin untuk ringkasan komplain ini?
                 </Text>
-              </TouchableOpacity>
+              </View>
 
-              <TouchableOpacity
-                onPress={handleConfirm}
-                disabled={isLoading}
-                className={`w-[48%] py-[14px] rounded-xl items-center ${isLoading ? "bg-blue-400" : "bg-blue-600"
-                  }`}>
-                <Text className="text-[16px] font-semibold text-white">
-                  {isLoading ? "Mengirim..." : "Konfirmasi"}
-                </Text>
-              </TouchableOpacity>
+              <View style={styles.modalButtonRow}>
+                <Pressable
+                  onPress={() => setShowConfirmModal(false)}
+                  style={[styles.modalButton, styles.modalCancelButton]}
+                >
+                  <Text style={styles.modalButtonText}>Kembali</Text>
+                </Pressable>
+
+                <Pressable
+                  onPress={handleConfirm}
+                  style={[styles.modalButton, styles.modalConfirmButton]}
+                  disabled={isLoading}
+                >
+                  <Text style={styles.modalButtonText}>
+                    {isLoading ? 'Mengirim...' : 'Konfirmasi'}
+                  </Text>
+                </Pressable>
+              </View>
             </View>
           </View>
-        </View>
-      </Modal>
+        </Modal>
+      </View>
 
       {/* Modal Pilih Solusi */}
       <Modal visible={showModal} transparent animationType="slide">
@@ -477,5 +479,76 @@ const styles = StyleSheet.create({
   modalTipsFormatBold: {
     fontWeight: "600",
     color: "#000",
+  },
+
+  footer: { marginBottom: 24, marginHorizontal: 20 },
+
+  modalOverlay: {
+    position: 'absolute',
+    inset: 0,
+    zIndex: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+  },
+  modalContainer: {
+    width: '90%',
+    backgroundColor: '#ffffff',
+    borderRadius: 16,
+    padding: 20,
+    borderWidth: 1,
+    borderColor: '#e5e7eb', // gray-200
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 3,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 24,
+  },
+  modalIconCircle: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: '#3b82f6', // blue-500
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  modalIconText: {
+    color: '#ffffff',
+    fontWeight: 'bold',
+    fontSize: 12,
+  },
+  modalTitleText: {
+    flex: 1,
+    fontSize: 18,
+    fontWeight: '500',
+    color: '#000000',
+  },
+  modalButtonRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  modalButton: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 8,
+  },
+  modalCancelButton: {
+    backgroundColor: '#f3f4f6', // gray-100
+    marginRight: 8,
+  },
+  modalConfirmButton: {
+    backgroundColor: '#dbeafe', // blue-100
+    marginLeft: 8,
+  },
+  modalButtonText: {
+    textAlign: 'center',
+    fontWeight: '600',
+    fontSize: 16,
+    color: '#000000',
   },
 });

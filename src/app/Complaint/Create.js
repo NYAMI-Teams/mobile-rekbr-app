@@ -218,28 +218,30 @@ export default function CreateComplaintScreen() {
           onRequestClose={() => setModalVisible(false)}
         >
           <View style={styles.modalOverlay}>
-            <View style={styles.modalContent}>
+            <View style={styles.modalContainer}>
               <View style={styles.modalHeader}>
-                <View style={styles.modalIcon}>
+                <View style={styles.modalIconCircle}>
                   <Text style={styles.modalIconText}>i</Text>
                 </View>
-                <Text style={styles.modalTitle}>
+                <Text style={styles.modalTitleText}>
                   Apakah kamu sudah yakin untuk ringkasan komplain ini?
                 </Text>
               </View>
-              <View style={styles.modalActions}>
+
+              <View style={styles.modalButtonRow}>
                 <Pressable
                   onPress={() => setModalVisible(false)}
-                  style={styles.cancelButton}
+                  style={[styles.modalButton, styles.modalCancelButton]}
                 >
-                  <Text style={styles.cancelText}>Kembali</Text>
+                  <Text style={styles.modalButtonText}>Kembali</Text>
                 </Pressable>
+
                 <Pressable
                   onPress={handleSubmitComplaint}
-                  style={styles.confirmButton}
+                  style={[styles.modalButton, styles.modalConfirmButton]}
                 >
-                  <Text style={styles.confirmText}>
-                    {isSubmitting ? "Mengirim..." : "Konfirmasi"}
+                  <Text style={styles.modalButtonText}>
+                    {isSubmitting ? 'Mengirim...' : 'Konfirmasi'}
                   </Text>
                 </Pressable>
               </View>
@@ -318,63 +320,76 @@ const styles = StyleSheet.create({
   breakdownContent: { gap: 4, marginTop: 4 },
   totalLabel: { fontSize: 18, fontWeight: "700", color: "#000" },
   footer: { marginBottom: 24, marginHorizontal: 20 },
+
   modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.3)",
-    justifyContent: "center",
-    alignItems: "center",
+    position: 'absolute',
+    inset: 0,
+    zIndex: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
   },
-  modalContent: {
-    width: "90%",
-    backgroundColor: "#fff",
-    borderRadius: 12,
+  modalContainer: {
+    width: '90%',
+    backgroundColor: '#ffffff',
+    borderRadius: 16,
     padding: 20,
-    borderColor: "#e5e7eb",
     borderWidth: 1,
+    borderColor: '#e5e7eb', // gray-200
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 3,
   },
   modalHeader: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    gap: 12,
+    flexDirection: 'row',
+    alignItems: 'flex-start',
     marginBottom: 24,
   },
-  modalIcon: {
+  modalIconCircle: {
     width: 24,
     height: 24,
     borderRadius: 12,
-    backgroundColor: "#3b82f6",
-    justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: '#3b82f6', // blue-500
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
   },
-  modalIconText: { color: "#fff", fontWeight: "700", fontSize: 12 },
-  modalTitle: { flex: 1, fontSize: 18, fontWeight: "500", color: "#000" },
-  modalActions: { flexDirection: "row", justifyContent: "space-between" },
-  cancelButton: {
+  modalIconText: {
+    color: '#ffffff',
+    fontWeight: 'bold',
+    fontSize: 12,
+  },
+  modalTitleText: {
+    flex: 1,
+    fontSize: 18,
+    fontWeight: '500',
+    color: '#000000',
+  },
+  modalButtonRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  modalButton: {
     flex: 1,
     paddingVertical: 12,
-    backgroundColor: "#f3f4f6",
     borderRadius: 8,
+  },
+  modalCancelButton: {
+    backgroundColor: '#f3f4f6', // gray-100
     marginRight: 8,
   },
-  cancelText: {
-    textAlign: "center",
-    fontWeight: "600",
-    fontSize: 16,
-    color: "#000",
-  },
-  confirmButton: {
-    flex: 1,
-    paddingVertical: 12,
-    backgroundColor: "#dbeafe",
-    borderRadius: 8,
+  modalConfirmButton: {
+    backgroundColor: '#dbeafe', // blue-100
     marginLeft: 8,
   },
-  confirmText: {
-    textAlign: "center",
-    fontWeight: "600",
+  modalButtonText: {
+    textAlign: 'center',
+    fontWeight: '600',
     fontSize: 16,
-    color: "#000",
+    color: '#000000',
   },
+
   loadingContainer: {
     flex: 1,
     justifyContent: "center",

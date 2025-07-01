@@ -103,7 +103,7 @@ export default function DisputeScreen() {
           <View style={styles.emptyIllustrationContainer}>
             <EmptyIllustration
               text={
-                "Belum ada dispute, semua transaksi rekber kamu aman, mulus, dan lancar jaya!"
+                "Belum ada komplain. Semua transaksi rekber kamu aman, mulus, dan lancar jaya!"
               }
             />
           </View>
@@ -175,7 +175,7 @@ export default function DisputeScreen() {
           <View style={styles.emptyIllustrationContainer}>
             <EmptyIllustration
               text={
-                "Belum ada dispute. Semua transaksi rekber kamu aman, mulus, dan lancar jaya!"
+                "Belum ada komplain. Semua transaksi rekber kamu aman, mulus, dan lancar jaya!"
               }
             />
           </View>

@@ -6,9 +6,11 @@ export const postBuyerComplaint = async (id, type, reason, evidence) => {
     const formData = new FormData();
     formData.append("type", type);
     formData.append("reason", reason);
-
+;   let totalSize = 0;
     if (evidence && evidence.length > 0) {
       evidence.forEach((file) => {
+        console.log("file", file);
+        totalSize += file.fileSize || 0; 
         formData.append("evidence", {
           uri: file.uri,
           name: file.fileName || file.uri.split("/").pop(),
@@ -17,6 +19,10 @@ export const postBuyerComplaint = async (id, type, reason, evidence) => {
             : "image/jpeg", // fallback
         });
       });
+    }
+
+    if (totalSize > 10 * 1024 * 1024) { // 10MB
+      throw new Error("Maksimum ukuran file adalah 10MB");
     }
 
     const res = await Api.post(
