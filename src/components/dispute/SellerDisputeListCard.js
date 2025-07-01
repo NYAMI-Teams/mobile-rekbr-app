@@ -143,8 +143,7 @@ const SellerDisputeListCard = ({
           </View>
         </View>
 
-
-        {/* Status Card */}
+        {/* Card Footer */}
         <View style={styles.cardFooter}>
           <View style={styles.statusRow}>
             <Image

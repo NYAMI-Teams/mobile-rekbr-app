@@ -84,7 +84,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     gap: 12,
-    marginBottom: 32,
   },
   mediaBox: {
     width: 80,

@@ -156,11 +156,9 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     paddingHorizontal: 16,
-    paddingTop: 16,
   },
   formWrapper: {
     flex: 1,
-    marginBottom: 16,
   },
   alertRow: {
     flexDirection: "row",

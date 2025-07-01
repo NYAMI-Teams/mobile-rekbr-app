@@ -264,7 +264,6 @@ export default function DisputeScreen() {
   };
 
   const dateShow = (status, data) => {
-    console.log("ini status dari Complain awal", status);
 
     switch (status) {
       case "waitingSellerApproval":

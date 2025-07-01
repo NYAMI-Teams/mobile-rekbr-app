@@ -17,6 +17,7 @@ import {
   resendVerifyEmail,
   resetPasswordOTP,
   changeEmail,
+  forgotPassword,
 } from "../../utils/api/auth";
 import { showToast } from "../../utils";
 import { setAccessToken } from "../../store";
@@ -49,16 +50,30 @@ export default function OTP() {
   const handleResendCode = () => {
     setTimeLeft(299);
     inputRefs[0]?.focus();
-    resendVerifyEmail(email)
-      .then((res) => {
-        showToast("Berhasil", res?.message, "success");
-      })
-      .catch((error) => {
-        showToast("Gagal", error?.message, "error");
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
+    if (isFromLogin) {
+      resendVerifyEmail(email)
+        .then((res) => {
+          showToast("Berhasil", res?.message, "success");
+        })
+        .catch((error) => {
+          showToast("Gagal", error?.message, "error");
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
+    } else if (isFromResetPassword) {
+      forgotPassword(email)
+        .then((res) => {
+          showToast("Berhasil", res?.message, "success");
+        })
+        .catch((error) => {
+          showToast("Gagal", error?.message, "error");
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
+    }
+
   };
 
   const submitOtp = (otpValue) => {
@@ -86,25 +101,6 @@ export default function OTP() {
             pathname: "/auth/LupaPassword/ResetPassword",
             params: { email },
           });
-        })
-        .catch((error) => {
-          setIsError(true);
-          setErrorMessage("Kode OTP yang Anda masukkan salah.");
-          showToast("Gagal", error?.message, "error");
-        })
-        .finally(() => {
-          setIsLoading(false);
-        });
-    } else {
-      // dev fallback
-      changeEmail(email)
-        .then((res) => {
-          showToast(
-            "Berhasil ganti email",
-            "Email kamu sudah berganti menjadi " + email,
-            "success"
-          );
-          router.replace("/auth/LupaPassword/ResetPassword");
         })
         .catch((error) => {
           setIsError(true);
@@ -158,8 +154,8 @@ export default function OTP() {
                   borderColor: isValid
                     ? "#009688"
                     : isError
-                    ? "#FF3B30"
-                    : "#ccc",
+                      ? "#FF3B30"
+                      : "#ccc",
                   borderRadius: 8,
                   textAlign: "center",
                   fontSize: 16,

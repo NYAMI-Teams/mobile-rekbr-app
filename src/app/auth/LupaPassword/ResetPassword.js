@@ -87,13 +87,13 @@ export default function ChangePasswordScreen() {
       {/* Content */}
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={{ flex: 1 }}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 60 : 0}
+        style={{ flex: 1, width: "100%" }}
       >
         <ScrollView
           contentContainerStyle={{ flexGrow: 1, width: "100%", paddingHorizontal: 16, marginTop: 20, }}
-          keyboardShouldPersistTaps="handled"
+          keyboardShouldPersistTaps='handled'
           showsVerticalScrollIndicator={false}
-          keyboardDismissMode="on-drag"
         >
           <View style={styles.formContainer}>
             {/* Password */}
@@ -164,17 +164,19 @@ export default function ChangePasswordScreen() {
         </ScrollView>
       </KeyboardAvoidingView>
 
-      {showPopup && (
-        <BuyerKonfirmasi
-          onClose={() => setShowPopup(false)}
-          onBtn2={handleChangePassword}
-          onBtn1={() => setShowPopup(false)}
-          title="Pastikan semuanya sudah benar yaa sebelum kamu kirim!"
-          btn1="Kembali"
-          btn2="Kirim"
-        />
-      )}
-    </View>
+      {
+        showPopup && (
+          <BuyerKonfirmasi
+            onClose={() => setShowPopup(false)}
+            onBtn2={handleChangePassword}
+            onBtn1={() => setShowPopup(false)}
+            title="Pastikan semuanya sudah benar yaa sebelum kamu kirim!"
+            btn1="Kembali"
+            btn2="Kirim"
+          />
+        )
+      }
+    </View >
   );
 }
 
@@ -182,7 +184,6 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#fff" },
 
   formContainer: {
-    marginTop: 16,
     gap: 16,
     flex: 1,
   },

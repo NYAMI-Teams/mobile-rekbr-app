@@ -12,7 +12,9 @@ export const postBuyerComplaint = async (id, type, reason, evidence) => {
         formData.append("evidence", {
           uri: file.uri,
           name: file.fileName || file.uri.split("/").pop(),
-          type: file.type || "image/jpeg",
+          type: file.type && file.type.startsWith("image/")
+            ? file.type
+            : "image/jpeg", // fallback
         });
       });
     }
@@ -83,13 +85,23 @@ export const postBuyerReturn = async (
     const file = {
       uri: photo?.uri,
       name: photo?.fileName || photo?.uri.split("/").pop(),
-      type: photo?.type || "image/jpeg", // default jika tidak ada type
+      type: photo?.type && photo?.type.startsWith("image/")
+        ? photo?.type
+        : "image/jpeg", // fallback
     };
     const formData = new FormData();
     formData.append("photo", file);
     formData.append("courierId", courier_id);
     formData.append("trackingNumber", tracking_number);
-    const res = await Api.post(`/buyer/complaints/${id}/return`, formData);
+    const res = await Api.post(
+      `/buyer/complaints/${id}/return`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
     if (res) {
       return res;
     }
@@ -108,7 +120,9 @@ export const postBuyerReturnConfirm = async (id, reason, evidence) => {
     const file = {
       uri: evidence?.uri,
       name: evidence?.fileName || evidence?.uri.split("/").pop(),
-      type: evidence?.type || "image/jpeg", // default jika tidak ada type
+      type: evidence?.type && evidence?.type.startsWith("image/")
+        ? evidence?.type
+        : "image/jpeg", // fallback
     };
 
     const formData = new FormData();
@@ -121,7 +135,12 @@ export const postBuyerReturnConfirm = async (id, reason, evidence) => {
 
     const res = await Api.post(
       `/buyer/complaints/${id}/request-confirmation`,
-      formData
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
     );
 
     if (res) {
@@ -193,7 +212,9 @@ export const postSellerResponse = async (
         formData.append("photo", {
           uri: file.uri,
           name: file.fileName || file.uri.split("/").pop(),
-          type: file.type || "image/jpeg",
+          type: file.type && file.type.startsWith("image/")
+            ? file.type
+            : "image/jpeg", // fallback
         });
       });
     }
@@ -203,7 +224,15 @@ export const postSellerResponse = async (
     console.log("ini seller_response_reason", seller_response_reason);
     console.log("ini arrPhoto", arrPhoto);
 
-    const res = await Api.patch(`/seller/complaints/${id}/respond`, formData);
+    const res = await Api.patch(
+      `/seller/complaints/${id}/respond`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
     if (res) {
       return res;
     }

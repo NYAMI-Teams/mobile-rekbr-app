@@ -31,12 +31,12 @@ export default function HomeDispute() {
     {
       label: "Tidak sesuai deskripsi",
       icon: require("../../assets/tidaksesuai.png"),
-      route: "/dispute/TidakSesuai",
+      // route: "/dispute/TidakSesuai",
     },
     {
       label: "Masalah atau komplain lainnya",
       icon: require("../../assets/komplain.png"),
-      route: "/dispute/KomplainLainnya",
+      // route: "/dispute/KomplainLainnya",
     },
   ];
 

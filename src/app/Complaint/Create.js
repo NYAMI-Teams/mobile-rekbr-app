@@ -9,6 +9,7 @@ import {
   Pressable,
   Alert,
   StyleSheet,
+  ActivityIndicator,
 } from "react-native";
 import { ChevronLeft, ChevronDown, ChevronUp, Copy } from "lucide-react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -40,8 +41,8 @@ export default function CreateComplaintScreen() {
   const fetchTransaction = async () => {
     try {
       const res = await getDetailBuyerTransaction(id);
-      setTransaction(res.data);
-      setAjukanUlang(res.data?.Complaint.length > 0);
+      setTransaction(res?.data);
+      setAjukanUlang(res?.data?.Complaint?.length > 0);
     } catch (err) {
       console.log(
         "❌ Error saat fetchTransaction:",
@@ -65,7 +66,7 @@ export default function CreateComplaintScreen() {
       showToast("Berhasil", "Komplain Berhasil dibuat", "success");
       router.replace("/(tabs)/complaint");
     } catch (err) {
-      console.log("❌ Error saat createComplaint:", err.message);
+      console.log("❌ Error saat createComplaint:", err?.message);
       showToast("Gagal", err?.message, "error");
     } finally {
       setIsSubmitting(false);
@@ -73,10 +74,10 @@ export default function CreateComplaintScreen() {
     }
   };
 
-  if (!transaction)
+  if (!transaction) // Loading state with activity indicator
     return (
-      <View style={styles.centeredContainer}>
-        <Text style={styles.errorText}>Error Rendered</Text>
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#000" />
       </View>
     );
 
@@ -373,5 +374,11 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     fontSize: 16,
     color: "#000",
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 20, // mt-5
   },
 });
