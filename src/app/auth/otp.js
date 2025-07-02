@@ -185,7 +185,9 @@ export default function OTP() {
                   borderRadius: 8,
                   textAlign: "center",
                   fontSize: 16,
+                  color: "#000",
                 }}
+                
               />
               <Text
                 style={[

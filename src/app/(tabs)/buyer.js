@@ -17,6 +17,11 @@ export default function Buyer() {
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const listRef = useRef();
 
+  useEffect(() => {
+    setIsInitialLoading(true);
+    fetchData(true);
+  }, []);
+
   const fetchData = async (reset = false) => {
     if (isFetching || (!hasMore && !reset)) return;
     setIsFetching(true);
@@ -43,11 +48,6 @@ export default function Buyer() {
       setIsInitialLoading(false);
     }
   };
-
-  useEffect(() => {
-    setIsInitialLoading(true);
-    fetchData(true);
-  }, []);
 
   const onRefresh = () => {
     setRefreshing(true);

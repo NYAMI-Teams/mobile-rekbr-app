@@ -108,7 +108,6 @@ export default function History() {
 
   return (
     <View style={styles.container}>
-      <StatusBar style="dark" />
       <View style={styles.tabContainer}>
         <TouchableOpacity
           onPress={() => setSelectedTab("pembelian")}
@@ -208,7 +207,7 @@ const styles = StyleSheet.create({
   flatList: {
     width: "100%",
     paddingHorizontal: 16,
-    marginTop: 16,
+    paddingTop: 4,
   },
   emptyContainer: {
     marginTop: 32,

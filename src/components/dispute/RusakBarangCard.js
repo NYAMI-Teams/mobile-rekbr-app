@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { View, Text, TouchableOpacity, Image, StyleSheet } from "react-native";
 import { ClipboardPaste } from "lucide-react-native";
 import PrimaryButton from "../PrimaryButton";
@@ -175,9 +175,18 @@ const RusakBarangCard = ({
   onPressButton = () => {},
 }) => {
   const config = statusconfig[status];
+  const [isLoading, setIsLoading] = useState(false);
 
   return (
-    <TouchableOpacity onPress={onPress} activeOpacity={0.8}>
+    <TouchableOpacity
+      onPress={async () => {
+        setIsLoading(true);
+        onPress();
+        setTimeout(() => {
+          setIsLoading(false);
+        }, 1500);
+      }}
+      disabled={isLoading}>
       <View style={styles.cardWrapper}>
         <View style={styles.cardContent}>
           {/* Nama Barang & Harga */}
@@ -256,6 +265,7 @@ const RusakBarangCard = ({
                 btnColor={config?.btnColor}
                 textColor={config?.btnTextColor}
                 onPress={onPressButton}
+                disabled={config?.button === "Permintaan Ditinjau"}
               />
             )}
 

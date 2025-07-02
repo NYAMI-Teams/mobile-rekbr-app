@@ -19,6 +19,7 @@ const BuyerCard = ({ data }) => {
   const [showPopup, setShowPopup] = useState(false);
   const router = useRouter();
   const status = data?.status;
+  const [isLoading, setIsLoading] = useState(false);
 
   const formatDateWIB = (dateTime) => {
     if (!dateTime) return "Invalid date";
@@ -210,12 +211,17 @@ const BuyerCard = ({ data }) => {
 
   return (
     <TouchableOpacity
-      onPress={() =>
+      onPress={async () => {
+        setIsLoading(true);
         router.push({
           pathname: "/DetailTransaksi/Buyer",
           params: { id: data?.id },
-        })
-      }>
+        });
+        setTimeout(() => {
+          setIsLoading(false);
+        }, 1500);
+      }}
+      disabled={isLoading}>
       <View style={styles.card}>
         <View style={styles.content}>
           {renderRows().map((row, index) => (

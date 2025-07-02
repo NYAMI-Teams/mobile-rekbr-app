@@ -169,15 +169,9 @@ export default function DetailKomplain() {
 
       <View style={styles.footer}>
         <TouchableOpacity
-          onPress={() => setShowOptionModal(true)}
-          style={styles.moreButton}>
-          <Text style={styles.moreButtonText}>⋯</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
           style={styles.emailButton}
-          onPress={() => router.push("../../(tabs)/complaint")}>
-          <Text style={styles.emailButtonText}>Kirim Seller Email</Text>
+          onPress={handleCancelComplaint}>
+          <Text style={styles.emailButtonText}>Batalkan Komplain</Text>
         </TouchableOpacity>
       </View>
 
@@ -269,7 +263,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     justifyContent: "center",
     alignItems: "center",
-    marginLeft: 8,
   },
   emailButtonText: {
     color: "white",

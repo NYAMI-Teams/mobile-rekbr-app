@@ -7,9 +7,11 @@ import {
   Image,
   Modal,
   StyleSheet,
+  Alert,
 } from "react-native";
 import { ChevronLeft, ChevronLeftCircle } from "lucide-react-native";
 import * as ImagePicker from "expo-image-picker";
+import * as ImageManipulator from "expo-image-manipulator";
 import { InputField } from "../../../components/dispute/InputField";
 import AttachmentFilled from "../../../components/AttachmentFilled";
 import PrimaryButton from "../../../components/PrimaryButton";
@@ -23,7 +25,7 @@ import NavBackHeader from "@/components/NavBackHeader";
 export default function PengembalianForm() {
   const router = useRouter();
   const { complaintId } = useLocalSearchParams();
-
+  const [hasCameraPermission, setHasCameraPermission] = useState(null);
   const [resi, setResi] = useState("");
   const [courier, setCourier] = useState("");
   const [photoUri, setPhotoUri] = useState(null);
@@ -36,7 +38,7 @@ export default function PengembalianForm() {
   useEffect(() => {
     (async () => {
       const cameraStatus = await ImagePicker.requestCameraPermissionsAsync();
-      // can be stored if needed
+      setHasCameraPermission(cameraStatus.status === "granted");
     })();
     getCourier();
   }, []);
@@ -62,23 +64,107 @@ export default function PengembalianForm() {
     setModalVisible(false);
   };
 
-  const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      quality: 1,
-    });
-
-    if (!result.canceled) {
-      setPhotoUri(result.assets[0].uri);
-      setImage(result.assets[0]);
+  const handleUpload = async () => {
+    if (hasCameraPermission === false) {
+      Alert.alert(
+        "Izin Kamera Diperlukan",
+        "Aplikasi memerlukan akses kamera."
+      );
+      return;
     }
+
+    if (hasCameraPermission === null) {
+      Alert.alert("Meminta Izin", "Mohon tunggu sebentar.");
+      return;
+    }
+
+    Alert.alert(
+      "Pilih Sumber Gambar",
+      "Ambil foto baru atau pilih dari galeri?",
+      [
+        { text: "Kamera", onPress: () => pickImage("camera") },
+        { text: "Galeri", onPress: () => pickImage("gallery") },
+        { text: "Batal", style: "cancel" },
+      ]
+    );
+  };
+
+  const pickImage = async (source) => {
+    let result =
+      source === "camera"
+        ? await ImagePicker.launchCameraAsync({
+            mediaTypes: "Images",
+            allowsEditing: true,
+            quality: 1,
+          })
+        : await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: "Images",
+            allowsEditing: true,
+            quality: 1,
+          });
+
+    if (!result.canceled && result.assets?.length > 0) {
+      let imageAsset = result.assets[0];
+      let quality = 0.7;
+      let compressed = await ImageManipulator.manipulateAsync(
+        imageAsset.uri,
+        [],
+        {
+          compress: quality,
+          format: ImageManipulator.SaveFormat.JPEG,
+        }
+      );
+
+      let blob, size;
+      do {
+        const response = await fetch(compressed.uri);
+        blob = await response.blob();
+        size = blob.size;
+        if (size > 1024 * 1024) {
+          quality -= 0.2;
+          if (quality < 0.2) break;
+          compressed = await ImageManipulator.manipulateAsync(
+            imageAsset.uri,
+            [],
+            {
+              compress: quality,
+              format: ImageManipulator.SaveFormat.JPEG,
+            }
+          );
+        }
+      } while (size > 1024 * 1024 && quality >= 0.2);
+
+      setPhotoUri(compressed.uri);
+      setImage(compressed);
+    } else {
+      setImage(null);
+    }
+  };
+
+  const verifyFields = () => {
+    if (resi.length === 0) {
+      showToast("Gagal", "Harap masukkan nomor resi", "error");
+      return false;
+    }
+    if (courierId.length === 0) {
+      showToast("Gagal", "Harap pilih ekspedisi", "error");
+      return false;
+    }
+    if (photoUri === null) {
+      showToast("Gagal", "Harap upload bukti pengiriman", "error");
+      return false;
+    }
+    return true;
   };
 
   const handleSubmit = async () => {
     if (isLoading) return;
     setIsLoading(true);
     try {
+      const valid = verifyFields();
+      if (!valid) return;
       await postBuyerReturn(complaintId, courierId, resi, image);
+      showToast("Berhasil", "Komplain berhasil dikirim", "success");
       router.replace("../../(tabs)/complaint");
     } catch (error) {
       showToast("Gagal", error?.message, "error");
@@ -124,7 +210,7 @@ export default function PengembalianForm() {
           alertColor="#C2C2C2"
           alertIconName="alert-circle"
           alertIconColor="#C2C2C2"
-          onPress={pickImage}
+          onPress={handleUpload}
           iconsColor="#FFF"
         />
 
@@ -160,15 +246,13 @@ export default function PengembalianForm() {
         animationType="slide"
         transparent={true}
         visible={modalVisible}
-        onRequestClose={closeModal}
-      >
+        onRequestClose={closeModal}>
         <TouchableOpacity style={styles.modalOverlay} onPress={closeModal}>
           <View style={styles.modalContainer}>
             <View style={styles.modalHeader}>
               <TouchableOpacity
                 onPress={closeModal}
-                style={styles.modalBackBtn}
-              >
+                style={styles.modalBackBtn}>
                 <ChevronLeftCircle size={24} color="#00C2C2" />
                 <Text style={styles.modalTitle}>Pilih Ekspedisi</Text>
               </TouchableOpacity>
@@ -180,8 +264,7 @@ export default function PengembalianForm() {
                   <TouchableOpacity
                     key={index}
                     style={styles.courierItem}
-                    onPress={() => handleSelectCourier(courier)}
-                  >
+                    onPress={() => handleSelectCourier(courier)}>
                     <Text style={styles.courierText}>{courier.name}</Text>
                   </TouchableOpacity>
                 ))}

@@ -1,6 +1,7 @@
 import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
 import * as Clipboard from "expo-clipboard";
 import Toast from "react-native-toast-message";
+import { Video } from "expo-av";
 
 // Fungsi salin teks ke clipboard
 const handleCopy = async (text) => {
@@ -32,6 +33,7 @@ const TrackDetail = ({
   resiNumber,
   expedition,
 }) => {
+  console.log("ini images", images, imgTitle);
   return (
     <View style={styles.detailContainer}>
       {/* Content text */}
@@ -48,14 +50,34 @@ const TrackDetail = ({
           {imgTitle ? <Text style={styles.imgTitle}>{imgTitle}</Text> : null}
 
           <View style={styles.imgRow}>
-            {images.map((imgSource, index) => (
-              <Image
-                key={index}
-                source={imgSource}
-                style={styles.img}
-                resizeMode="cover"
-              />
-            ))}
+            {images.map((item, index) => {
+              if (
+                item?.uri?.toLowerCase().includes("mov") ||
+                item?.uri?.toLowerCase().includes("mp4")
+              ) {
+                return (
+                  <View style={styles.videoBox}>
+                    <Video
+                      source={{ uri: item.uri }}
+                      style={styles.mediaImg}
+                      resizeMode="contain"
+                      shouldPlay={false}
+                      isLooping={false}
+                      useNativeControls
+                    />
+                  </View>
+                );
+              } else {
+                return (
+                  <Image
+                    key={index}
+                    source={item}
+                    style={styles.img}
+                    resizeMode="cover"
+                  />
+                );
+              }
+            })}
           </View>
         </View>
       )}
@@ -201,5 +223,16 @@ const styles = StyleSheet.create({
     color: "#2563EB",
     fontWeight: "500",
     marginLeft: 4,
+  },
+  videoBox: {
+    width: "100%",
+    height: 200, // gunakan height tetap
+    overflow: "hidden",
+    borderRadius: 8, // opsional jika ingin tampilannya membulat
+    backgroundColor: "#000", // agar tidak ada background putih saat loading video
+  },
+  mediaImg: {
+    width: "100%",
+    height: "100%",
   },
 });

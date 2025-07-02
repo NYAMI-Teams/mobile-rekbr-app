@@ -21,8 +21,7 @@ import {
   setProfileStore,
 } from "../../store";
 import { registerForPushNotificationsAsync } from "@/utils/notifications";
-import CryptoJS from 'crypto-js';
-
+import CryptoJS from "crypto-js";
 
 export default function Login() {
   const router = useRouter();
@@ -57,7 +56,7 @@ export default function Login() {
     try {
       // Hash the password using SHA-256
       const hashedPassword = CryptoJS.SHA256(password).toString();
-      
+
       const res = await login(email, hashedPassword);
       showToast(
         "Login Berhasil",
@@ -69,7 +68,13 @@ export default function Login() {
       await getUserProfile();
     } catch (err) {
       setError(true);
-      setErrorMsg("Email atau kata sandi salah");
+      if (err?.message === "email atau password salah") {
+        setErrorMsg("Email atau Password Salah");
+      } else if (err?.message === "Validasi gagal") {
+        setErrorMsg("Format Email atau Password Salah");
+      } else {
+        setErrorMsg(err?.message);
+      }
       showToast("Login Gagal", err?.message, "error");
       setIsLoading(false);
     }

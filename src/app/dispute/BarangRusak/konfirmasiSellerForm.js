@@ -133,13 +133,21 @@ export default function KonfirmasiSellerForm() {
   };
 
   const handleSubmit = async () => {
+    if (!image?.uri) {
+      showToast("Gagal", "Harap Unggah Bukti", "error");
+      return;
+    }
+    if (!reason) {
+      showToast("Gagal", "Harap isi alasan", "error");
+      return;
+    }
     try {
       await postBuyerReturnConfirm(complaintId, reason, image);
       router.replace("../../(tabs)/complaint");
       showToast("Sukses", "Permintaan konfirmasi berhasil dikirim", "success");
     } catch (error) {
       showToast("Gagal", error?.message, "error");
-      // console.log("ini error konfirmasi form", error);
+      console.log("ini error konfirmasi form", error);
     }
   };
 

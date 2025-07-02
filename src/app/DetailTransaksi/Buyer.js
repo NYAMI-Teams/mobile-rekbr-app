@@ -44,32 +44,32 @@ export default function DetailTransaksiBuyer() {
   const modalizeRef = useRef(null);
 
   useEffect(() => {
-    const fetchTransactionDetails = async () => {
-      try {
-        const res = await getDetailBuyerTransaction(id);
-        setData(res.data);
-        // // console.log(
-        //   "Ini Detail Buyer Transaction",
-        //   JSON.stringify(res.data, null, 2)
-        // );
-      } catch (err) {
-        showToast(
-          "Gagal",
-          "Gagal mengambil data transaksi. Silahkan coba lagi.",
-          "error"
-        );
-      }
-    };
-
     fetchTransactionDetails();
   }, [id]);
+
+  const fetchTransactionDetails = async () => {
+    try {
+      const res = await getDetailBuyerTransaction(id);
+      setData(res.data);
+      // // console.log(
+      //   "Ini Detail Buyer Transaction",
+      //   JSON.stringify(res.data, null, 2)
+      // );
+    } catch (err) {
+      showToast(
+        "Gagal",
+        "Gagal mengambil data transaksi. Silahkan coba lagi.",
+        "error"
+      );
+    }
+  };
 
   const updateTransaction = async () => {
     try {
       const res = await updateBuyerTransaction(data?.id);
       setPaymentDone(res.data);
       setIsPaymentDone(res.success);
-      modalizeRef.current?.close();
+      fetchTransactionDetails();
     } catch (error) {
       showToast("Gagal", "Gagal memperbarui transaksi", "error");
     }
