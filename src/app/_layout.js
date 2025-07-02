@@ -1,4 +1,4 @@
-import { View } from "react-native";
+import { View, Platform } from "react-native";
 import { Stack } from "expo-router";
 import "../../global.css";
 import Toast from "react-native-toast-message";
@@ -14,7 +14,7 @@ import { useEffect } from "react";
 import { setDataNotification } from "@/store";
 export default function RootLayout() {
   useEffect(() => {
-    Notifications.getLastNotificationResponseAsync().then(response => {
+    Notifications.getLastNotificationResponseAsync().then((response) => {
       if (response) {
         const data = response.notification.request.content.data;
         setDataNotification(data);
@@ -35,8 +35,7 @@ export default function RootLayout() {
           <GestureHandlerRootView style={{ flex: 1 }}>
             <SafeAreaView
               style={{ flex: 1, backgroundColor: "#fff" }}
-              edges={["top", "!bottom"]}
-            >
+              edges={["top", Platform.OS === "ios" ? "!bottom" : "bottom"]}>
               <Stack
                 screenOptions={{
                   headerShown: false,
