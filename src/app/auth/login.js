@@ -15,7 +15,11 @@ import PrimaryButton from "../../components/PrimaryButton";
 import { useRouter } from "expo-router";
 import { getProfile, login, savePushToken } from "../../utils/api/auth";
 import { showToast } from "../../utils";
-import { getDataNotification, setAccessToken, setProfileStore } from "../../store";
+import {
+  getDataNotification,
+  setAccessToken,
+  setProfileStore,
+} from "../../store";
 import { registerForPushNotificationsAsync } from "@/utils/notifications";
 
 export default function Login() {
@@ -45,7 +49,7 @@ export default function Login() {
     } catch (err) {
       setError(true);
       setErrorMsg("Email atau kata sandi salah");
-      showToast("Login Gagal", "Silahkan coba lagi", "error");
+      showToast("Login Gagal", err?.message, "error");
       setIsLoading(false);
       return;
     }
@@ -61,14 +65,14 @@ export default function Login() {
         // console.log("Push token saved:", pushToken);
       }
     } catch (err) {
-      console.warn("Gagal simpan push token:", err);
+      console.warn("Gagal simpan push token:", err?.message);
     }
 
     try {
       await getUserProfile();
     } catch (err) {
-      console.warn("Gagal ambil profil:", err);
-      showToast("Gagal", "Gagal mengambil data profile", "error");
+      console.warn("Gagal ambil profil:", err?.message);
+      showToast("Gagal", err?.message, "error");
     } finally {
       setIsLoading(false);
     }
@@ -80,11 +84,7 @@ export default function Login() {
       await setProfileStore(res?.data);
       router.replace("/");
     } catch (error) {
-      showToast(
-        "Gagal",
-        "Gagal mengambil data profile. Silahkan coba login kembali.",
-        "error"
-      );
+      showToast("Gagal", error?.message, "error");
     } finally {
       setIsLoading(false);
     }

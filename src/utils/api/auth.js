@@ -7,6 +7,9 @@ export const login = async (email, password) => {
       password,
     });
     if (res) {
+      if (res.data.isAdmin) {
+        throw new Error("Admin cannot login");
+      }
       return res;
     }
   } catch (error) {
