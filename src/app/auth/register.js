@@ -18,6 +18,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { register } from "../../utils/api/auth";
 import { showToast } from "../../utils";
+import CryptoJS from "crypto-js";
 
 export default function Register() {
   const router = useRouter();
@@ -38,14 +39,6 @@ export default function Register() {
     // setIsChecked(true);
   }, []);
 
-  const togglePasswordVisibility = () => {
-    setIsPasswordVisible(!isPasswordVisible);
-  };
-
-  const toggleConfirmPasswordVisibility = () => {
-    setIsConfirmPasswordVisible(!isConfirmPasswordVisible);
-  };
-
   const isEmailValid = () => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   };
@@ -56,7 +49,8 @@ export default function Register() {
       /[a-z]/.test(password) &&
       /[A-Z]/.test(password) &&
       /[0-9]/.test(password) &&
-      /[^a-zA-Z0-9]/.test(password)
+      /[^a-zA-Z0-9]/.test(password) &&
+      password == confirmPassword
     );
   };
 
@@ -71,7 +65,8 @@ export default function Register() {
 
   const handleRegister = () => {
     setIsLoading(true);
-    register(email, password)
+    const hashedPassword = CryptoJS.SHA256(password).toString();
+    register(email, hashedPassword)
       .then((res) => {
         showToast("Registrasi Berhasil", res?.message, "success");
         router.push({
@@ -89,16 +84,14 @@ export default function Register() {
 
   return (
     <View style={styles.container}>
-       <KeyboardAvoidingView
+      <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         keyboardVerticalOffset={Platform.OS === "ios" ? 60 : 0}
-        style={{ flex: 1, width: "100%"}}
-      >
+        style={{ flex: 1, width: "100%" }}>
         <ScrollView
           contentContainerStyle={{ flexGrow: 1 }}
           keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
-        >
+          showsVerticalScrollIndicator={false}>
           <View style={styles.headerContainer}>
             <Image
               source={require("../../assets/header.png")}
@@ -118,21 +111,22 @@ export default function Register() {
                 keyboardType="email-address"
               />
               {/* Alert Validasi Email */}
-              {email.length > 0 && <View style={styles.validationRow}>
-                <Feather
-                  name={isEmailValid() ? "check-circle" : "x-circle"}
-                  size={18}
-                  color={isEmailValid() ? "#4ade80" : "#f87171"}
-                />
-                <Text
-                  style={[
-                    styles.validationText,
-                    { color: isEmailValid() ? "#16a34a" : "#f87171" },
-                  ]}
-                >
-                  {isEmailValid() ? "Email valid" : "Email tidak valid"}
-                </Text>
-              </View>}
+              {email.length > 0 && (
+                <View style={styles.validationRow}>
+                  <Feather
+                    name={isEmailValid() ? "check-circle" : "x-circle"}
+                    size={18}
+                    color={isEmailValid() ? "#4ade80" : "#f87171"}
+                  />
+                  <Text
+                    style={[
+                      styles.validationText,
+                      { color: isEmailValid() ? "#16a34a" : "#f87171" },
+                    ]}>
+                    {isEmailValid() ? "Email valid" : "Email tidak valid"}
+                  </Text>
+                </View>
+              )}
             </View>
 
             {/* Password */}
@@ -141,7 +135,9 @@ export default function Register() {
                 title="Kata Sandi Rekbr"
                 placeholder="Masukkan kata sandi kamu"
                 value={password}
-                onChangeText={setPassword}
+                onChangeText={(text) => {
+                  setPassword(text.replace(/\s/g, ""));
+                }}
                 isPassword={true}
               />
               <PasswordChecklist password={password} />
@@ -153,7 +149,9 @@ export default function Register() {
                 title="Konfirmasi Kata Sandi Rekbr Kamu"
                 placeholder="Pastikan sama, ya!"
                 value={confirmPassword}
-                onChangeText={setConfirmPassword}
+                onChangeText={(text) => {
+                  setConfirmPassword(text.replace(/\s/g, ""));
+                }}
                 isPassword={true}
               />
               {/* Alert Validasi */}
@@ -173,8 +171,7 @@ export default function Register() {
                         color:
                           confirmPassword === password ? "#16a34a" : "#f87171",
                       },
-                    ]}
-                  >
+                    ]}>
                     {confirmPassword === password
                       ? "Kata sandi sesuai"
                       : "Kata sandi tidak sesuai"}
@@ -192,8 +189,7 @@ export default function Register() {
                   isChecked
                     ? { backgroundColor: "#3ED6C5", borderColor: "#3ED6C5" }
                     : { borderColor: "#9CA3AF" },
-                ]}
-              >
+                ]}>
                 {isChecked && <Text style={styles.checkboxText}>✓</Text>}
               </TouchableOpacity>
               <Text style={styles.termsText}>
@@ -206,7 +202,7 @@ export default function Register() {
             <PrimaryButton
               title="Daftar"
               onPress={handleRegister}
-              disabled={!isFormValid()}
+              disabled={!isFormValid() || isLoading}
             />
           </View>
 
@@ -230,8 +226,7 @@ export default function Register() {
               <View style={styles.linkRow}>
                 <Text style={styles.linkLabel}>Terdapat kendala?</Text>
                 <TouchableOpacity
-                  onPress={() => Alert.alert("Berhasil terhubung")}
-                >
+                  onPress={() => Alert.alert("Berhasil terhubung")}>
                   <Text style={styles.linkAction}>Silakan Hubungi Kami</Text>
                 </TouchableOpacity>
               </View>

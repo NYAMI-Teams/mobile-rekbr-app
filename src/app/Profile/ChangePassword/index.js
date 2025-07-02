@@ -19,34 +19,16 @@ import PrimaryButton from "@/components/PrimaryButton";
 import PasswordChecklist from "@/components/PasswordChecklist";
 import BuyerKonfirmasi from "@/components/BuyerKonfirmasi";
 import NavBackHeader from "@/components/NavBackHeader";
+import CryptoJS from "crypto-js";
 
 export default function ChangePasswordScreen() {
   const router = useRouter();
   const [kataSandiSaatIni, setKataSandiSaatIni] = useState("");
   const [kataSandiBaru, setKataSandiBaru] = useState("");
   const [konfirmasiKataSandiBaru, setKonfirmasiKataSandiBaru] = useState("");
-  const [isKataSandiSaatIniVisible, setIsKataSandiSaatIniVisible] =
-    useState(false);
-  const [isKataSandiBaruVisible, setIsKataSandiBaruVisible] = useState(false);
-  const [
-    isKonfirmasiKataSandiBaruVisible,
-    setIsKonfirmasiKataSandiBaruVisible,
-  ] = useState(false);
 
   const [showPopup, setShowPopup] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-
-  const toggleKataSandiSaatIniVisibility = () => {
-    setIsKataSandiSaatIniVisible(!isKataSandiSaatIniVisible);
-  };
-
-  const toggleKataSandiBaruVisibility = () => {
-    setIsKataSandiBaruVisible(!isKataSandiBaruVisible);
-  };
-
-  const toggleKonfirmasiKataSandiBaruVisibility = () => {
-    setIsKonfirmasiKataSandiBaruVisible(!isKonfirmasiKataSandiBaruVisible);
-  };
 
   const isPasswordValid = () => {
     return (
@@ -54,7 +36,8 @@ export default function ChangePasswordScreen() {
       /[a-z]/.test(konfirmasiKataSandiBaru) &&
       /[A-Z]/.test(konfirmasiKataSandiBaru) &&
       /[0-9]/.test(konfirmasiKataSandiBaru) &&
-      /[^a-zA-Z0-9]/.test(konfirmasiKataSandiBaru)
+      /[^a-zA-Z0-9]/.test(konfirmasiKataSandiBaru) &&
+      kataSandiBaru == konfirmasiKataSandiBaru
     );
   };
 
@@ -62,10 +45,6 @@ export default function ChangePasswordScreen() {
     if (isPasswordValid()) {
       setShowPopup(true);
     }
-  };
-
-  const handleBackBtn = () => {
-    router.back();
   };
 
   const handleChangePassword = async () => {
@@ -81,7 +60,10 @@ export default function ChangePasswordScreen() {
     }
 
     try {
-      await changePassword(kataSandiSaatIni, konfirmasiKataSandiBaru);
+      const hashedPassword = CryptoJS.SHA256(
+        konfirmasiKataSandiBaru
+      ).toString();
+      await changePassword(kataSandiSaatIni, hashedPassword);
       setShowPopup(false);
       showToast("Berhasil", "Password valid", "success");
       router.replace("/");
@@ -101,20 +83,24 @@ export default function ChangePasswordScreen() {
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         keyboardVerticalOffset={Platform.OS === "ios" ? 60 : 0}
-        style={{ flex: 1 }}
-      >
+        style={{ flex: 1 }}>
         <ScrollView
-          contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 16, marginTop: 20 }}
+          contentContainerStyle={{
+            flexGrow: 1,
+            paddingHorizontal: 16,
+            marginTop: 20,
+          }}
           keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
-        >
+          showsVerticalScrollIndicator={false}>
           <View style={styles.form}>
             <View style={styles.inputWrapper}>
               <InputField
                 title="Kata Sandi Rekbr Saat Ini"
                 placeholder="Masukkan kata sandi kamu saat ini"
                 value={kataSandiSaatIni}
-                onChangeText={setKataSandiSaatIni}
+                onChangeText={(text) => {
+                  setKataSandiSaatIni(text.replace(/\s/g, ""));
+                }}
                 isPassword={true}
               />
             </View>
@@ -125,7 +111,9 @@ export default function ChangePasswordScreen() {
                 title="Kata Sandi Rekbr"
                 placeholder="Masukkan kata sandi kamu"
                 value={kataSandiBaru}
-                onChangeText={setKataSandiBaru}
+                onChangeText={(text) => {
+                  setKataSandiBaru(text.replace(/\s/g, ""));
+                }}
                 isPassword={true}
               />
               <PasswordChecklist password={kataSandiBaru} />
@@ -137,7 +125,9 @@ export default function ChangePasswordScreen() {
                 title="Konfirmasi Kata Sandi Rekbr Kamu"
                 placeholder="Pastikan sama, ya!"
                 value={konfirmasiKataSandiBaru}
-                onChangeText={setKonfirmasiKataSandiBaru}
+                onChangeText={(text) => {
+                  setKonfirmasiKataSandiBaru(text.replace(/\s/g, ""));
+                }}
                 isPassword={true}
               />
 
@@ -166,8 +156,7 @@ export default function ChangePasswordScreen() {
                             ? "#4ade80"
                             : "#f87171",
                       },
-                    ]}
-                  >
+                    ]}>
                     {konfirmasiKataSandiBaru === kataSandiBaru
                       ? "Kata sandi sesuai"
                       : "Kata sandi tidak sesuai"}

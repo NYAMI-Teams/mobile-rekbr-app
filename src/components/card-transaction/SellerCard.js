@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -17,6 +17,7 @@ import { showToast } from "../../utils";
 const SellerCard = ({ data }) => {
   const status = data?.status || "";
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
 
   const formatDateWIB = (dateTime) => {
     if (!dateTime) return "Invalid date";
@@ -208,12 +209,17 @@ const SellerCard = ({ data }) => {
 
   return (
     <TouchableOpacity
-      onPress={() =>
+      onPress={async () => {
+        setIsLoading(true);
         router.push({
           pathname: `/DetailTransaksi/Seller`,
           params: { id: data?.id || "" },
-        })
-      }>
+        });
+        setTimeout(() => {
+          setIsLoading(false);
+        }, 3000);
+      }}
+      disabled={isLoading}>
       <View style={styles.cardWrapper}>
         <View style={styles.cardContent}>
           {renderRows().map((row, index) => (

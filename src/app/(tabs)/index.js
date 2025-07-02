@@ -15,7 +15,12 @@ import EmptyIllustration from "../../components/Ilustration";
 import TransactionSkeleton from "../../components/skeleton/TransactionSkeleton";
 import { showToast } from "../../utils";
 import { getSellerTransactions } from "../../utils/api/seller";
-import { getDataNotification, getProfileStore, setProfileStore } from "@/store";
+import {
+  getDataNotification,
+  getProfileStore,
+  setDataNotification,
+  setProfileStore,
+} from "@/store";
 import { getProfile } from "@/utils/api/auth";
 
 export default function Seller() {
@@ -31,6 +36,7 @@ export default function Seller() {
 
   useEffect(() => {
     getDataNotification().then((data) => {
+      setDataNotification(null);
       switch (data?.screen) {
         case "transaction/buyer":
           router.push({
@@ -59,7 +65,7 @@ export default function Seller() {
         default:
           break;
       }
-    })
+    });
     getUserProfile();
     fetchTransactions(true);
   }, []);
@@ -171,9 +177,9 @@ export default function Seller() {
           onPress={() =>
             router.push("/CreateTransaksi/CreateRekening/ChooseRekening")
           }
-          btnColor='black'
-          textColor='#fff'
-          width='50%'
+          btnColor="black"
+          textColor="#fff"
+          width="50%"
           height={50}
           style={styles.floatingButton}
         />
@@ -193,7 +199,7 @@ function SellerEmptyContent({ isKYCCompleted }) {
             <Image
               source={require("../../assets/icon-warning.png")}
               style={styles.warningIcon}
-              resizeMode='contain'
+              resizeMode="contain"
             />
             <Text style={styles.warningText}>
               Biar bisa lanjut bikin Rekber, kamu perlu selesain KYC dulu, ya!
@@ -216,8 +222,7 @@ function SellerEmptyContent({ isKYCCompleted }) {
           } else {
             router.push("CreateTransaksi/CreateRekening/ChooseRekening");
           }
-        }}
-      >
+        }}>
         <Text style={styles.ctaButtonText}>
           {isKYCCompleted ? "Bikin Rekber Baru" : "Lengkapi KYC & Bikin Rekber"}
         </Text>

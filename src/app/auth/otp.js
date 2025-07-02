@@ -18,9 +18,12 @@ import {
   resetPasswordOTP,
   changeEmail,
   forgotPassword,
+  getProfile,
+  savePushToken,
 } from "../../utils/api/auth";
 import { showToast } from "../../utils";
-import { setAccessToken } from "../../store";
+import { setAccessToken, setProfileStore } from "../../store";
+import { registerForPushNotificationsAsync } from "@/utils/notifications";
 
 export default function OTP() {
   const { email, isFromLogin, isFromResetPassword } = useLocalSearchParams();
@@ -73,26 +76,50 @@ export default function OTP() {
           setIsLoading(false);
         });
     }
-
   };
 
-  const submitOtp = (otpValue) => {
+  const handlePushToken = async () => {
+    try {
+      const pushToken = await registerForPushNotificationsAsync();
+      if (!pushToken || !pushToken.startsWith("ExponentPushToken")) {
+        console.warn("Push token tidak valid:", pushToken);
+      } else {
+        await savePushToken(pushToken);
+      }
+    } catch (err) {
+      console.warn("Gagal simpan push token:", err?.message);
+      setIsLoading(false);
+    }
+  };
+
+  const getUserProfile = async () => {
+    try {
+      const res = await getProfile();
+      await setProfileStore(res?.data);
+      router.replace("/auth/SuccessLogin");
+    } catch (error) {
+      showToast("Gagal", error?.message, "error");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const submitOtp = async (otpValue) => {
     setIsLoading(true);
     if (isFromLogin) {
-      verifyEmail(email, otpValue)
-        .then((res) => {
-          setAccessToken(res?.data?.accessToken);
-          showToast("Selamat datang, " + email, res?.message, "success");
-          router.replace("/auth/SuccessLogin");
-        })
-        .catch((error) => {
-          setIsError(true);
-          setErrorMessage("Kode OTP yang Anda masukkan salah.");
-          showToast("Gagal", error?.message, "error");
-        })
-        .finally(() => {
-          setIsLoading(false);
-        });
+      try {
+        const res = await verifyEmail(email, otpValue);
+        setAccessToken(res?.data?.accessToken);
+        showToast("Selamat datang, " + email, res?.message, "success");
+        await handlePushToken();
+        await getUserProfile();
+      } catch (error) {
+        setIsError(true);
+        setErrorMessage("Kode OTP yang Anda masukkan salah.");
+        showToast("Gagal", error?.message, "error");
+        setIsLoading(false);
+      }
+      /// Recheck
     } else if (isFromResetPassword) {
       resetPasswordOTP(email, otpValue)
         .then((res) => {
@@ -118,8 +145,7 @@ export default function OTP() {
       <GestureHandlerRootView>
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : undefined}
-          style={styles.keyboardView}
-        >
+          style={styles.keyboardView}>
           {/* Header */}
           <View style={styles.header}>
             <TouchableOpacity onPress={() => router.back()}>
@@ -154,8 +180,8 @@ export default function OTP() {
                   borderColor: isValid
                     ? "#009688"
                     : isError
-                      ? "#FF3B30"
-                      : "#ccc",
+                    ? "#FF3B30"
+                    : "#ccc",
                   borderRadius: 8,
                   textAlign: "center",
                   fontSize: 16,
@@ -165,28 +191,23 @@ export default function OTP() {
                 style={[
                   styles.timerText,
                   { color: timeLeft > 0 ? "#000" : "#EF4444" },
-                ]}
-              >
+                ]}>
                 {formatTime(timeLeft)}
               </Text>
             </View>
 
-            {isError && (
-              <Text style={styles.errorMessage}>{errorMessage}</Text>
-            )}
+            {isError && <Text style={styles.errorMessage}>{errorMessage}</Text>}
 
             <View style={styles.resendWrapper}>
               <Text style={styles.resendLabel}>Tidak menerima kode?</Text>
               <TouchableOpacity
                 onPress={handleResendCode}
-                disabled={timeLeft > 0}
-              >
+                disabled={timeLeft > 0}>
                 <Text
                   style={[
                     styles.resendAction,
                     { color: timeLeft > 0 ? "#9CA3AF" : "#3B82F6" },
-                  ]}
-                >
+                  ]}>
                   Klik untuk kirim ulang
                 </Text>
               </TouchableOpacity>

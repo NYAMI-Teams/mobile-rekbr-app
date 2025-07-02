@@ -24,9 +24,9 @@ export default function NavigationBar({
     router.push("/Profile/ChangePassword");
   };
 
-  const handleChangeEmail = () => {
-    router.push("/Profile/ChangeEmail");
-  };
+  // const handleChangeEmail = () => {
+  //   router.push("/Profile/ChangeEmail");
+  // };
 
   return (
     <>
@@ -91,31 +91,25 @@ export default function NavigationBar({
           paddingTop: 32,
           paddingBottom: 32,
           backgroundColor: "#fff",
-        }}
-      >
+        }}>
         <View>
-          <Text style={styles.modalTitle}>
-            Atur Profile
-          </Text>
-          <TouchableOpacity onPress={handleChangePassword} style={styles.modalButton}>
-            <Text style={styles.modalButtonText}>
-              Ubah Password
-            </Text>
+          <Text style={styles.modalTitle}>Atur Profile</Text>
+          <TouchableOpacity
+            onPress={handleChangePassword}
+            style={styles.modalButton}>
+            <Text style={styles.modalButtonText}>Ubah Password</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={handleChangeEmail} style={styles.modalButton}>
+          {/* <TouchableOpacity onPress={handleChangeEmail} style={styles.modalButton}>
             <Text style={styles.modalButtonText}>
               Ubah Email
             </Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           <TouchableOpacity
             onPress={() => {
               onLogoutPress();
             }}
-            style={[styles.modalButton, styles.logoutButton]}
-          >
-            <Text style={styles.logoutButtonText}>
-              Keluar
-            </Text>
+            style={[styles.modalButton, styles.logoutButton]}>
+            <Text style={styles.logoutButtonText}>Keluar</Text>
           </TouchableOpacity>
         </View>
       </Modalize>

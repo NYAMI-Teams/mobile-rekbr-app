@@ -64,7 +64,6 @@ export const setupNotificationListeners = () => {
     Notifications.addNotificationResponseReceivedListener((response) => {
       const data = response.notification.request.content.data;
       console.log("Respons notifikasi:", data);
-      setDataNotification(data);
       switch (data?.screen) {
         case "transaction/buyer":
           router.push({
@@ -93,6 +92,7 @@ export const setupNotificationListeners = () => {
         default:
           break;
       }
+      setDataNotification(null);
     });
 
   return () => {

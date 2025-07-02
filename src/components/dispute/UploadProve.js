@@ -1,5 +1,6 @@
 import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
 import { Video } from "expo-av";
+import { Feather } from "@expo/vector-icons";
 
 export const UploadProve = ({
   media,

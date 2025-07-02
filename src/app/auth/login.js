@@ -21,6 +21,8 @@ import {
   setProfileStore,
 } from "../../store";
 import { registerForPushNotificationsAsync } from "@/utils/notifications";
+import CryptoJS from 'crypto-js';
+
 
 export default function Login() {
   const router = useRouter();
@@ -29,6 +31,20 @@ export default function Login() {
   const [error, setError] = useState(true);
   const [errorMsg, setErrorMsg] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  const handlePushToken = async () => {
+    try {
+      const pushToken = await registerForPushNotificationsAsync();
+      if (!pushToken || !pushToken.startsWith("ExponentPushToken")) {
+        console.warn("Push token tidak valid:", pushToken);
+      } else {
+        await savePushToken(pushToken);
+      }
+    } catch (err) {
+      console.warn("Gagal simpan push token:", err?.message);
+      setIsLoading(false);
+    }
+  };
 
   const handleLogin = async () => {
     setError(false);
@@ -39,41 +55,22 @@ export default function Login() {
     setIsLoading(true);
 
     try {
-      const res = await login(email, password);
+      // Hash the password using SHA-256
+      const hashedPassword = CryptoJS.SHA256(password).toString();
+      
+      const res = await login(email, hashedPassword);
       showToast(
         "Login Berhasil",
         "Selamat datang kembali, " + email + "!",
         "success"
       );
       await setAccessToken(res?.data?.accessToken);
+      await handlePushToken();
+      await getUserProfile();
     } catch (err) {
       setError(true);
       setErrorMsg("Email atau kata sandi salah");
       showToast("Login Gagal", err?.message, "error");
-      setIsLoading(false);
-      return;
-    }
-
-    try {
-      const pushToken = await registerForPushNotificationsAsync();
-
-      // ✅ Tambahkan validasi format token di sini
-      if (!pushToken || !pushToken.startsWith("ExponentPushToken")) {
-        console.warn("Push token tidak valid:", pushToken);
-      } else {
-        await savePushToken(pushToken);
-        // console.log("Push token saved:", pushToken);
-      }
-    } catch (err) {
-      console.warn("Gagal simpan push token:", err?.message);
-    }
-
-    try {
-      await getUserProfile();
-    } catch (err) {
-      console.warn("Gagal ambil profil:", err?.message);
-      showToast("Gagal", err?.message, "error");
-    } finally {
       setIsLoading(false);
     }
   };
@@ -130,7 +127,9 @@ export default function Login() {
                     title="Kata Sandi Rekbr"
                     placeholder="Masukkan kata sandi kamu"
                     value={password}
-                    onChangeText={setPassword}
+                    onChangeText={(text) => {
+                      setPassword(text.replace(/\s/g, ""));
+                    }}
                     isPassword={true}
                   />
                 </View>
