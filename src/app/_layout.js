@@ -12,6 +12,13 @@ import {
 import * as Notifications from "expo-notifications";
 import { useEffect } from "react";
 import { setDataNotification } from "@/store";
+import {
+  configureNotificationHandler,
+  setupNotificationListeners,
+} from "@/utils/notifications";
+import * as Notifications from "expo-notifications";
+import { useEffect } from "react";
+import { setDataNotification } from "@/store";
 export default function RootLayout() {
   useEffect(() => {
     Notifications.getLastNotificationResponseAsync().then((response) => {
