@@ -58,21 +58,25 @@ export default function FundReleaseRequestScreen() {
       return;
     }
 
-    Alert.alert("Pilih Sumber Gambar", "Ambil foto baru atau pilih dari galeri?", [
-      {
-        text: "Kamera",
-        onPress: async () => {
-          await pickImage("camera");
+    Alert.alert(
+      "Pilih Sumber Gambar",
+      "Ambil foto baru atau pilih dari galeri?",
+      [
+        {
+          text: "Kamera",
+          onPress: async () => {
+            await pickImage("camera");
+          },
         },
-      },
-      {
-        text: "Galeri",
-        onPress: async () => {
-          await pickImage("gallery");
+        {
+          text: "Galeri",
+          onPress: async () => {
+            await pickImage("gallery");
+          },
         },
-      },
-      { text: "Batal", style: "cancel" },
-    ]);
+        { text: "Batal", style: "cancel" },
+      ]
+    );
   };
 
   const pickImage = async (source) => {
@@ -133,10 +137,18 @@ export default function FundReleaseRequestScreen() {
     try {
       await postFundRelease(id, image, alasanText);
       setShowPopup(false);
-      showToast("Berhasil", "Permintaan konfirmasi pengiriman berhasil dibuat", "success");
+      showToast(
+        "Berhasil",
+        "Permintaan konfirmasi pengiriman berhasil dibuat",
+        "success"
+      );
       router.replace("/");
     } catch (error) {
-      showToast("Gagal", `Gagal membuat permintaan konfirmasi pengiriman, ${error?.message}`, "error");
+      showToast(
+        "Gagal",
+        `Gagal membuat permintaan konfirmasi pengiriman, ${error?.message}`,
+        "error"
+      );
     } finally {
       setIsLoading(false);
     }
@@ -148,13 +160,11 @@ export default function FundReleaseRequestScreen() {
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         keyboardVerticalOffset={Platform.OS === "ios" ? 60 : 0}
-        style={{ flex: 1 }}
-      >
+        style={{ flex: 1 }}>
         <ScrollView
           contentContainerStyle={styles.scrollContainer}
           keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
-        >
+          showsVerticalScrollIndicator={false}>
           <View style={styles.innerContainer}>
             <InputField
               title="Alasan Permintaan Konfirmasi"
@@ -163,7 +173,7 @@ export default function FundReleaseRequestScreen() {
               onChangeText={setAlasanText}
             />
 
-            <TouchableOpacity onPress={handleUpload} style={styles.uploadButton}>
+            <View style={styles.uploadButton}>
               <AttachmentFilled
                 title="Unggah Bukti"
                 caption={
@@ -182,11 +192,14 @@ export default function FundReleaseRequestScreen() {
                 alertIconColor={isUploaded ? "#08B20F" : "#C2C2C2"}
                 onPress={handleUpload}
               />
-            </TouchableOpacity>
+            </View>
 
             {image && (
               <View style={styles.imageContainer}>
-                <Image source={{ uri: image?.uri }} style={styles.uploadedImage} />
+                <Image
+                  source={{ uri: image?.uri }}
+                  style={styles.uploadedImage}
+                />
               </View>
             )}
           </View>
