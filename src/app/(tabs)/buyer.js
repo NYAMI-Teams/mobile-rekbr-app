@@ -95,7 +95,6 @@ export default function Buyer() {
 
   return (
     <View style={styles.container}>
-      <StatusBar style='dark' />
       <FlatList
         ref={listRef}
         style={styles.flatList}

@@ -35,8 +35,8 @@ export default function DisputeScreen() {
   const [selectedTab, setSelectedTab] = useState("pembelian");
   const [BuyerComplaints, setBuyerComplaints] = useState([]);
   const [SellerComplaints, setSellerComplaints] = useState([]);
-  const [isEmptyBuyerComplaints, setIsEmptyBuyerComplaints] = useState(false);
-  const [isEmptySellerComplaints, setIsEmptySellerComplaints] = useState(false);
+  const [isEmptyBuyerComplaints, setIsEmptyBuyerComplaints] = useState(true);
+  const [isEmptySellerComplaints, setIsEmptySellerComplaints] = useState(true);
   const { type } = useLocalSearchParams();
 
   useEffect(() => {

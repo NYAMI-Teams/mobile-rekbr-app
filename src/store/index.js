@@ -54,7 +54,6 @@ export const setDataNotification = async (data) => {
 export const getDataNotification = async () => {
   try {
     const data = await SecureStore.getItemAsync("data_notification");
-    console.log("Data:", data);
     return data ? JSON.parse(data) : null;
   } catch (error) {
     throw new Error("Error getting data notification:", error);

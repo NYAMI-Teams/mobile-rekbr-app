@@ -10,7 +10,6 @@ import {
 } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Icon from "react-native-vector-icons/Ionicons";
-import { PinInput } from "@pakenfit/react-native-pin-input";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
   verifyEmail,
@@ -24,16 +23,22 @@ import {
 import { showToast } from "../../utils";
 import { setAccessToken, setProfileStore } from "../../store";
 import { registerForPushNotificationsAsync } from "@/utils/notifications";
+import SmoothPinCodeInput from "@dreamwalk-os/react-native-smooth-pincode-input";
 
 export default function OTP() {
   const { email, isFromLogin, isFromResetPassword } = useLocalSearchParams();
   const router = useRouter();
+  const [code, setCode] = useState("");
   const [timeLeft, setTimeLeft] = useState(299);
   const [isError, setIsError] = useState(false);
   const [isValid, setIsValid] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const inputRefs = useRef([]);
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    console.log("code", code);
+  }, [code]);
 
   useEffect(() => {
     if (timeLeft > 0) {
@@ -105,6 +110,8 @@ export default function OTP() {
   };
 
   const submitOtp = async (otpValue) => {
+    console.log("otpValue", otpValue);
+    
     setIsLoading(true);
     if (isFromLogin) {
       try {
@@ -170,12 +177,15 @@ export default function OTP() {
 
             {/* OTP Input */}
             <View style={styles.otpInputWrapper}>
-              <PinInput
-                length={6}
-                onFillEnded={(otp) => submitOtp(otp)}
-                inputStyle={{
-                  width: 40,
-                  height: 40,
+              <SmoothPinCodeInput
+                value={code}
+                codeLength={6}
+                onTextChange={setCode}
+                onFulfill={submitOtp}
+                containerStyle={{
+                  marginTop: 16,
+                }}
+                cellStyle={{
                   borderWidth: 1,
                   borderColor: isValid
                     ? "#009688"
@@ -187,7 +197,7 @@ export default function OTP() {
                   fontSize: 16,
                   color: "#000",
                 }}
-                
+                restrictToNumbers={true}
               />
               <Text
                 style={[

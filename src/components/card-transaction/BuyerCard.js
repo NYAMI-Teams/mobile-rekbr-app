@@ -291,7 +291,7 @@ const BuyerCard = ({ data }) => {
           onClose={() => setShowPopup(false)}
           onBtn2={handleConfirmReceived}
           onBtn1={() => setShowPopup(false)}
-          title="Pastikan semua data di form sudah benar dan lengkap sebelum kamu kirim. Cek lagi, ya!"
+          title="Pastikan barang sudah sesuai sebelum melakukan konfirmasi!"
           btn1="Kembali"
           btn2="Konfirmasi"
         />

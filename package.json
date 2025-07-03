@@ -9,9 +9,9 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@dreamwalk-os/react-native-smooth-pincode-input": "^1.0.2",
     "@expo-google-fonts/poppins": "^0.4.0",
     "@expo/vector-icons": "^14.1.0",
-    "@pakenfit/react-native-pin-input": "^1.2.1",
     "@react-native-clipboard/clipboard": "^1.16.2",
     "@react-native-community/checkbox": "^0.5.20",
     "@react-navigation/bottom-tabs": "^7.3.10",
