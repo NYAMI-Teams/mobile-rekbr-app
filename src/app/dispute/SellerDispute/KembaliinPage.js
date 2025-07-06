@@ -44,16 +44,11 @@ export default function KembaliinPage() {
 
   const fetchDetailComplaint = async () => {
     try {
-      console.log("ID Complaint:", id);
-      console.log("Status Complaint:", status);
-
       const res = await getDetailSellerComplaint(id);
       setDetailComplaint(res.data);
       setSellerRejected(res.data.seller_decision === "rejected");
       setBuyerExpiredDate(res.data.status === "canceled_by_buyer");
-      console.log("Detail Complaint:", JSON.stringify(res.data, null, 2));
     } catch (error) {
-      console.error("Gagal mengambil data detail komplain:", error);
       showToast("Gagal", error?.message, "error");
     }
   };
@@ -208,7 +203,7 @@ export default function KembaliinPage() {
             {buyerExpiredDate === true ? (
               <>
                 <TouchableOpacity
-                  onPress={() => console.log("Hubungi kami di klik!")}
+                  onPress={() => {}}
                 >
                   <View style={styles.contactUsContainer}>
                     <Text style={styles.contactUsText}>
@@ -372,7 +367,6 @@ export default function KembaliinPage() {
           text: "Konfirmasi",
           style: "destructive",
           onPress: () => {
-            console.log("Finishing Id ===> ", id);
             postSellerConfirmReturn(id)
               .then(() => {
                 showToast(
@@ -393,7 +387,6 @@ export default function KembaliinPage() {
   };
 
   const handleSubmit = () => {
-    console.log("Submit komplain");
   };
 
   return (

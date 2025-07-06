@@ -85,7 +85,6 @@ export default function ComplaintDetailScreen() {
   };
 
   const getStatusLabel = (status) => {
-    // console.log("status", status);
     switch (status) {
       case "under_investigation":
         return "Dalam Investigasi";

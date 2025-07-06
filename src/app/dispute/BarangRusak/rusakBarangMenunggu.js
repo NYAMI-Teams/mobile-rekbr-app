@@ -49,10 +49,6 @@ export default function DetailKomplain() {
     try {
       const res = await getDetailBuyerComplaint(complaintId);
       setDetailComplaint(res.data);
-      // console.log(
-      //   "ini detail complaint as buyer",
-      //   JSON.stringify(res.data, null, 2)
-      // );
     } catch (err) {
       showToast(
         "Gagal",
@@ -80,7 +76,6 @@ export default function DetailKomplain() {
                   "Gagal membatalkan komplain. Coba lagi.",
                   "error"
                 );
-                // console.log("Cancel error:", err);
               });
           },
         },
@@ -203,7 +198,7 @@ export default function DetailKomplain() {
           </TouchableOpacity>
 
           <TouchableOpacity
-            onPress={() => console.log("Simulate pressed")}
+            onPress={() => {}}
             style={styles.modalItem}>
             <Text style={styles.modalItemText}>Simulate reject</Text>
           </TouchableOpacity>

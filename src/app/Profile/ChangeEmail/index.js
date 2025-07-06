@@ -60,7 +60,6 @@ export default function ChangeEmailScreen() {
         params: { email: res.data.email, isFromLogin: false },
       });
     } catch (err) {
-      // console.log(err);
       showToast("Gagal", "Silahkan coba lagi", "error");
     }
   };

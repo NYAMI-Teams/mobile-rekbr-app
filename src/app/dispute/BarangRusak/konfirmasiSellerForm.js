@@ -147,7 +147,6 @@ export default function KonfirmasiSellerForm() {
       showToast("Sukses", "Permintaan konfirmasi berhasil dikirim", "success");
     } catch (error) {
       showToast("Gagal", error?.message, "error");
-      console.log("ini error konfirmasi form", error);
     }
   };
 

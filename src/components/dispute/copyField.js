@@ -13,7 +13,6 @@ const handleCopy = async (text) => {
       text2: "Disalin ke clipboard",
       position: "bottom",
     });
-    // console.log("Copied to clipboard:", text);
   } catch (error) {
     Toast.show({
       type: "error",
@@ -21,7 +20,6 @@ const handleCopy = async (text) => {
       text2: "Tidak dapat menyalin",
       position: "bottom",
     });
-    // console.log("Failed to copy to clipboard:", error);
   }
 };
 

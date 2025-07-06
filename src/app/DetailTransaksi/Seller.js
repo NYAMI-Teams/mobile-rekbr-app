@@ -35,10 +35,6 @@ export default function DetailTransaksiSeller() {
         const res = await getDetailSellerTransaction(id);
         setData(res.data);
         setStatus(res.data.status);
-        // // console.log(
-        //   "Ini Data Detail Seller",
-        //   JSON.stringify(res.data, null, 2)
-        // );
       } catch (err) {
         showToast(
           "Gagal",
@@ -273,7 +269,7 @@ export default function DetailTransaksiSeller() {
           <View style={styles.footerRow}>
             <Text style={styles.footerTextGray}>Terdapat kendala?</Text>
             <TouchableOpacity
-              onPress={() => console.log("Hubungi Kami pressed")}>
+              onPress={() => {}}>
               <Text style={styles.footerTextBlue}>Silahkan Hubungi Kami</Text>
             </TouchableOpacity>
           </View>
@@ -307,7 +303,7 @@ export default function DetailTransaksiSeller() {
           <View style={styles.footerRow}>
             <Text style={styles.footerTextGray}>Terdapat kendala?</Text>
             <TouchableOpacity
-              onPress={() => console.log("Hubungi Kami pressed")}>
+              onPress={() => {}}>
               <Text style={styles.footerTextBlue}>Silahkan Hubungi Kami</Text>
             </TouchableOpacity>
           </View>
@@ -452,8 +448,8 @@ export default function DetailTransaksiSeller() {
         )}
 
         {/* Admin Message (done)*/}
-        {data?.fundReleaseRequest?.status != null ||
-          (status == "completed" && (
+        {(data?.fundReleaseRequest?.status != null ||
+          status == "completed") && (
             <>
               <View style={styles.adminMsgRow}>
                 <Image
@@ -462,7 +458,7 @@ export default function DetailTransaksiSeller() {
                 />
                 <Text style={styles.adminMsgText}>
                   {status == "completed"
-                    ? "Komplain dianggap tidak ada dan bakal selesai otomatis kalau pembeli nggak respon."
+                    ? "Komplain dianggap tidak ada dan transaksi otomatis selesai setelah waktu tunggu."
                     : data?.fundReleaseRequest?.status == "pending"
                     ? "Tunggu approval kami, ya! Kalau bukti kamu oke, permintaan konfirmasi bakal langsung dikirim ke buyer!"
                     : data?.fundReleaseRequest?.status == "approved"
@@ -471,11 +467,11 @@ export default function DetailTransaksiSeller() {
                 </Text>
               </View>
             </>
-          ))}
+          )}
 
         {/* Status Rekbr (done)*/}
-        {data?.fundReleaseRequest?.status == "pending" ||
-        data?.fundReleaseRequest?.status == "rejected" ? (
+        {(data?.fundReleaseRequest?.status == "pending" ||
+        data?.fundReleaseRequest?.status == "rejected") ? (
           <View style={styles.statusBox}>
             <View style={styles.statusRow}>
               <Text style={styles.statusLabel}>Status Rekbr:</Text>

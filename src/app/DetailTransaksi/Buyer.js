@@ -51,10 +51,6 @@ export default function DetailTransaksiBuyer() {
     try {
       const res = await getDetailBuyerTransaction(id);
       setData(res.data);
-      // // console.log(
-      //   "Ini Detail Buyer Transaction",
-      //   JSON.stringify(res.data, null, 2)
-      // );
     } catch (err) {
       showToast(
         "Gagal",
@@ -353,7 +349,7 @@ export default function DetailTransaksiBuyer() {
           <View style={styles.footerRow}>
             <Text style={styles.footerTextGray}>Terdapat kendala?</Text>
             <TouchableOpacity
-              onPress={() => console.log("Hubungi Kami pressed")}>
+              onPress={() => {}}>
               <Text style={styles.footerTextBlue}>Silahkan Hubungi Kami</Text>
             </TouchableOpacity>
           </View>
@@ -364,7 +360,7 @@ export default function DetailTransaksiBuyer() {
       return (
         <View style={styles.footerRow}>
           <Text style={styles.footerTextGray}>Terdapat kendala?</Text>
-          <TouchableOpacity onPress={() => console.log("Hubungi Kami pressed")}>
+          <TouchableOpacity onPress={() => {}}>
             <Text style={styles.footerTextBlue}>Silahkan Hubungi Kami</Text>
           </TouchableOpacity>
         </View>

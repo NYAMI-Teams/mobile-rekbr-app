@@ -45,7 +45,6 @@ export default function DisputeScreen() {
   }, []);
 
   useEffect(() => {
-    console.log("Type:", type);
     if (type === "seller") {
       setSelectedTab("penjualan");
     } else {
@@ -251,7 +250,6 @@ export default function DisputeScreen() {
                           text: "Konfirmasi",
                           style: "default",
                           onPress: () => {
-                            console.log("Finishing Id ===> ", item?.id);
                             postSellerConfirmReturn(item?.id)
                               .then(() => {
                                 showToast(

@@ -24,7 +24,6 @@ export const UploadProve = ({
       </TouchableOpacity>
       <View style={styles.mediaWrap}>
         {media.map((item, idx) => {
-          // // console.log("item", item);
           return (
             <View key={idx} style={styles.mediaBox}>
               {item.type === "image" ? (

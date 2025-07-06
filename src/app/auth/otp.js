@@ -37,10 +37,6 @@ export default function OTP() {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    console.log("code", code);
-  }, [code]);
-
-  useEffect(() => {
     if (timeLeft > 0) {
       const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
       return () => clearTimeout(timer);
@@ -110,7 +106,6 @@ export default function OTP() {
   };
 
   const submitOtp = async (otpValue) => {
-    console.log("otpValue", otpValue);
     
     setIsLoading(true);
     if (isFromLogin) {

@@ -226,7 +226,6 @@ export default function DisputeDetail() {
       if (type === "video") {
         try {
           const compressedSizeMB = sizeMB;
-          console.log("compressedSizeMB", compressedSizeMB);
 
           if (compressedSizeMB > 90) {
             alert("Ukuran video melebihi 90MB");

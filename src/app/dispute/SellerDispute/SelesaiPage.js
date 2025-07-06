@@ -41,10 +41,6 @@ export default function SelesaiPage() {
       const res = await getDetailSellerComplaint(complaintId);
       setDetailComplaint(res.data);
       setSellerRejected(res.data?.seller_decision);
-      // // console.log(
-      //   "ini detail complaint as seller",
-      //   JSON.stringify(res.data, null, 2)
-      // );
     } catch (err) {
       showToast(
         "Gagal",

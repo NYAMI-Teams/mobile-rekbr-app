@@ -42,14 +42,6 @@ export default function RusakBarangKembaliinPage() {
     try {
       const res = await getDetailBuyerComplaint(complaintId);
       setDetailComplaint(res.data);
-      // console.log(
-      //   "ini detail complaint barang kembaliin",
-      //   JSON.stringify(res.data, null, 2)
-      // );
-      // console.log(
-      //   detailComplaint?.buyer_deadline_input_shipment <
-      //     detailComplaint?.updated_at
-      // );
     } catch (err) {
       showToast(
         "Gagal",
@@ -273,7 +265,7 @@ export default function RusakBarangKembaliinPage() {
             detailComplaint?.updated_at ? (
               <>
                 <TouchableOpacity
-                  onPress={() => console.log("Hubungi kami di klik!")}>
+                  onPress={() => {}}>
                   <View style={styles.contactUsContainer}>
                     <Text style={styles.contactUsText}>
                       Silahkan Hubungi Kami
