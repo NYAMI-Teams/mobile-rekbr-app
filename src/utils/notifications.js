@@ -3,6 +3,7 @@ import * as Device from "expo-device";
 import { Platform, Alert } from "react-native";
 import { router } from "expo-router";
 import { setDataNotification } from "@/store";
+import { Audio } from "expo-av";
 
 // Handler agar notifikasi muncul saat app aktif
 export const configureNotificationHandler = () => {
@@ -10,7 +11,7 @@ export const configureNotificationHandler = () => {
     handleNotification: async () => ({
       shouldShowBanner: true,
       shouldShowList: true,
-      shouldPlaySound: true,
+      shouldPlaySound: false,
       shouldSetBadge: false,
     }),
   });
@@ -55,15 +56,17 @@ export const registerForPushNotificationsAsync = async () => {
 // Listener untuk menerima notifikasi saat app aktif
 export const setupNotificationListeners = () => {
   const notificationListener = Notifications.addNotificationReceivedListener(
-    (notification) => {
-      // console.log("Notifikasi diterima:", notification);
+    async (notification) => {
+      const { sound } = await Audio.Sound.createAsync(
+        require('../assets/sound-notif.mp3')
+      );
+      await sound.playAsync();
     }
   );
 
   const responseListener =
     Notifications.addNotificationResponseReceivedListener((response) => {
       const data = response.notification.request.content.data;
-      console.log("Respons notifikasi:", data);
       switch (data?.screen) {
         case "transaction/buyer":
           router.push({
