@@ -19,7 +19,7 @@ import Tagihan from "./Tagihan";
 import { useRouter } from "expo-router";
 import React, { useState, useEffect } from "react";
 import { ChevronLeftCircle, Play } from "lucide-react-native";
-import StepSuccesBar from "../../components/SuccesBar";
+import StepSuccesBar from "../SuccesBar";
 import CountdownTimer from "../Countdown";
 import moment from "moment";
 import {
@@ -436,7 +436,7 @@ export default function DetailTransaksiBuyer({ data }) {
                 resizeMode="contain"
               />
               <Text style={styles.warningMsgText}>
-                {data.status === "completed"
+                {data?.status === "completed"
                   ? "Komplain dianggap tidak ada dan bakal selesai otomatis kalau pembeli nggak respon."
                   : "Biar aman, pastikan kamu videoin proses buka paket ya! Ini penting banget sebagai bukti kalau mau komplain nanti."}
               </Text>

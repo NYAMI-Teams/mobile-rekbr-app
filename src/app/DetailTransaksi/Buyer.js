@@ -516,7 +516,7 @@ export default function DetailTransaksiBuyer() {
             />
             <Text style={styles.adminMsgText}>
               {data?.status == "completed"
-                ? "Komplain dianggap tidak ada dan bakal selesai otomatis kalau pembeli nggak respon."
+                ? "Komplain dianggap tidak ada dan transaksi otomatis selesai setelah waktu tunggu."
                 : "Halo! Barang udah sampai. Cek dan konfirmasi, biar dana langsung ke penjual via BNI!"}
             </Text>
           </View>
@@ -533,7 +533,7 @@ export default function DetailTransaksiBuyer() {
               />
               <Text style={styles.warningText}>
                 {data.status === "completed"
-                  ? "Komplain dianggap tidak ada dan bakal selesai otomatis kalau pembeli nggak respon."
+                  ? "Komplain dianggap tidak ada dan transaksi otomatis selesai setelah waktu tunggu."
                   : "Biar aman, pastikan kamu videoin proses buka paket ya! Ini penting banget sebagai bukti kalau mau komplain nanti."}
               </Text>
             </View>

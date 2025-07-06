@@ -88,7 +88,6 @@ export default function ChangePasswordScreen() {
           contentContainerStyle={{
             flexGrow: 1,
             paddingHorizontal: 16,
-            marginTop: 20,
           }}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}>

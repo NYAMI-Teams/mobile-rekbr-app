@@ -8,6 +8,7 @@ import { useRouter, useLocalSearchParams } from "expo-router";
 import { sellerCreateTransaction } from "../../../utils/api/transaction";
 import { formatCurrency, showToast } from "../../../utils";
 import NavBackHeader from "@/components/NavBackHeader";
+import InfoModal from "@/components/InfoModal";
 
 export default function TransactionSummary() {
   const router = useRouter();
@@ -19,6 +20,8 @@ export default function TransactionSummary() {
   const [serviceFee, setServiceFee] = useState(0);
   const [totalAmount, setTotalAmount] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  const [infoInsuranceVisible, setInfoInsuranceVisible] = useState(false);
+  const [infoServiceFeeVisible, setInfoServiceFeeVisible] = useState(false);
 
   useEffect(() => {
     const price = Number(payload?.itemPrice) || 0;
@@ -46,7 +49,7 @@ export default function TransactionSummary() {
     }
   };
 
-  return (
+  return (<>
     <View style={styles.container}>
       {/* Header */}
       <NavBackHeader title="Ringkasan Transaksi Rekber" />
@@ -74,26 +77,30 @@ export default function TransactionSummary() {
 
         {/* Biaya Tambahan */}
         {payload?.isInsurance && (
+          <TouchableOpacity onPress={() => setInfoInsuranceVisible(true)}>
+            <View style={styles.additionalFee}>
+              <View style={styles.rowCenter}>
+                <Text style={styles.additionalFeeTitle}>Asuransi Pengiriman BNI Life</Text>
+                <Info size={14} color="#888" style={styles.iconMargin} />
+              </View>
+              <Text style={styles.additionalFeeValue}>
+                {formatCurrency(insuranceFee)}
+              </Text>
+            </View>
+          </TouchableOpacity>
+        )}
+
+        <TouchableOpacity onPress={() => setInfoServiceFeeVisible(true)}>
           <View style={styles.additionalFee}>
             <View style={styles.rowCenter}>
-              <Text style={styles.additionalFeeTitle}>Asuransi Pengiriman BNI Life</Text>
+              <Text style={styles.additionalFeeTitle}>Biaya Jasa Aplikasi</Text>
               <Info size={14} color="#888" style={styles.iconMargin} />
             </View>
             <Text style={styles.additionalFeeValue}>
-              {formatCurrency(insuranceFee)}
+              {formatCurrency(serviceFee)}
             </Text>
           </View>
-        )}
-
-        <View style={styles.additionalFee}>
-          <View style={styles.rowCenter}>
-            <Text style={styles.additionalFeeTitle}>Biaya Jasa Aplikasi</Text>
-            <Info size={14} color="#888" style={styles.iconMargin} />
-          </View>
-          <Text style={styles.additionalFeeValue}>
-            {formatCurrency(serviceFee)}
-          </Text>
-        </View>
+        </TouchableOpacity>
       </ScrollView>
 
       {/* Footer */}
@@ -111,6 +118,20 @@ export default function TransactionSummary() {
         />
       </View>
     </View>
+
+    <InfoModal
+      title={"Asuransi BNI Life"}
+      desc={"Perlindungan kehilangan/kerusakan barang saat pengiriman. Biaya 0.2% dari nominal transaksi."}
+      modalVisible={infoInsuranceVisible}
+      setModalVisible={setInfoInsuranceVisible}
+    />
+    <InfoModal
+      title={"Biaya Jasa Aplikasi"}
+      desc={"Biaya layanan untuk penggunaan fitur Rekber, mencakup pengelolaan transaksi dan dukungan operasional platform."}
+      modalVisible={infoServiceFeeVisible}
+      setModalVisible={setInfoServiceFeeVisible}
+    />
+  </>
   );
 }
 
@@ -196,7 +217,7 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     color: "#374151",
   },
-  footerTotal: { 
+  footerTotal: {
     fontSize: 16,
     fontWeight: "700",
     color: "#111827",

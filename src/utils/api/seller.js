@@ -25,7 +25,6 @@ export const getSellerTransactions = async (offset, limit) => {
         return QueryString.stringify(params, { arrayFormat: "repeat" });
       },
     });
-    // console.log(res);
     if (res) {
       return res;
     }
@@ -106,7 +105,6 @@ export const postResi = async (id, courier_id, tracking_number, photo) => {
       return res;
     }
   } catch (error) {
-    // console.log(error);
     throw error;
   }
 };
@@ -140,7 +138,6 @@ export const postFundRelease = async (id, evidence, reason) => {
       return res;
     }
   } catch (error) {
-    // console.log("Error posting fund release:", error);
     throw error;
   }
 };
