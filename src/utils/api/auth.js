@@ -156,3 +156,14 @@ export const changeEmail = async (email) => {
     throw error;
   }
 };
+
+export const logout = async () => {
+  try {
+    const res = await Api.post(`/user/logout`);
+    if (res) {
+      return res;
+    }
+  } catch (error) {
+    throw error;
+  }
+};
