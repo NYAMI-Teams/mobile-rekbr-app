@@ -111,7 +111,9 @@ export default function ChangePasswordScreen() {
                 placeholder="Masukkan kata sandi baru kamu"
                 value={kataSandiBaru}
                 onChangeText={(text) => {
-                  setKataSandiBaru(text.replace(/\s/g, ""));
+                  // Hanya izinkan karakter ASCII 32-126 (tanpa spasi)
+                  const filtered = text.replace(/[^ -~]/g, "").replace(/\s/g, "");
+                  setKataSandiBaru(filtered);
                 }}
                 isPassword={true}
               />
@@ -125,7 +127,9 @@ export default function ChangePasswordScreen() {
                 placeholder="Pastikan sama, ya!"
                 value={konfirmasiKataSandiBaru}
                 onChangeText={(text) => {
-                  setKonfirmasiKataSandiBaru(text.replace(/\s/g, ""));
+                  // Hanya izinkan karakter ASCII 32-126 (tanpa spasi)
+                  const filtered = text.replace(/[^ -~]/g, "").replace(/\s/g, "");
+                  setKonfirmasiKataSandiBaru(filtered);
                 }}
                 isPassword={true}
               />

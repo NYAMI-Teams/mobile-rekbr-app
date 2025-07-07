@@ -1,61 +1,88 @@
-import React from "react";
-import { View, Text, StyleSheet } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons"; // ganti di sini
+import React, { Fragment, useEffect, useRef } from "react";
+import { View, Text, StyleSheet, Animated } from "react-native";
+import { MaterialIcons } from "@expo/vector-icons";
 
-const StepProgressBar = ({ currentStep, steps }) => {
+const StepProgressBar = ({ currentStep, steps, buttonSimulatePress = false }) => {
+
+
     return (
         <View style={styles.container}>
             {steps.map((label, index) => {
                 const isCompleted = index < currentStep;
                 const isActive = index === currentStep;
                 const isFinalStep = isActive && currentStep === steps.length - 1;
+                const progress = useRef(new Animated.Value(0)).current;
+
+                useEffect(() => {
+                    if (buttonSimulatePress) {
+                        Animated.timing(progress, {
+                            toValue: 1,
+                            duration: 1000, // durasi animasi
+                            useNativeDriver: false,
+                        }).start();
+                    }
+                }, [buttonSimulatePress]);
+
+                const LINE_WIDTH = 250;
+
+                const animatedWidth = progress.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [0, LINE_WIDTH],
+                });
+
+                const animatedDotLeft = progress.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [0, LINE_WIDTH - 8], // 8 = diameter dot
+                });
 
                 return (
-                    <React.Fragment key={index}>
-                        <View style={styles.stepContainer}>
-                            <View
-                                style={[
-                                    styles.circle,
-                                    isCompleted && styles.completedCircle,
-                                    isActive && !isFinalStep && styles.activeCircle,
-                                    isFinalStep && styles.finalCircle,
-                                ]}
-                            >
-                                {isCompleted || isFinalStep ? (
-                                    <MaterialIcons
-                                        name="check"
-                                        size={16}
-                                        color={isFinalStep ? "#4CD964" : "#4CD7D0"}
-                                    />
-                                ) : isActive && (
-                                    <View
-                                        style={[
-                                            styles.dot,
-                                            isFinalStep && { backgroundColor: "#4CD964" },
-                                        ]}
-                                    />
-                                )}
+                    <Fragment key={index}>
+                        <Fragment>
+                            <View style={styles.stepContainer}>
+                                <View
+                                    style={[
+                                        styles.circle,
+                                        isCompleted && styles.completedCircle,
+                                        isActive && !isFinalStep && styles.activeCircle,
+                                        isFinalStep && styles.finalCircle,
+                                    ]}
+                                >
+                                    {isCompleted || isFinalStep ? (
+                                        <MaterialIcons
+                                            name="check"
+                                            size={16}
+                                            color={isFinalStep ? "#4CD964" : "#4CD7D0"}
+                                        />
+                                    ) : isActive && (
+                                        <View
+                                            style={[
+                                                styles.dot,
+                                                isFinalStep && { backgroundColor: "#4CD964" },
+                                            ]}
+                                        />
+                                    )}
+                                </View>
+                                <Text
+                                    style={[
+                                        styles.label,
+                                        isCompleted && styles.completedLabel,
+                                        isActive && !isFinalStep && styles.activeLabel,
+                                        isFinalStep && styles.finalLabel,
+                                    ]}
+                                >
+                                    {label}
+                                </Text>
                             </View>
-                            <Text
-                                style={[
-                                    styles.label,
-                                    isCompleted && styles.completedLabel,
-                                    isActive && !isFinalStep && styles.activeLabel,
-                                    isFinalStep && styles.finalLabel,
-                                ]}
-                            >
-                                {label}
-                            </Text>
-                        </View>
-                        {index !== steps.length - 1 && (
-                            <View
-                                style={[
-                                    styles.line,
-                                    index < currentStep && styles.completedLine,
-                                ]}
-                            />
+                        </Fragment >
+                        {index < steps?.length - 1 && (
+                            <View style={[styles.lineWrapper, { width: LINE_WIDTH }]}>
+                                <View style={styles.lineBase} />
+                                <Animated.View style={[styles.completedLine, { width: animatedWidth }]}>
+                                    <Animated.View style={[styles.animatedDot, { left: animatedDotLeft }]} />
+                                </Animated.View>
+                            </View>
                         )}
-                    </React.Fragment>
+                    </Fragment>
                 );
             })}
         </View>
@@ -64,12 +91,12 @@ const StepProgressBar = ({ currentStep, steps }) => {
 
 const styles = StyleSheet.create({
     container: {
+        width: "100%",
+        flex: 1,
         flexDirection: "row",
-        alignItems: "start",
-        paddingHorizontal: 10,
-        marginVertical: 20,
+        justifyContent: "center",
+        marginTop: 20,
         marginBottom: 16,
-        marginHorizontal: 16,
     },
     stepContainer: {
         alignItems: "center",
@@ -115,9 +142,6 @@ const styles = StyleSheet.create({
         marginHorizontal: -20,
         zIndex: 0
     },
-    completedLine: {
-        backgroundColor: "#4CD7D0",
-    },
     label: {
         marginTop: 6,
         fontSize: 12,
@@ -134,6 +158,37 @@ const styles = StyleSheet.create({
     finalLabel: {
         color: "#4CD964",
         fontWeight: "600",
+    },
+    lineWrapper: {
+        // flex: 1,
+        height: 3,
+        backgroundColor: "#000",
+        marginTop: 12,
+        marginHorizontal: -25,
+        zIndex: 0,
+        // overflow: "hidden",
+    },
+    lineBase: {
+        ...StyleSheet.absoluteFillObject,
+        backgroundColor: "#ccc",
+    },
+    completedLine: {
+        ...StyleSheet.absoluteFillObject,
+        backgroundColor: "#4CD7D0",
+        width: "0%",
+    },
+    animatedDot: {
+        position: "absolute",
+        top: -3, // agar dot sejajar dengan garis
+        width: 8,
+        height: 8,
+        borderRadius: 4,
+        backgroundColor: "#4CD7D0",
+        shadowColor: "#4CD7D0",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.6,
+        shadowRadius: 3,
+        elevation: 4,
     },
 });
 

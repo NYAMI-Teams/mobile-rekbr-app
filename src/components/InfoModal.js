@@ -30,7 +30,7 @@ export default function InfoModal({ title, desc, modalVisible, setModalVisible=(
                 </TouchableOpacity>
               </View>
               {/* content */}
-              <View>
+              <View style={{ marginTop: 8 }}>
                 <Text style={styles.descText}>{desc}</Text>
               </View>
             </View>

@@ -19,6 +19,7 @@ import { useRouter } from "expo-router";
 import { register } from "../../utils/api/auth";
 import { showToast } from "../../utils";
 import CryptoJS from "crypto-js";
+import LoadingModal from "@/components/LoadingModal";
 
 export default function Register() {
   const router = useRouter();
@@ -40,7 +41,11 @@ export default function Register() {
   }, []);
 
   const isEmailValid = () => {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    return (
+      typeof email === "string" &&
+      email.length > 5 &&
+      /^[a-zA-Z0-9][a-zA-Z0-9._%+-]*@[a-zA-Z0-9][a-zA-Z0-9.-]*\.[a-zA-Z]{2,}$/.test(email.trim())
+    );
   };
 
   const isPasswordValid = () => {
@@ -83,168 +88,179 @@ export default function Register() {
   };
 
   return (
-    <View style={styles.container}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        keyboardVerticalOffset={Platform.OS === "ios" ? 60 : 0}
-        style={{ flex: 1, width: "100%" }}>
-        <ScrollView
-          contentContainerStyle={{ flexGrow: 1 }}
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}>
-          <View style={styles.headerContainer}>
-            <Image
-              source={require("../../assets/header.png")}
-              style={styles.headerImage}
-              resizeMode="cover"
-            />
-          </View>
-
-          <View style={styles.formWrapper}>
-            {/* Email */}
-            <View style={styles.marginBottom}>
-              <InputField
-                title="Email Kamu, Yuk!"
-                placeholder="email@kamu.com"
-                value={email}
-                onChangeText={setEmail}
-                keyboardType="email-address"
-              />
-              {/* Alert Validasi Email */}
-              {email.length > 0 && (
-                <View style={styles.validationRow}>
-                  <Feather
-                    name={isEmailValid() ? "check-circle" : "x-circle"}
-                    size={18}
-                    color={isEmailValid() ? "#4ade80" : "#f87171"}
-                  />
-                  <Text
-                    style={[
-                      styles.validationText,
-                      { color: isEmailValid() ? "#16a34a" : "#f87171" },
-                    ]}>
-                    {isEmailValid() ? "Email valid" : "Email tidak valid"}
-                  </Text>
-                </View>
-              )}
-            </View>
-
-            {/* Password */}
-            <View style={styles.inputRelative}>
-              <InputField
-                title="Kata Sandi Rekbr"
-                placeholder="Masukkan kata sandi kamu"
-                value={password}
-                onChangeText={(text) => {
-                  setPassword(text.replace(/\s/g, ""));
-                }}
-                isPassword={true}
-              />
-              <PasswordChecklist password={password} />
-            </View>
-
-            {/* Confirm Password */}
-            <View style={styles.inputRelative}>
-              <InputField
-                title="Konfirmasi Kata Sandi Rekbr Kamu"
-                placeholder="Pastikan sama, ya!"
-                value={confirmPassword}
-                onChangeText={(text) => {
-                  setConfirmPassword(text.replace(/\s/g, ""));
-                }}
-                isPassword={true}
-              />
-              {/* Alert Validasi */}
-              {confirmPassword.length > 0 && (
-                <View style={styles.validationRow}>
-                  <Feather
-                    name={
-                      confirmPassword === password ? "check-circle" : "x-circle"
-                    }
-                    size={18}
-                    color={confirmPassword === password ? "#4ade80" : "#f87171"}
-                  />
-                  <Text
-                    style={[
-                      styles.validationText,
-                      {
-                        color:
-                          confirmPassword === password ? "#16a34a" : "#f87171",
-                      },
-                    ]}>
-                    {confirmPassword === password
-                      ? "Kata sandi sesuai"
-                      : "Kata sandi tidak sesuai"}
-                  </Text>
-                </View>
-              )}
-            </View>
-
-            {/* Checkbox TnC */}
-            <View style={styles.checkboxRow}>
-              <TouchableOpacity
-                onPress={() => setIsChecked(!isChecked)}
-                style={[
-                  styles.checkboxBox,
-                  isChecked
-                    ? { backgroundColor: "#3ED6C5", borderColor: "#3ED6C5" }
-                    : { borderColor: "#9CA3AF" },
-                ]}>
-                {isChecked && <Text style={styles.checkboxText}>✓</Text>}
-              </TouchableOpacity>
-              <Text style={styles.termsText}>
-                Saya menyetujui Kebijakan Privasi yang berlaku
-              </Text>
-            </View>
-          </View>
-
-          <View style={styles.buttonWrapper}>
-            <PrimaryButton
-              title="Daftar"
-              onPress={handleRegister}
-              disabled={!isFormValid() || isLoading}
-            />
-          </View>
-
-          {/* Footer */}
-          <View style={styles.footer}>
-            <View style={styles.footerGradient}>
+    <>
+      <View style={styles.container}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          keyboardVerticalOffset={Platform.OS === "ios" ? 60 : 0}
+          style={{ flex: 1, width: "100%" }}>
+          <ScrollView
+            contentContainerStyle={{ flexGrow: 1 }}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}>
+            <View style={styles.headerContainer}>
               <Image
-                source={require("../../assets/gradasi.png")}
-                style={styles.footerImage}
+                source={require("../../assets/header.png")}
+                style={styles.headerImage}
                 resizeMode="cover"
               />
             </View>
 
-            <View style={styles.linkWrapper}>
-              <View style={styles.linkRow}>
-                <Text style={styles.linkLabel}>Sudah punya akun?</Text>
-                <TouchableOpacity onPress={() => router.replace("/auth/login")}>
-                  <Text style={styles.linkAction}>Silakan Login</Text>
-                </TouchableOpacity>
+            <View style={styles.formWrapper}>
+              {/* Email */}
+              <View style={styles.marginBottom}>
+                <InputField
+                  title="Email Kamu, Yuk!"
+                  placeholder="email@kamu.com"
+                  value={email}
+                  onChangeText={(text) => {
+                    // Hanya izinkan karakter ASCII 32-126 (tanpa spasi)
+                    const filtered = text.replace(/[^ -~]/g, "").replace(/\s/g, "");
+                    setEmail(filtered);
+                  }}
+                  keyboardType="email-address"
+                />
+                {/* Alert Validasi Email */}
+                {email.length > 0 && (
+                  <View style={styles.validationRow}>
+                    <Feather
+                      name={isEmailValid() ? "check-circle" : "x-circle"}
+                      size={18}
+                      color={isEmailValid() ? "#4ade80" : "#f87171"}
+                    />
+                    <Text
+                      style={[
+                        styles.validationText,
+                        { color: isEmailValid() ? "#16a34a" : "#f87171" },
+                      ]}>
+                      {isEmailValid() ? "Email valid" : "Email tidak valid"}
+                    </Text>
+                  </View>
+                )}
               </View>
-              <View style={styles.linkRow}>
-                <Text style={styles.linkLabel}>Terdapat kendala?</Text>
+
+              {/* Password */}
+              <View style={styles.inputRelative}>
+                <InputField
+                  title="Kata Sandi Rekbr"
+                  placeholder="Masukkan kata sandi kamu"
+                  value={password}
+                  onChangeText={(text) => {
+                    // Hanya izinkan karakter ASCII 32-126 (tanpa spasi)
+                    const filtered = text.replace(/[^ -~]/g, "").replace(/\s/g, "");
+                    setPassword(filtered);
+                  }}
+                  isPassword={true}
+                />
+                <PasswordChecklist password={password} />
+              </View>
+
+              {/* Confirm Password */}
+              <View style={styles.inputRelative}>
+                <InputField
+                  title="Konfirmasi Kata Sandi Rekbr Kamu"
+                  placeholder="Pastikan sama, ya!"
+                  value={confirmPassword}
+                  onChangeText={(text) => {
+                    // Hanya izinkan karakter ASCII 32-126 (tanpa spasi)
+                    const filtered = text.replace(/[^ -~]/g, "").replace(/\s/g, "");
+                    setConfirmPassword(filtered);
+                  }}
+                  isPassword={true}
+                />
+                {/* Alert Validasi */}
+                {confirmPassword.length > 0 && (
+                  <View style={styles.validationRow}>
+                    <Feather
+                      name={
+                        confirmPassword === password ? "check-circle" : "x-circle"
+                      }
+                      size={18}
+                      color={confirmPassword === password ? "#4ade80" : "#f87171"}
+                    />
+                    <Text
+                      style={[
+                        styles.validationText,
+                        {
+                          color:
+                            confirmPassword === password ? "#16a34a" : "#f87171",
+                        },
+                      ]}>
+                      {confirmPassword === password
+                        ? "Kata sandi sesuai"
+                        : "Kata sandi tidak sesuai"}
+                    </Text>
+                  </View>
+                )}
+              </View>
+
+              {/* Checkbox TnC */}
+              <View style={styles.checkboxRow}>
                 <TouchableOpacity
-                  onPress={() => Alert.alert("Berhasil terhubung")}>
-                  <Text style={styles.linkAction}>Silakan Hubungi Kami</Text>
+                  onPress={() => setIsChecked(!isChecked)}
+                  style={[
+                    styles.checkboxBox,
+                    isChecked
+                      ? { backgroundColor: "#3ED6C5", borderColor: "#3ED6C5" }
+                      : { borderColor: "#9CA3AF" },
+                  ]}>
+                  {isChecked && <Text style={styles.checkboxText}>✓</Text>}
                 </TouchableOpacity>
+                <Text style={styles.termsText}>
+                  Saya menyetujui Kebijakan Privasi yang berlaku
+                </Text>
               </View>
             </View>
 
-            <View style={styles.poweredByRow}>
-              <Text style={styles.poweredByText}>Powered by</Text>
-              <Image
-                source={require("../../assets/326.png")}
-                style={styles.logoIcon}
-                resizeMode="contain"
+            <View style={styles.buttonWrapper}>
+              <PrimaryButton
+                title="Daftar"
+                onPress={handleRegister}
+                disabled={!isFormValid() || isLoading}
               />
-              <Text style={styles.poweredByBrand}>ADHIKSHA TRIBIXA</Text>
             </View>
-          </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </View>
+
+            {/* Footer */}
+            <View style={styles.footer}>
+              <View style={styles.footerGradient}>
+                <Image
+                  source={require("../../assets/gradasi.png")}
+                  style={styles.footerImage}
+                  resizeMode="cover"
+                />
+              </View>
+
+              <View style={styles.linkWrapper}>
+                <View style={styles.linkRow}>
+                  <Text style={styles.linkLabel}>Sudah punya akun?</Text>
+                  <TouchableOpacity onPress={() => router.replace("/auth/login")}>
+                    <Text style={styles.linkAction}>Silakan Login</Text>
+                  </TouchableOpacity>
+                </View>
+                <View style={styles.linkRow}>
+                  <Text style={styles.linkLabel}>Terdapat kendala?</Text>
+                  <TouchableOpacity
+                    onPress={() => Alert.alert("Berhasil terhubung")}>
+                    <Text style={styles.linkAction}>Silakan Hubungi Kami</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              <View style={styles.poweredByRow}>
+                <Text style={styles.poweredByText}>Powered by</Text>
+                <Image
+                  source={require("../../assets/326.png")}
+                  style={styles.logoIcon}
+                  resizeMode="contain"
+                />
+                <Text style={styles.poweredByBrand}>ADHIKSHA TRIBIXA</Text>
+              </View>
+            </View>
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </View>
+      <LoadingModal visible={isLoading} />
+    </>
   );
 }
 

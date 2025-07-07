@@ -26,10 +26,19 @@ export default function TransactionSummary() {
   useEffect(() => {
     const price = Number(payload?.itemPrice) || 0;
     const _insuranceFee = payload?.isInsurance ? price * 0.002 : 0;
-    const _serviceFee = price * 0.008;
-    setInsuranceFee(_insuranceFee);
-    setServiceFee(_serviceFee);
-    setTotalAmount(price + _serviceFee + _insuranceFee);
+
+    let _serviceFee = 0;
+    if (price >= 10000 && price <= 499999) {
+      _serviceFee = 5000;
+    } else if (price >= 500000 && price <= 4999999) {
+      _serviceFee = price * 0.01;
+    } else if (price >= 5000000 && price <= 10000000) {
+      _serviceFee = price * 0.008;
+    }
+
+    setInsuranceFee(parseInt(_insuranceFee));
+    setServiceFee(parseInt(_serviceFee));
+    setTotalAmount(parseInt(price) + parseInt(_serviceFee) + parseInt(_insuranceFee));
   }, [payload]);
 
   const handleCreateTransaction = async () => {

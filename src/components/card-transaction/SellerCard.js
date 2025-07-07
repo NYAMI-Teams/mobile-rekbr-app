@@ -14,13 +14,15 @@ import CountdownTimer from "../Countdown";
 import { useRouter } from "expo-router";
 import { showToast } from "../../utils";
 
-const SellerCard = ({ data }) => {
+const SellerCard = ({ data, disabled = false, onPress = () => { } }) => {
   const status = data?.status || "";
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
 
   const formatDateWIB = (dateTime) => {
-    if (!dateTime) return "Invalid date";
+    // Pastikan dateTime valid ISO/RFC2822, dan bukan "-", null, atau string kosong
+    if (!dateTime || dateTime === "-" || !moment(dateTime, moment.ISO_8601, true).isValid()) {
+      return "-";
+    }
     return moment(dateTime).utcOffset(7).format("DD MMMM YYYY, HH:mm [WIB]");
   };
 
@@ -209,17 +211,8 @@ const SellerCard = ({ data }) => {
 
   return (
     <TouchableOpacity
-      onPress={async () => {
-        setIsLoading(true);
-        router.push({
-          pathname: `/DetailTransaksi/Seller`,
-          params: { id: data?.id || "" },
-        });
-        setTimeout(() => {
-          setIsLoading(false);
-        }, 1500);
-      }}
-      disabled={isLoading}>
+      onPress={onPress}
+      disabled={disabled}>
       <View style={styles.cardWrapper}>
         <View style={styles.cardContent}>
           {renderRows().map((row, index) => (
@@ -271,12 +264,12 @@ const SellerCard = ({ data }) => {
                 {data?.fundReleaseRequest?.status === null
                   ? "Cek no resi berkala, kalau pembeli nggak konfirmasi, minta konfirmasi pembeli lewat admin."
                   : data?.fundReleaseRequest?.status === "pending"
-                  ? "Tunggu approval kami, ya! Kalau bukti kamu oke, permintaan konfirmasi bakal langsung dikirim ke pembeli!"
-                  : data?.fundReleaseRequest?.status === "rejected"
-                  ? "Permintaan konfirmasi ke pembeli ditolak. Pastikan data atau bukti yang kamu kirim sudah lengkap dan sesuai."
-                  : data?.fundReleaseRequest?.status === "approved"
-                  ? "Konfirmasi udah dikirim ke pembeli! Sekarang tinggal tunggu respon mereka dalam 1 x 24 jam."
-                  : "-"}
+                    ? "Tunggu approval kami, ya! Kalau bukti kamu oke, permintaan konfirmasi bakal langsung dikirim ke pembeli!"
+                    : data?.fundReleaseRequest?.status === "rejected"
+                      ? "Permintaan konfirmasi ke pembeli ditolak. Pastikan data atau bukti yang kamu kirim sudah lengkap dan sesuai."
+                      : data?.fundReleaseRequest?.status === "approved"
+                        ? "Konfirmasi udah dikirim ke pembeli! Sekarang tinggal tunggu respon mereka dalam 1 x 24 jam."
+                        : "-"}
               </Text>
             </View>
           )}
@@ -289,8 +282,8 @@ const SellerCard = ({ data }) => {
                   status === "completed"
                     ? { backgroundColor: "#4ade80" }
                     : status === "canceled" || status === "refunded"
-                    ? { backgroundColor: "#f87171" }
-                    : { backgroundColor: "#facc15" },
+                      ? { backgroundColor: "#f87171" }
+                      : { backgroundColor: "#facc15" },
                 ]}
               />
               <Text style={styles.statusText}>{renderStatus()}</Text>

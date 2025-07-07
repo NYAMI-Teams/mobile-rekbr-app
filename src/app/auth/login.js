@@ -22,6 +22,7 @@ import {
 } from "../../store";
 import { registerForPushNotificationsAsync } from "@/utils/notifications";
 import CryptoJS from "crypto-js";
+import LoadingModal from "@/components/LoadingModal";
 
 export default function Login() {
   const router = useRouter();
@@ -40,8 +41,8 @@ export default function Login() {
         await savePushToken(pushToken);
       }
     } catch (err) {
-      console.warn("Gagal simpan push token:", err?.message);
       setIsLoading(false);
+      throw new Error("Gagal mendapatkan token notifikasi: " + err.message);
     }
   };
 
@@ -49,20 +50,14 @@ export default function Login() {
     setError(false);
     if (!email.trim() || !password.trim()) {
       setErrorMsg("Silahkan masukkan email dan password.");
+      setIsLoading(false);
       return;
     }
-    setIsLoading(true);
-
     try {
       // Hash the password using SHA-256
       const hashedPassword = CryptoJS.SHA256(password).toString();
 
       const res = await login(email, hashedPassword);
-      showToast(
-        "Login Berhasil",
-        "Selamat datang kembali, " + email + "!",
-        "success"
-      );
       await setAccessToken(res?.data?.accessToken);
       await handlePushToken();
       await getUserProfile();
@@ -84,6 +79,11 @@ export default function Login() {
     try {
       const res = await getProfile();
       await setProfileStore(res?.data);
+      showToast(
+        "Login Berhasil",
+        "Selamat datang kembali, " + email + "!",
+        "success"
+      );
       router.replace("/");
     } catch (error) {
       showToast("Gagal", error?.message, "error");
@@ -93,112 +93,126 @@ export default function Login() {
   };
 
   return (
-    <View style={styles.container}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        keyboardVerticalOffset={Platform.OS === "ios" ? 60 : 0}
-        style={{ flex: 1, width: "100%" }}>
-        <ScrollView
-          contentContainerStyle={{ flexGrow: 1 }}
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}>
-          <View style={{ flex: 1 }}>
-            {/* Header */}
-            <View style={styles.headerContainer}>
-              <Image
-                source={require("../../assets/header.png")}
-                style={styles.headerImage}
-                resizeMode="cover"
-              />
-            </View>
-
-            {/* Form */}
-            <View style={styles.formContainer}>
-              {/* Email */}
-              <View>
-                <InputField
-                  title="Email Kamu, Yuk!"
-                  placeholder="email@kamu.com"
-                  value={email}
-                  onChangeText={setEmail}
-                  keyboardType="email-address"
-                />
-              </View>
-
-              {/* Password */}
-              <View>
-                <View style={styles.passwordFieldWrapper}>
-                  <InputField
-                    title="Kata Sandi Rekbr"
-                    placeholder="Masukkan kata sandi kamu"
-                    value={password}
-                    onChangeText={(text) => {
-                      setPassword(text.replace(/\s/g, ""));
-                    }}
-                    isPassword={true}
-                  />
-                </View>
-
-                <TouchableOpacity
-                  style={styles.forgotPassword}
-                  onPress={() => router.push("/auth/LupaPassword")}>
-                  <Text style={styles.linkText}>Lupa Kata Sandi?</Text>
-                </TouchableOpacity>
-
-                {error && <Text style={styles.errorText}>{errorMsg}</Text>}
-              </View>
-            </View>
-
-            {/* Button & Links */}
-            <View style={styles.footerContainer}>
-              <View style={styles.gradientBackground}>
+    <>
+      <View style={styles.container}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          keyboardVerticalOffset={Platform.OS === "ios" ? 60 : 0}
+          style={{ flex: 1, width: "100%" }}>
+          <ScrollView
+            contentContainerStyle={{ flexGrow: 1 }}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}>
+            <View style={{ flex: 1 }}>
+              {/* Header */}
+              <View style={styles.headerContainer}>
                 <Image
-                  source={require("../../assets/gradasi.png")}
-                  style={styles.gradientImage}
+                  source={require("../../assets/header.png")}
+                  style={styles.headerImage}
                   resizeMode="cover"
                 />
               </View>
-              <View style={styles.buttonWrapper}>
-                <PrimaryButton
-                  title="Masuk"
-                  onPress={handleLogin}
-                  disabled={isLoading || !email || !password}
-                />
+
+              {/* Form */}
+              <View style={styles.formContainer}>
+                {/* Email */}
+                <View>
+                  <InputField
+                    title="Email Kamu, Yuk!"
+                    placeholder="email@kamu.com"
+                    value={email}
+                    onChangeText={(text) => {
+                      // Hanya izinkan karakter ASCII 32-126 (tanpa spasi)
+                      const filtered = text.replace(/[^ -~]/g, "").replace(/\s/g, "");
+                      setEmail(filtered);
+                    }}
+                    keyboardType="email-address"
+                  />
+                </View>
+
+                {/* Password */}
+                <View>
+                  <View style={styles.passwordFieldWrapper}>
+                    <InputField
+                      title="Kata Sandi Rekbr"
+                      placeholder="Masukkan kata sandi kamu"
+                      value={password}
+                      onChangeText={(text) => {
+                        // Hanya izinkan karakter ASCII 32-126 (tanpa spasi)
+                        const filtered = text.replace(/[^ -~]/g, "").replace(/\s/g, "");
+                        setPassword(filtered);
+                      }}
+                      isPassword={true}
+                    />
+                  </View>
+
+                  <TouchableOpacity
+                    style={styles.forgotPassword}
+                    onPress={() => router.push("/auth/LupaPassword")}>
+                    <Text style={styles.linkText}>Lupa Kata Sandi?</Text>
+                  </TouchableOpacity>
+
+                  {error && <Text style={styles.errorText}>{errorMsg}</Text>}
+                </View>
               </View>
 
-              {/* Registrasi / Hubungi Kami */}
-              <View style={styles.linkSection}>
-                <View style={styles.linkRow}>
-                  <Text style={styles.linkLabel}>Belum punya akun?</Text>
-                  <TouchableOpacity
-                    onPress={() => router.replace("/auth/register")}>
-                    <Text style={styles.linkAction}>Silakan Registrasi</Text>
-                  </TouchableOpacity>
+              {/* Button & Links */}
+              <View style={styles.footerContainer}>
+                <View style={styles.gradientBackground}>
+                  <Image
+                    source={require("../../assets/gradasi.png")}
+                    style={styles.gradientImage}
+                    resizeMode="cover"
+                  />
                 </View>
-                <View style={styles.linkRow}>
-                  <Text style={styles.linkLabel}>Terdapat kendala?</Text>
-                  <TouchableOpacity
-                    onPress={() => Alert.alert("Berhasil terhubung")}>
-                    <Text style={styles.linkAction}>Silakan Hubungi Kami</Text>
-                  </TouchableOpacity>
+                <View style={styles.buttonWrapper}>
+                  <PrimaryButton
+                    title="Masuk"
+                    onPress={() => {
+                      setIsLoading(true);
+                      handleLogin()
+                    }}
+                    disabled={isLoading || !email || !password}
+                  />
                 </View>
-              </View>
 
-              {/* Powered by */}
-              <View style={styles.poweredByRow}>
-                <Text style={styles.poweredByText}>Powered by</Text>
-                <Image
-                  source={require("../../assets/326.png")}
-                  style={styles.logoIcon}
-                  resizeMode="contain"
-                />
-                <Text style={styles.poweredByBrand}>ADHIKSHA TRIBIXA</Text>
+                {/* Registrasi / Hubungi Kami */}
+                <View style={styles.linkSection}>
+                  <View style={styles.linkRow}>
+                    <Text style={styles.linkLabel}>Belum punya akun?</Text>
+                    <TouchableOpacity
+                      onPress={() => router.replace("/auth/register")}
+                      disabled={isLoading}
+                    >
+                      <Text style={styles.linkAction}>Silakan Registrasi</Text>
+                    </TouchableOpacity>
+                  </View>
+                  <View style={styles.linkRow}>
+                    <Text style={styles.linkLabel}>Terdapat kendala?</Text>
+                    <TouchableOpacity
+                      onPress={() => Alert.alert("Berhasil terhubung")}>
+                      <Text style={styles.linkAction}>Silakan Hubungi Kami</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+
+                {/* Powered by */}
+                <View style={styles.poweredByRow}>
+                  <Text style={styles.poweredByText}>Powered by</Text>
+                  <Image
+                    source={require("../../assets/326.png")}
+                    style={styles.logoIcon}
+                    resizeMode="contain"
+                  />
+                  <Text style={styles.poweredByBrand}>ADHIKSHA TRIBIXA</Text>
+                </View>
               </View>
             </View>
-          </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </View>
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </View>
+      <LoadingModal visible={isLoading} />
+    </>
   );
 }
 

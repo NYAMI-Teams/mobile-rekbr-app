@@ -24,6 +24,7 @@ import { showToast } from "../../utils";
 import { setAccessToken, setProfileStore } from "../../store";
 import { registerForPushNotificationsAsync } from "@/utils/notifications";
 import SmoothPinCodeInput from "@dreamwalk-os/react-native-smooth-pincode-input";
+import LoadingModal from "@/components/LoadingModal";
 
 export default function OTP() {
   const { email, isFromLogin, isFromResetPassword } = useLocalSearchParams();
@@ -52,6 +53,7 @@ export default function OTP() {
   };
 
   const handleResendCode = () => {
+    setIsLoading(true);
     setTimeLeft(299);
     inputRefs[0]?.focus();
     if (isFromLogin) {
@@ -90,6 +92,7 @@ export default function OTP() {
     } catch (err) {
       console.warn("Gagal simpan push token:", err?.message);
       setIsLoading(false);
+      throw new Error("Gagal mendapatkan token notifikasi: " + err.message);
     }
   };
 
@@ -106,7 +109,6 @@ export default function OTP() {
   };
 
   const submitOtp = async (otpValue) => {
-    
     setIsLoading(true);
     if (isFromLogin) {
       try {
@@ -143,90 +145,93 @@ export default function OTP() {
   };
 
   return (
-    <View style={styles.container}>
-      <GestureHandlerRootView>
-        <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : undefined}
-          style={styles.keyboardView}>
-          {/* Header */}
-          <View style={styles.header}>
-            <TouchableOpacity onPress={() => router.back()}>
-              <Icon name="chevron-back" size={24} color="#000" />
-            </TouchableOpacity>
-            <Text style={styles.headerTitle}>Verifikasi Email Kamu</Text>
-            <View style={{ width: 24 }} />
-          </View>
-
-          {/* OTP Card */}
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>
-              Masukkan kode yang kami kirimkan
-            </Text>
-
-            <View style={styles.subTextWrapper}>
-              <Text style={styles.subText}>
-                Sudah dikirim ke email kamu
-                <Text style={styles.emailText}> {email}</Text>
-              </Text>
+    <>
+      <View style={styles.container}>
+        <GestureHandlerRootView>
+          <KeyboardAvoidingView
+            behavior={Platform.OS === "ios" ? "padding" : undefined}
+            style={styles.keyboardView}>
+            {/* Header */}
+            <View style={styles.header}>
+              <TouchableOpacity onPress={() => router.back()}>
+                <Icon name="chevron-back" size={24} color="#000" />
+              </TouchableOpacity>
+              <Text style={styles.headerTitle}>Verifikasi Email Kamu</Text>
+              <View style={{ width: 24 }} />
             </View>
 
-            {/* OTP Input */}
-            <View style={styles.otpInputWrapper}>
-              <SmoothPinCodeInput
-                value={code}
-                codeLength={6}
-                onTextChange={setCode}
-                onFulfill={submitOtp}
-                containerStyle={{
-                  marginTop: 16,
-                }}
-                cellStyle={{
-                  borderWidth: 1,
-                  borderColor: isValid
-                    ? "#009688"
-                    : isError
-                    ? "#FF3B30"
-                    : "#ccc",
-                  borderRadius: 8,
-                  textAlign: "center",
-                  fontSize: 16,
-                  color: "#000",
-                }}
-                restrictToNumbers={true}
-              />
-              <Text
-                style={[
-                  styles.timerText,
-                  { color: timeLeft > 0 ? "#000" : "#EF4444" },
-                ]}>
-                {formatTime(timeLeft)}
+            {/* OTP Card */}
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}>
+                Masukkan kode yang kami kirimkan
               </Text>
-            </View>
 
-            {isError && <Text style={styles.errorMessage}>{errorMessage}</Text>}
+              <View style={styles.subTextWrapper}>
+                <Text style={styles.subText}>
+                  Sudah dikirim ke email kamu
+                  <Text style={styles.emailText}> {email}</Text>
+                </Text>
+              </View>
 
-            <View style={styles.resendWrapper}>
-              <Text style={styles.resendLabel}>Tidak menerima kode?</Text>
-              <TouchableOpacity
-                onPress={handleResendCode}
-                disabled={timeLeft > 0}>
+              {/* OTP Input */}
+              <View style={styles.otpInputWrapper}>
+                <SmoothPinCodeInput
+                  value={code}
+                  codeLength={6}
+                  onTextChange={setCode}
+                  onFulfill={submitOtp}
+                  containerStyle={{
+                    marginTop: 16,
+                  }}
+                  cellStyle={{
+                    borderWidth: 1,
+                    borderColor: isValid
+                      ? "#009688"
+                      : isError
+                        ? "#FF3B30"
+                        : "#ccc",
+                    borderRadius: 8,
+                    textAlign: "center",
+                    fontSize: 16,
+                    color: "#000",
+                  }}
+                  restrictToNumbers={true}
+                />
                 <Text
                   style={[
-                    styles.resendAction,
-                    { color: timeLeft > 0 ? "#9CA3AF" : "#3B82F6" },
+                    styles.timerText,
+                    { color: timeLeft > 0 ? "#000" : "#EF4444" },
                   ]}>
-                  Klik untuk kirim ulang
+                  {formatTime(timeLeft)}
                 </Text>
+              </View>
+
+              {isError && <Text style={styles.errorMessage}>{errorMessage}</Text>}
+
+              <View style={styles.resendWrapper}>
+                <Text style={styles.resendLabel}>Tidak menerima kode?</Text>
+                <TouchableOpacity
+                  onPress={handleResendCode}
+                  disabled={timeLeft > 0}>
+                  <Text
+                    style={[
+                      styles.resendAction,
+                      { color: timeLeft > 0 ? "#9CA3AF" : "#3B82F6" },
+                    ]}>
+                    Klik untuk kirim ulang
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
+              <TouchableOpacity onPress={() => router.back()}>
+                <Text style={styles.backText}>Salah alamat email?</Text>
               </TouchableOpacity>
             </View>
-
-            <TouchableOpacity onPress={() => router.back()}>
-              <Text style={styles.backText}>Salah alamat email?</Text>
-            </TouchableOpacity>
-          </View>
-        </KeyboardAvoidingView>
-      </GestureHandlerRootView>
-    </View>
+          </KeyboardAvoidingView>
+        </GestureHandlerRootView>
+      </View>
+      <LoadingModal visible={isLoading} />
+    </>
   );
 }
 

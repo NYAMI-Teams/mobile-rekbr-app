@@ -34,6 +34,7 @@ export default function Seller() {
   const [isFetching, setIsFetching] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [toDetailLoading, setToDetailLoading] = useState(false);
   const listRef = useRef();
 
   useEffect(() => {
@@ -144,7 +145,21 @@ export default function Seller() {
     }
   };
 
-  const renderItem = ({ item }) => <SellerCard data={item} />;
+  const renderItem = ({ item }) =>
+    <SellerCard
+      data={item}
+      disabled={toDetailLoading}
+      onPress={async () => {
+        setToDetailLoading(true);
+        router.push({
+          pathname: `/DetailTransaksi/Seller`,
+          params: { id: item?.id || "" },
+        });
+        setTimeout(() => {
+          setToDetailLoading(false);
+        }, 1500);
+      }}
+    />;
 
   const RenderEmpty = () => {
     if (isInitialLoading) {

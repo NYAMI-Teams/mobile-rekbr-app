@@ -6,6 +6,8 @@ import {
   TouchableOpacity,
   ScrollView,
   Alert,
+  RefreshControl,
+  ActivityIndicator,
 } from "react-native";
 import { useEffect, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
@@ -28,24 +30,30 @@ export default function DetailTransaksiSeller() {
   const [data, setData] = useState(null);
   const [isExpanded, setIsExpanded] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
+  const [isReafreashing, setIsRefreshing] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    const fetchTransactionDetails = async () => {
-      try {
-        const res = await getDetailSellerTransaction(id);
-        setData(res.data);
-        setStatus(res.data.status);
-      } catch (err) {
-        showToast(
-          "Gagal",
-          "Gagal mengambil data transaksi. Silahkan coba lagi.",
-          "error"
-        );
-      }
-    };
-
+    setIsLoading(true);
     fetchTransactionDetails();
   }, [id]);
+
+  const fetchTransactionDetails = async () => {
+    try {
+      const res = await getDetailSellerTransaction(id);
+      setData(res.data);
+      setStatus(res.data.status);
+    } catch (err) {
+      showToast(
+        "Gagal",
+        "Gagal mengambil data transaksi. Silahkan coba lagi.",
+        "error"
+      );
+    } finally {
+      setIsLoading(false);
+      setIsRefreshing(false);
+    }
+  };
 
   const handleCancelTransaksiSeller = async () => {
     try {
@@ -269,7 +277,7 @@ export default function DetailTransaksiSeller() {
           <View style={styles.footerRow}>
             <Text style={styles.footerTextGray}>Terdapat kendala?</Text>
             <TouchableOpacity
-              onPress={() => {}}>
+              onPress={() => { }}>
               <Text style={styles.footerTextBlue}>Silahkan Hubungi Kami</Text>
             </TouchableOpacity>
           </View>
@@ -303,7 +311,7 @@ export default function DetailTransaksiSeller() {
           <View style={styles.footerRow}>
             <Text style={styles.footerTextGray}>Terdapat kendala?</Text>
             <TouchableOpacity
-              onPress={() => {}}>
+              onPress={() => { }}>
               <Text style={styles.footerTextBlue}>Silahkan Hubungi Kami</Text>
             </TouchableOpacity>
           </View>
@@ -339,17 +347,6 @@ export default function DetailTransaksiSeller() {
     }
   };
 
-  const calculatePlatformFee = (itemPrice) => {
-    if (itemPrice >= 10000 && itemPrice <= 499999.99) {
-      return 5000;
-    } else if (itemPrice >= 500000 && itemPrice <= 4999999.99) {
-      return `1 %`;
-    } else if (itemPrice >= 5000000 && itemPrice <= 10000000) {
-      return `0.8 %`;
-    }
-    return 0;
-  };
-
   const setupStatusFundReleaseRequest = () => {
     if (data?.fundReleaseRequest?.status == "pending") {
       return "Permintaan Ditinjau";
@@ -358,6 +355,7 @@ export default function DetailTransaksiSeller() {
       return "Permintaan Ditolak";
     }
   };
+
 
   return (
     <View style={styles.container}>
@@ -385,239 +383,267 @@ export default function DetailTransaksiSeller() {
 
         return <ProgressBar currentStep={currentStep} steps={steps} />;
       })()}
-      <ScrollView>
-        {(status == "pending_payment" ||
-          (status == "waiting_shipment" &&
-            data?.shipment?.trackingNumber != null) ||
-          status == "shipped" ||
-          status == "completed") && (
-          <>
-            {/* Copas Field */}
-            <View
-              style={{
-                padding: 12,
-                marginHorizontal: 12,
-                backgroundColor: "#EDFBFA",
-                borderRadius: 12,
-              }}>
-              <Text
-                style={{ fontSize: 15, marginBottom: 12, fontWeight: "500" }}>
-                {status == "pending_payment" ? "Virtual Account" : "No Resi"}
-              </Text>
-              <View
-                style={[
-                  { flexDirection: "row", alignItems: "center" },
-                  (status === "waiting_shipment" ||
-                    status === "shipped" ||
-                    status === "completed") && { marginBottom: 12 }, // mb-3 = 12px
-                ]}>
-                <Text style={{ fontSize: 17, fontWeight: "500" }}>
-                  {status == "pending_payment"
-                    ? data?.virtualAccount || "-"
-                    : data?.shipment?.trackingNumber || "-"}
+
+      {isLoading ? (
+        <View style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          marginTop: 20
+        }}>
+          <ActivityIndicator size="large" color="#0000ff" />
+        </View>
+      ) : (
+        <>
+          <ScrollView
+            refreshControl={
+              <RefreshControl
+                refreshing={isReafreashing}
+                onRefresh={() => {
+                  setIsRefreshing(true);
+                  fetchTransactionDetails()
+                }}
+              />
+            }
+          >
+            {(status == "pending_payment" ||
+              (status == "waiting_shipment" &&
+                data?.shipment?.trackingNumber != null) ||
+              status == "shipped" ||
+              status == "completed") && (
+                <>
+                  {/* Copas Field */}
+                  <View
+                    style={{
+                      padding: 12,
+                      marginHorizontal: 12,
+                      backgroundColor: "#EDFBFA",
+                      borderRadius: 12,
+                    }}>
+                    <Text
+                      style={{ fontSize: 15, marginBottom: 12, fontWeight: "500" }}>
+                      {status == "pending_payment" ? "Virtual Account" : "No Resi"}
+                    </Text>
+                    <View
+                      style={[
+                        { flexDirection: "row", alignItems: "center" },
+                        (status === "waiting_shipment" ||
+                          status === "shipped" ||
+                          status === "completed") && { marginBottom: 12 }, // mb-3 = 12px
+                      ]}>
+                      <Text style={{ fontSize: 17, fontWeight: "500" }}>
+                        {status == "pending_payment"
+                          ? data?.virtualAccount || "-"
+                          : data?.shipment?.trackingNumber || "-"}
+                      </Text>
+                      <TouchableOpacity
+                        onPress={() =>
+                          handleCopy(
+                            status == "pending_payment"
+                              ? data?.virtualAccount || "-"
+                              : data?.shipment?.trackingNumber || "-"
+                          )
+                        }>
+                        <Image
+                          source={require("@/assets/copy.png")}
+                          style={{ marginLeft: 4, width: 17, height: 16 }}
+                        />
+                      </TouchableOpacity>
+                    </View>
+                    {status == "waiting_shipment" ||
+                      status == "shipped" ||
+                      (status == "completed" && (
+                        <Text
+                          style={{
+                            fontSize: 12,
+                            // marginBottom: 12,
+                            fontWeight: "400",
+                            color: "#616161",
+                          }}>
+                          {data?.shipment?.courier || "-"}
+                        </Text>
+                      ))}
+                  </View>
+                </>
+              )}
+
+            {/* Admin Message (done)*/}
+            {(data?.fundReleaseRequest?.status != null ||
+              status == "completed") && (
+                <>
+                  <View style={styles.adminMsgRow}>
+                    <Image
+                      source={require("@/assets/admin1.png")}
+                      style={styles.adminMsgImg}
+                    />
+                    <Text style={styles.adminMsgText}>
+                      {status == "completed"
+                        ? "Komplain dianggap tidak ada dan transaksi otomatis selesai setelah waktu tunggu."
+                        : data?.fundReleaseRequest?.status == "pending"
+                          ? "Tunggu approval kami, ya! Kalau bukti kamu oke, permintaan konfirmasi bakal langsung dikirim ke buyer!"
+                          : data?.fundReleaseRequest?.status == "approved"
+                            ? "Konfirmasi udah dikirim ke buyer! Sekarang tinggal tunggu respon mereka dalam 1 x 24 jam"
+                            : "Permintaan konfirmasi ke buyer ditolak. Pastikan data atau bukti yang kamu kirim sudah lengkap dan sesuai"}
+                    </Text>
+                  </View>
+                </>
+              )}
+
+            {/* Status Rekbr (done)*/}
+            {(data?.fundReleaseRequest?.status == "pending" ||
+              data?.fundReleaseRequest?.status == "rejected") ? (
+              <View style={styles.statusBox}>
+                <View style={styles.statusRow}>
+                  <Text style={styles.statusLabel}>Status Rekbr:</Text>
+                  <View style={styles.statusRowRight}>
+                    <Text style={styles.statusValue}>{setupStatus()}</Text>
+                    <TouchableOpacity onPress={() => setIsExpanded(!isExpanded)}>
+                      <Ionicons
+                        name={isExpanded ? "chevron-up" : "chevron-down"}
+                        size={20}
+                        color="black"
+                      />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+                {isExpanded && (
+                  <View style={styles.statusExpandedBox}>
+                    <Text style={styles.statusExpandedLabel}>
+                      Status Pengajuan:
+                    </Text>
+                    <Text
+                      style={[
+                        styles.statusExpandedValue,
+                        {
+                          color:
+                            data?.fundReleaseRequest?.status == "pending"
+                              ? "#FBBF24"
+                              : "#CB3A31",
+                        },
+                      ]}>
+                      {setupStatusFundReleaseRequest()}
+                    </Text>
+                  </View>
+                )}
+              </View>
+            ) : (
+              <View style={styles.statusRowSimple}>
+                <Text style={styles.statusLabel}>Status Rekbr:</Text>
+                <Text style={styles.statusValue}>{setupStatus()}</Text>
+              </View>
+            )}
+
+            {/* Timestamp */}
+            <View style={styles.sectionBox}>
+              <Timestamp
+                data={data}
+                caption={setupCaptionTimeStamp()}
+                date={setupDateTimestamp()}
+                details={setupDetailTimestamp()}
+              />
+            </View>
+
+            {/* Buyer Section */}
+            <View style={styles.sectionBox}>
+              <Text style={styles.sectionLabel}>Pembeli</Text>
+              <Text style={styles.sectionValue}>{data?.buyerEmail || "-"}</Text>
+            </View>
+
+            {/* Virtual Account Section */}
+            <View style={styles.sectionBox}>
+              <Text style={styles.sectionLabel}>Virtual Account</Text>
+              <View style={styles.rowAlignCenter}>
+                <Text style={styles.sectionValue}>
+                  {data?.virtualAccount || "-"}
                 </Text>
                 <TouchableOpacity
-                  onPress={() =>
-                    handleCopy(
-                      status == "pending_payment"
-                        ? data?.virtualAccount || "-"
-                        : data?.shipment?.trackingNumber || "-"
-                    )
-                  }>
+                  onPress={() => handleCopy(data?.virtualAccount || "-")}>
                   <Image
                     source={require("@/assets/copy.png")}
                     style={{ marginLeft: 4, width: 17, height: 16 }}
                   />
                 </TouchableOpacity>
               </View>
-              {status == "waiting_shipment" ||
-                status == "shipped" ||
-                (status == "completed" && (
-                  <Text
-                    style={{
-                      fontSize: 12,
-                      // marginBottom: 12,
-                      fontWeight: "400",
-                      color: "#616161",
-                    }}>
-                    {data?.shipment?.courier || "-"}
-                  </Text>
-                ))}
             </View>
-          </>
-        )}
 
-        {/* Admin Message (done)*/}
-        {(data?.fundReleaseRequest?.status != null ||
-          status == "completed") && (
-            <>
-              <View style={styles.adminMsgRow}>
+            {/* Items Name Section */}
+            <View style={styles.sectionBox}>
+              <Text style={styles.sectionLabel}>Nama Barang</Text>
+              <Text style={styles.sectionValue}>{data?.itemName || "-"}</Text>
+            </View>
+
+            {/* Items Price Section */}
+            <View style={styles.sectionBox}>
+              <Tagihan
+                caption="Harga Barang"
+                price={formatPrice(data?.totalAmount) || "-"}
+                details={[
+                  {
+                    status: "Nominal Barang",
+                    price: formatPrice(data?.itemPrice) || "-",
+                  },
+                  {
+                    status: "Asuransi Pengiriman BNI Life (0.2%)",
+                    price: formatPrice(data?.insuranceFee) || "-",
+                  },
+                  {
+                    status: `Biaya Jasa Aplikasi`,
+                    price: formatPrice(data?.platformFee) || "-",
+                  },
+                ]}
+              />
+            </View>
+
+            {/* Seller Bank Section */}
+            <View style={styles.sectionBox}>
+              <Text style={styles.sectionLabel}>Rekening Penjual</Text>
+              <View style={styles.sellerBankRow}>
                 <Image
-                  source={require("@/assets/admin1.png")}
-                  style={styles.adminMsgImg}
+                  source={{ uri: data?.rekeningSeller?.logoUrl || "-" }}
+                  style={styles.sellerBankLogo}
                 />
-                <Text style={styles.adminMsgText}>
-                  {status == "completed"
-                    ? "Komplain dianggap tidak ada dan transaksi otomatis selesai setelah waktu tunggu."
-                    : data?.fundReleaseRequest?.status == "pending"
-                    ? "Tunggu approval kami, ya! Kalau bukti kamu oke, permintaan konfirmasi bakal langsung dikirim ke buyer!"
-                    : data?.fundReleaseRequest?.status == "approved"
-                    ? "Konfirmasi udah dikirim ke buyer! Sekarang tinggal tunggu respon mereka dalam 1 x 24 jam"
-                    : "Permintaan konfirmasi ke buyer ditolak. Pastikan data atau bukti yang kamu kirim sudah lengkap dan sesuai"}
-                </Text>
+                <View style={styles.rowAlignCenter}>
+                  <Text style={styles.sectionValue}>
+                    {data?.rekeningSeller?.accountNumber || "-"}
+                  </Text>
+                  <TouchableOpacity
+                    onPress={() =>
+                      handleCopy(data?.rekeningSeller?.accountNumber || "-")
+                    }>
+                    <Image
+                      source={require("@/assets/copy.png")}
+                      style={{ marginLeft: 4, width: 17, height: 16 }}
+                    />
+                  </TouchableOpacity>
+                </View>
               </View>
-            </>
-          )}
+            </View>
 
-        {/* Status Rekbr (done)*/}
-        {(data?.fundReleaseRequest?.status == "pending" ||
-        data?.fundReleaseRequest?.status == "rejected") ? (
-          <View style={styles.statusBox}>
-            <View style={styles.statusRow}>
-              <Text style={styles.statusLabel}>Status Rekbr:</Text>
-              <View style={styles.statusRowRight}>
-                <Text style={styles.statusValue}>{setupStatus()}</Text>
-                <TouchableOpacity onPress={() => setIsExpanded(!isExpanded)}>
-                  <Ionicons
-                    name={isExpanded ? "chevron-up" : "chevron-down"}
-                    size={20}
-                    color="black"
+            {/* Transaction ID Section */}
+            <View style={[styles.sectionBox, { marginBottom: 80 }]}>
+              <Text style={styles.sectionLabel}>ID Transaksi</Text>
+              <View style={styles.rowAlignCenter}>
+                <Text style={styles.sectionValue}>{data?.transactionCode}</Text>
+                <TouchableOpacity
+                  onPress={() => handleCopy(data?.transactionCode || "-")}>
+                  <Image
+                    source={require("@/assets/copy.png")}
+                    style={{ marginLeft: 4, width: 17, height: 16 }}
                   />
                 </TouchableOpacity>
               </View>
             </View>
-            {isExpanded && (
-              <View style={styles.statusExpandedBox}>
-                <Text style={styles.statusExpandedLabel}>
-                  Status Pengajuan:
-                </Text>
-                <Text
-                  style={[
-                    styles.statusExpandedValue,
-                    {
-                      color:
-                        data?.fundReleaseRequest?.status == "pending"
-                          ? "#FBBF24"
-                          : "#CB3A31",
-                    },
-                  ]}>
-                  {setupStatusFundReleaseRequest()}
-                </Text>
-              </View>
-            )}
-          </View>
-        ) : (
-          <View style={styles.statusRowSimple}>
-            <Text style={styles.statusLabel}>Status Rekbr:</Text>
-            <Text style={styles.statusValue}>{setupStatus()}</Text>
-          </View>
-        )}
-
-        {/* Timestamp */}
-        <View style={styles.sectionBox}>
-          <Timestamp
-            data={data}
-            caption={setupCaptionTimeStamp()}
-            date={setupDateTimestamp()}
-            details={setupDetailTimestamp()}
-          />
-        </View>
-
-        {/* Buyer Section */}
-        <View style={styles.sectionBox}>
-          <Text style={styles.sectionLabel}>Pembeli</Text>
-          <Text style={styles.sectionValue}>{data?.buyerEmail || "-"}</Text>
-        </View>
-
-        {/* Virtual Account Section */}
-        <View style={styles.sectionBox}>
-          <Text style={styles.sectionLabel}>Virtual Account</Text>
-          <View style={styles.rowAlignCenter}>
-            <Text style={styles.sectionValue}>
-              {data?.virtualAccount || "-"}
-            </Text>
-            <TouchableOpacity
-              onPress={() => handleCopy(data?.virtualAccount || "-")}>
-              <Image
-                source={require("@/assets/copy.png")}
-                style={{ marginLeft: 4, width: 17, height: 16 }}
-              />
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        {/* Items Name Section */}
-        <View style={styles.sectionBox}>
-          <Text style={styles.sectionLabel}>Nama Barang</Text>
-          <Text style={styles.sectionValue}>{data?.itemName || "-"}</Text>
-        </View>
-
-        {/* Items Price Section */}
-        <View style={styles.sectionBox}>
-          <Tagihan
-            caption="Harga Barang"
-            price={formatPrice(data?.totalAmount) || "-"}
-            details={[
-              {
-                status: "Nominal Barang",
-                price: formatPrice(data?.itemPrice) || "-",
-              },
-              {
-                status: "Asuransi Pengiriman BNI Life (0.2%)",
-                price: formatPrice(data?.insuranceFee) || "-",
-              },
-              {
-                status: `Biaya Jasa Aplikasi (${calculatePlatformFee(
-                  data?.itemPrice
-                )})`,
-                price: formatPrice(data?.platformFee) || "-",
-              },
-            ]}
-          />
-        </View>
-
-        {/* Seller Bank Section */}
-        <View style={styles.sectionBox}>
-          <Text style={styles.sectionLabel}>Rekening Penjual</Text>
-          <View style={styles.sellerBankRow}>
-            <Image
-              source={{ uri: data?.rekeningSeller?.logoUrl || "-" }}
-              style={styles.sellerBankLogo}
-            />
-            <View style={styles.rowAlignCenter}>
-              <Text style={styles.sectionValue}>
-                {data?.rekeningSeller?.accountNumber || "-"}
-              </Text>
-              <TouchableOpacity
-                onPress={() =>
-                  handleCopy(data?.rekeningSeller?.accountNumber || "-")
-                }>
-                <Image
-                  source={require("@/assets/copy.png")}
-                  style={{ marginLeft: 4, width: 17, height: 16 }}
-                />
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-
-        {/* Transaction ID Section */}
-        <View style={styles.sectionBox}>
-          <Text style={styles.sectionLabel}>ID Transaksi</Text>
-          <View style={styles.rowAlignCenter}>
-            <Text style={styles.sectionValue}>{data?.transactionCode}</Text>
-            <TouchableOpacity
-              onPress={() => handleCopy(data?.transactionCode || "-")}>
-              <Image
-                source={require("@/assets/copy.png")}
-                style={{ marginLeft: 4, width: 17, height: 16 }}
-              />
-            </TouchableOpacity>
-          </View>
-        </View>
-      </ScrollView>
-      {/* Footer */}
-      <View style={styles.footerContainer}>{setupFooter()}</View>
+          </ScrollView>
+          {(
+            status == "pending_payment" ||
+            status == "waiting_shipment" || 
+            status == "shipped" || 
+            status == "completed"
+          ) &&
+            <View style={styles.footerContainer}>{setupFooter()}</View>
+          }
+        </>
+      )}
 
       {/* Modal */}
       {showPopup &&
@@ -761,18 +787,21 @@ const styles = StyleSheet.create({
     resizeMode: "contain",
   },
   footerContainer: {
-    padding: 12,
-    borderTopWidth: 2,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    borderColor: "#E5E7EB",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
-    alignItems: "center",
-    marginBottom: 24,
     backgroundColor: "#fff",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    elevation: 32,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.1,
+    shadowRadius: 32,
+    borderWidth: 1,
+    borderBottomWidth: 0,
+    borderColor: "#F3F4F6",
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    paddingBottom: 20,
+    alignItems: "center",
   },
   footerCol: {
     flexDirection: "column",

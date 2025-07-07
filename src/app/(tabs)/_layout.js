@@ -10,11 +10,13 @@ import SellerIcon from "@/assets/icon-seller.svg";
 import BuyerIcon from "@/assets/icon-buyer.svg";
 import DisputeIcon from "@/assets/icon-complaint.svg";
 import HistoryIcon from "@/assets/icon-history.svg";
+import LoadingModal from "@/components/LoadingModal";
 
 export default function TabLayout() {
   const router = useRouter();
   const [profile, setProfile] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [logoutLoading, setLogoutLoading] = useState(false);
 
   useEffect(() => {
     checkAuth();
@@ -43,6 +45,7 @@ export default function TabLayout() {
   };
 
   const handleLogout = async () => {
+    setLogoutLoading(true);
     try {
       await logout();
       await removeAccessToken();
@@ -65,6 +68,8 @@ export default function TabLayout() {
       } else {
         showToast("Logout Gagal", "Gagal logout. Silahkan coba lagi.", "error");
       }
+    } finally {
+      setLogoutLoading(false);
     }
   };
 
@@ -152,6 +157,7 @@ export default function TabLayout() {
           />
         </Tabs>
       </View>
+      <LoadingModal visible={logoutLoading} text="Keluar..." />
     </>
   );
 }
