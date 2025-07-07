@@ -75,7 +75,27 @@ export default function DisputeDetail() {
     },
   ];
 
-  const handleSubmit = () => setShowConfirmModal(true);
+  const handleSubmit = () => {
+    const valid = recheckFields();
+    if (!valid) return;
+    setShowConfirmModal(true);
+  };
+
+  const recheckFields = () => {
+    if (media.length === 0) {
+      showToast("Gagal", "Harap tambahkan bukti", "error");
+      return false;
+    }
+    if (reason.length === 0) {
+      showToast("Gagal", "Harap tambahkan alasan", "error");
+      return false;
+    }
+    if (selectedSolution === null) {
+      showToast("Gagal", "Harap pilih solusi", "error");
+      return false;
+    }
+    return true;
+  };
 
   const handleConfirm = async () => {
     setLoading(true);
@@ -206,7 +226,6 @@ export default function DisputeDetail() {
       if (type === "video") {
         try {
           const compressedSizeMB = sizeMB;
-          console.log("compressedSizeMB", compressedSizeMB);
 
           if (compressedSizeMB > 90) {
             alert("Ukuran video melebihi 90MB");

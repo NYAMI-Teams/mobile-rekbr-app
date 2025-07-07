@@ -39,7 +39,6 @@ export default function RusakBarangSelesai() {
     try {
       const res = await getDetailBuyerComplaint(complaintId);
       setDetailComplaint(res.data);
-      // console.log("ini detail complaint", JSON.stringify(res.data, null, 2));
     } catch (err) {
       showToast("Gagal", err?.message, "error");
     }

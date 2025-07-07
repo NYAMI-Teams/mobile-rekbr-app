@@ -21,3 +21,25 @@ export const formatCurrency = (amount) => {
         maximumFractionDigits: 2,
     }).format(amount).replace('IDR', 'Rp');
 };
+
+// change 2025-07-03T07:23:21.649Z to 03 July 2025, 07:23 WIB
+export const formatDateToWIB = (isoString) => {
+    if (!isoString || isoString === "-" || !isoString.trim()) {
+        return "-";
+    }
+    const date = new Date(isoString);
+
+    // Konversi ke zona waktu WIB (UTC+7)
+    const options = {
+        timeZone: 'Asia/Jakarta',
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+    };
+
+    const formatted = new Intl.DateTimeFormat('en-GB', options).format(date);
+    return `${formatted.replace(',', '')} WIB`;
+}

@@ -77,12 +77,12 @@ export default function HomeDispute() {
         </Text>
 
         {/* Button Email */}
-        <View style={styles.buttonContainer}>
+        {/* <View style={styles.buttonContainer}>
           <PrimaryButton
             onPress={() => router.push("../(tabs)/complaint")}
             title="Diskusi via email dengan penjual"
           />
-        </View>
+        </View> */}
 
         {/* Opsi Komplain */}
         <Text style={styles.optionLabel}>

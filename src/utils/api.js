@@ -21,12 +21,7 @@ const onRequestSuccess = async (config) => {
 const onRequestError = (error) => Promise.reject(error);
 const onResponseSuccess = (response) => response.data;
 const onResponseError = (error) => {
-  // if (error.response?.data.statusCode === 401 && getAccessToken()) {
-  //   refreshToken({ refreshToken: getRefreshToken() })
-  // } else if (error.response?.data.statusCode === 401 && !getAccessToken()) {
-  //   // // removeAuth()
-  //   // window.location.reload()
-  // }
+
   return Promise.reject(error?.response?.data ? error?.response?.data : error);
 };
 

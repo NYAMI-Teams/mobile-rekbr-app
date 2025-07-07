@@ -1,7 +1,7 @@
 import NavigationBar from "@/components/NavigationBar";
 import { getAccessToken, removeAccessToken, setProfileStore } from "@/store";
 import { showToast } from "@/utils";
-import { getProfile } from "@/utils/api/auth";
+import { getProfile, logout } from "@/utils/api/auth";
 import { Tabs, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { View, StyleSheet } from "react-native";
@@ -10,11 +10,13 @@ import SellerIcon from "@/assets/icon-seller.svg";
 import BuyerIcon from "@/assets/icon-buyer.svg";
 import DisputeIcon from "@/assets/icon-complaint.svg";
 import HistoryIcon from "@/assets/icon-history.svg";
+import LoadingModal from "@/components/LoadingModal";
 
 export default function TabLayout() {
   const router = useRouter();
   const [profile, setProfile] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [logoutLoading, setLogoutLoading] = useState(false);
 
   useEffect(() => {
     checkAuth();
@@ -43,12 +45,31 @@ export default function TabLayout() {
   };
 
   const handleLogout = async () => {
+    setLogoutLoading(true);
     try {
+      await logout();
       await removeAccessToken();
       showToast("Logout Berhasil", "Anda telah berhasil logout.", "success");
       router.replace("Onboarding");
     } catch (err) {
-      showToast("Logout Gagal", "Gagal logout. Silahkan coba lagi.", "error");
+      if (
+        err?.message?.includes("token") ||
+        err?.message?.include("jwt") ||
+        err?.message?.includes("invalid") ||
+        err?.message?.includes("Access denied")
+      ) {
+        showToast(
+          "Sesi Berakhir",
+          "Sesi Anda telah berakhir. Silahkan login kembali.",
+          "error"
+        );
+        await removeAccessToken();
+        router.replace("Onboarding");
+      } else {
+        showToast("Logout Gagal", "Gagal logout. Silahkan coba lagi.", "error");
+      }
+    } finally {
+      setLogoutLoading(false);
     }
   };
 
@@ -136,6 +157,7 @@ export default function TabLayout() {
           />
         </Tabs>
       </View>
+      <LoadingModal visible={logoutLoading} text="Keluar..." />
     </>
   );
 }

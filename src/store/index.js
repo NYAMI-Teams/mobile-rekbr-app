@@ -45,7 +45,6 @@ export const getProfileStore = async () => {
 
 export const setDataNotification = async (data) => {
   try {
-    console.log("Setting data notification:", data);
     await SecureStore.setItemAsync("data_notification", JSON.stringify(data));
   } catch (error) {
     throw new Error("Error setting data notification:", error);
@@ -55,7 +54,6 @@ export const setDataNotification = async (data) => {
 export const getDataNotification = async () => {
   try {
     const data = await SecureStore.getItemAsync("data_notification");
-    console.log("Data:", data);
     return data ? JSON.parse(data) : null;
   } catch (error) {
     throw new Error("Error getting data notification:", error);

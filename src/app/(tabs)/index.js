@@ -8,14 +8,20 @@ import {
   StyleSheet,
 } from "react-native";
 import { useRouter } from "expo-router";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import PrimaryButton from "../../components/PrimaryButton";
 import SellerCard from "../../components/card-transaction/SellerCard";
 import EmptyIllustration from "../../components/Ilustration";
 import TransactionSkeleton from "../../components/skeleton/TransactionSkeleton";
 import { showToast } from "../../utils";
 import { getSellerTransactions } from "../../utils/api/seller";
-import { getDataNotification, getProfileStore, setProfileStore } from "@/store";
+import {
+  getDataNotification,
+  getProfileStore,
+  removeAccessToken,
+  setDataNotification,
+  setProfileStore,
+} from "@/store";
 import { getProfile } from "@/utils/api/auth";
 
 export default function Seller() {
@@ -28,9 +34,12 @@ export default function Seller() {
   const [isFetching, setIsFetching] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [toDetailLoading, setToDetailLoading] = useState(false);
+  const listRef = useRef();
 
   useEffect(() => {
     getDataNotification().then((data) => {
+      setDataNotification(null);
       switch (data?.screen) {
         case "transaction/buyer":
           router.push({
@@ -59,14 +68,14 @@ export default function Seller() {
         default:
           break;
       }
-    })
+    });
     getUserProfile();
+    setIsInitialLoading(true);
     fetchTransactions(true);
   }, []);
 
   const getUserProfile = async () => {
     try {
-      setIsInitialLoading(true);
       const res = await getProfile();
       if (res?.data?.kycStatus === "verified") {
         setIsKYCCompleted(true);
@@ -78,8 +87,6 @@ export default function Seller() {
         "Gagal mengambil data profile. Silahkan coba kembali.",
         "error"
       );
-    } finally {
-      setIsInitialLoading(false);
     }
   };
 
@@ -102,7 +109,11 @@ export default function Seller() {
       setOffset(currentOffset + limit);
       setHasMore(newData.length === limit);
     } catch (err) {
-      showToast("Gagal", "Gagal mengambil data transaksi", "error");
+      if (err?.message == "Access denied: No token provided") {
+        handleLogout();
+      } else {
+        showToast("Gagal", "Gagal mengambil data transaksi", "error");
+      }
     } finally {
       setIsFetching(false);
       setRefreshing(false);
@@ -120,9 +131,37 @@ export default function Seller() {
     fetchTransactions(true);
   };
 
-  const renderItem = ({ item }) => <SellerCard data={item} />;
+  const handleLogout = async () => {
+    try {
+      await removeAccessToken();
+      showToast(
+        "Error",
+        "Sesi anda telah habis. Silahkan login kembali.",
+        "error"
+      );
+      router.replace("Onboarding");
+    } catch (err) {
+      showToast("Error", "Gagal logout. Silahkan coba lagi.", "error");
+    }
+  };
 
-  const renderEmpty = () => {
+  const renderItem = ({ item }) =>
+    <SellerCard
+      data={item}
+      disabled={toDetailLoading}
+      onPress={async () => {
+        setToDetailLoading(true);
+        router.push({
+          pathname: `/DetailTransaksi/Seller`,
+          params: { id: item?.id || "" },
+        });
+        setTimeout(() => {
+          setToDetailLoading(false);
+        }, 1500);
+      }}
+    />;
+
+  const RenderEmpty = () => {
     if (isInitialLoading) {
       return (
         <View>
@@ -133,25 +172,26 @@ export default function Seller() {
       );
     }
 
-    if (!isFetching && transactions.length === 0) {
-      return <SellerEmptyContent isKYCCompleted={isKYCCompleted} />;
-    }
-
-    return null;
+    return <SellerEmptyContent isKYCCompleted={isKYCCompleted} />;
   };
 
-  const renderFooter = () =>
-    isFetching && offset > 0 ? (
-      <View style={styles.footerContainer}>
-        {[...Array(2)].map((_, i) => (
-          <TransactionSkeleton key={i} />
-        ))}
-      </View>
-    ) : null;
+  const RenderFooter = () => {
+    if (isFetching && offset > 0) {
+      return (
+        <View style={styles.footerContainer}>
+          {[...Array(2)].map((_, i) => (
+            <TransactionSkeleton key={i} />
+          ))}
+        </View>
+      );
+    }
+    return null;
+  };
 
   return (
     <View style={styles.container}>
       <FlatList
+        ref={listRef}
         style={styles.flatList}
         data={transactions}
         keyExtractor={(item) => item.id}
@@ -161,8 +201,8 @@ export default function Seller() {
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
-        ListEmptyComponent={renderEmpty}
-        ListFooterComponent={renderFooter}
+        ListEmptyComponent={<RenderEmpty />}
+        ListFooterComponent={<RenderFooter />}
       />
 
       {isKYCCompleted && transactions.length > 0 && (
@@ -171,9 +211,9 @@ export default function Seller() {
           onPress={() =>
             router.push("/CreateTransaksi/CreateRekening/ChooseRekening")
           }
-          btnColor='black'
-          textColor='#fff'
-          width='50%'
+          btnColor="black"
+          textColor="#fff"
+          width="50%"
           height={50}
           style={styles.floatingButton}
         />
@@ -193,7 +233,7 @@ function SellerEmptyContent({ isKYCCompleted }) {
             <Image
               source={require("../../assets/icon-warning.png")}
               style={styles.warningIcon}
-              resizeMode='contain'
+              resizeMode="contain"
             />
             <Text style={styles.warningText}>
               Biar bisa lanjut bikin Rekber, kamu perlu selesain KYC dulu, ya!
@@ -216,8 +256,7 @@ function SellerEmptyContent({ isKYCCompleted }) {
           } else {
             router.push("CreateTransaksi/CreateRekening/ChooseRekening");
           }
-        }}
-      >
+        }}>
         <Text style={styles.ctaButtonText}>
           {isKYCCompleted ? "Bikin Rekber Baru" : "Lengkapi KYC & Bikin Rekber"}
         </Text>

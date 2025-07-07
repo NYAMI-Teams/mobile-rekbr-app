@@ -6,12 +6,17 @@ import {
   ActivityIndicator,
   RefreshControl,
   TouchableOpacity,
-  StyleSheet, // Import StyleSheet
+  StyleSheet,
+  Alert, // Import StyleSheet
 } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 
 import RusakBarangCard from "@/components/dispute/RusakBarangCard";
-import { getBuyerComplaints, getSellerComplaints } from "@/utils/api/complaint";
+import {
+  getBuyerComplaints,
+  getSellerComplaints,
+  postSellerConfirmReturn,
+} from "@/utils/api/complaint";
 import { showToast } from "@/utils";
 import { SafeAreaView } from "react-native-safe-area-context";
 import EmptyIllustration from "@/components/Ilustration";
@@ -30,8 +35,8 @@ export default function DisputeScreen() {
   const [selectedTab, setSelectedTab] = useState("pembelian");
   const [BuyerComplaints, setBuyerComplaints] = useState([]);
   const [SellerComplaints, setSellerComplaints] = useState([]);
-  const [isEmptyBuyerComplaints, setIsEmptyBuyerComplaints] = useState(false);
-  const [isEmptySellerComplaints, setIsEmptySellerComplaints] = useState(false);
+  const [isEmptyBuyerComplaints, setIsEmptyBuyerComplaints] = useState(true);
+  const [isEmptySellerComplaints, setIsEmptySellerComplaints] = useState(true);
   const { type } = useLocalSearchParams();
 
   useEffect(() => {
@@ -40,7 +45,6 @@ export default function DisputeScreen() {
   }, []);
 
   useEffect(() => {
-    console.log("Type:", type);
     if (type === "seller") {
       setSelectedTab("penjualan");
     } else {
@@ -132,19 +136,19 @@ export default function DisputeScreen() {
             seller={item?.transaction?.sellerEmail}
             noResi={
               item?.status === "return_in_transit" ||
-                item?.status === "approved_by_admin" ||
-                item?.status === "completed" ||
-                item?.status === "awaiting_seller_confirmation" ||
-                item?.status === "awaiting_admin_confirmation"
+              item?.status === "approved_by_admin" ||
+              item?.status === "completed" ||
+              item?.status === "awaiting_seller_confirmation" ||
+              item?.status === "awaiting_admin_confirmation"
                 ? item?.returnShipment?.trackingNumber || "-"
                 : "-"
             }
             expedisi={
               item?.status === "return_in_transit" ||
-                item?.status === "approved_by_admin" ||
-                item?.status === "completed" ||
-                item?.status === "awaiting_seller_confirmation" ||
-                item?.status === "awaiting_admin_confirmation"
+              item?.status === "approved_by_admin" ||
+              item?.status === "completed" ||
+              item?.status === "awaiting_seller_confirmation" ||
+              item?.status === "awaiting_admin_confirmation"
                 ? item?.returnShipment?.courierName || "-"
                 : "-"
             }
@@ -155,18 +159,20 @@ export default function DisputeScreen() {
             onPressButton={
               mappedStatus === "returnRequested"
                 ? () => {
-                  router.push({
-                    pathname: "/dispute/BarangRusak/pengembalianForm",
-                    params: { complaintId: item?.id },
-                  });
-                }
-                : mappedStatus === "returnInTransit"
-                  ? () =>
+                    router.push({
+                      pathname: "/dispute/BarangRusak/pengembalianForm",
+                      params: { complaintId: item?.id },
+                    });
+                  }
+                : mappedStatus === "returnInTransit" ||
+                  mappedStatus === "approvedBySeller" ||
+                  mappedStatus === "approvedByAdmin"
+                ? () =>
                     router.push({
                       pathname: "/dispute/BarangRusak/konfirmasiSellerForm",
                       params: { complaintId: item?.id },
                     })
-                  : () => { }
+                : () => {}
             }
           />
         );
@@ -198,19 +204,19 @@ export default function DisputeScreen() {
             buyer={item?.transaction?.buyerEmail || ""}
             noResi={
               item?.status === "return_in_transit" ||
-                item?.status === "approved_by_admin" ||
-                item?.status === "completed" ||
-                item?.status === "awaiting_seller_confirmation" ||
-                item?.status === "awaiting_admin_confirmation"
+              item?.status === "approved_by_admin" ||
+              item?.status === "completed" ||
+              item?.status === "awaiting_seller_confirmation" ||
+              item?.status === "awaiting_admin_confirmation"
                 ? item?.returnShipment?.trackingNumber || "-"
                 : "-"
             }
             expedisi={
               item?.status === "return_in_transit" ||
-                item?.status === "approved_by_admin" ||
-                item?.status === "completed" ||
-                item?.status === "awaiting_seller_confirmation" ||
-                item?.status === "awaiting_admin_confirmation"
+              item?.status === "approved_by_admin" ||
+              item?.status === "completed" ||
+              item?.status === "awaiting_seller_confirmation" ||
+              item?.status === "awaiting_admin_confirmation"
                 ? item?.returnShipment?.courierName || "-"
                 : "-"
             }
@@ -218,7 +224,52 @@ export default function DisputeScreen() {
             time={dateShow(mappedStatus, item)}
             status={mappedStatus}
             onPress={() => handleSellerComplaintPress(item, mappedStatus)}
-            onPressButton={() => { }}
+            onPressButton={
+              mappedStatus === "returnRequested"
+                ? () => {
+                    router.push({
+                      pathname: "/dispute/BarangRusak/pengembalianForm",
+                      params: { complaintId: item?.id },
+                    });
+                  }
+                : mappedStatus === "returnInTransit" ||
+                  mappedStatus === "awaitingSellerConfirmation"
+                ? () => {
+                    Alert.alert(
+                      "Konfirmasi",
+                      "Barang udah diterima dengan baik dan benar? Cek dulu ya, biar aman!",
+                      [
+                        {
+                          text: "Kembali",
+                          style: "cancel",
+                          onPress: () => {
+                            // No need to router.back() here, as it would close the alert immediately
+                          },
+                        },
+                        {
+                          text: "Konfirmasi",
+                          style: "default",
+                          onPress: () => {
+                            postSellerConfirmReturn(item?.id)
+                              .then(() => {
+                                showToast(
+                                  "Berhasil",
+                                  "Konfirmasi barang berhasil dikirimkan",
+                                  "success"
+                                );
+                                router.replace("../../(tabs)/complaint");
+                              })
+                              .catch((err) => {
+                                showToast("Gagal", err?.message, "error");
+                              });
+                          },
+                        },
+                      ],
+                      { cancelable: true }
+                    );
+                  }
+                : () => {}
+            }
           />
         );
       });
@@ -470,7 +521,7 @@ export default function DisputeScreen() {
           });
         }
       },
-      sellerRejected: () => { },
+      sellerRejected: () => {},
       returnInTransit: () =>
         router.push({
           pathname: "/dispute/SellerDispute/KembaliinPage",
@@ -599,7 +650,9 @@ export default function DisputeScreen() {
             refreshControl={
               <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
             }>
-            {renderContent()}
+            <View style={{ paddingBottom: 48, paddingTop: 4 }}>
+              {renderContent()}
+            </View>
           </ScrollView>
         </View>
       )}
@@ -652,7 +705,6 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     paddingHorizontal: 16, // px-4
-    marginVertical: 12, // my-3
   },
   emptyIllustrationContainer: {
     justifyContent: "center",

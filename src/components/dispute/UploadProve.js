@@ -1,5 +1,6 @@
 import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
 import { Video } from "expo-av";
+import { Feather } from "@expo/vector-icons";
 
 export const UploadProve = ({
   media,
@@ -23,7 +24,6 @@ export const UploadProve = ({
       </TouchableOpacity>
       <View style={styles.mediaWrap}>
         {media.map((item, idx) => {
-          // // console.log("item", item);
           return (
             <View key={idx} style={styles.mediaBox}>
               {item.type === "image" ? (

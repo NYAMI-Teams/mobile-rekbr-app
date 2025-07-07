@@ -10,7 +10,6 @@ import {
 } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Icon from "react-native-vector-icons/Ionicons";
-import { PinInput } from "@pakenfit/react-native-pin-input";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
   verifyEmail,
@@ -18,13 +17,19 @@ import {
   resetPasswordOTP,
   changeEmail,
   forgotPassword,
+  getProfile,
+  savePushToken,
 } from "../../utils/api/auth";
 import { showToast } from "../../utils";
-import { setAccessToken } from "../../store";
+import { setAccessToken, setProfileStore } from "../../store";
+import { registerForPushNotificationsAsync } from "@/utils/notifications";
+import SmoothPinCodeInput from "@dreamwalk-os/react-native-smooth-pincode-input";
+import LoadingModal from "@/components/LoadingModal";
 
 export default function OTP() {
   const { email, isFromLogin, isFromResetPassword } = useLocalSearchParams();
   const router = useRouter();
+  const [code, setCode] = useState("");
   const [timeLeft, setTimeLeft] = useState(299);
   const [isError, setIsError] = useState(false);
   const [isValid, setIsValid] = useState(false);
@@ -48,6 +53,7 @@ export default function OTP() {
   };
 
   const handleResendCode = () => {
+    setIsLoading(true);
     setTimeLeft(299);
     inputRefs[0]?.focus();
     if (isFromLogin) {
@@ -73,26 +79,51 @@ export default function OTP() {
           setIsLoading(false);
         });
     }
-
   };
 
-  const submitOtp = (otpValue) => {
+  const handlePushToken = async () => {
+    try {
+      const pushToken = await registerForPushNotificationsAsync();
+      if (!pushToken || !pushToken.startsWith("ExponentPushToken")) {
+        console.warn("Push token tidak valid:", pushToken);
+      } else {
+        await savePushToken(pushToken);
+      }
+    } catch (err) {
+      console.warn("Gagal simpan push token:", err?.message);
+      setIsLoading(false);
+      throw new Error("Gagal mendapatkan token notifikasi: " + err.message);
+    }
+  };
+
+  const getUserProfile = async () => {
+    try {
+      const res = await getProfile();
+      await setProfileStore(res?.data);
+      router.replace("/auth/SuccessLogin");
+    } catch (error) {
+      showToast("Gagal", error?.message, "error");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const submitOtp = async (otpValue) => {
     setIsLoading(true);
     if (isFromLogin) {
-      verifyEmail(email, otpValue)
-        .then((res) => {
-          setAccessToken(res?.data?.accessToken);
-          showToast("Selamat datang, " + email, res?.message, "success");
-          router.replace("/auth/SuccessLogin");
-        })
-        .catch((error) => {
-          setIsError(true);
-          setErrorMessage("Kode OTP yang Anda masukkan salah.");
-          showToast("Gagal", error?.message, "error");
-        })
-        .finally(() => {
-          setIsLoading(false);
-        });
+      try {
+        const res = await verifyEmail(email, otpValue);
+        setAccessToken(res?.data?.accessToken);
+        showToast("Selamat datang, " + email, res?.message, "success");
+        await handlePushToken();
+        await getUserProfile();
+      } catch (error) {
+        setIsError(true);
+        setErrorMessage("Kode OTP yang Anda masukkan salah.");
+        showToast("Gagal", error?.message, "error");
+        setIsLoading(false);
+      }
+      /// Recheck
     } else if (isFromResetPassword) {
       resetPasswordOTP(email, otpValue)
         .then((res) => {
@@ -114,91 +145,93 @@ export default function OTP() {
   };
 
   return (
-    <View style={styles.container}>
-      <GestureHandlerRootView>
-        <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : undefined}
-          style={styles.keyboardView}
-        >
-          {/* Header */}
-          <View style={styles.header}>
-            <TouchableOpacity onPress={() => router.back()}>
-              <Icon name="chevron-back" size={24} color="#000" />
-            </TouchableOpacity>
-            <Text style={styles.headerTitle}>Verifikasi Email Kamu</Text>
-            <View style={{ width: 24 }} />
-          </View>
-
-          {/* OTP Card */}
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>
-              Masukkan kode yang kami kirimkan
-            </Text>
-
-            <View style={styles.subTextWrapper}>
-              <Text style={styles.subText}>
-                Sudah dikirim ke email kamu
-                <Text style={styles.emailText}> {email}</Text>
-              </Text>
+    <>
+      <View style={styles.container}>
+        <GestureHandlerRootView>
+          <KeyboardAvoidingView
+            behavior={Platform.OS === "ios" ? "padding" : undefined}
+            style={styles.keyboardView}>
+            {/* Header */}
+            <View style={styles.header}>
+              <TouchableOpacity onPress={() => router.back()}>
+                <Icon name="chevron-back" size={24} color="#000" />
+              </TouchableOpacity>
+              <Text style={styles.headerTitle}>Verifikasi Email Kamu</Text>
+              <View style={{ width: 24 }} />
             </View>
 
-            {/* OTP Input */}
-            <View style={styles.otpInputWrapper}>
-              <PinInput
-                length={6}
-                onFillEnded={(otp) => submitOtp(otp)}
-                inputStyle={{
-                  width: 40,
-                  height: 40,
-                  borderWidth: 1,
-                  borderColor: isValid
-                    ? "#009688"
-                    : isError
-                      ? "#FF3B30"
-                      : "#ccc",
-                  borderRadius: 8,
-                  textAlign: "center",
-                  fontSize: 16,
-                }}
-              />
-              <Text
-                style={[
-                  styles.timerText,
-                  { color: timeLeft > 0 ? "#000" : "#EF4444" },
-                ]}
-              >
-                {formatTime(timeLeft)}
+            {/* OTP Card */}
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}>
+                Masukkan kode yang kami kirimkan
               </Text>
-            </View>
 
-            {isError && (
-              <Text style={styles.errorMessage}>{errorMessage}</Text>
-            )}
+              <View style={styles.subTextWrapper}>
+                <Text style={styles.subText}>
+                  Sudah dikirim ke email kamu
+                  <Text style={styles.emailText}> {email}</Text>
+                </Text>
+              </View>
 
-            <View style={styles.resendWrapper}>
-              <Text style={styles.resendLabel}>Tidak menerima kode?</Text>
-              <TouchableOpacity
-                onPress={handleResendCode}
-                disabled={timeLeft > 0}
-              >
+              {/* OTP Input */}
+              <View style={styles.otpInputWrapper}>
+                <SmoothPinCodeInput
+                  value={code}
+                  codeLength={6}
+                  onTextChange={setCode}
+                  onFulfill={submitOtp}
+                  containerStyle={{
+                    marginTop: 16,
+                  }}
+                  cellStyle={{
+                    borderWidth: 1,
+                    borderColor: isValid
+                      ? "#009688"
+                      : isError
+                        ? "#FF3B30"
+                        : "#ccc",
+                    borderRadius: 8,
+                    textAlign: "center",
+                    fontSize: 16,
+                    color: "#000",
+                  }}
+                  restrictToNumbers={true}
+                />
                 <Text
                   style={[
-                    styles.resendAction,
-                    { color: timeLeft > 0 ? "#9CA3AF" : "#3B82F6" },
-                  ]}
-                >
-                  Klik untuk kirim ulang
+                    styles.timerText,
+                    { color: timeLeft > 0 ? "#000" : "#EF4444" },
+                  ]}>
+                  {formatTime(timeLeft)}
                 </Text>
+              </View>
+
+              {isError && <Text style={styles.errorMessage}>{errorMessage}</Text>}
+
+              <View style={styles.resendWrapper}>
+                <Text style={styles.resendLabel}>Tidak menerima kode?</Text>
+                <TouchableOpacity
+                  onPress={handleResendCode}
+                  disabled={timeLeft > 0}>
+                  <Text
+                    style={[
+                      styles.resendAction,
+                      { color: timeLeft > 0 ? "#9CA3AF" : "#3B82F6" },
+                    ]}>
+                    Klik untuk kirim ulang
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
+              <TouchableOpacity onPress={() => router.back()}>
+                <Text style={styles.backText}>Salah alamat email?</Text>
               </TouchableOpacity>
             </View>
-
-            <TouchableOpacity onPress={() => router.back()}>
-              <Text style={styles.backText}>Salah alamat email?</Text>
-            </TouchableOpacity>
-          </View>
-        </KeyboardAvoidingView>
-      </GestureHandlerRootView>
-    </View>
+          </KeyboardAvoidingView>
+        </GestureHandlerRootView>
+      </View>
+      <LoadingModal visible={isLoading} />
+    </>
   );
 }
 

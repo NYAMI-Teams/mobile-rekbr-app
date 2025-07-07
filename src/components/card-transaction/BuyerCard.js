@@ -10,21 +10,14 @@ import {
 import * as Clipboard from "expo-clipboard";
 import moment from "moment";
 import CountdownTimer from "../Countdown";
-import { useRouter } from "expo-router";
 import { buyerConfirmReceivedTransaction } from "../../utils/api/buyer";
 import BuyerKonfirmasi from "../BuyerKonfirmasi";
-import { showToast } from "../../utils";
+import { formatDateToWIB, showToast } from "../../utils";
 
-const BuyerCard = ({ data }) => {
+const BuyerCard = ({ data, disabled = false, onPress = () => { } }) => {
   const [showPopup, setShowPopup] = useState(false);
-  const router = useRouter();
   const status = data?.status;
-
-  const formatDateWIB = (dateTime) => {
-    if (!dateTime) return "Invalid date";
-    return moment(dateTime).utcOffset(7).format("DD MMMM YYYY, HH:mm [WIB]");
-  };
-
+  
   const handleConfirmReceived = async () => {
     try {
       await buyerConfirmReceivedTransaction(data?.id);
@@ -142,7 +135,7 @@ const BuyerCard = ({ data }) => {
       return (
         <View style={commonStyle}>
           <Text style={styles.badgeText}>
-            {formatDateWIB(data?.shipmentDeadline)}
+            {formatDateToWIB(data?.shipmentDeadline)}
           </Text>
         </View>
       );
@@ -176,7 +169,7 @@ const BuyerCard = ({ data }) => {
       return (
         <View style={styles.dateBadge}>
           <Text style={styles.badgeText}>
-            {formatDateWIB(data?.buyerConfirmedAt)}
+            {formatDateToWIB(data?.buyerConfirmedAt)}
           </Text>
         </View>
       );
@@ -185,7 +178,7 @@ const BuyerCard = ({ data }) => {
       return (
         <View style={styles.dateBadge}>
           <Text style={styles.badgeText}>
-            {formatDateWIB(
+            {formatDateToWIB(
               data?.shipmentDeadline == null
                 ? data?.paymentDeadline
                 : data?.shipmentDeadline
@@ -199,7 +192,7 @@ const BuyerCard = ({ data }) => {
       return (
         <View style={styles.dateBadge}>
           <Text style={styles.badgeText}>
-            {formatDateWIB(data?.createdAt || "-")}
+            {formatDateToWIB(data?.createdAt || "-")}
           </Text>
         </View>
       );
@@ -210,12 +203,8 @@ const BuyerCard = ({ data }) => {
 
   return (
     <TouchableOpacity
-      onPress={() =>
-        router.push({
-          pathname: "/DetailTransaksi/Buyer",
-          params: { id: data?.id },
-        })
-      }>
+      onPress={onPress}
+      disabled={disabled}>
       <View style={styles.card}>
         <View style={styles.content}>
           {renderRows().map((row, index) => (
@@ -270,8 +259,8 @@ const BuyerCard = ({ data }) => {
                   status === "completed"
                     ? { backgroundColor: "#4ade80" }
                     : status === "canceled" || status === "refunded"
-                    ? { backgroundColor: "#f87171" }
-                    : { backgroundColor: "#facc15" },
+                      ? { backgroundColor: "#f87171" }
+                      : { backgroundColor: "#facc15" },
                 ]}
               />
               <Text style={styles.statusText}>{renderStatus()}</Text>
@@ -285,7 +274,7 @@ const BuyerCard = ({ data }) => {
           onClose={() => setShowPopup(false)}
           onBtn2={handleConfirmReceived}
           onBtn1={() => setShowPopup(false)}
-          title="Pastikan semua data di form sudah benar dan lengkap sebelum kamu kirim. Cek lagi, ya!"
+          title="Pastikan barang sudah sesuai sebelum melakukan konfirmasi!"
           btn1="Kembali"
           btn2="Konfirmasi"
         />

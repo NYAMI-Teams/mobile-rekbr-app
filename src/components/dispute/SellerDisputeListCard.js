@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { View, Text, TouchableOpacity, Image, StyleSheet } from "react-native";
 import { ClipboardPaste } from "lucide-react-native";
 import PrimaryButton from "../PrimaryButton";
@@ -34,7 +34,7 @@ const statusconfig = {
     color: "#FBBF24",
     text: "Menunggu Pengembalian",
     note: "Konfirmasi bila barang telah sampai dan diterima ya!",
-    button: null,
+    button: "Barang Diterima",
   },
   awaitingAdminApproval: {
     color: "#CB3A31",
@@ -48,14 +48,13 @@ const statusconfig = {
     note: "Setelah ditinjau, bukti belum cukup kuat. Dana diteruskan ke seller dan transaksi dianggap selesai.",
     button: null,
   },
-  awaitingSellerConfirmation: {},
   approvedBySeller: {
     color: "#FBBF24",
     text: "Menunggu Pengembalian",
     note: "Kembalikan dengan baik, kemasan aman, dan berikan bukti pengiriman kembali!",
     notebold: " Proses maksimal 1 x 24 jam.",
     button: "Bukti Pengembalian",
-  },
+  }, //approvedBySeller,
   approvedByAdmin: {
     color: "#FBBF24",
     text: "Pengembalian Barang",
@@ -83,14 +82,14 @@ const statusconfig = {
   awaitingSellerConfirmation: {
     color: "#FBBF24",
     text: "Menunggu Pengembalian",
-    note: "Buyer akan mengembalikan barang dalam 24 jam, konfirmasi bila barang telah sampai dan diterima.",
+    note: "Konfirmasi resi udah dikirim ke buyer, segera konfirmasi ya!",
     button: "Barang Diterima",
   },
 
   awaitingAdminConfirmation: {
     color: "#FBBF24",
     text: "Menunggu Pengembalian",
-    note: "Tunggu approval kami, ya! Kalau bukti kamu oke, permintaan konfirmasi bakal langsung dikirim ke seller!",
+    note: "Konfirmasi bila barang telah sampai dan diterima ya!",
     button: "Permintaan Ditinjau",
     btnColor: "#FEF2D3",
     btnTextColor: "black",
@@ -110,9 +109,17 @@ const SellerDisputeListCard = ({
   onPressButton = () => {},
 }) => {
   const config = statusconfig[status];
-
+  const [isLoading, setIsLoading] = useState(false);
   return (
-    <TouchableOpacity onPress={onPress}>
+    <TouchableOpacity
+      onPress={async () => {
+        setIsLoading(true);
+        onPress();
+        setTimeout(() => {
+          setIsLoading(false);
+        }, 1500);
+      }}
+      disabled={isLoading}>
       <View style={styles.cardWrapper}>
         <View style={styles.cardContent}>
           {/* Nama Barang & Harga */}

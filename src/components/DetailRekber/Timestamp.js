@@ -3,17 +3,13 @@ import { View, Text, TouchableOpacity, Image, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import moment from "moment";
 import CountdownTimer from "../Countdown";
+import { formatDateToWIB } from "@/utils";
 
 const TimestampDetail = ({ status, date }) => {
-  const formatDateWIB = (dateTime) => {
-    if (!dateTime) return "Invalid date";
-    return moment(dateTime).utcOffset(7).format("DD MMMM YYYY, HH:mm [WIB]");
-  };
-
   return (
     <View style={styles.detailContainer}>
       <Text style={styles.detailStatus}>{status}</Text>
-      <Text style={styles.detailDate}>{formatDateWIB(date)}</Text>
+      <Text style={styles.detailDate}>{formatDateToWIB(date)}</Text>
     </View>
   );
 };
@@ -21,11 +17,6 @@ const TimestampDetail = ({ status, date }) => {
 const Timestamp = ({ data, caption, date, details = [] }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const toggleExpand = () => setIsExpanded(!isExpanded);
-
-  const formatDateWIB = (dateTime) => {
-    if (!dateTime) return "Invalid date";
-    return moment(dateTime).utcOffset(7).format("DD MMMM YYYY, HH:mm [WIB]");
-  };
 
   const shippedApproved =
     data?.status === "shipped" &&
@@ -134,7 +125,7 @@ const Timestamp = ({ data, caption, date, details = [] }) => {
             },
           ]}
         >
-          {formatDateWIB(date)}
+          {formatDateToWIB(date)}
         </Text>
       </View>
     </TouchableOpacity>

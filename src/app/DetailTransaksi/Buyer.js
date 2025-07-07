@@ -7,6 +7,8 @@ import {
   Modal,
   Pressable,
   Text,
+  RefreshControl,
+  ActivityIndicator,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import * as Clipboard from "expo-clipboard";
@@ -22,14 +24,13 @@ import StepSuccesBar from "@/components/SuccesBar";
 import CountdownTimer from "@/components/Countdown";
 import PrimaryButton from "@/components/PrimaryButton";
 import { getDetailBuyerTransaction } from "@/utils/api/buyer";
-import moment from "moment";
 import {
   updateBuyerTransaction,
   buyerConfirmReceivedTransaction,
 } from "@/utils/api/buyer";
 import { Alert } from "react-native";
 import BuyerKonfirmasi from "@/components/BuyerKonfirmasi";
-import { showToast } from "@/utils";
+import { formatDateToWIB, showToast } from "@/utils";
 import NavBackHeader from "@/components/NavBackHeader";
 import { Modalize } from "react-native-modalize";
 
@@ -41,35 +42,38 @@ export default function DetailTransaksiBuyer() {
   const [isPaymentDone, setIsPaymentDone] = useState(false);
   const [paymentDone, setPaymentDone] = useState({});
   const [showPopup, setShowPopup] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [buttonSimulatePress, setButtonSimulatePress] = useState(false);
   const modalizeRef = useRef(null);
 
   useEffect(() => {
-    const fetchTransactionDetails = async () => {
-      try {
-        const res = await getDetailBuyerTransaction(id);
-        setData(res.data);
-        // // console.log(
-        //   "Ini Detail Buyer Transaction",
-        //   JSON.stringify(res.data, null, 2)
-        // );
-      } catch (err) {
-        showToast(
-          "Gagal",
-          "Gagal mengambil data transaksi. Silahkan coba lagi.",
-          "error"
-        );
-      }
-    };
-
+    setIsLoading(true);
     fetchTransactionDetails();
   }, [id]);
+
+  const fetchTransactionDetails = async () => {
+    try {
+      const res = await getDetailBuyerTransaction(id);
+      setData(res.data);
+    } catch (err) {
+      showToast(
+        "Gagal",
+        "Gagal mengambil data transaksi. Silahkan coba lagi.",
+        "error"
+      );
+    } finally {
+      setIsLoading(false);
+      setRefreshing(false);
+    }
+  };
 
   const updateTransaction = async () => {
     try {
       const res = await updateBuyerTransaction(data?.id);
       setPaymentDone(res.data);
       setIsPaymentDone(res.success);
-      modalizeRef.current?.close();
+      fetchTransactionDetails();
     } catch (error) {
       showToast("Gagal", "Gagal memperbarui transaksi", "error");
     }
@@ -94,12 +98,9 @@ export default function DetailTransaksiBuyer() {
     router.back();
   };
 
-  const formatDateWIB = (dateTime) => {
-    if (!dateTime) return "Invalid date";
-    return moment(dateTime).utcOffset(7).format("DD MMMM YYYY, HH:mm [WIB]");
-  };
-
   const handleCopy = async (text) => {
+    setButtonSimulatePress(false);
+    setIsPaymentDone(false)
     if (!text) return;
     try {
       await Clipboard.setStringAsync(text);
@@ -353,7 +354,7 @@ export default function DetailTransaksiBuyer() {
           <View style={styles.footerRow}>
             <Text style={styles.footerTextGray}>Terdapat kendala?</Text>
             <TouchableOpacity
-              onPress={() => console.log("Hubungi Kami pressed")}>
+              onPress={() => { }}>
               <Text style={styles.footerTextBlue}>Silahkan Hubungi Kami</Text>
             </TouchableOpacity>
           </View>
@@ -364,7 +365,7 @@ export default function DetailTransaksiBuyer() {
       return (
         <View style={styles.footerRow}>
           <Text style={styles.footerTextGray}>Terdapat kendala?</Text>
-          <TouchableOpacity onPress={() => console.log("Hubungi Kami pressed")}>
+          <TouchableOpacity onPress={() => { }}>
             <Text style={styles.footerTextBlue}>Silahkan Hubungi Kami</Text>
           </TouchableOpacity>
         </View>
@@ -410,16 +411,6 @@ export default function DetailTransaksiBuyer() {
     }
   };
 
-  const calculatePlatformFee = (itemPrice) => {
-    if (itemPrice >= 10000 && itemPrice <= 499999.99) {
-      return 5000;
-    } else if (itemPrice >= 500000 && itemPrice <= 4999999.99) {
-      return `1 %`;
-    } else if (itemPrice >= 5000000 && itemPrice <= 10000000) {
-      return `0.8 %`;
-    }
-    return 0;
-  };
 
   return (
     <View style={styles.container}>
@@ -447,189 +438,219 @@ export default function DetailTransaksiBuyer() {
 
         return <ProgressBar currentStep={currentStep} steps={steps} />;
       })()}
-      <ScrollView>
-        {(data?.status === "pending_payment" ||
-          (data?.status === "waiting_shipment" &&
-            data?.shipment?.trackingNumber) ||
-          data?.status === "shipped" ||
-          data?.status === "completed") && (
-          <>
-            <View
-              style={{
-                padding: 12,
-                marginHorizontal: 12,
-                backgroundColor: "#EDFBFA",
-                borderRadius: 12,
-              }}>
-              <Text
-                style={{ fontSize: 15, marginBottom: 12, fontWeight: "500" }}>
-                {data?.status === "pending_payment"
-                  ? "Virtual Account"
-                  : "No Resi"}
-              </Text>
 
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  marginBottom:
-                    data?.status === "waiting_shipment" ||
-                    data?.status === "shipped" ||
-                    data?.status === "completed"
-                      ? 12
-                      : 0,
-                }}>
-                <Text style={{ fontSize: 17, fontWeight: "500" }}>
-                  {data?.status === "pending_payment"
-                    ? data?.virtualAccount
-                    : data?.shipment?.trackingNumber}
+      {isLoading ? (
+        <View style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          marginTop: 20
+        }}>
+          <ActivityIndicator size="large" color="#0000ff" />
+        </View>
+      ) : (
+        <>
+          <ScrollView
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={() => {
+                  setRefreshing(true);
+                  fetchTransactionDetails()
+                }}
+              />
+            }
+          >
+            {(data?.status === "pending_payment" ||
+              (data?.status === "waiting_shipment" &&
+                data?.shipment?.trackingNumber) ||
+              data?.status === "shipped" ||
+              data?.status === "completed") && (
+                <>
+                  <View
+                    style={{
+                      padding: 12,
+                      marginHorizontal: 12,
+                      backgroundColor: "#EDFBFA",
+                      borderRadius: 12,
+                    }}>
+                    <Text
+                      style={{ fontSize: 15, marginBottom: 12, fontWeight: "500" }}>
+                      {data?.status === "pending_payment"
+                        ? "Virtual Account"
+                        : "No Resi"}
+                    </Text>
+
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        marginBottom:
+                          data?.status === "waiting_shipment" ||
+                            data?.status === "shipped" ||
+                            data?.status === "completed"
+                            ? 12
+                            : 0,
+                      }}>
+                      <Text style={{ fontSize: 17, fontWeight: "500" }}>
+                        {data?.status === "pending_payment"
+                          ? data?.virtualAccount
+                          : data?.shipment?.trackingNumber}
+                      </Text>
+                      <TouchableOpacity
+                        onPress={() =>
+                          handleCopy(
+                            data?.status === "pending_payment"
+                              ? data?.virtualAccount
+                              : data?.shipment?.trackingNumber
+                          )
+                        }>
+                        <Image
+                          source={require("../../assets/copy.png")}
+                          style={{ marginLeft: 4, width: 17, height: 16 }}
+                        />
+                      </TouchableOpacity>
+                    </View>
+
+                    {(data?.status === "waiting_shipment" ||
+                      data?.status === "shipped" ||
+                      data?.status === "completed") && (
+                        <Text style={{ fontSize: 14, color: "#333" }}>
+                          {data?.shipment?.courier || "-"}
+                        </Text>
+                      )}
+                  </View>
+                </>
+              )}
+
+            {/* Admin Message */}
+            {(data?.fundReleaseRequest?.status == "approved" ||
+              data?.status == "completed") && (
+                <View style={styles.adminMsgRow}>
+                  <Image
+                    source={require("../../assets/admin1.png")}
+                    style={styles.adminMsgImg}
+                  />
+                  <Text style={styles.adminMsgText}>
+                    {data?.status == "completed"
+                      ? "Komplain dianggap tidak ada dan transaksi otomatis selesai setelah waktu tunggu."
+                      : "Halo! Barang udah sampai. Cek dan konfirmasi, biar dana langsung ke penjual via BNI!"}
+                  </Text>
+                </View>
+              )}
+
+            {/* Warning Message */}
+            {data?.status == "shipped" && (
+              <View style={{ marginVertical: 8 }}>
+                <View style={styles.warningRow}>
+                  <Image
+                    source={require("../../assets/icon-warning.png")}
+                    style={styles.warningIcon}
+                    resizeMode="contain"
+                  />
+                  <Text style={styles.warningText}>
+                    {data.status === "completed"
+                      ? "Komplain dianggap tidak ada dan transaksi otomatis selesai setelah waktu tunggu."
+                      : "Biar aman, pastikan kamu videoin proses buka paket ya! Ini penting banget sebagai bukti kalau mau komplain nanti."}
+                  </Text>
+                </View>
+              </View>
+            )}
+
+            {/* Status Rekbr */}
+            <View style={styles.statusRow}>
+              <Text style={styles.statusLabel}>Status Rekbr:</Text>
+              <Text style={styles.statusValue}>{setupStatus()}</Text>
+            </View>
+
+            {/* Timestamp */}
+            <View style={styles.sectionBox}>
+              <Timestamp
+                data={data}
+                caption={setupCaptionTimeStamp()}
+                date={setupDateTimestamp()}
+                details={setupDetailTimestamp()}
+              />
+            </View>
+
+            {/* Seller Section */}
+            <View style={styles.sectionBox}>
+              <Text style={styles.sectionLabel}>Penjual</Text>
+              <Text style={styles.sectionValue}>{data?.sellerEmail || "-"}</Text>
+            </View>
+
+            {/* Items Name Section */}
+            <View style={styles.sectionBox}>
+              <Text style={styles.sectionLabel}>Nama Barang</Text>
+              <Text style={styles.sectionValue}>{data?.itemName || "-"}</Text>
+            </View>
+
+            {/* Items Price Section */}
+            <View style={styles.sectionBox}>
+              <Tagihan
+                caption="Harga Barang"
+                price={formatPrice(data?.totalAmount)}
+                details={[
+                  {
+                    status: "Nominal Barang",
+                    price: formatPrice(data?.itemPrice),
+                  },
+                  {
+                    status: "Asuransi Pengiriman BNI Life (0.2%)",
+                    price: formatPrice(data?.insuranceFee),
+                  },
+                  {
+                    status: `Biaya Jasa Aplikasi`,
+                    price: formatPrice(data?.platformFee),
+                  },
+                ]}
+              />
+            </View>
+
+            {/* ID Transaction Section */}
+            <View style={styles.sectionBox}>
+              <Text style={styles.sectionLabel}>ID Transaksi</Text>
+              <View style={styles.rowAlignCenter}>
+                <Text style={styles.sectionValue}>
+                  {data?.transactionCode || "-"}
                 </Text>
-                <TouchableOpacity
-                  onPress={() =>
-                    handleCopy(
-                      data?.status === "pending_payment"
-                        ? data?.virtualAccount
-                        : data?.shipment?.trackingNumber
-                    )
-                  }>
+                <TouchableOpacity onPress={() => handleCopy(data?.transactionCode)}>
                   <Image
                     source={require("../../assets/copy.png")}
                     style={{ marginLeft: 4, width: 17, height: 16 }}
                   />
                 </TouchableOpacity>
               </View>
+            </View>
 
-              {(data?.status === "waiting_shipment" ||
-                data?.status === "shipped" ||
-                data?.status === "completed") && (
-                <Text style={{ fontSize: 14, color: "#333" }}>
-                  {data?.shipment?.courier || "-"}
+            {/* Virtual Account Section */}
+            <View style={[styles.sectionBox, { marginBottom: 80 }]}>
+              <Text style={styles.sectionLabel}>Virtual Account</Text>
+              <View style={styles.rowAlignCenter}>
+                <Text style={styles.sectionValue}>
+                  {data?.virtualAccount || "-"}
                 </Text>
-              )}
+                <TouchableOpacity onPress={() => handleCopy(data?.virtualAccount)}>
+                  <Image
+                    source={require("../../assets/copy.png")}
+                    style={{ marginLeft: 4, width: 17, height: 16 }}
+                  />
+                </TouchableOpacity>
+              </View>
             </View>
-          </>
-        )}
+          </ScrollView>
+          {/* Footer */}
+          {(
+            data?.status == "pending_payment" ||
+            data?.status == "waiting_shipment" ||
+            data?.status == "shipped" ||
+            data?.status == "completed"
+          ) &&
+            <View style={styles.footerContainer}>{setupFooter()}</View>
+          }
+        </>
+      )}
 
-        {/* Admin Message */}
-        {(data?.fundReleaseRequest?.status == "approved" ||
-          data?.status == "completed") && (
-          <View style={styles.adminMsgRow}>
-            <Image
-              source={require("../../assets/admin1.png")}
-              style={styles.adminMsgImg}
-            />
-            <Text style={styles.adminMsgText}>
-              {data?.status == "completed"
-                ? "Komplain dianggap tidak ada dan bakal selesai otomatis kalau pembeli nggak respon."
-                : "Halo! Barang udah sampai. Cek dan konfirmasi, biar dana langsung ke penjual via BNI!"}
-            </Text>
-          </View>
-        )}
-
-        {/* Warning Message */}
-        {data?.status == "shipped" && (
-          <View style={{ marginVertical: 8 }}>
-            <View style={styles.warningRow}>
-              <Image
-                source={require("../../assets/icon-warning.png")}
-                style={styles.warningIcon}
-                resizeMode="contain"
-              />
-              <Text style={styles.warningText}>
-                {data.status === "completed"
-                  ? "Komplain dianggap tidak ada dan bakal selesai otomatis kalau pembeli nggak respon."
-                  : "Biar aman, pastikan kamu videoin proses buka paket ya! Ini penting banget sebagai bukti kalau mau komplain nanti."}
-              </Text>
-            </View>
-          </View>
-        )}
-
-        {/* Status Rekbr */}
-        <View style={styles.statusRow}>
-          <Text style={styles.statusLabel}>Status Rekbr:</Text>
-          <Text style={styles.statusValue}>{setupStatus()}</Text>
-        </View>
-
-        {/* Timestamp */}
-        <View style={styles.sectionBox}>
-          <Timestamp
-            data={data}
-            caption={setupCaptionTimeStamp()}
-            date={setupDateTimestamp()}
-            details={setupDetailTimestamp()}
-          />
-        </View>
-
-        {/* Seller Section */}
-        <View style={styles.sectionBox}>
-          <Text style={styles.sectionLabel}>Penjual</Text>
-          <Text style={styles.sectionValue}>{data?.sellerEmail || "-"}</Text>
-        </View>
-
-        {/* Items Name Section */}
-        <View style={styles.sectionBox}>
-          <Text style={styles.sectionLabel}>Nama Barang</Text>
-          <Text style={styles.sectionValue}>{data?.itemName || "-"}</Text>
-        </View>
-
-        {/* Items Price Section */}
-        <View style={styles.sectionBox}>
-          <Tagihan
-            caption="Harga Barang"
-            price={formatPrice(data?.totalAmount)}
-            details={[
-              {
-                status: "Nominal Barang",
-                price: formatPrice(data?.itemPrice),
-              },
-              {
-                status: "Asuransi Pengiriman BNI Life (0.2%)",
-                price: formatPrice(data?.insuranceFee),
-              },
-              {
-                status: `Biaya Jasa Aplikasi (${calculatePlatformFee(
-                  data?.itemPrice
-                )})`,
-                price: formatPrice(data?.platformFee),
-              },
-            ]}
-          />
-        </View>
-
-        {/* ID Transaction Section */}
-        <View style={styles.sectionBox}>
-          <Text style={styles.sectionLabel}>ID Transaksi</Text>
-          <View style={styles.rowAlignCenter}>
-            <Text style={styles.sectionValue}>
-              {data?.transactionCode || "-"}
-            </Text>
-            <TouchableOpacity onPress={() => handleCopy(data?.transactionCode)}>
-              <Image
-                source={require("../../assets/copy.png")}
-                style={{ marginLeft: 4, width: 17, height: 16 }}
-              />
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        {/* Virtual Account Section */}
-        <View style={styles.sectionBox}>
-          <Text style={styles.sectionLabel}>Virtual Account</Text>
-          <View style={styles.rowAlignCenter}>
-            <Text style={styles.sectionValue}>
-              {data?.virtualAccount || "-"}
-            </Text>
-            <TouchableOpacity onPress={() => handleCopy(data?.virtualAccount)}>
-              <Image
-                source={require("../../assets/copy.png")}
-                style={{ marginLeft: 4, width: 17, height: 16 }}
-              />
-            </TouchableOpacity>
-          </View>
-        </View>
-      </ScrollView>
-      {/* Footer */}
-      <View style={styles.footerContainer}>{setupFooter()}</View>
       {/* Modal Simulate Payment*/}
       <Modalize
         ref={modalizeRef}
@@ -678,6 +699,7 @@ export default function DetailTransaksiBuyer() {
             <StepSuccesBar
               currentStep={isPaymentDone ? 1 : 0}
               steps={["Mengecek", "Diterima"]}
+              buttonSimulatePress={buttonSimulatePress}
             />
           </View>
 
@@ -695,12 +717,17 @@ export default function DetailTransaksiBuyer() {
                 </Text>
               </View>
               <Text style={styles.modalDeadlineDate}>
-                {formatDateWIB(data?.paymentDeadline || "-")}
+                {formatDateToWIB(data?.paymentDeadline || "-")}
               </Text>
 
               <Pressable
                 style={styles.modalSimulateBtn}
-                onPress={updateTransaction}>
+                onPress={() => {
+                  setButtonSimulatePress(true);
+                  setTimeout(() => {
+                    updateTransaction()
+                  }, 1000);
+                }}>
                 <Play size={20} color="#000" />
                 <Text style={styles.modalSimulateBtnText}>
                   Simulate Payment
@@ -713,7 +740,7 @@ export default function DetailTransaksiBuyer() {
                 Transaksi Berhasil Diproses
               </Text>
               <Text style={styles.modalSuccessDate}>
-                {formatDateWIB(paymentDone?.paidAt || "-")}
+                {formatDateToWIB(paymentDone?.paidAt || "-")}
               </Text>
               <View style={styles.modalBuyerRow}>
                 <View style={styles.modalBuyerRowInner}>
@@ -753,7 +780,7 @@ export default function DetailTransaksiBuyer() {
         onClose={() => setShowPopup(false)}
         onBtn2={handleConfirmReceived}
         onBtn1={() => setShowPopup(false)}
-        title="Pastikan semua data di form sudah benar dan lengkap sebelum kamu kirim. Cek lagi, ya!"
+        title="Pastikan barang sudah sesuai sebelum melakukan konfirmasi!"
         btn1="Kembali"
         btn2="Konfirmasi"
       />
@@ -860,18 +887,22 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   footerContainer: {
-    padding: 12,
-    borderTopWidth: 2,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    borderColor: "#E5E7EB",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
-    alignItems: "center",
-    marginBottom: 24,
     backgroundColor: "#fff",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    elevation: 32,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.1,
+    shadowRadius: 32,
+    borderWidth: 1,
+    borderBottomWidth: 0,
+    borderColor: "#F3F4F6",
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    paddingBottom: 20,
+    alignItems: "center",
+    paddingTop: 16,
   },
   footerCol: {
     flexDirection: "column",

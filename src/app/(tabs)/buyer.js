@@ -6,8 +6,10 @@ import { showToast } from "../../utils";
 import BuyerCard from "../../components/card-transaction/BuyerCard";
 import EmptyIllustration from "@/components/Ilustration";
 import TransactionSkeleton from "@/components/skeleton/TransactionSkeleton";
+import { useRouter } from "expo-router";
 
 export default function Buyer() {
+  const router = useRouter();
   const [transactions, setTransactions] = useState([]);
   const [offset, setOffset] = useState(0);
   const limit = 7;
@@ -15,7 +17,13 @@ export default function Buyer() {
   const [isFetching, setIsFetching] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [toDetailLoading, setToDetailLoading] = useState(false);
   const listRef = useRef();
+
+  useEffect(() => {
+    setIsInitialLoading(true);
+    fetchData(true);
+  }, []);
 
   const fetchData = async (reset = false) => {
     if (isFetching || (!hasMore && !reset)) return;
@@ -44,11 +52,6 @@ export default function Buyer() {
     }
   };
 
-  useEffect(() => {
-    setIsInitialLoading(true);
-    fetchData(true);
-  }, []);
-
   const onRefresh = () => {
     setRefreshing(true);
     setHasMore(true);
@@ -58,7 +61,19 @@ export default function Buyer() {
     fetchData(true);
   };
 
-  const renderItem = ({ item }) => <BuyerCard data={item} />;
+  const renderItem = ({ item }) =>
+    <BuyerCard data={item} disabled={toDetailLoading}
+      onPress={async () => {
+        setToDetailLoading(true);
+        router.push({
+          pathname: "/DetailTransaksi/Buyer",
+          params: { id: item?.id },
+        });
+        setTimeout(() => {
+          setToDetailLoading(false);
+        }, 1500);
+      }}
+    />;
 
   const ListEmpty = () => {
     if (isInitialLoading) {
@@ -95,7 +110,6 @@ export default function Buyer() {
 
   return (
     <View style={styles.container}>
-      <StatusBar style='dark' />
       <FlatList
         ref={listRef}
         style={styles.flatList}

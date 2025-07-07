@@ -22,6 +22,7 @@ import {
 import { showToast } from "../../../utils";
 import { Feather } from "@expo/vector-icons";
 import NavBackHeader from "@/components/NavBackHeader";
+import InfoModal from "@/components/InfoModal";
 
 export default function CreateRekber() {
   const router = useRouter();
@@ -37,6 +38,7 @@ export default function CreateRekber() {
   const [isUserFound, setIsUserFound] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorText, setErrorText] = useState("");
+  const [infoInsuranceVisible, setInfoInsuranceVisible] = useState(false);
 
   const handleCheckboxPress = () => {
     setIsChecked(!isChecked);
@@ -237,12 +239,12 @@ export default function CreateRekber() {
                       <Text style={styles.checkboxCheckmark}>✓</Text>
                     )}
                   </TouchableOpacity>
-                  <Text style={styles.checkboxLabel}>
-                    Gunakan Asuransi Pengiriman BNI Life (0,2%)
-                  </Text>
                   <TouchableOpacity
-                    onPress={() => console.log("Info Asuransi")}
-                    style={styles.checkboxInfoButton}>
+                    onPress={() => setInfoInsuranceVisible(true)}
+                    style={{flexDirection: "row", alignItems: "center", gap: 4}}>
+                    <Text style={styles.checkboxLabel}>
+                      Gunakan Asuransi Pengiriman BNI Life (0,2%)
+                    </Text>
                     <Icon name="info" size={16} color="black" />
                   </TouchableOpacity>
                 </View>
@@ -268,6 +270,12 @@ export default function CreateRekber() {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
+      <InfoModal
+        title={"Asuransi BNI Life"}
+        desc={"Perlindungan kehilangan/kerusakan barang saat pengiriman. Biaya 0.2% dari nominal transaksi."}
+        modalVisible={infoInsuranceVisible}
+        setModalVisible={setInfoInsuranceVisible}
+      />
     </View>
   );
 }
@@ -283,10 +291,10 @@ const styles = StyleSheet.create({
   keyboardAvoiding: {
     flex: 1,
     width: "100%",
-    padding: 12,
   },
   scrollViewContent: {
     flexGrow: 1,
+    paddingHorizontal: 16,
   },
   innerContainer: {
     flex: 1,
@@ -298,25 +306,24 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     alignItems: "center",
     gap: 16,
-    paddingHorizontal: 16,
     paddingVertical: 0,
-    position: "relative",
-    alignSelf: "stretch",
     width: "100%",
   },
   infoBox: {
     flexDirection: "row",
+    width: "100%",
     alignItems: "center",
     gap: 8,
     backgroundColor: "#FEF2D3",
     padding: 8,
     borderRadius: 12,
-    marginHorizontal: 16,
+    overflow: "hidden"
   },
   infoText: {
     color: "#262626",
     fontSize: 14,
     fontWeight: "400",
+    flex: 1,
   },
   formSection: {
     flexDirection: "column",
@@ -377,9 +384,9 @@ const styles = StyleSheet.create({
   },
   checkboxRow: {
     flexDirection: "row",
-    gap: 8,
-    width: "100%",
     alignItems: "center",
+    width: "100%",
+    gap: 8,
   },
   checkbox: {
     width: 24,
@@ -404,17 +411,11 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#000",
     fontWeight: "400",
-    flex: 1,
     alignItems: "center",
-    justifyContent: "center",
-  },
-  checkboxInfoButton: {
-    alignItems: "flex-end",
-    justifyContent: "center",
   },
   buttonContainer: {
     width: "100%",
     marginBottom: 32,
-    paddingHorizontal: 16,
+    // paddingHorizontal: 16,
   },
 });

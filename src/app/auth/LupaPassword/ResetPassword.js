@@ -18,6 +18,7 @@ import PrimaryButton from "@/components/PrimaryButton";
 import PasswordChecklist from "@/components/PasswordChecklist";
 import BuyerKonfirmasi from "@/components/BuyerKonfirmasi";
 import NavBackHeader from "@/components/NavBackHeader";
+import CryptoJS from "crypto-js";
 
 export default function ChangePasswordScreen() {
   const router = useRouter();
@@ -46,7 +47,8 @@ export default function ChangePasswordScreen() {
       /[a-z]/.test(konfirmasiKataSandiBaru) &&
       /[A-Z]/.test(konfirmasiKataSandiBaru) &&
       /[0-9]/.test(konfirmasiKataSandiBaru) &&
-      /[^a-zA-Z0-9]/.test(konfirmasiKataSandiBaru)
+      /[^a-zA-Z0-9]/.test(konfirmasiKataSandiBaru) &&
+      konfirmasiKataSandiBaru == kataSandiBaru
     );
   };
 
@@ -68,7 +70,10 @@ export default function ChangePasswordScreen() {
     }
 
     try {
-      const res = await resetPassword(email, konfirmasiKataSandiBaru);
+      const hashedPassword = CryptoJS.SHA256(
+        konfirmasiKataSandiBaru
+      ).toString();
+      const res = await resetPassword(email, hashedPassword);
       setShowPopup(false);
       showToast("Berhasil", res?.message, "success");
       router.replace("/auth/login");
@@ -88,13 +93,16 @@ export default function ChangePasswordScreen() {
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         keyboardVerticalOffset={Platform.OS === "ios" ? 60 : 0}
-        style={{ flex: 1, width: "100%" }}
-      >
+        style={{ flex: 1, width: "100%" }}>
         <ScrollView
-          contentContainerStyle={{ flexGrow: 1, width: "100%", paddingHorizontal: 16, marginTop: 20, }}
-          keyboardShouldPersistTaps='handled'
-          showsVerticalScrollIndicator={false}
-        >
+          contentContainerStyle={{
+            flexGrow: 1,
+            width: "100%",
+            paddingHorizontal: 16,
+            marginTop: 20,
+          }}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}>
           <View style={styles.formContainer}>
             {/* Password */}
             <View style={styles.relativeContainer}>
@@ -102,7 +110,11 @@ export default function ChangePasswordScreen() {
                 title="Kata Sandi Baru Rekbr"
                 placeholder="Masukkan kata sandi baru kamu"
                 value={kataSandiBaru}
-                onChangeText={setKataSandiBaru}
+                onChangeText={(text) => {
+                  // Hanya izinkan karakter ASCII 32-126 (tanpa spasi)
+                  const filtered = text.replace(/[^ -~]/g, "").replace(/\s/g, "");
+                  setKataSandiBaru(filtered);
+                }}
                 isPassword={true}
               />
               <PasswordChecklist password={kataSandiBaru} />
@@ -114,7 +126,11 @@ export default function ChangePasswordScreen() {
                 title="Konfirmasi Kata Sandi Baru Rekbr"
                 placeholder="Pastikan sama, ya!"
                 value={konfirmasiKataSandiBaru}
-                onChangeText={setKonfirmasiKataSandiBaru}
+                onChangeText={(text) => {
+                  // Hanya izinkan karakter ASCII 32-126 (tanpa spasi)
+                  const filtered = text.replace(/[^ -~]/g, "").replace(/\s/g, "");
+                  setKonfirmasiKataSandiBaru(filtered);
+                }}
                 isPassword={true}
               />
               {/* Alert Validasi */}
@@ -142,8 +158,7 @@ export default function ChangePasswordScreen() {
                             ? "#4ade80"
                             : "#f87171",
                       },
-                    ]}
-                  >
+                    ]}>
                     {konfirmasiKataSandiBaru === kataSandiBaru
                       ? "Kata sandi sesuai"
                       : "Kata sandi tidak sesuai"}
@@ -158,25 +173,23 @@ export default function ChangePasswordScreen() {
             <PrimaryButton
               title="Kirim"
               onPress={handleBtnPress}
-              disabled={isLoading ? false : !isPasswordValid()}
+              disabled={isLoading || !isPasswordValid()}
             />
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
 
-      {
-        showPopup && (
-          <BuyerKonfirmasi
-            onClose={() => setShowPopup(false)}
-            onBtn2={handleChangePassword}
-            onBtn1={() => setShowPopup(false)}
-            title="Pastikan semuanya sudah benar yaa sebelum kamu kirim!"
-            btn1="Kembali"
-            btn2="Kirim"
-          />
-        )
-      }
-    </View >
+      {showPopup && (
+        <BuyerKonfirmasi
+          onClose={() => setShowPopup(false)}
+          onBtn2={handleChangePassword}
+          onBtn1={() => setShowPopup(false)}
+          title="Pastikan semuanya sudah benar yaa sebelum kamu kirim!"
+          btn1="Kembali"
+          btn2="Kirim"
+        />
+      )}
+    </View>
   );
 }
 

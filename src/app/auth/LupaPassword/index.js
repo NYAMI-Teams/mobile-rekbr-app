@@ -76,7 +76,9 @@ export default function MasukkanEmailScreen() {
               placeholder="Masukkan email kamu"
               value={email}
               onChangeText={(text) => {
-                setEmail(text);
+                // Hanya izinkan karakter ASCII 32-126 (tanpa spasi)
+                const filtered = text.replace(/[^ -~]/g, "").replace(/\s/g, "");
+                setEmail(filtered);
                 setEmailFound(false);
               }}
               keyboardType="email-address"

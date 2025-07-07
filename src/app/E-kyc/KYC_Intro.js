@@ -20,11 +20,10 @@ export default function KYCFirst() {
   return (
     <>
       <View style={styles.container}>
-        <StatusBar style="dark" />
 
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => router.back()}>
+          <TouchableOpacity onPress={() => router.replace("/")}>
             <Ionicons name="chevron-back-outline" size={24} color="#000" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Know Your Customer</Text>
@@ -44,9 +43,7 @@ export default function KYCFirst() {
               Kenapa Seller Wajib KYC Dulu Sebelumnya?
             </Text>
             <Text style={styles.paragraph}>
-              Dengan KYC, kita pastiin penjual asli, bukan akun palsu atau penipu.
-              Jadi, kamu bisa jualan tanpa takut ribet, dan pembeli juga yakin
-              barangnya beneran nyata.
+              Dengan KYC, kita pastiin penjual asli, bukan akun palsu atau penipu. Jadi, kamu bisa jualan tanpa takut ribet, dan pembeli juga yakin barangnya beneran nyata.
             </Text>
           </View>
         </View>
@@ -69,7 +66,6 @@ export default function KYCFirst() {
             title="Lanjut"
             onPress={() => router.push("/E-kyc/KYC_DataDiri")}
             disabled={!isChecked}
-            style={styles.button}
           />
 
           <View style={styles.footer}>

@@ -8,17 +8,16 @@ import {
   TextInput,
   Dimensions,
   Platform,
-  StatusBar,
   FlatList,
   Animated,
   UIManager,
   LayoutAnimation,
-  Alert,
   Pressable,
-  Modal,
+  TouchableWithoutFeedback,
+  KeyboardAvoidingView,
+  Keyboard,
 } from "react-native";
 import { useRouter } from "expo-router";
-import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import BankSelector from "@/components/BankScreens";
 import { ChevronLeftCircle } from "lucide-react-native";
 import PrimaryButton from "@/components/PrimaryButton";
@@ -108,7 +107,7 @@ export default function ChooseRekening() {
 
   const checkRekening = async () => {
     try {
-      const res = await checkRekeningExist(accountNumber, selectedBank.id);
+      const res = await checkRekeningExist(accountNumber, selectedBank.bankId);
       if (res.success === true) {
         setAccountName(res.data.accountName);
         setIsAlreadyCheckedRekening(true);
@@ -208,54 +207,59 @@ export default function ChooseRekening() {
 
   return (
     <>
-      <View style={styles.flex1}>
-        <NavBackHeader
-          title={"Pilih Rekening Kamu"}
-          onBackPress={() => router.back()}
-        />
-
-        <View style={styles.topBackground}>
-          <Image
-            source={require("@/assets/illustration-transfer.png")}
-            style={styles.topImage}
-            resizeMode="contain"
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <KeyboardAvoidingView
+          style={styles.flex1}
+          behavior={Platform.OS === "ios" ? "height" : "height"}
+          keyboardVerticalOffset={Platform.OS === "ios" ? 24 : 0}>
+          <NavBackHeader
+            title={"Pilih Rekening Kamu"}
+            onBackPress={() => router.back()}
           />
-        </View>
 
-        <View style={styles.searchContainer}>
-          <TextInput
-            placeholder="Cari nama, bank, atau nomor rekening"
-            style={styles.searchInput}
-            placeholderTextColor="#999"
-          />
-          <Image
-            source={require("@/assets/icon-search.png")}
-            style={styles.searchIcon}
-          />
-        </View>
-
-        {isEmpty ? (
-          <View style={styles.emptyState}>
+          <View style={styles.topBackground}>
             <Image
-              source={require("@/assets/illustration-empty.png")}
-              style={styles.emptyImage}
+              source={require("@/assets/illustration-transfer.png")}
+              style={styles.topImage}
               resizeMode="contain"
             />
-            <Text style={styles.emptyText}>
-              Kamu belum pernah transaksi sebelumnya, jadi belum ada tujuan
-              rekening yang bisa dituju.
-            </Text>
           </View>
-        ) : (
-          <FlatList
-            ListHeaderComponent={
-              <View
-                style={{
-                  paddingHorizontal: 16,
-                  paddingTop: 16,
-                }}
-              >
-                <Text style={styles.sectionTitle}>Rekening Favorit kamu!</Text>
+
+          <View style={styles.searchContainer}>
+            <TextInput
+              placeholder="Cari nama, bank, atau nomor rekening"
+              style={styles.searchInput}
+              placeholderTextColor="#999"
+            />
+            <Image
+              source={require("@/assets/icon-search.png")}
+              style={styles.searchIcon}
+            />
+          </View>
+
+          <Text style={[styles.sectionTitle]}>Rekening Tersimpan</Text>
+
+          {isEmpty ? (
+            <View style={styles.emptyState}>
+              <Image
+                source={require("@/assets/illustration-empty.png")}
+                style={styles.emptyImage}
+                resizeMode="contain"
+              />
+              <Text style={styles.emptyText}>
+                Kamu belum pernah transaksi sebelumnya, jadi belum ada tujuan
+                rekening yang bisa dituju.
+              </Text>
+            </View>
+          ) : (
+            <FlatList
+              ListHeaderComponent={
+                <View
+                  style={{
+                    paddingHorizontal: 16,
+                  }}
+                >
+                  {/* <Text style={styles.sectionTitle}>Rekening Favorit kamu!</Text>
                 {favorites.length === 0 ? (
                   <Text style={styles.noFavoritesText}>
                     Tambah rekening favorit kamu biar lebih gampang nyarinya
@@ -265,42 +269,40 @@ export default function ChooseRekening() {
                   favorites.map((item, index) =>
                     renderAccountItem(item, true, index)
                   )
-                )}
+                )} */}
 
-                {!isSavedEmpty && (
-                  <>
-                    <Text style={[styles.sectionTitle, { marginTop: 24 }]}>
-                      Rekening Tersimpan
-                    </Text>
-                    {saved.map((item, index) =>
-                      renderAccountItem(item, false, index)
-                    )}
-                  </>
-                )}
-              </View>
-            }
-            data={[]}
-            renderItem={null}
-            keyExtractor={() => ""}
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={{
-              paddingBottom: 100,
-              width: "100%",
-            }}
-          />
-        )}
+                  {!isSavedEmpty && (
+                    <>
+                      {saved.map((item, index) =>
+                        renderAccountItem(item, false, index)
+                      )}
+                    </>
+                  )}
+                </View>
+              }
+              data={[]}
+              renderItem={null}
+              keyExtractor={() => ""}
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={{
+                paddingBottom: 100,
+                width: "100%",
+              }}
+            />
+          )}
 
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={styles.addButton}
-            onPress={() => {
-              openModal();
-            }}
-          >
-            <Text style={styles.addButtonText}>+ Rekening</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity
+              style={styles.addButton}
+              onPress={() => {
+                openModal();
+              }}
+            >
+              <Text style={styles.addButtonText}>+ Rekening</Text>
+            </TouchableOpacity>
+          </View>
+        </KeyboardAvoidingView>
+      </TouchableWithoutFeedback>
 
       <Modalize
         ref={modalizeRef}
@@ -328,8 +330,7 @@ export default function ChooseRekening() {
                 : isSelectBankDone
                 ? handleBackToBankSelection
                 : closeModal
-            }
-          >
+            }>
             <View style={styles.modalHeader}>
               <ChevronLeftCircle size={24} color="#00C2C2" />
               <Text style={styles.modalHeaderText}>
@@ -525,7 +526,7 @@ const AnimatedAccountItem = ({
             </Text>
           </View>
         </View>
-        <TouchableOpacity onPress={() => toggleFavorite(item, fromFavorites)}>
+        {/* <TouchableOpacity onPress={() => toggleFavorite(item, fromFavorites)}>
           <Image
             source={
               item.isFavorite
@@ -534,7 +535,7 @@ const AnimatedAccountItem = ({
             }
             style={styles.favoriteIcon}
           />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </Animated.View>
     </TouchableOpacity>
   );
@@ -603,7 +604,9 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 16,
     fontWeight: "600",
-    marginBottom: 12,
+    marginBottom: 8,
+    paddingHorizontal: 16,
+    marginTop: 8,
   },
   noFavoritesText: {
     fontSize: 14,
@@ -646,7 +649,7 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     position: "absolute",
-    bottom: 16,
+    bottom: 0,
     right: 16,
   },
   addButton: {

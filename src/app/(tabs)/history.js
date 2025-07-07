@@ -15,8 +15,10 @@ import BuyerCard from "@/components/card-transaction/BuyerCard";
 import SellerCard from "@/components/card-transaction/SellerCard";
 import EmptyIllustration from "@/components/Ilustration";
 import TransactionSkeleton from "@/components/skeleton/TransactionSkeleton";
+import { useRouter } from "expo-router";
 
 export default function History() {
+  const router = useRouter();
   const [selectedTab, setSelectedTab] = useState("pembelian");
   const [data, setData] = useState([]);
   const [offset, setOffset] = useState(0);
@@ -25,6 +27,7 @@ export default function History() {
   const [isFetching, setIsFetching] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [toDetailLoading, setToDetailLoading] = useState(false);
   const flatListRef = useRef();
 
   const fetchData = async (reset = false) => {
@@ -76,9 +79,35 @@ export default function History() {
 
   const renderItem = ({ item }) => {
     return selectedTab === "pembelian" ? (
-      <BuyerCard data={item} />
+      <BuyerCard
+        data={item}
+        disabled={toDetailLoading}
+        onPress={async () => {
+          setToDetailLoading(true);
+          router.push({
+            pathname: "/DetailTransaksi/Buyer",
+            params: { id: item?.id },
+          });
+          setTimeout(() => {
+            setToDetailLoading(false);
+          }, 1500);
+        }}
+      />
     ) : (
-      <SellerCard data={item} />
+      <SellerCard
+        data={item}
+        disabled={toDetailLoading}
+        onPress={async () => {
+          setToDetailLoading(true);
+          router.push({
+            pathname: `/DetailTransaksi/Seller`,
+            params: { id: item?.id },
+          });
+          setTimeout(() => {
+            setToDetailLoading(false);
+          }, 1500);
+        }}
+      />
     );
   };
 
@@ -108,7 +137,6 @@ export default function History() {
 
   return (
     <View style={styles.container}>
-      <StatusBar style="dark" />
       <View style={styles.tabContainer}>
         <TouchableOpacity
           onPress={() => setSelectedTab("pembelian")}
@@ -208,7 +236,7 @@ const styles = StyleSheet.create({
   flatList: {
     width: "100%",
     paddingHorizontal: 16,
-    marginTop: 16,
+    paddingTop: 4,
   },
   emptyContainer: {
     marginTop: 32,

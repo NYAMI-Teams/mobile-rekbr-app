@@ -1,8 +1,13 @@
 // app/index.js
 import { useEffect, useState } from "react";
-import { View, Image } from "react-native";
+import { View, Image, Platform } from "react-native";
 import { Redirect, useLocalSearchParams, useRouter } from "expo-router";
-import { getAccessToken, getDataNotification, setDataNotification, setProfileStore } from "@/store";
+import {
+  getAccessToken,
+  getDataNotification,
+  setDataNotification,
+  setProfileStore,
+} from "@/store";
 import { getProfile } from "@/utils/api/auth";
 import { useAppBoot } from "@/context/AppBootContext";
 import SplashScreen from "@/assets/splash.png";
@@ -36,7 +41,7 @@ export default function Index() {
         setIsLoggedIn(true);
       } catch (e) {
         setIsLoggedIn(false);
-        setDataNotification(null)
+        setDataNotification(null);
       } finally {
         setAppIsReady(true);
         setHasBooted(true);
@@ -48,7 +53,12 @@ export default function Index() {
 
   if (!appIsReady) {
     return (
-      <View style={{ flex: 1, backgroundColor: "#fff" }}>
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: "#fff",
+          marginBottom: Platform.OS === "ios" ? 24 : 0,
+        }}>
         <Image
           source={SplashScreen}
           style={{ width: "100%", height: "100%", resizeMode: "cover" }}

@@ -49,10 +49,6 @@ export default function DetailKomplain() {
     try {
       const res = await getDetailBuyerComplaint(complaintId);
       setDetailComplaint(res.data);
-      // console.log(
-      //   "ini detail complaint as buyer",
-      //   JSON.stringify(res.data, null, 2)
-      // );
     } catch (err) {
       showToast(
         "Gagal",
@@ -80,7 +76,6 @@ export default function DetailKomplain() {
                   "Gagal membatalkan komplain. Coba lagi.",
                   "error"
                 );
-                // console.log("Cancel error:", err);
               });
           },
         },
@@ -169,15 +164,9 @@ export default function DetailKomplain() {
 
       <View style={styles.footer}>
         <TouchableOpacity
-          onPress={() => setShowOptionModal(true)}
-          style={styles.moreButton}>
-          <Text style={styles.moreButtonText}>⋯</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
           style={styles.emailButton}
-          onPress={() => router.push("../../(tabs)/complaint")}>
-          <Text style={styles.emailButtonText}>Kirim Seller Email</Text>
+          onPress={handleCancelComplaint}>
+          <Text style={styles.emailButtonText}>Batalkan Komplain</Text>
         </TouchableOpacity>
       </View>
 
@@ -209,7 +198,7 @@ export default function DetailKomplain() {
           </TouchableOpacity>
 
           <TouchableOpacity
-            onPress={() => console.log("Simulate pressed")}
+            onPress={() => {}}
             style={styles.modalItem}>
             <Text style={styles.modalItemText}>Simulate reject</Text>
           </TouchableOpacity>
@@ -269,7 +258,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     justifyContent: "center",
     alignItems: "center",
-    marginLeft: 8,
   },
   emailButtonText: {
     color: "white",

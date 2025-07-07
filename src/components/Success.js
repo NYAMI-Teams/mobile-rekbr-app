@@ -1,23 +1,34 @@
 // RegisterSuccess.js
 
 import { StatusBar } from "expo-status-bar";
-import {
-  StyleSheet,
-  View,
-  Text,
-  Image,
-  TouchableOpacity,
-} from "react-native";
+import { StyleSheet, View, Text, Image, TouchableOpacity, BackHandler } from "react-native";
 import { useRouter } from "expo-router";
+import { useFocusEffect } from "@react-navigation/native";
+import { useCallback } from "react";
 
 //Kamu Seller atau bukan? Biar bisa create Rekber,{"\n"}jangan lupa KYC dulu, ya!
 
 export default function RegisterSuccess({ title, subTitle, fromRegister }) {
   const router = useRouter();
+
+  useFocusEffect(
+    useCallback(() => {
+      const onBackPress = () => {
+        router.replace("/");
+        return true;
+      };
+
+      const subscription = BackHandler.addEventListener(
+        "hardwareBackPress",
+        onBackPress
+      );
+
+      return () => subscription.remove(); // ✅ cara baru mengganti removeEventListener
+    }, [])
+  );
+
   return (
     <View style={styles.container}>
-      <StatusBar style="dark" />
-
       {/* Logo Rekbr + by BNI */}
       <View style={styles.logoContainer}>
         <Image
@@ -56,7 +67,7 @@ export default function RegisterSuccess({ title, subTitle, fromRegister }) {
 
             <TouchableOpacity
               style={styles.buttonDark}
-              onPress={() => router.push("/E-kyc/KYC_Intro")}>
+              onPress={() => router.replace("/E-kyc/KYC_Intro")}>
               <Text style={styles.buttonDarkText}>Mulai KYC Sekarang</Text>
             </TouchableOpacity>
           </>

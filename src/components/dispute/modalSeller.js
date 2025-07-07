@@ -37,7 +37,6 @@ export default function ModalSeller({ showPopup, setShowPopup, id, isTolak }) {
       const cameraStatus = await ImagePicker.requestCameraPermissionsAsync();
       setHasCameraPermission(cameraStatus.status === "granted");
     })();
-    // console.log("ini isTolak", isTolak);
   }, []);
 
   const handleUpload = async () => {
@@ -97,7 +96,6 @@ export default function ModalSeller({ showPopup, setShowPopup, id, isTolak }) {
       const type = selected.type;
       const extension = uri.split(".").pop().toLowerCase();
       const sizeMB = (await FileSystem.getInfoAsync(uri)).size / (1024 * 1024);
-      console.log("masuk sini");
 
       const allowedImages = ["jpg", "jpeg", "png"];
       const allowedVideos = ["mp4", "mov"];
@@ -156,7 +154,6 @@ export default function ModalSeller({ showPopup, setShowPopup, id, isTolak }) {
       if (type === "video") {
         try {
           const compressedSizeMB = sizeMB;
-          console.log("compressedSizeMB", compressedSizeMB);
 
           if (compressedSizeMB > 90) {
             alert("Ukuran video melebihi 90MB");
@@ -204,10 +201,7 @@ export default function ModalSeller({ showPopup, setShowPopup, id, isTolak }) {
       router.replace("/(tabs)/complaint");
       setShowPopup(false);
     } catch (err) {
-      // console.log("Gagal cok ===> ", err.message);
       showToast("Gagal", err?.message, "error");
-      // Re-enable the button on error
-      // Tidak perlu document.querySelector di React Native
     } finally {
       setIsUploaded(false);
     }

@@ -7,6 +7,9 @@ export const login = async (email, password) => {
       password,
     });
     if (res) {
+      if (res.data.isAdmin) {
+        throw new Error("Admin cannot login");
+      }
       return res;
     }
   } catch (error) {
@@ -149,6 +152,17 @@ export const changeEmail = async (email) => {
     // if (res) {
     //   return res;
     // }
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const logout = async () => {
+  try {
+    const res = await Api.post(`/user/logout`);
+    if (res) {
+      return res;
+    }
   } catch (error) {
     throw error;
   }

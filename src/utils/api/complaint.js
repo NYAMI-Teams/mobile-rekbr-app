@@ -9,8 +9,6 @@ export const postBuyerComplaint = async (id, type, reason, evidence) => {
     let totalSize = 0;
     if (evidence && evidence.length > 0) {
       evidence.forEach((file) => {
-        console.log("file", file.mimeType);
-        // console.log(`total size ${file.fileSize}`);
         totalSize += file.fileSize || 0;
         formData.append("evidence", {
           uri: file.uri,
@@ -26,8 +24,6 @@ export const postBuyerComplaint = async (id, type, reason, evidence) => {
       throw new Error("Maksimum ukuran semua file adalah 100MB");
     }
 
-    console.log("ini formData", formData._parts);
-
     const res = await Api.post(
       `/buyer/transactions/${id}/complaint`,
       formData,
@@ -40,8 +36,6 @@ export const postBuyerComplaint = async (id, type, reason, evidence) => {
 
     return res;
   } catch (error) {
-    console.log("error cok", error);
-
     throw error;
   }
 };
@@ -120,10 +114,6 @@ export const postBuyerReturn = async (
 
 export const postBuyerReturnConfirm = async (id, reason, evidence) => {
   try {
-    // console.log("ini id", id);
-    // console.log("ini reason", reason);
-    // console.log("ini evidence", evidence);
-
     const file = {
       uri: evidence?.uri,
       name: evidence?.fileName || evidence?.uri.split("/").pop(),
@@ -136,10 +126,6 @@ export const postBuyerReturnConfirm = async (id, reason, evidence) => {
     const formData = new FormData();
     formData.append("reason", reason);
     formData.append("evidence", file);
-
-    // console.log("ini id", id);
-    // console.log("ini reason", reason);
-    // console.log("ini evidence", evidence);
 
     const res = await Api.post(
       `/buyer/complaints/${id}/request-confirmation`,
@@ -206,10 +192,6 @@ export const postSellerResponse = async (
   arrPhoto
 ) => {
   try {
-    // console.log("ini id", id);
-    // console.log("ini status", status);
-    // console.log("ini seller_response_reason", seller_response_reason);
-    // console.log("ini arrPhoto", arrPhoto);
 
     const formData = new FormData();
     formData.append("status", status);
@@ -227,11 +209,6 @@ export const postSellerResponse = async (
       });
     }
 
-    // console.log("ini id", id);
-    // console.log("ini status", status);
-    // console.log("ini seller_response_reason", seller_response_reason);
-    // console.log("ini arrPhoto", arrPhoto);
-
     if (totalSize > 100 * 1024 * 1024) {
       // 10MB
       throw new Error("Maksimum ukuran semua file adalah 100MB");
@@ -246,7 +223,6 @@ export const postSellerResponse = async (
       return res;
     }
   } catch (error) {
-    // console.log("error cok 1", error);
     throw error;
   }
 };

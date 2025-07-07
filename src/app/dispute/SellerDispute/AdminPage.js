@@ -43,10 +43,6 @@ export default function AdminPage() {
       setDetailComplaint(res.data);
       setRejectedAdmin(res.data.admin_decision === "rejected");
       setRejectedSeller(res.data.seller_decision === "rejected");
-      // // console.log(
-      //   "ini detail complaint as seller",
-      //   JSON.stringify(res.data, null, 2)
-      // );
     } catch (err) {
       showToast(
         "Gagal",

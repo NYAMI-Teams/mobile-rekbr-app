@@ -44,10 +44,6 @@ export default function CreateComplaintScreen() {
       setTransaction(res?.data);
       setAjukanUlang(res?.data?.Complaint?.length > 0);
     } catch (err) {
-      // console.log(
-      //   "❌ Error saat fetchTransaction:",
-      //   err?.response?.data || err.message || err
-      // );
     }
   };
 
@@ -66,7 +62,6 @@ export default function CreateComplaintScreen() {
       showToast("Berhasil", "Komplain Berhasil dibuat", "success");
       router.replace("/(tabs)/complaint");
     } catch (err) {
-      // console.log("❌ Error saat createComplaint:", err?.message);
       showToast("Gagal", err?.message, "error");
     } finally {
       setIsSubmitting(false);

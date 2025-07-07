@@ -158,6 +158,7 @@ export default function InputResi() {
   const handleUploadResi = async () => {
     try {
       await postResi(id, courierId, resiNumber, image);
+      showToast("Berhasil", "Resi berhasil diunggah", "success");
       router.replace("/");
     } catch (error) {
       showToast("Gagal", `Gagal mengunggah resi, ${error?.message}`, "error");
@@ -208,7 +209,7 @@ export default function InputResi() {
                 editable={false}
               />
             </TouchableOpacity>
-            <TouchableOpacity onPress={handleUpload} style={styles.mt4}>
+            <View style={styles.mt4}>
               <AttachmentFilled
                 title="Unggah Bukti"
                 caption={
@@ -225,8 +226,9 @@ export default function InputResi() {
                 alertColor={isUploaded ? "#08B20F" : "#C2C2C2"}
                 alertIconName={isUploaded ? "checkmark-circle" : "alert-circle"}
                 alertIconColor={isUploaded ? "#08B20F" : "#C2C2C2"}
+                onPress={handleUpload}
               />
-            </TouchableOpacity>
+            </View>
             {image && (
               <View style={styles.imagePreview}>
                 <Image
